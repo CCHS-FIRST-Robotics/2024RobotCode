@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drive;
+package frc.robot.subsystems.mecaDrive;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
@@ -13,15 +13,15 @@ public class DriveIOSim implements DriveIO {
   @Override
   public void updateInputs(DriveIOInputs inputs) {
     sim.update(0.02);
-    inputs.leftPositionRad = sim.getLeftPositionMeters() / Drive.WHEEL_RADIUS_METERS;
-    inputs.leftVelocityRadPerSec = sim.getLeftVelocityMetersPerSecond() / Drive.WHEEL_RADIUS_METERS;
-    inputs.rightPositionRad = sim.getRightPositionMeters() / Drive.WHEEL_RADIUS_METERS;
-    inputs.rightVelocityRadPerSec = sim.getRightVelocityMetersPerSecond() / Drive.WHEEL_RADIUS_METERS;
+    // inputs.leftPositionRad = sim.getLeftPositionMeters() / Drive.WHEEL_RADIUS_METERS;
+    // inputs.leftVelocityRadPerSec = sim.getLeftVelocityMetersPerSecond() / Drive.WHEEL_RADIUS_METERS;
+    // inputs.rightPositionRad = sim.getRightPositionMeters() / Drive.WHEEL_RADIUS_METERS;
+    // inputs.rightVelocityRadPerSec = sim.getRightVelocityMetersPerSecond() / Drive.WHEEL_RADIUS_METERS;
     inputs.gyroYawRad = sim.getHeading().getRadians() * -1;
   }
 
   @Override
-  public void setVoltage(double leftVolts, double rightVolts) {
-    sim.setInputs(MathUtil.clamp(leftVolts, -12.0, 12.0), MathUtil.clamp(rightVolts, -12.0, 12.0));
+  public void setVoltage(double frVolts, double flVolts, double brVolts, double blVolts) {
+    // sim.setInputs(MathUtil.clamp(leftVolts, -12.0, 12.0), MathUtil.clamp(rightVolts, -12.0, 12.0));
   }
 }

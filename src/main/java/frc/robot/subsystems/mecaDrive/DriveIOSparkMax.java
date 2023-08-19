@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drive;
+package frc.robot.subsystems.mecaDrive;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.revrobotics.CANSparkMax;
@@ -53,18 +53,18 @@ public class DriveIOSparkMax implements DriveIO {
 
   @Override
   public void updateInputs(DriveIOInputs inputs) {
-    inputs.leftPositionRad = Units.rotationsToRadians(leftEncoder.getPosition() / GEAR_RATIO);
-    inputs.rightPositionRad = Units.rotationsToRadians(rightEncoder.getPosition() / GEAR_RATIO);
-    inputs.leftVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(
-        leftEncoder.getVelocity() / GEAR_RATIO);
-    inputs.rightVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(
-        rightEncoder.getVelocity() / GEAR_RATIO);
-    inputs.gyroYawRad = gyro.getYaw();
+    // inputs.leftPositionRad = Units.rotationsToRadians(leftEncoder.getPosition() / GEAR_RATIO);
+    // inputs.rightPositionRad = Units.rotationsToRadians(rightEncoder.getPosition() / GEAR_RATIO);
+    // inputs.leftVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(
+    //     leftEncoder.getVelocity() / GEAR_RATIO);
+    // inputs.rightVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(
+    //     rightEncoder.getVelocity() / GEAR_RATIO);
+    // inputs.gyroYawRad = gyro.getYaw();
   }
 
   @Override
-  public void setVoltage(double leftVolts, double rightVolts) {
-    leftLeader.setVoltage(leftVolts);
-    rightLeader.setVoltage(rightVolts);
+  public void setVoltage(double frVolts, double flVolts, double brVolts, double blVolts) {
+    // leftLeader.setVoltage(leftVolts);
+    // rightLeader.setVoltage(rightVolts);
   }
 }

@@ -2,8 +2,8 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.flywheel.Flywheel;
+import frc.robot.subsystems.mecaDrive.Drive;
 
 public class DriveWithFlywheelAuto extends SequentialCommandGroup {
   private static final double drivePercent = 0.5;
@@ -16,10 +16,10 @@ public class DriveWithFlywheelAuto extends SequentialCommandGroup {
    * and then runs the flywheel for ten seconds.
    */
   public DriveWithFlywheelAuto(Drive drive, Flywheel flywheel) {
-    addCommands(
-        new StartEndCommand(() -> drive.drivePercent(drivePercent, -drivePercent), drive::stop, drive)
-            .withTimeout(driveDuration),
-        new StartEndCommand(() -> flywheel.runVelocity(flywheelSpeed), flywheel::stop, flywheel)
-            .withTimeout(flywheelDuration));
+    // addCommands(
+    //     new StartEndCommand(() -> drive.drivePercent(drivePercent, -drivePercent), drive::stop, drive)
+    //         .withTimeout(driveDuration),
+    //     new StartEndCommand(() -> flywheel.runVelocity(flywheelSpeed), flywheel::stop, flywheel)
+    //         .withTimeout(flywheelDuration));
   }
 }
