@@ -32,6 +32,8 @@ public final class Constants {
     REPLAY
   }
 
+  public static final double PERIOD = .02;
+
   // TODO: Should this be its own file?
   public static class HardwareConstants {
     // the port for the xbox controller
