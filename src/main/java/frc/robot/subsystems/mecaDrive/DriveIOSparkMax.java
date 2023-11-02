@@ -1,6 +1,6 @@
 package frc.robot.subsystems.mecaDrive;
 
-import com.ctre.phoenix.sensors.Pigeon2;
+// import com.ctre.phoenix.sensors.Pigeon2;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -17,7 +17,7 @@ public class DriveIOSparkMax implements DriveIO {
   private final RelativeEncoder leftEncoder;
   private final RelativeEncoder rightEncoder;
 
-  private final Pigeon2 gyro;
+  // private final Pigeon2 gyro;
 
   public DriveIOSparkMax() {
     leftLeader = new CANSparkMax(1, MotorType.kBrushless);
@@ -48,7 +48,7 @@ public class DriveIOSparkMax implements DriveIO {
     leftFollower.burnFlash();
     rightFollower.burnFlash();
 
-    gyro = new Pigeon2(0);
+    // gyro = new Pigeon2(0);
   }
 
   @Override

@@ -1,5 +1,8 @@
 package frc.robot.subsystems.swerveDrive;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.hardware.CANcoder;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -8,8 +11,9 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotController;
+
+
 
 public class ModuleIOSparkMax implements ModuleIO {
   private final CANSparkMax driveSparkMax;
@@ -17,7 +21,7 @@ public class ModuleIOSparkMax implements ModuleIO {
 
   private final RelativeEncoder driveEncoder; // NEO Encoder
   private final RelativeEncoder turnRelativeEncoder; // NEO Encoder
-  private final AnalogInput turnAbsoluteEncoder; // TODO: update for cancoder
+  private final CANcoder turnAbsoluteEncoder; // CANcoder
 
   private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
   private final double turnAfterEncoderReduction = 150.0 / 7.0;
@@ -28,9 +32,10 @@ public class ModuleIOSparkMax implements ModuleIO {
   public ModuleIOSparkMax(int index) {
     System.out.println("[Init] Creating ModuleIOSparkMax " + Integer.toString(index));
 
-    driveSparkMax = new CANSparkMax(19, MotorType.kBrushless);
-    turnSparkMax = new CANSparkMax(18, MotorType.kBrushless);
-    turnAbsoluteEncoder = new AnalogInput(0);
+    driveSparkMax = new CANSparkMax(2, MotorType.kBrushless);
+    turnSparkMax = new CANSparkMax(1, MotorType.kBrushless);
+    // turnAbsoluteEncoder = new AnalogInput(0);
+    turnAbsoluteEncoder = new CANcoder(11, "rio");
     absoluteEncoderOffset = new Rotation2d(-3.03887450);
 
     driveSparkMax.setCANTimeout(500);
@@ -38,6 +43,17 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     driveEncoder = driveSparkMax.getEncoder();
     turnRelativeEncoder = turnSparkMax.getEncoder();
+
+    /* Configure CANcoder */
+    var toApply = new CANcoderConfiguration();
+
+    /* User can change the configs if they want, or leave it empty for factory-default */
+
+    turnAbsoluteEncoder.getConfigurator().apply(toApply);
+
+    /* Speed up signals to an appropriate rate */
+    turnAbsoluteEncoder.getPosition().setUpdateFrequency(100);
+    turnAbsoluteEncoder.getVelocity().setUpdateFrequency(100);
 
     driveSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
 
@@ -72,13 +88,12 @@ public class ModuleIOSparkMax implements ModuleIO {
     inputs.driveTempCelcius = new double[] {driveSparkMax.getMotorTemperature()};
 
     // update turning motor info
+    // System.out.println(turnAbsoluteEncoder.getPosition().getValue());
     inputs.turnAbsolutePositionRad =
         MathUtil.angleModulus(
             new Rotation2d(
-                    turnAbsoluteEncoder.getVoltage() // TODO: change for whatever encoder we're using
-                        / RobotController.getVoltage5V()
-                        * 2.0
-                        * Math.PI)
+                    turnAbsoluteEncoder.getPosition() // POSITION IN ROTATIONS
+                    .getValue() * 2 * Math.PI)
                 .minus(absoluteEncoderOffset)
                 .getRadians());
     inputs.turnPositionRad =

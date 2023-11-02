@@ -34,7 +34,7 @@ public class Drive extends SubsystemBase {
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
-    private static final double maxLinearSpeed = 0;
+    private static final double maxLinearSpeed = 4.5;
     private static final double trackWidthX = 0;
     private static final double trackWidthY = 0;
 

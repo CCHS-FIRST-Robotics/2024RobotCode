@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -18,15 +19,15 @@ public class Module {
     private final int index;
 
     // TODO: update constants in periodic once tunable is set up
-    private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(0.0, 0.0);
+    private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(0.0, 0.14);
     private final PIDController driveFeedback =
-        new PIDController(0.0, 0.0, 0.0, .02);
+        new PIDController(.1, 0.0, 0.0, .02);
     private final PIDController turnFeedback =
-        new PIDController(0.0, 0.0, 0.0, .02);
+        new PIDController(5, 0.0, 0.2, .02);
 
     
     // TODO: switch to tunable numbers w/ smartdash
-    private static final double wheelRadius = 0;
+    private static final double wheelRadius = 0.0508; // 2"
     
     private static final double driveKp = 0;
     private static final double driveKd = 0;
@@ -46,8 +47,18 @@ public class Module {
 
     /** Updates inputs and checks tunable numbers. */
     public void periodic() {
+        double prevVel = getVelocityMetersPerSec();
         io.updateInputs(inputs);
         Logger.getInstance().processInputs("Drive/Module" + Integer.toString(index), inputs);
+        double acceleration = (getVelocityMetersPerSec() - prevVel) / 0.02;
+        // if (Math.abs(acceleration) > 50) System.out.println(acceleration);
+
+        // until we figure out how to use the logger
+        SmartDashboard.putNumber("Drive Position", Units.radiansToDegrees(inputs.drivePositionRad));
+        SmartDashboard.putNumber("Drive Velocity", Units.radiansToDegrees(inputs.driveVelocityRadPerSec));
+        SmartDashboard.putNumber("Turn Absolute Position", Units.radiansToDegrees(inputs.turnAbsolutePositionRad));
+        SmartDashboard.putNumber("Turn Relative Position", Units.radiansToDegrees(inputs.turnPositionRad));
+        SmartDashboard.putNumber("Turn Velocity", Units.radiansToDegrees(inputs.turnVelocityRadPerSec));
     }
 
     /**
