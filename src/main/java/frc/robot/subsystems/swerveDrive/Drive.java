@@ -35,13 +35,15 @@ public class Drive extends SubsystemBase {
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
     private static final double maxLinearSpeed = 4.5;
+    private static final double maxLinearAcceleration = 50.0;
     private static final double trackWidthX = 0;
     private static final double trackWidthY = 0;
 
     private double maxAngularSpeed;
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
 
-    private ChassisSpeeds setpoint = new ChassisSpeeds();
+    private ChassisSpeeds chassisSetpoint = new ChassisSpeeds();
+    private SwerveModuleState moduleSetpoint = new SwerveModuleState();
     private SwerveModuleState[] lastSetpointStates =
         new SwerveModuleState[] {
             new SwerveModuleState(),
@@ -56,6 +58,14 @@ public class Drive extends SubsystemBase {
 
     private double[] lastModulePositionsMeters = new double[] {0.0, 0.0, 0.0, 0.0};
     private Rotation2d lastGyroYaw = new Rotation2d();
+
+    enum CONTROL_MODE {
+      DISABLED,
+      MODULE_SETPOINT,
+      CHASSIS_SETPOINT
+    };
+
+    CONTROL_MODE controlMode = CONTROL_MODE.DISABLED;
 
     public Drive(
         GyroIO gyroIO,
@@ -85,67 +95,88 @@ public class Drive extends SubsystemBase {
             module.periodic();
         }
 
-        // Run modules
-        if (DriverStation.isDisabled()) {
-            // Stop moving while disabled
-            for (var module : modules) {
-                module.stop();
-            }
-    
-            // Clear setpoint logs
-            Logger.getInstance().recordOutput("SwerveStates/Setpoints", new double[] {});
-            Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
-        } else {
-            // Convert from a field-oriented setpoint to a robot-oriented twist to achieve that setpoint
-            // Brief explanation here: https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/transformations.html
-            // For more detail, see chapter 10 here: https://file.tavsys.net/control/controls-engineering-in-frc.pdf
-            var setpointTwist =
-            new Pose2d()
-                .log(
-                    new Pose2d(
-                        setpoint.vxMetersPerSecond * Constants.PERIOD,
-                        setpoint.vyMetersPerSecond * Constants.PERIOD,
-                        new Rotation2d(setpoint.omegaRadiansPerSecond * Constants.PERIOD)));
-            // takes the twist deltas and converts them to velocities
-            var adjustedSpeeds =
-                new ChassisSpeeds(
-                    setpointTwist.dx / Constants.PERIOD,
-                    setpointTwist.dy / Constants.PERIOD,
-                    setpointTwist.dtheta / Constants.PERIOD);
-            // uses the IK to convert from chassis velocities to individual swerve positions/velocities
-            SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(adjustedSpeeds);
-            // ensure a module isnt trying to go faster than max
-            SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxLinearSpeed);
-
-            // Set to last angles if zero
-            if (adjustedSpeeds.vxMetersPerSecond == 0.0
-                && adjustedSpeeds.vyMetersPerSecond == 0.0
-                && adjustedSpeeds.omegaRadiansPerSecond == 0) {
-                for (int i = 0; i < 4; i++) {
-                setpointStates[i] = new SwerveModuleState(0.0, lastSetpointStates[i].angle);
-                }
-            }
-            lastSetpointStates = setpointStates;
-
-            // Send setpoints to modules
-            SwerveModuleState[] optimizedStates = new SwerveModuleState[4];
-            for (int i = 0; i < 4; i++) {
-                optimizedStates[i] = modules[i].runSetpoint(setpointStates[i]);
-            }
-
-            // Log setpoint states
-            Logger.getInstance().recordOutput("SwerveStates/Setpoints", setpointStates);
-            Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
-        }
-
         // Log measured states
         SwerveModuleState[] measuredStates = new SwerveModuleState[4];
         for (int i = 0; i < 4; i++) {
-        measuredStates[i] = modules[i].getState();
+            measuredStates[i] = modules[i].getState();
         }
         Logger.getInstance().recordOutput("SwerveStates/Measured", measuredStates);
-        
-        
+
+        if (DriverStation.isDisabled()) {
+            controlMode = CONTROL_MODE.DISABLED;
+        }
+
+        // Run modules
+        switch (controlMode) {
+            case DISABLED:
+                // Stop moving while disabled
+                for (var module : modules) {
+                module.stop();
+                }
+
+                // Clear setpoint logs
+                Logger.getInstance().recordOutput("SwerveStates/Setpoints", new double[] {});
+                Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
+                return;
+
+            case CHASSIS_SETPOINT:
+                // Convert from a field-oriented setpoint to a robot-oriented twist to achieve that setpoint
+                // Brief explanation here: https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/transformations.html
+                // For more detail, see chapter 10 here: https://file.tavsys.net/control/controls-engineering-in-frc.pdf
+                var setpointTwist =
+                new Pose2d()
+                    .log(
+                        new Pose2d(
+                            chassisSetpoint.vxMetersPerSecond * Constants.PERIOD,
+                            chassisSetpoint.vyMetersPerSecond * Constants.PERIOD,
+                            new Rotation2d(chassisSetpoint.omegaRadiansPerSecond * Constants.PERIOD)));
+                // takes the twist deltas and converts them to velocities
+                var adjustedSpeeds =
+                    new ChassisSpeeds(
+                        setpointTwist.dx / Constants.PERIOD,
+                        setpointTwist.dy / Constants.PERIOD,
+                        setpointTwist.dtheta / Constants.PERIOD);
+                // uses the IK to convert from chassis velocities to individual swerve positions/velocities
+                SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(adjustedSpeeds);
+                // ensure a module isnt trying to go faster than max
+                SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxLinearSpeed);
+
+                // Set to last angles if zero
+                if (adjustedSpeeds.vxMetersPerSecond == 0.0
+                    && adjustedSpeeds.vyMetersPerSecond == 0.0
+                    && adjustedSpeeds.omegaRadiansPerSecond == 0) {
+                    for (int i = 0; i < 4; i++) {
+                    setpointStates[i] = new SwerveModuleState(0.0, lastSetpointStates[i].angle);
+                    }
+                }
+                lastSetpointStates = setpointStates;
+
+                // Send setpoints to modules
+                SwerveModuleState[] optimizedStates = new SwerveModuleState[4];
+                for (int i = 0; i < 4; i++) {
+                    optimizedStates[i] = modules[i].runSetpoint(setpointStates[i]);
+                }
+
+                // Log setpoint states
+                Logger.getInstance().recordOutput("SwerveStates/Setpoints", setpointStates);
+                Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
+                break;
+
+            case MODULE_SETPOINT:
+                setpointStates = new SwerveModuleState[] {moduleSetpoint, moduleSetpoint, moduleSetpoint, moduleSetpoint};
+                lastSetpointStates = setpointStates;
+
+                // Send setpoints to modules
+                optimizedStates = new SwerveModuleState[4];
+                for (int i = 0; i < 4; i++) {
+                    optimizedStates[i] = modules[i].runSetpoint(setpointStates[i]);
+                }
+
+                // Log setpoint states
+                Logger.getInstance().recordOutput("SwerveStates/Setpoints", setpointStates);
+                Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
+                break;
+        }
     }
 
     /**
@@ -154,7 +185,13 @@ public class Drive extends SubsystemBase {
    * @param speeds Speeds in meters/sec
    */
   public void runVelocity(ChassisSpeeds speeds) {
-    setpoint = speeds;
+    controlMode = CONTROL_MODE.CHASSIS_SETPOINT;
+    chassisSetpoint = speeds;
+  }
+
+  public void runModules(SwerveModuleState setpoint) {
+    controlMode = CONTROL_MODE.MODULE_SETPOINT;
+    moduleSetpoint = setpoint;
   }
 
   /** Stops the drive. */
@@ -178,6 +215,11 @@ public class Drive extends SubsystemBase {
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
     return maxLinearSpeed;
+  }
+
+  /** Returns the maximum linear acceleration in meters per sec per sec. */
+  public double getMaxLinearAccelerationMetersPerSecPerSec() {
+    return maxLinearAcceleration;
   }
 
   /** Returns the maximum angular speed in radians per sec. */

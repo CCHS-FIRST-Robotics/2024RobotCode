@@ -34,6 +34,12 @@ public final class Constants {
 
   public static final double PERIOD = .02;
 
+  // TODO: change to tunable numbers
+  public static final double LIENAR_SPEED_EXPONENT = 2;
+  public static final double ANGULAR_SPEED_EXPONENT = 2.5;
+
+  public static final double ANALOG_DEADZONE = .075;
+
   // TODO: Should this be its own file?
   public static class HardwareConstants {
     // the port for the xbox controller
@@ -71,5 +77,5 @@ public final class Constants {
     public static final Translation2d RR_WHEEL_POS = new Translation2d(-WHEEL_ABSOLUTE_X_METERS, -WHEEL_ABSOLUTE_Y_METERS);
 
     public static final MecanumDriveKinematics MECANUM_KINEMATICS = new MecanumDriveKinematics(FL_WHEEL_POS, FR_WHEEL_POS, RL_WHEEL_POS, RR_WHEEL_POS);
-}
+  }
 }
