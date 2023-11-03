@@ -17,32 +17,16 @@ public class Module {
     private final ModuleIO io;
     private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
     private final int index;
-
-    // TODO: update constants in periodic once tunable is set up
-    private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(0.0, 0.14);
-    private final PIDController driveFeedback =
-        new PIDController(.1, 0.0, 0.0, .02);
-    private final PIDController turnFeedback =
-        new PIDController(5, 0.0, 0.2, .02);
-
     
     // TODO: switch to tunable numbers w/ smartdash
     private static final double wheelRadius = 0.0508; // 2"
-    
-    private static final double driveKp = 0;
-    private static final double driveKd = 0;
-    private static final double driveKs = 0;
-    private static final double driveKv = 0;
-
-    private static final double turnKp = 0;
-    private static final double turnKd = 0;
 
     public Module(ModuleIO io, int index) {
         System.out.println("[Init] Creating Module " + Integer.toString(index));
         this.io = io;
         this.index = index;
     
-        turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
+        // turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     /** Updates inputs and checks tunable numbers. */
@@ -70,22 +54,20 @@ public class Module {
         var optimizedState = SwerveModuleState.optimize(targetState, getAngle());
 
         // Run turn controller
-        io.setTurnVoltage(
-            turnFeedback.calculate(getAngle().getRadians(), optimizedState.angle.getRadians())
-        );
+        // io.setTurnVoltage(
+        //     turnFeedback.calculate(getAngle().getRadians(), optimizedState.angle.getRadians())
+        // );
+        io.setTurnPosition(optimizedState.angle.getRadians());
 
         // Update velocity based on turn error
         // does some fancy things to move only in the direction you want while theres an error
         // draw out the current/desired vectors, and remember that cos is like the dot product, 
         // it projects one vector onto the other, idk I cant make sense of it rn im tired asf
-        optimizedState.speedMetersPerSecond *= Math.cos(turnFeedback.getPositionError());
+        optimizedState.speedMetersPerSecond *= Math.cos(inputs.turnAbsolutePositionRad - optimizedState.angle.getRadians());
 
         // Run drive controller
         double velocityRadPerSec = optimizedState.speedMetersPerSecond / wheelRadius;
-        io.setDriveVoltage(
-            driveFeedforward.calculate(velocityRadPerSec)
-                + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec)
-        );
+        io.setDriveVelocity(velocityRadPerSec);
 
         return optimizedState;
     }
@@ -95,8 +77,8 @@ public class Module {
    * periodically.
    */
     public void runCharacterization(double volts) {
-        io.setTurnVoltage(turnFeedback.calculate(getAngle().getRadians(), 0.0));
-        io.setDriveVoltage(volts);
+        // io.setTurnVoltage(turnFeedback.calculate(getAngle().getRadians(), 0.0));
+        // io.setDriveVoltage(volts);
     }
 
     /** Disables all outputs to motors. */

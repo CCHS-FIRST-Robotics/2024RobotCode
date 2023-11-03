@@ -11,7 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.geometry.Rotation2d;
-
+import frc.robot.commands.DriveModules;
 
 // import frc.robot.subsystems.mecaDrive.Drive;
 // import frc.robot.subsystems.mecaDrive.DriveIO;
@@ -96,9 +96,13 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // drive.setDefaultCommand(
-    //   new RunCommand(() -> drive.drive(controller.getLeftX(), -controller.getLeftY(), controller.getRightX(), true))
-    // );
+    drive.setDefaultCommand(
+      new DriveModules(
+        drive, 
+        () -> -controller.getLeftY(), 
+        () -> controller.getRightX(), 
+        () -> 0.5 + 0.5 * controller.getRightTriggerAxis()
+    ));
   }
 
   /**
