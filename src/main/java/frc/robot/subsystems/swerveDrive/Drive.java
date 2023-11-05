@@ -1,9 +1,12 @@
 package frc.robot.subsystems.swerveDrive;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.geometry.Twist3d;
@@ -15,6 +18,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,8 +56,25 @@ public class Drive extends SubsystemBase {
             new SwerveModuleState(),
             new SwerveModuleState()
         };
-
+    private Pose2d positionSetpointTrajectory = new Pose2d();
+    private Twist2d twistSetpointTrajectory = new Twist2d();
+    private ArrayList<Pose2d> positionTrajectory = new ArrayList<Pose2d>();
+    private ArrayList<Twist2d> twistTrajectory = new ArrayList<Twist2d>();
+    private int trajectoryCounter = -1;
     
+    // POSITION PID CONSTANTS
+    private double kPx = 0.0;
+    private double kPy = 0.0;
+    private double kPHeading = 0.0;
+
+    private double kIx = 0.0;
+    private double kIy = 0.0;
+    private double kIHeading = 0.0;
+
+    private PIDController xController = new PIDController(kPx, kIx, 0.0);
+    private PIDController yController = new PIDController(kPy, kIy, 0.0);
+    private PIDController headingController = new PIDController(kPHeading, kIHeading, 0.0);
+
     private boolean isBrakeMode = false;
     private Timer lastMovementTimer = new Timer();
 
@@ -62,7 +84,8 @@ public class Drive extends SubsystemBase {
     enum CONTROL_MODE {
       DISABLED,
       MODULE_SETPOINT,
-      CHASSIS_SETPOINT
+      CHASSIS_SETPOINT,
+      POSITION_SETPOINT
     };
 
     CONTROL_MODE controlMode = CONTROL_MODE.DISABLED;
@@ -119,10 +142,38 @@ public class Drive extends SubsystemBase {
                 Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
                 return;
 
+            case POSITION_SETPOINT:
+                if (trajectoryCounter == -1) break;
+                if (trajectoryCounter > positionTrajectory.size() - 1) {
+                    trajectoryCounter = positionTrajectory.size() - 1;
+                }
+
+                positionSetpointTrajectory = positionTrajectory.get(trajectoryCounter);
+                twistSetpointTrajectory = twistTrajectory.get(trajectoryCounter);
+
+                double xPID = xController.calculate(getPose().getX(), positionSetpointTrajectory.getX());
+                double yPID = yController.calculate(getPose().getY(), positionSetpointTrajectory.getY());
+                double headingPID = headingController.calculate(getPose().getRotation().getRadians(), positionSetpointTrajectory.getRotation().getRadians());
+
+                chassisSetpoint = new ChassisSpeeds(
+                    twistSetpointTrajectory.dx + xPID,
+                    twistSetpointTrajectory.dy + yPID,
+                    twistSetpointTrajectory.dtheta + headingPID
+                );
+                
+                trajectoryCounter++;
+                /*
+                 * WARNING:
+                 * NO BREAK HERE
+                 * IT CONTINUES TO CHASSIS_SETPOINT CASE
+                 */
+                // fallthrough
             case CHASSIS_SETPOINT:
                 // Convert from a field-oriented setpoint to a robot-oriented twist to achieve that setpoint
                 // Brief explanation here: https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/transformations.html
                 // For more detail, see chapter 10 here: https://file.tavsys.net/control/controls-engineering-in-frc.pdf
+                // Purpose: accounts for movement along an arc instead of a straight line, avoids skew
+                // More detail here: https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/47
                 var setpointTwist =
                 new Pose2d()
                     .log(
@@ -194,6 +245,13 @@ public class Drive extends SubsystemBase {
     moduleSetpoint = setpoint;
   }
 
+  public void runPosition(ArrayList<Pose2d> poseTrajectory, ArrayList<Twist2d> twistTrajectory) {
+    controlMode = CONTROL_MODE.POSITION_SETPOINT;
+    this.positionTrajectory = poseTrajectory;
+    this.twistTrajectory = twistTrajectory;
+    trajectoryCounter = 0;
+  }
+
   /** Stops the drive. */
   public void stop() {
     runVelocity(new ChassisSpeeds());
@@ -260,5 +318,13 @@ public class Drive extends SubsystemBase {
       new Translation2d(-trackWidthX / 2.0, trackWidthY / 2.0),
       new Translation2d(-trackWidthX / 2.0, -trackWidthY / 2.0)
     };
+  }
+
+  public Pose2d getPose() {
+    return new Pose2d();
+  } 
+
+  public Twist2d getVelocity() {
+    return new Twist2d();
   }
 }

@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import org.ejml.data.CMatrixRMaj;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
@@ -19,6 +20,7 @@ import frc.robot.commands.DriveModules;
 // import frc.robot.subsystems.mecaDrive.DriveIOSparkMax;
 
 import frc.robot.subsystems.swerveDrive.*;
+import frc.robot.subsystems.vision.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -36,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Camera camera;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -57,6 +60,7 @@ public class RobotContainer {
           new ModuleIOSparkMax(2), 
           new ModuleIOSparkMax(3)
         );
+        camera = new Camera(new CameraIOZED());
         break;
 
       // Sim robot, instantiate physics sim IO implementations
@@ -68,17 +72,19 @@ public class RobotContainer {
           new ModuleIOSim(),
           new ModuleIOSim()
         );
+        camera = new Camera(new CameraIOZED());
         break;
 
       // Replayed robot, disable IO implementations
       default:
-      drive = new Drive(
-        new GyroIONavX(),
-        new ModuleIOSparkMax(0), 
-        new ModuleIOSparkMax(1), 
-        new ModuleIOSparkMax(2), 
-        new ModuleIOSparkMax(3)
-      );
+        drive = new Drive(
+          new GyroIONavX(),
+          new ModuleIOSparkMax(0), 
+          new ModuleIOSparkMax(1), 
+          new ModuleIOSparkMax(2), 
+          new ModuleIOSparkMax(3)
+        );
+        camera = new Camera(new CameraIOZED());
         break;
     }
 
