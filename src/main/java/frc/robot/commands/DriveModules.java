@@ -42,7 +42,8 @@ public class DriveModules extends CommandBase {
     public void execute() {
         double linearSpeed = linearSpeedSupplier.get();
         double angularPosition = angularPositionSupplier.get();
-        
+
+        angularPosition = applyPreferences(angularPosition, 1, Constants.ANALOG_DEADZONE);
 
         // TODO: switch constants to tunable numbers
         linearSpeed = applyPreferences(linearSpeed, Constants.LIENAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);

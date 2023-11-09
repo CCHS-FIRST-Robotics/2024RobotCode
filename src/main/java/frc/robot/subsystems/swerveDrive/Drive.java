@@ -216,6 +216,7 @@ public class Drive extends SubsystemBase {
             case MODULE_SETPOINT:
                 setpointStates = new SwerveModuleState[] {moduleSetpoint, moduleSetpoint, moduleSetpoint, moduleSetpoint};
                 lastSetpointStates = setpointStates;
+                // System.out.println(moduleSetpoint.angle.getDegrees());
 
                 // Send setpoints to modules
                 optimizedStates = new SwerveModuleState[4];

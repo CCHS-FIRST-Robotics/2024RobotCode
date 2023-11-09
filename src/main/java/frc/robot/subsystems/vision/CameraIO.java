@@ -10,7 +10,7 @@ public interface CameraIO {
     @AutoLog
     public static class CameraIOInputs {
         // Values from the primary (closest) tag
-        public int primaryTagId = -1;
+        public long primaryTagId = -1;
         public double primaryTagX = -1;
         public double primaryTagY = -1;
         public double primaryTagZ = -1;
@@ -18,7 +18,7 @@ public interface CameraIO {
         public double primaryTagHeading = -1;
 
         // Values for all tags found by the camera
-        public int[] tagIds = new int[] {};
+        public long[] tagIds = new long[] {};
         public double[] tagXs = new double[] {};
         public double[] tagYs = new double[] {};
         public double[] tagZs = new double[] {};
@@ -27,7 +27,7 @@ public interface CameraIO {
 
         // Localization data
         //TODO: develop localization system
-        Pose2d poseEstimate = new Pose2d();
+        // Pose2d poseEstimate = new Pose2d();
     }
 
     /** Updates the set of loggable inputs. */

@@ -43,5 +43,7 @@ public class FollowAprilTag extends CommandBase {
         ArrayList<Twist2d> velocityTrajectory = new ArrayList<Twist2d>();
         poseTrajectory.add(targetPose);
         velocityTrajectory.add(new Twist2d());
+
+        drive.runPosition(poseTrajectory, velocityTrajectory);
     }
 }

@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -29,14 +30,14 @@ public class ModuleIOSparkMax implements ModuleIO {
   private final SparkMaxPIDController turnSparkMaxPIDF;
 
   // TODO: update constants in periodic once tunable is set up
-  private static final double driveKp = 0.1; // needs to be updated for REV PID
+  private static final double driveKp = 0.0000; // needs to be updated for REV PID
   private static final double driveKd = 0.0;
   private static final double driveKi = 0.0;
   private static final double driveKs = 0.0;
-  private static final double driveKv = 0.14; // could be updated for REV FF (i think it was like .001??)
+  private static final double driveKv = 0.01; // could be updated for REV FF (i think it was like .001??)
 
   private static final double turnKp = 5; // needs to be updated for REV PID (I think it was like 1??)
-  private static final double turnKd = 0.2; // needs to be updated for REV PID (I think it was like 0??)
+  private static final double turnKd = 0.00; // needs to be updated for REV PID (I think it was like 0??)
 
   private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv); // kV UNITS: VOLTS / (RAD PER SECOND)
 
@@ -48,11 +49,15 @@ public class ModuleIOSparkMax implements ModuleIO {
   private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
   private final double turnAfterEncoderReduction = 150.0 / 7.0;
 
-  private final boolean isTurnMotorInverted = true;
+  private final boolean isTurnMotorInverted = false;
+  private final boolean isDriveMotorInverted = true;
   // private final Rotation2d absoluteEncoderOffset;
+
+  int index;
 
   public ModuleIOSparkMax(int index) {
     System.out.println("[Init] Creating ModuleIOSparkMax " + Integer.toString(index));
+    this.index = index;
 
     driveSparkMax = new CANSparkMax(2 + 2 *index, MotorType.kBrushless);
     turnSparkMax = new CANSparkMax(1 + 2 * index, MotorType.kBrushless);
@@ -68,8 +73,8 @@ public class ModuleIOSparkMax implements ModuleIO {
     turnSparkMaxPIDF.setD(turnKd, 0);
 
     turnSparkMaxPIDF.setPositionPIDWrappingEnabled(true);
-    turnSparkMaxPIDF.setPositionPIDWrappingMinInput(-Math.PI);
-    turnSparkMaxPIDF.setPositionPIDWrappingMaxInput(Math.PI);
+    turnSparkMaxPIDF.setPositionPIDWrappingMinInput(0);
+    turnSparkMaxPIDF.setPositionPIDWrappingMaxInput(1);
   
     turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
     // absoluteEncoderOffset = new Rotation2d(-3.03887450);
@@ -84,6 +89,7 @@ public class ModuleIOSparkMax implements ModuleIO {
     driveSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
 
     turnSparkMax.setInverted(isTurnMotorInverted);
+    driveSparkMax.setInverted(isDriveMotorInverted);
 
     driveSparkMax.setSmartCurrentLimit(40);
     turnSparkMax.setSmartCurrentLimit(30);
@@ -99,10 +105,15 @@ public class ModuleIOSparkMax implements ModuleIO {
     turnRelativeEncoder.setAverageDepth(2);
 
     // TODO: any other params/tuning?
-    turnAbsoluteEncoder.setAverageDepth(8);
+    turnAbsoluteEncoder.setAverageDepth(2 );
 
     driveSparkMax.setCANTimeout(0);
     turnSparkMax.setCANTimeout(0);
+
+
+    // System.out.println("TESTING");
+    // System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
+    // System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
   }
 
   public void updateInputs(ModuleIOInputs inputs) {
@@ -118,12 +129,15 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     // update turning motor info
     // System.out.println(turnAbsoluteEncoder.getPosition().getValue());
-    inputs.turnAbsolutePositionRad =
-        MathUtil.angleModulus(
-            new Rotation2d(
-                    turnAbsoluteEncoder.getPosition() // POSITION IN ROTATIONS
-                    * 2 * Math.PI)
-                .getRadians());
+    // inputs.turnAbsolutePositionRad =
+    //     MathUtil.angleModulus(
+    //         new Rotation2d(
+    //                 turnAbsoluteEncoder.getPosition() // POSITION IN ROTATIONS
+    //                 * 2 * Math.PI)
+    //             .getRadians());
+    // FOR TESTING ONLY:
+    inputs.turnAbsolutePositionRad = turnAbsoluteEncoder.getPosition();
+
     inputs.turnPositionRad =
         Units.rotationsToRadians(turnRelativeEncoder.getPosition())
             / turnAfterEncoderReduction;
@@ -144,8 +158,10 @@ public class ModuleIOSparkMax implements ModuleIO {
   }
 
   public void setDriveVelocity(double velocityRadPerSec) {
+    double motorRPM = Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec) * driveAfterEncoderReduction;
+    System.out.println(index);
     driveSparkMaxPIDF.setReference(
-        Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec) * driveAfterEncoderReduction,
+        500,
         CANSparkMax.ControlType.kVelocity,
         0,
         driveFeedforward.calculate(velocityRadPerSec)
@@ -153,8 +169,11 @@ public class ModuleIOSparkMax implements ModuleIO {
   }
 
   public void setTurnPosition(double positionRad) {
+    positionRad += Math.PI; // Adjust from -PI, PI -> 0, 2PI
+    double positionRotations = Units.radiansToRotations(positionRad);
+    // System.out.println(positionRotations);
     turnSparkMaxPIDF.setReference(
-        Units.radiansToRotations(positionRad),
+        0,
         CANSparkMax.ControlType.kPosition,
         0
     );

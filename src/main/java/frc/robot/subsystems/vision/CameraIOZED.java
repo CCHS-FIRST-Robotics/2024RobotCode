@@ -18,7 +18,7 @@ public class CameraIOZED implements CameraIO {
     public void updateInputs(CameraIOInputs inputs) {
         // Pose estimate from the zed (x, y, theta)
         double[] pose2d = tags.getEntry("zed_pose").getDoubleArray(new double[] {-1, -1, -1});
-        inputs.poseEstimate = new Pose2d(pose2d[0], pose2d[1], new Rotation2d(pose2d[2]));
+        // inputs.poseEstimate = new Pose2d(pose2d[0], pose2d[1], new Rotation2d(pose2d[2]));
 
         // Values from the primary (closest) tag
         inputs.primaryTagId = (int) tags.getEntry("primary_tag_id").getDouble(-1);
@@ -30,7 +30,7 @@ public class CameraIOZED implements CameraIO {
 
         // Values for all tags found by the camera
         double[] tagIds = tags.getEntry("tag_ids").getDoubleArray(new double[] {});
-        inputs.tagIds = new int[tagIds.length];
+        inputs.tagIds = new long[tagIds.length];
         for (int i = 0; i < tagIds.length; i++) {
             inputs.tagIds[i] = (int) tagIds[i];
         }

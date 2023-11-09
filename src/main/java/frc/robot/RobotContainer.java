@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.commands.DriveModules;
+import frc.robot.commands.FollowAprilTag;
 
 // import frc.robot.subsystems.mecaDrive.Drive;
 // import frc.robot.subsystems.mecaDrive.DriveIO;
@@ -109,6 +110,10 @@ public class RobotContainer {
         () -> controller.getRightX(), 
         () -> 0.5 + 0.5 * controller.getRightTriggerAxis()
     ));
+
+    // TODO: shouldn't be used yet -- drive.getPose() isn't implemented, PID will bug
+    // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
+    
   }
 
   /**
