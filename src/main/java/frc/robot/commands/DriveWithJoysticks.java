@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import java.util.function.Supplier;
 
@@ -30,8 +32,8 @@ public class DriveWithJoysticks extends CommandBase {
     ) {
         addRequirements(drive);
         this.drive = drive;
-        linearXSpeedSupplier = leftXSupplier;
-        linearYSpeedSupplier = leftYSupplier;
+        linearYSpeedSupplier = leftXSupplier;
+        linearXSpeedSupplier = leftYSupplier;
         angularSpeedSupplier = rightXSupplier;
         this.linearSpeedMultiplierSupplier = linearSpeedMultiplierSupplier;
     }
@@ -64,7 +66,21 @@ public class DriveWithJoysticks extends CommandBase {
             new ChassisSpeeds(
                 linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                 linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                angularSpeed * drive.getMaxAngularSpeedRadPerSec());
+                angularSpeed * drive.getMaxAngularSpeedRadPerSec()
+            );
+
+        // Convert from field relative
+        var driveRotation = drive.getYaw();
+        if (DriverStation.getAlliance() == Alliance.Red) {
+            driveRotation = driveRotation.plus(new Rotation2d(Math.PI));
+        }
+        speeds =
+            ChassisSpeeds.fromFieldRelativeSpeeds(
+                speeds.vxMetersPerSecond,
+                speeds.vyMetersPerSecond,
+                speeds.omegaRadiansPerSecond,
+                driveRotation
+            );
 
         // Desaturate speeds to max acceleration
         speeds =
@@ -79,7 +95,9 @@ public class DriveWithJoysticks extends CommandBase {
                 prevSpeeds.vyMetersPerSecond + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD),
             speeds.omegaRadiansPerSecond
         );
+
         prevSpeeds = speeds;
+        // System.out.println(speeds.omegaRadiansPerSecond);
         
         drive.runVelocity(speeds);
     }

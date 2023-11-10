@@ -30,14 +30,14 @@ public class ModuleIOSparkMax implements ModuleIO {
   private final SparkMaxPIDController turnSparkMaxPIDF;
 
   // TODO: update constants in periodic once tunable is set up
-  private static final double driveKp = 0.0000; // needs to be updated for REV PID
+  private static final double driveKp = 0.0001; 
   private static final double driveKd = 0.0;
   private static final double driveKi = 0.0;
   private static final double driveKs = 0.0;
-  private static final double driveKv = 0.01; // could be updated for REV FF (i think it was like .001??)
+  private static final double driveKv = 0.15; 
 
-  private static final double turnKp = 5; // needs to be updated for REV PID (I think it was like 1??)
-  private static final double turnKd = 0.00; // needs to be updated for REV PID (I think it was like 0??)
+  private static final double turnKp = 5; 
+  private static final double turnKd = 0.00; 
 
   private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv); // kV UNITS: VOLTS / (RAD PER SECOND)
 
@@ -50,7 +50,6 @@ public class ModuleIOSparkMax implements ModuleIO {
   private final double turnAfterEncoderReduction = 150.0 / 7.0;
 
   private final boolean isTurnMotorInverted = false;
-  private final boolean isDriveMotorInverted = true;
   // private final Rotation2d absoluteEncoderOffset;
 
   int index;
@@ -68,9 +67,12 @@ public class ModuleIOSparkMax implements ModuleIO {
     driveSparkMaxPIDF.setP(driveKp, 0);
     driveSparkMaxPIDF.setI(driveKi, 0);
     driveSparkMaxPIDF.setD(driveKd, 0);
+    driveSparkMaxPIDF.setFF(0, 0);
   
     turnSparkMaxPIDF.setP(turnKp, 0);
     turnSparkMaxPIDF.setD(turnKd, 0);
+    turnSparkMaxPIDF.setI(0, 0);
+    turnSparkMaxPIDF.setFF(0, 0);
 
     turnSparkMaxPIDF.setPositionPIDWrappingEnabled(true);
     turnSparkMaxPIDF.setPositionPIDWrappingMinInput(0);
@@ -89,7 +91,12 @@ public class ModuleIOSparkMax implements ModuleIO {
     driveSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
 
     turnSparkMax.setInverted(isTurnMotorInverted);
-    driveSparkMax.setInverted(isDriveMotorInverted);
+    if (index == 2 || index == 3) {
+      driveSparkMax.setInverted(false);
+    } else {
+      driveSparkMax.setInverted(true);
+    }
+    
 
     driveSparkMax.setSmartCurrentLimit(40);
     turnSparkMax.setSmartCurrentLimit(30);
@@ -112,8 +119,8 @@ public class ModuleIOSparkMax implements ModuleIO {
 
 
     // System.out.println("TESTING");
-    // System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
-    // System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
+    System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
+    System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
   }
 
   public void updateInputs(ModuleIOInputs inputs) {
@@ -159,9 +166,9 @@ public class ModuleIOSparkMax implements ModuleIO {
 
   public void setDriveVelocity(double velocityRadPerSec) {
     double motorRPM = Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec) * driveAfterEncoderReduction;
-    System.out.println(index);
+
     driveSparkMaxPIDF.setReference(
-        500,
+        motorRPM,
         CANSparkMax.ControlType.kVelocity,
         0,
         driveFeedforward.calculate(velocityRadPerSec)
@@ -173,7 +180,7 @@ public class ModuleIOSparkMax implements ModuleIO {
     double positionRotations = Units.radiansToRotations(positionRad);
     // System.out.println(positionRotations);
     turnSparkMaxPIDF.setReference(
-        0,
+        positionRotations,
         CANSparkMax.ControlType.kPosition,
         0
     );

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.commands.DriveModules;
+import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.FollowAprilTag;
 
 // import frc.robot.subsystems.mecaDrive.Drive;
@@ -96,6 +97,10 @@ public class RobotContainer {
     configureButtonBindings();
   }
 
+  private double genericSupplier() {
+    return 1;
+  }
+
   /**
    * Use this method to define your button->command mappings. Buttons can be
    * created by instantiating a {@link GenericHID} or one of its subclasses
@@ -103,13 +108,25 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // DRIVING MODULES -- FOR TESTING
+    // drive.setDefaultCommand(
+    //   new DriveModules(
+    //     drive, 
+    //     () -> -controller.getLeftY(), 
+    //     () -> controller.getRightX(), 
+    //     () -> 0.5 + 0.5 * controller.getRightTriggerAxis()
+    // ));
+
+    // DRIVING WITH JOYSTICKS (NORMAL)
     drive.setDefaultCommand(
-      new DriveModules(
+      new DriveWithJoysticks(
         drive, 
+        () -> controller.getLeftX(), 
         () -> -controller.getLeftY(), 
-        () -> controller.getRightX(), 
-        () -> 0.5 + 0.5 * controller.getRightTriggerAxis()
-    ));
+        () -> -controller.getRightX(), 
+        () -> genericSupplier()
+      )
+    );
 
     // TODO: shouldn't be used yet -- drive.getPose() isn't implemented, PID will bug
     // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));

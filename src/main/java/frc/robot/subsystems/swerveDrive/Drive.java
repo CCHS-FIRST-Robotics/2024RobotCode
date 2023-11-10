@@ -41,10 +41,10 @@ public class Drive extends SubsystemBase {
 
     private static final double maxLinearSpeed = 4.5;
     private static final double maxLinearAcceleration = 50.0;
-    private static final double trackWidthX = 0;
-    private static final double trackWidthY = 0;
+    private static final double trackWidthX = Units.inchesToMeters(22.5);
+    private static final double trackWidthY = Units.inchesToMeters(22.5);
 
-    private double maxAngularSpeed;
+    private double maxAngularSpeed = 4 * Math.PI;
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
 
     private ChassisSpeeds chassisSetpoint = new ChassisSpeeds();
@@ -169,7 +169,6 @@ public class Drive extends SubsystemBase {
                  */
                 // fallthrough
             case CHASSIS_SETPOINT:
-                // Convert from a field-oriented setpoint to a robot-oriented twist to achieve that setpoint
                 // Brief explanation here: https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/transformations.html
                 // For more detail, see chapter 10 here: https://file.tavsys.net/control/controls-engineering-in-frc.pdf
                 // Purpose: accounts for movement along an arc instead of a straight line, avoids skew
@@ -187,8 +186,11 @@ public class Drive extends SubsystemBase {
                         setpointTwist.dx / Constants.PERIOD,
                         setpointTwist.dy / Constants.PERIOD,
                         setpointTwist.dtheta / Constants.PERIOD);
+                
+                // System.out.println(adjustedSpeeds);
                 // uses the IK to convert from chassis velocities to individual swerve positions/velocities
                 SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(adjustedSpeeds);
+                // System.out.println(setpointStates[0]);
                 // ensure a module isnt trying to go faster than max
                 SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxLinearSpeed);
 
@@ -296,6 +298,11 @@ public class Drive extends SubsystemBase {
     return new Rotation2d(gyroInputs.rollPositionRad);
   }
 
+  /** Returns the current yaw (Z rotation). */
+  public Rotation2d getYaw() {
+    return new Rotation2d(gyroInputs.yawPositionRad);
+  }
+
   /** Returns the current yaw velocity (Z rotation) in radians per second. */
   public double getYawVelocity() {
     return gyroInputs.yawVelocityRadPerSec;
@@ -314,9 +321,9 @@ public class Drive extends SubsystemBase {
   /** Returns an array of module translations. */
   public Translation2d[] getModuleTranslations() {
     return new Translation2d[] {
+      new Translation2d(-trackWidthX / 2.0, trackWidthY / 2.0),
       new Translation2d(trackWidthX / 2.0, trackWidthY / 2.0),
       new Translation2d(trackWidthX / 2.0, -trackWidthY / 2.0),
-      new Translation2d(-trackWidthX / 2.0, trackWidthY / 2.0),
       new Translation2d(-trackWidthX / 2.0, -trackWidthY / 2.0)
     };
   }
