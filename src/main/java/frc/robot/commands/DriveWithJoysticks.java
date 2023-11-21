@@ -74,6 +74,7 @@ public class DriveWithJoysticks extends CommandBase {
         if (DriverStation.getAlliance() == Alliance.Red) {
             driveRotation = driveRotation.plus(new Rotation2d(Math.PI));
         }
+        // System.out.println(driveRotation);
         speeds =
             ChassisSpeeds.fromFieldRelativeSpeeds(
                 speeds.vxMetersPerSecond,

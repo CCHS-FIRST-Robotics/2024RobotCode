@@ -40,7 +40,7 @@ public class Drive extends SubsystemBase {
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
     private static final double maxLinearSpeed = 4.5;
-    private static final double maxLinearAcceleration = 50.0;
+    private static final double maxLinearAcceleration = 5.0;
     private static final double trackWidthX = Units.inchesToMeters(22.5);
     private static final double trackWidthY = Units.inchesToMeters(22.5);
 
@@ -48,6 +48,7 @@ public class Drive extends SubsystemBase {
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
 
     private ChassisSpeeds chassisSetpoint = new ChassisSpeeds();
+    private ChassisSpeeds lastSetpoint = new ChassisSpeeds();
     private SwerveModuleState moduleSetpoint = new SwerveModuleState();
     private SwerveModuleState[] lastSetpointStates =
         new SwerveModuleState[] {
@@ -63,7 +64,7 @@ public class Drive extends SubsystemBase {
     private int trajectoryCounter = -1;
     
     // POSITION PID CONSTANTS
-    private double kPx = 0.0;
+    private double kPx = 0.01;
     private double kPy = 0.0;
     private double kPHeading = 0.0;
 
@@ -80,12 +81,14 @@ public class Drive extends SubsystemBase {
 
     private double[] lastModulePositionsMeters = new double[] {0.0, 0.0, 0.0, 0.0};
     private Rotation2d lastGyroYaw = new Rotation2d();
+    private Twist2d fieldVelocity = new Twist2d();
+    private Pose2d fieldPosition = new Pose2d();
 
     enum CONTROL_MODE {
-      DISABLED,
-      MODULE_SETPOINT,
-      CHASSIS_SETPOINT,
-      POSITION_SETPOINT
+        DISABLED,
+        MODULE_SETPOINT,
+        CHASSIS_SETPOINT,
+        POSITION_SETPOINT
     };
 
     CONTROL_MODE controlMode = CONTROL_MODE.DISABLED;
@@ -125,6 +128,40 @@ public class Drive extends SubsystemBase {
         }
         Logger.getInstance().recordOutput("SwerveStates/Measured", measuredStates);
 
+
+        // Update odometry
+        SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
+        for (int i = 0; i < 4; i++) {
+          wheelDeltas[i] =
+              new SwerveModulePosition(
+                  (modules[i].getPositionMeters() - lastModulePositionsMeters[i]),
+                  modules[i].getAngle());
+          lastModulePositionsMeters[i] = modules[i].getPositionMeters();
+        }
+        var twist = kinematics.toTwist2d(wheelDeltas);
+        var gyroYaw = new Rotation2d(gyroInputs.yawPositionRad);
+        if (gyroInputs.connected) {
+            twist = new Twist2d(twist.dx, twist.dy, gyroYaw.minus(lastGyroYaw).getRadians());
+        }
+        lastGyroYaw = gyroYaw;
+        fieldPosition = fieldPosition.exp(twist);
+
+        // Update field velocity
+        ChassisSpeeds chassisSpeeds = kinematics.toChassisSpeeds(measuredStates);
+        Translation2d linearFieldVelocity =
+            new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)
+                .rotateBy(getYaw());
+        fieldVelocity =
+            new Twist2d(
+                linearFieldVelocity.getX(),
+                linearFieldVelocity.getY(),
+                gyroInputs.connected
+                    ? gyroInputs.yawVelocityRadPerSec
+                    : chassisSpeeds.omegaRadiansPerSecond);
+
+        Logger.getInstance().recordOutput("Odometry/FieldVelocity", new Pose2d(fieldVelocity.dx, fieldVelocity.dy, new Rotation2d(fieldVelocity.dtheta)));
+        Logger.getInstance().recordOutput("Odometry/FieldPosition", fieldPosition);
+
         if (DriverStation.isDisabled()) {
             controlMode = CONTROL_MODE.DISABLED;
         }
@@ -134,7 +171,7 @@ public class Drive extends SubsystemBase {
             case DISABLED:
                 // Stop moving while disabled
                 for (var module : modules) {
-                module.stop();
+                    module.stop();
                 }
 
                 // Clear setpoint logs
@@ -185,8 +222,26 @@ public class Drive extends SubsystemBase {
                     new ChassisSpeeds(
                         setpointTwist.dx / Constants.PERIOD,
                         setpointTwist.dy / Constants.PERIOD,
-                        setpointTwist.dtheta / Constants.PERIOD);
-                
+                        setpointTwist.dtheta / Constants.PERIOD
+                    );
+
+                // desaturate speeds if above the max acceleration
+                // TODO: I think I already do this in the command... oml
+                double[] accelVector = {
+                    (adjustedSpeeds.vxMetersPerSecond - lastSetpoint.vxMetersPerSecond) / Constants.PERIOD,
+                    (adjustedSpeeds.vyMetersPerSecond - lastSetpoint.vyMetersPerSecond) / Constants.PERIOD
+                };
+                double acceleration = Math.sqrt(
+                    accelVector[0]*accelVector[0] + 
+                    accelVector[1]*accelVector[1]
+                );
+                double accelDir = Math.atan2(accelVector[1], accelVector[0]);
+                if (acceleration > maxLinearAcceleration) {
+                    adjustedSpeeds.vxMetersPerSecond = lastSetpoint.vxMetersPerSecond + Math.cos(accelDir) * maxLinearAcceleration * Constants.PERIOD;
+                    adjustedSpeeds.vyMetersPerSecond = lastSetpoint.vyMetersPerSecond + Math.sin(accelDir) * maxLinearAcceleration * Constants.PERIOD;
+                }
+                lastSetpoint = adjustedSpeeds;
+
                 // System.out.println(adjustedSpeeds);
                 // uses the IK to convert from chassis velocities to individual swerve positions/velocities
                 SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(adjustedSpeeds);
@@ -194,6 +249,7 @@ public class Drive extends SubsystemBase {
                 // ensure a module isnt trying to go faster than max
                 SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxLinearSpeed);
 
+                
                 // Set to last angles if zero
                 if (adjustedSpeeds.vxMetersPerSecond == 0.0
                     && adjustedSpeeds.vyMetersPerSecond == 0.0
@@ -202,6 +258,7 @@ public class Drive extends SubsystemBase {
                     setpointStates[i] = new SwerveModuleState(0.0, lastSetpointStates[i].angle);
                     }
                 }
+
                 lastSetpointStates = setpointStates;
 
                 // Send setpoints to modules
@@ -234,105 +291,106 @@ public class Drive extends SubsystemBase {
     }
 
     /**
-   * Runs the drive at the desired velocity.
-   *
-   * @param speeds Speeds in meters/sec
-   */
-  public void runVelocity(ChassisSpeeds speeds) {
-    controlMode = CONTROL_MODE.CHASSIS_SETPOINT;
-    chassisSetpoint = speeds;
-  }
-
-  public void runModules(SwerveModuleState setpoint) {
-    controlMode = CONTROL_MODE.MODULE_SETPOINT;
-    moduleSetpoint = setpoint;
-  }
-
-  public void runPosition(ArrayList<Pose2d> poseTrajectory, ArrayList<Twist2d> twistTrajectory) {
-    controlMode = CONTROL_MODE.POSITION_SETPOINT;
-    this.positionTrajectory = poseTrajectory;
-    this.twistTrajectory = twistTrajectory;
-    trajectoryCounter = 0;
-  }
-
-  /** Stops the drive. */
-  public void stop() {
-    runVelocity(new ChassisSpeeds());
-  }
-
-  /**
-   * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
-   * return to their normal orientations the next time a nonzero velocity is requested.
-   */
-  public void stopWithX() {
-    stop();
-    for (int i = 0; i < 4; i++) {
-      lastSetpointStates[i] =
-          new SwerveModuleState(
-              lastSetpointStates[i].speedMetersPerSecond, getModuleTranslations()[i].getAngle());
+     * Runs the drive at the desired velocity.
+     *
+     * @param speeds Speeds in meters/sec
+     */
+    public void runVelocity(ChassisSpeeds speeds) {
+        controlMode = CONTROL_MODE.CHASSIS_SETPOINT;
+        chassisSetpoint = speeds;
     }
-  }
 
-  /** Returns the maximum linear speed in meters per sec. */
-  public double getMaxLinearSpeedMetersPerSec() {
-    return maxLinearSpeed;
-  }
+    public void runModules(SwerveModuleState setpoint) {
+        controlMode = CONTROL_MODE.MODULE_SETPOINT;
+        moduleSetpoint = setpoint;
+    }
 
-  /** Returns the maximum linear acceleration in meters per sec per sec. */
-  public double getMaxLinearAccelerationMetersPerSecPerSec() {
-    return maxLinearAcceleration;
-  }
+    public void runPosition(ArrayList<Pose2d> poseTrajectory, ArrayList<Twist2d> twistTrajectory) {
+        controlMode = CONTROL_MODE.POSITION_SETPOINT;
+        this.positionTrajectory = poseTrajectory;
+        this.twistTrajectory = twistTrajectory;
+        trajectoryCounter = 0;
+    }
 
-  /** Returns the maximum angular speed in radians per sec. */
-  public double getMaxAngularSpeedRadPerSec() {
-    return maxAngularSpeed;
-  }
+    /** Stops the drive. */
+    public void stop() {
+        runVelocity(new ChassisSpeeds());
+    }
 
-  /** Returns the current pitch (Y rotation). */
-  public Rotation2d getPitch() {
-    return new Rotation2d(gyroInputs.pitchPositionRad);
-  }
+    /**
+     * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
+     * return to their normal orientations the next time a nonzero velocity is requested.
+     */
+    public void stopWithX() {
+        stop();
+        for (int i = 0; i < 4; i++) {
+            lastSetpointStates[i] =
+                new SwerveModuleState(
+                    lastSetpointStates[i].speedMetersPerSecond, getModuleTranslations()[i].getAngle()
+                );
+        }
+    }
 
-  /** Returns the current roll (X rotation). */
-  public Rotation2d getRoll() {
-    return new Rotation2d(gyroInputs.rollPositionRad);
-  }
+    /** Returns the maximum linear speed in meters per sec. */
+    public double getMaxLinearSpeedMetersPerSec() {
+        return maxLinearSpeed;
+    }
 
-  /** Returns the current yaw (Z rotation). */
-  public Rotation2d getYaw() {
-    return new Rotation2d(gyroInputs.yawPositionRad);
-  }
+    /** Returns the maximum linear acceleration in meters per sec per sec. */
+    public double getMaxLinearAccelerationMetersPerSecPerSec() {
+        return maxLinearAcceleration;
+    }
 
-  /** Returns the current yaw velocity (Z rotation) in radians per second. */
-  public double getYawVelocity() {
-    return gyroInputs.yawVelocityRadPerSec;
-  }
+    /** Returns the maximum angular speed in radians per sec. */
+    public double getMaxAngularSpeedRadPerSec() {
+        return maxAngularSpeed;
+    }
 
-  /** Returns the current pitch velocity (Y rotation) in radians per second. */
-  public double getPitchVelocity() {
-    return gyroInputs.pitchVelocityRadPerSec;
-  }
+    /** Returns the current pitch (Y rotation). */
+    public Rotation2d getPitch() {
+        return new Rotation2d(gyroInputs.pitchPositionRad);
+    }
 
-  /** Returns the current roll velocity (X rotation) in radians per second. */
-  public double getRollVelocity() {
-    return gyroInputs.rollVelocityRadPerSec;
-  }
+    /** Returns the current roll (X rotation). */
+    public Rotation2d getRoll() {
+        return new Rotation2d(gyroInputs.rollPositionRad);
+    }
 
-  /** Returns an array of module translations. */
-  public Translation2d[] getModuleTranslations() {
-    return new Translation2d[] {
-      new Translation2d(-trackWidthX / 2.0, trackWidthY / 2.0),
-      new Translation2d(trackWidthX / 2.0, trackWidthY / 2.0),
-      new Translation2d(trackWidthX / 2.0, -trackWidthY / 2.0),
-      new Translation2d(-trackWidthX / 2.0, -trackWidthY / 2.0)
-    };
-  }
+    /** Returns the current yaw (Z rotation). */
+    public Rotation2d getYaw() {
+        return new Rotation2d(gyroInputs.yawPositionRad);
+    }
 
-  public Pose2d getPose() {
-    return new Pose2d();
-  } 
+    /** Returns the current yaw velocity (Z rotation) in radians per second. */
+    public double getYawVelocity() {
+        return gyroInputs.yawVelocityRadPerSec;
+    }
 
-  public Twist2d getVelocity() {
-    return new Twist2d();
-  }
+    /** Returns the current pitch velocity (Y rotation) in radians per second. */
+    public double getPitchVelocity() {
+        return gyroInputs.pitchVelocityRadPerSec;
+    }
+
+    /** Returns the current roll velocity (X rotation) in radians per second. */
+    public double getRollVelocity() {
+        return gyroInputs.rollVelocityRadPerSec;
+    }
+
+    /** Returns an array of module translations. */
+    public Translation2d[] getModuleTranslations() {
+        return new Translation2d[] {
+            new Translation2d(-trackWidthX / 2.0, trackWidthY / 2.0),
+            new Translation2d(trackWidthX / 2.0, trackWidthY / 2.0),
+            new Translation2d(trackWidthX / 2.0, -trackWidthY / 2.0),
+            new Translation2d(-trackWidthX / 2.0, -trackWidthY / 2.0)
+        };
+    }
+
+    public Pose2d getPose() {
+        return fieldPosition;
+    } 
+
+    public Twist2d getVelocity() {
+        return fieldVelocity;
+    }
 }
