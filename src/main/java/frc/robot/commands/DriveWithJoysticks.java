@@ -51,10 +51,12 @@ public class DriveWithJoysticks extends CommandBase {
         Rotation2d linearDirection = new Rotation2d(linearXSpeed, linearYSpeed);
         
         double angularSpeed = angularSpeedSupplier.get();
+        // System.out.println(angularSpeed);
 
         // TODO: switch constants to tunable numbers
         linearSpeed = applyPreferences(linearSpeed, Constants.LIENAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
         angularSpeed = applyPreferences(angularSpeed, Constants.ANGULAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
+        // System.out.println(angularSpeed);
 
         linearSpeed *= linearSpeedMultiplierSupplier.get();
 
@@ -74,6 +76,10 @@ public class DriveWithJoysticks extends CommandBase {
         if (DriverStation.getAlliance() == Alliance.Red) {
             driveRotation = driveRotation.plus(new Rotation2d(Math.PI));
         }
+
+        // System.out.println("test");
+        // System.out.println(speeds);
+
         // System.out.println(driveRotation);
         speeds =
             ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -96,8 +102,8 @@ public class DriveWithJoysticks extends CommandBase {
                 prevSpeeds.vyMetersPerSecond + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD),
             speeds.omegaRadiansPerSecond
         );
-
         prevSpeeds = speeds;
+
         // System.out.println(speeds.omegaRadiansPerSecond);
         
         drive.runVelocity(speeds);

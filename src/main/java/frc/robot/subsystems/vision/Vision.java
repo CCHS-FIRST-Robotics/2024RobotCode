@@ -9,12 +9,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.littletonrobotics.junction.Logger;
 
-public class Camera extends SubsystemBase {
+public class Vision extends SubsystemBase {
     
     CameraIO io;
     CameraIOInputsAutoLogged inputs = new CameraIOInputsAutoLogged();
 
-    public Camera(CameraIO io) {
+    public Vision(CameraIO io) {
         this.io = io;
     }
     

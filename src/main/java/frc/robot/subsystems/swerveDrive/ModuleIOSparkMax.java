@@ -177,7 +177,6 @@ public class ModuleIOSparkMax implements ModuleIO {
         double positionRotations = Units.radiansToRotations(
             MathUtil.inputModulus(positionRad, 0, 2 * Math.PI)
         );
-        System.out.println(positionRotations);
         turnSparkMaxPIDF.setReference(
             positionRotations,
             CANSparkMax.ControlType.kPosition,

@@ -11,10 +11,12 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.commands.DriveModules;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.FollowAprilTag;
+import frc.robot.commands.MoveToPose;
 
 // import frc.robot.subsystems.mecaDrive.Drive;
 // import frc.robot.subsystems.mecaDrive.DriveIO;
@@ -97,8 +99,12 @@ public class RobotContainer {
     configureButtonBindings();
   }
 
-  private double genericSupplier() {
-    return 1;
+  private double genericSupplier(double x) {
+      return x;
+  }
+
+  private Pose2d genericSupplier(Pose2d pose) {
+     return pose;
   }
 
   /**
@@ -123,14 +129,20 @@ public class RobotContainer {
         drive, 
         () -> controller.getLeftX(), 
         () -> -controller.getLeftY(), 
-        () -> -controller.getRightX(), 
-        () -> genericSupplier()
+        () -> controller.getRightX(), 
+        () -> genericSupplier(1)
       )
     );
 
     // TODO: shouldn't be used yet -- drive.getPose() isn't implemented, PID will bug
     // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
     
+    // controller.a().onTrue(
+    //   new MoveToPose(
+    //     drive, 
+    //     () -> genericSupplier(new Pose2d(-1, -1, new Rotation2d(-Math.PI * 3 / 4)))
+    //   )
+    // );
   }
 
   /**

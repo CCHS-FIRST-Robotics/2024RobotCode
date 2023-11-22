@@ -40,7 +40,7 @@ public class Drive extends SubsystemBase {
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
     private static final double maxLinearSpeed = 4.5;
-    private static final double maxLinearAcceleration = 5.0;
+    private static final double maxLinearAcceleration = 8.0;
     private static final double trackWidthX = Units.inchesToMeters(22.5);
     private static final double trackWidthY = Units.inchesToMeters(22.5);
 
@@ -64,13 +64,13 @@ public class Drive extends SubsystemBase {
     private int trajectoryCounter = -1;
     
     // POSITION PID CONSTANTS
-    private double kPx = 0.01;
-    private double kPy = 0.0;
-    private double kPHeading = 0.0;
+    private double kPx = 0.0; // 0.5
+    private double kPy = 0.0; // 0.5
+    private double kPHeading = 0.0; // 0.5
 
-    private double kIx = 0.0;
-    private double kIy = 0.0;
-    private double kIHeading = 0.0;
+    private double kIx = 0.0; // 0.3
+    private double kIy = 0.0; // 0.3
+    private double kIHeading = 0.0; // 0.3
 
     private PIDController xController = new PIDController(kPx, kIx, 0.0);
     private PIDController yController = new PIDController(kPy, kIy, 0.0);
@@ -188,6 +188,13 @@ public class Drive extends SubsystemBase {
                 positionSetpointTrajectory = positionTrajectory.get(trajectoryCounter);
                 twistSetpointTrajectory = twistTrajectory.get(trajectoryCounter);
 
+                System.out.println("SETPOINTS:");
+                System.out.println(positionSetpointTrajectory);
+                System.out.println(twistSetpointTrajectory);
+
+                Logger.getInstance().recordOutput("Auto/FieldVelocity", new Pose2d(twistSetpointTrajectory.dx, twistSetpointTrajectory.dy, new Rotation2d(twistSetpointTrajectory.dtheta)));
+                Logger.getInstance().recordOutput("Auto/FieldPosition", positionSetpointTrajectory);
+
                 double xPID = xController.calculate(getPose().getX(), positionSetpointTrajectory.getX());
                 double yPID = yController.calculate(getPose().getY(), positionSetpointTrajectory.getY());
                 double headingPID = headingController.calculate(getPose().getRotation().getRadians(), positionSetpointTrajectory.getRotation().getRadians());
@@ -197,6 +204,13 @@ public class Drive extends SubsystemBase {
                     twistSetpointTrajectory.dy + yPID,
                     twistSetpointTrajectory.dtheta + headingPID
                 );
+                chassisSetpoint =
+                    ChassisSpeeds.fromFieldRelativeSpeeds(
+                        chassisSetpoint.vxMetersPerSecond,
+                        chassisSetpoint.vyMetersPerSecond,
+                        chassisSetpoint.omegaRadiansPerSecond,
+                        getYaw()
+                    );
                 
                 trajectoryCounter++;
                 /*
@@ -243,6 +257,7 @@ public class Drive extends SubsystemBase {
                 lastSetpoint = adjustedSpeeds;
 
                 // System.out.println(adjustedSpeeds);
+
                 // uses the IK to convert from chassis velocities to individual swerve positions/velocities
                 SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(adjustedSpeeds);
                 // System.out.println(setpointStates[0]);

@@ -25,7 +25,6 @@ public class CameraIOZED implements CameraIO {
         inputs.primaryTagX = tags.getEntry("primary_tag_x").getDouble(-1);
         inputs.primaryTagY = tags.getEntry("primary_tag_y").getDouble(-1);
         inputs.primaryTagZ = tags.getEntry("primary_tag_z").getDouble(-1);
-        inputs.primaryTagDistance = tags.getEntry("primary_tag_distance").getDouble(-1);
         inputs.primaryTagHeading = tags.getEntry("primary_tag_heading").getDouble(-1);
 
         // Values for all tags found by the camera
@@ -37,7 +36,6 @@ public class CameraIOZED implements CameraIO {
         inputs.tagXs = tags.getEntry("tag_xs").getDoubleArray(new double[] {});
         inputs.tagYs = tags.getEntry("tag_ys").getDoubleArray(new double[] {});
         inputs.tagZs = tags.getEntry("tag_zs").getDoubleArray(new double[] {});
-        inputs.tagDistances = tags.getEntry("tag_distances").getDoubleArray(new double[] {});
         inputs.tagHeadings = tags.getEntry("tag_headings").getDoubleArray(new double[] {});
     }
 }

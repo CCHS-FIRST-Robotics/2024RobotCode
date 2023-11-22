@@ -38,7 +38,7 @@ public final class Constants {
   public static final double LIENAR_SPEED_EXPONENT = 2;
   public static final double ANGULAR_SPEED_EXPONENT = 2.5;
 
-  public static final double ANALOG_DEADZONE = .075;
+  public static final double ANALOG_DEADZONE = .1;
 
   // TODO: Should this be its own file?
   public static class HardwareConstants {

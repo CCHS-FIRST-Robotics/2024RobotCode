@@ -8,11 +8,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.swerveDrive.Drive;
 
 // SHOULD (usually) BE RAN ONCE, CONTROL IS DONE IN DRIVE SUBSYSTEM
-public class MoveToPose extends CommandBase {
+public class MoveToPose extends InstantCommand {
 
     Drive drive;
     Supplier<Pose2d> targetPoseSupplier;
@@ -56,7 +57,7 @@ public class MoveToPose extends CommandBase {
         ArrayList<Pose2d> poseTrajectory = new ArrayList<Pose2d>();
         ArrayList<Twist2d> velocityTrajectory = new ArrayList<Twist2d>();
         // +1 so that the last point is included just in case (int) cuts it off
-        for (int i = 0; i < (int) (timeToEnd / Constants.PERIOD + 1); i++) {
+        for (int i = 0; i < (int) (timeToEnd / Constants.PERIOD) + 2; i++) {
             double time = i * Constants.PERIOD;
 
             double x = profileX.calculate(time).position;
@@ -68,6 +69,10 @@ public class MoveToPose extends CommandBase {
             double dy = profileY.calculate(time).velocity;
             double dtheta = profileHeading.calculate(time).velocity;
             velocityTrajectory.add(new Twist2d(dx, dy, dtheta));
+
+            // System.out.println(i);
+            // System.out.println(new Pose2d(x, y, new Rotation2d(heading)));
+            // System.out.println(new Twist2d(dx, dy, dtheta));
         }
         
         drive.runPosition(poseTrajectory, velocityTrajectory);
