@@ -26,6 +26,7 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 import frc.robot.Constants;
+import frc.robot.utils.PoseEstimator;
 
 
 public class Drive extends SubsystemBase {
@@ -83,6 +84,7 @@ public class Drive extends SubsystemBase {
     private Rotation2d lastGyroYaw = new Rotation2d();
     private Twist2d fieldVelocity = new Twist2d();
     private Pose2d fieldPosition = new Pose2d();
+    private PoseEstimator poseEstimator;
 
     enum CONTROL_MODE {
         DISABLED,
@@ -98,14 +100,19 @@ public class Drive extends SubsystemBase {
         ModuleIO flModuleIO,
         ModuleIO frModuleIO,
         ModuleIO blModuleIO,
-        ModuleIO brModuleIO
+        ModuleIO brModuleIO,
+        PoseEstimator poseEstimator
     ) {
         System.out.println("[Init] Creating Drive");
+
         this.gyroIO = gyroIO;
+        this.poseEstimator = poseEstimator;
+
         modules[0] = new Module(flModuleIO, 0);
         modules[1] = new Module(frModuleIO, 1);
         modules[2] = new Module(blModuleIO, 2);
         modules[3] = new Module(brModuleIO, 3);
+
         lastMovementTimer.start();
         // whats the difference between this and modules.forEach(()=> )
         // wait thats js im stupid
@@ -128,7 +135,6 @@ public class Drive extends SubsystemBase {
         }
         Logger.getInstance().recordOutput("SwerveStates/Measured", measuredStates);
 
-
         // Update odometry
         SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
         for (int i = 0; i < 4; i++) {
@@ -144,7 +150,8 @@ public class Drive extends SubsystemBase {
             twist = new Twist2d(twist.dx, twist.dy, gyroYaw.minus(lastGyroYaw).getRadians());
         }
         lastGyroYaw = gyroYaw;
-        fieldPosition = fieldPosition.exp(twist);
+        // fieldPosition = fieldPosition.exp(twist);
+        poseEstimator.addOdometryData(twist, Timer.getFPGATimestamp());
 
         // Update field velocity
         ChassisSpeeds chassisSpeeds = kinematics.toChassisSpeeds(measuredStates);
@@ -311,6 +318,11 @@ public class Drive extends SubsystemBase {
      * @param speeds Speeds in meters/sec
      */
     public void runVelocity(ChassisSpeeds speeds) {
+        // Since DriveWithJoysticks is the default command and MoveToPose runs once
+        // Keep drive running the position trajectory unless overridden (driver sets a nonzero speed with joysticks)
+        if (controlMode == CONTROL_MODE.POSITION_SETPOINT && speeds.equals(new ChassisSpeeds())) {
+            return;
+        }
         controlMode = CONTROL_MODE.CHASSIS_SETPOINT;
         chassisSetpoint = speeds;
     }
@@ -402,7 +414,7 @@ public class Drive extends SubsystemBase {
     }
 
     public Pose2d getPose() {
-        return fieldPosition;
+        return poseEstimator.getPoseEstimate();
     } 
 
     public Twist2d getVelocity() {

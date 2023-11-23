@@ -56,7 +56,7 @@ public class MoveToPose extends InstantCommand {
         // Create a list of poses and velocities (represented as twists) for each time step
         ArrayList<Pose2d> poseTrajectory = new ArrayList<Pose2d>();
         ArrayList<Twist2d> velocityTrajectory = new ArrayList<Twist2d>();
-        // +1 so that the last point is included just in case (int) cuts it off
+        // +2 so that the last point is included just in case (int) cuts it off
         for (int i = 0; i < (int) (timeToEnd / Constants.PERIOD) + 2; i++) {
             double time = i * Constants.PERIOD;
 

@@ -25,7 +25,7 @@ import frc.robot.commands.MoveToPose;
 
 import frc.robot.subsystems.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
-
+import frc.robot.utils.PoseEstimator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -42,7 +42,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final Camera camera;
+  private final Vision camera;
+  private final PoseEstimator poseEstimator = new PoseEstimator();
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -62,9 +63,10 @@ public class RobotContainer {
           new ModuleIOSparkMax(0), 
           new ModuleIOSparkMax(1), 
           new ModuleIOSparkMax(2), 
-          new ModuleIOSparkMax(3)
+          new ModuleIOSparkMax(3),
+          poseEstimator
         );
-        camera = new Camera(new CameraIOZED());
+        camera = new Vision(new CameraIOZED(), poseEstimator);
         break;
 
       // Sim robot, instantiate physics sim IO implementations
@@ -74,9 +76,10 @@ public class RobotContainer {
           new ModuleIOSim(), 
           new ModuleIOSim(),
           new ModuleIOSim(),
-          new ModuleIOSim()
+          new ModuleIOSim(),
+          poseEstimator
         );
-        camera = new Camera(new CameraIOZED());
+        camera = new Vision(new CameraIOZED(), poseEstimator);
         break;
 
       // Replayed robot, disable IO implementations
@@ -86,9 +89,10 @@ public class RobotContainer {
           new ModuleIOSparkMax(0), 
           new ModuleIOSparkMax(1), 
           new ModuleIOSparkMax(2), 
-          new ModuleIOSparkMax(3)
+          new ModuleIOSparkMax(3),
+          poseEstimator
         );
-        camera = new Camera(new CameraIOZED());
+        camera = new Vision(new CameraIOZED(), poseEstimator);
         break;
     }
 
@@ -97,14 +101,6 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-  }
-
-  private double genericSupplier(double x) {
-      return x;
-  }
-
-  private Pose2d genericSupplier(Pose2d pose) {
-     return pose;
   }
 
   /**
@@ -130,19 +126,18 @@ public class RobotContainer {
         () -> controller.getLeftX(), 
         () -> -controller.getLeftY(), 
         () -> controller.getRightX(), 
-        () -> genericSupplier(1)
+        () -> {return 1.0;}
       )
     );
 
-    // TODO: shouldn't be used yet -- drive.getPose() isn't implemented, PID will bug
-    // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
+    controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
     
-    // controller.a().onTrue(
-    //   new MoveToPose(
-    //     drive, 
-    //     () -> genericSupplier(new Pose2d(-1, -1, new Rotation2d(-Math.PI * 3 / 4)))
-    //   )
-    // );
+    controller.a().onTrue(
+      new MoveToPose(
+        drive, 
+        () -> {return new Pose2d(-1, -1, new Rotation2d(-Math.PI * 3 / 4));}
+      )
+    );
   }
 
   /**

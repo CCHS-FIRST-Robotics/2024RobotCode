@@ -1,33 +1,30 @@
 package frc.robot.subsystems.vision;
 
+import java.util.ArrayList;
+
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import frc.robot.utils.AprilTag;
 
 public interface CameraIO {
 
     @AutoLog
     public static class CameraIOInputs {
         // Values from the primary (closest) tag
-        public long primaryTagId = -1;
+        public int primaryTagId = -1;
         public double primaryTagX = -1;
         public double primaryTagY = -1;
         public double primaryTagZ = -1;
-        public double primaryTagDistance = -1;
         public double primaryTagHeading = -1;
 
         // Values for all tags found by the camera
-        public long[] tagIds = new long[] {};
-        public double[] tagXs = new double[] {};
-        public double[] tagYs = new double[] {};
-        public double[] tagZs = new double[] {};
-        public double[] tagDistances = new double[] {};
-        public double[] tagHeadings = new double[] {};
+        public ArrayList<AprilTag> tags = new ArrayList<AprilTag>();
 
         // Localization data
-        //TODO: develop localization system
-        // Pose2d poseEstimate = new Pose2d();
+        Pose2d poseEstimate = new Pose2d();
+        Pose3d poseEstimate3d = new Pose3d();
     }
 
     /** Updates the set of loggable inputs. */
