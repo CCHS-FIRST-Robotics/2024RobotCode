@@ -21,6 +21,12 @@ public class Module {
     // TODO: switch to tunable numbers w/ smartdash
     private static final double wheelRadius = 0.0508; // 2"
 
+    /**
+     * Constructs a new Module (subsytem) object
+     * 
+     * @param io The ModuleIO object to use
+     * @param index The index of the module
+     */
     public Module(ModuleIO io, int index) {
         System.out.println("[Init] Creating Module " + Integer.toString(index));
         this.io = io;
@@ -46,9 +52,12 @@ public class Module {
     }
 
     /**
-    * Runs the module with the specified setpoint state. Must be called periodically. Returns the
-    * optimized state.
-    */
+     * Runs the module with the specified setpoint state. Must be called periodically. Returns the
+     * optimized state.
+     * 
+     * @param targetState The desired state of the module
+     * @return The optimized state of the module
+     */
     public SwerveModuleState runSetpoint(SwerveModuleState targetState) {
         // Optimize state based on current angle
         var optimizedState = SwerveModuleState.optimize(targetState, getAngle());
@@ -73,15 +82,15 @@ public class Module {
     }
 
     /**
-   * Runs the module with the specified voltage while controlling to zero degrees. Must be called
-   * periodically.
-   */
+     * Runs the module with the specified voltage while controlling to zero degrees. Must be called
+     * periodically.
+     */
     public void runCharacterization(double volts) {
         // io.setTurnVoltage(turnFeedback.calculate(getAngle().getRadians(), 0.0));
         // io.setDriveVoltage(volts);
     }
 
-    /** Disables all outputs to motors. */
+    /** Disables all outputs to motors (sets voltage to 0). */
     public void stop() {
         io.setTurnVoltage(0.0);
         io.setDriveVoltage(0.0);

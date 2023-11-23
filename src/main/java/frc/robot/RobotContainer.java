@@ -40,112 +40,114 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
  * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // Subsystems
-  private final Drive drive;
-  private final Vision camera;
-  private final PoseEstimator poseEstimator = new PoseEstimator();
+    // Subsystems
+    private final Drive drive;
+    private final Vision camera;
+    private final PoseEstimator poseEstimator = new PoseEstimator();
 
-  // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+    // Controller
+    private final CommandXboxController controller = new CommandXboxController(0);
 
-  // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
+    // Dashboard inputs
+    private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
-  public RobotContainer() {
-    switch (Constants.currentMode) {
-      // Real robot, instantiate hardware IO implementations
-      case REAL:
-        drive = new Drive(
-          new GyroIONavX(),
-          new ModuleIOSparkMax(0), 
-          new ModuleIOSparkMax(1), 
-          new ModuleIOSparkMax(2), 
-          new ModuleIOSparkMax(3),
-          poseEstimator
-        );
-        camera = new Vision(new CameraIOZED(), poseEstimator);
-        break;
+    /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
+    public RobotContainer() {
+        switch (Constants.currentMode) {
+        // Real robot, instantiate hardware IO implementations
+        case REAL:
+            drive = new Drive(
+                new GyroIONavX(),
+                new ModuleIOSparkMax(0), 
+                new ModuleIOSparkMax(1), 
+                new ModuleIOSparkMax(2), 
+                new ModuleIOSparkMax(3),
+                poseEstimator
+            );
+            camera = new Vision(new CameraIOZED(), poseEstimator);
+            break;
 
-      // Sim robot, instantiate physics sim IO implementations
-      case SIM:
-        drive = new Drive(
-          new GyroIONavX(),
-          new ModuleIOSim(), 
-          new ModuleIOSim(),
-          new ModuleIOSim(),
-          new ModuleIOSim(),
-          poseEstimator
-        );
-        camera = new Vision(new CameraIOZED(), poseEstimator);
-        break;
+        // Sim robot, instantiate physics sim IO implementations
+        case SIM:
+            drive = new Drive(
+                new GyroIONavX(),
+                new ModuleIOSim(), 
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                poseEstimator
+            );
+            camera = new Vision(new CameraIOZED(), poseEstimator);
+            break;
 
-      // Replayed robot, disable IO implementations
-      default:
-        drive = new Drive(
-          new GyroIONavX(),
-          new ModuleIOSparkMax(0), 
-          new ModuleIOSparkMax(1), 
-          new ModuleIOSparkMax(2), 
-          new ModuleIOSparkMax(3),
-          poseEstimator
-        );
-        camera = new Vision(new CameraIOZED(), poseEstimator);
-        break;
+        // Replayed robot, disable IO implementations
+        default:
+            drive = new Drive(
+                new GyroIONavX(),
+                new ModuleIOSparkMax(0), 
+                new ModuleIOSparkMax(1), 
+                new ModuleIOSparkMax(2), 
+                new ModuleIOSparkMax(3),
+                poseEstimator
+            );
+            camera = new Vision(new CameraIOZED(), poseEstimator);
+            break;
+        }
+
+        // Set up auto routines
+        autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+
+        // Configure the button bindings
+        configureButtonBindings();
     }
 
-    // Set up auto routines
-    autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+    /**
+     * Use this method to define your button->command mappings. Buttons can be
+     * created by instantiating a {@link GenericHID} or one of its subclasses
+     * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then
+     * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     */
+    private void configureButtonBindings() {
+        // DRIVING MODULES -- FOR TESTING
+        // drive.setDefaultCommand(
+        //   new DriveModules(
+        //     drive, 
+        //     () -> -controller.getLeftY(), 
+        //     () -> controller.getRightX(), 
+        //     () -> 0.5 + 0.5 * controller.getRightTriggerAxis()
+        // ));
 
-    // Configure the button bindings
-    configureButtonBindings();
-  }
+        // DRIVING WITH JOYSTICKS (NORMAL)
+        drive.setDefaultCommand(
+            new DriveWithJoysticks(
+                drive, 
+                () -> controller.getLeftX(), 
+                () -> -controller.getLeftY(), 
+                () -> controller.getRightX(), 
+                () -> {return 1.0;}
+            )
+        );
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by instantiating a {@link GenericHID} or one of its subclasses
-   * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then
-   * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-  private void configureButtonBindings() {
-    // DRIVING MODULES -- FOR TESTING
-    // drive.setDefaultCommand(
-    //   new DriveModules(
-    //     drive, 
-    //     () -> -controller.getLeftY(), 
-    //     () -> controller.getRightX(), 
-    //     () -> 0.5 + 0.5 * controller.getRightTriggerAxis()
-    // ));
+        // Follow the nearest apriltag while the right trigger is held
+        controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
+        
+        // Generate a trajectory to a pose when the A button is pressed (and switch drive to position control)
+        controller.a().onTrue(
+            new MoveToPose(
+                drive, 
+                () -> {return new Pose2d(-1, -1, new Rotation2d(-Math.PI * 3 / 4));}
+            )
+        );
+    }
 
-    // DRIVING WITH JOYSTICKS (NORMAL)
-    drive.setDefaultCommand(
-      new DriveWithJoysticks(
-        drive, 
-        () -> controller.getLeftX(), 
-        () -> -controller.getLeftY(), 
-        () -> controller.getRightX(), 
-        () -> {return 1.0;}
-      )
-    );
-
-    controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
-    
-    controller.a().onTrue(
-      new MoveToPose(
-        drive, 
-        () -> {return new Pose2d(-1, -1, new Rotation2d(-Math.PI * 3 / 4));}
-      )
-    );
-  }
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    return autoChooser.get();
-  }
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
+    public Command getAutonomousCommand() {
+        return autoChooser.get();
+    }
 }

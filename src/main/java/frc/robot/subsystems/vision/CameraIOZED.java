@@ -16,10 +16,16 @@ public class CameraIOZED implements CameraIO {
     NetworkTable tagsTable = NetworkTableInstance.getDefault().getTable("tags");
 
     
+    /**
+     * Constructs a new CameraIOZED object
+     */
     public CameraIOZED() {
         System.out.println("[Init] Creating CameraIOZED");
     }
 
+    /* (non-Javadoc)
+     * @see frc.robot.subsystems.vision.CameraIO#updateInputs(frc.robot.subsystems.vision.CameraIO.CameraIOInputs)
+     */
     public void updateInputs(CameraIOInputs inputs) {
         // Pose estimate from the zed (x, y, theta)
         double[] pose2d = tagsTable.getEntry("pose_estimate").getDoubleArray(new double[] {-1, -1, -1});

@@ -52,6 +52,12 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     int index;
 
+    /**
+     * Constructs a new ModuleIOSparkMax object
+     * Sets PID constants and configures the SparkMAX's + encoders
+     * 
+     * @param index The index of the module
+     */
     public ModuleIOSparkMax(int index) {
         System.out.println("[Init] Creating ModuleIOSparkMax " + Integer.toString(index));
         this.index = index;
@@ -120,6 +126,9 @@ public class ModuleIOSparkMax implements ModuleIO {
         // System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
     }
 
+    /* (non-Javadoc)
+     * @see frc.robot.subsystems.swerveDrive.ModuleIO#updateInputs(frc.robot.subsystems.swerveDrive.ModuleIO.ModuleIOInputs)
+     */
     public void updateInputs(ModuleIOInputs inputs) {
         // update drive motor info
         inputs.drivePositionRad =
@@ -153,14 +162,23 @@ public class ModuleIOSparkMax implements ModuleIO {
         inputs.turnTempCelcius = new double[] {turnSparkMax.getMotorTemperature()};
     }
 
+    /* (non-Javadoc)
+     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVoltage(double)
+     */
     public void setDriveVoltage(double volts) {
         driveSparkMax.setVoltage(volts);
     }
 
+    /* (non-Javadoc)
+     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setTurnVoltage(double)
+     */
     public void setTurnVoltage(double volts) {
         turnSparkMax.setVoltage(volts);
     }
 
+    /* (non-Javadoc)
+     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVelocity(double)
+     */
     public void setDriveVelocity(double velocityRadPerSec) {
         double motorRPM = Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec) * driveAfterEncoderReduction;
 
@@ -172,6 +190,9 @@ public class ModuleIOSparkMax implements ModuleIO {
         );
     }
 
+    /* (non-Javadoc)
+     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setTurnPosition(double)
+     */
     public void setTurnPosition(double positionRad) {
         // Adjust from [-PI, PI] (wrapped angle, so initially -pi was 2pi) -> [0, 2PI] 
         double positionRotations = Units.radiansToRotations(
@@ -184,10 +205,16 @@ public class ModuleIOSparkMax implements ModuleIO {
         );
     }
 
+    /* (non-Javadoc)
+     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveBrakeMode(boolean)
+     */
     public void setDriveBrakeMode(boolean enable) {
         driveSparkMax.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
     }
 
+    /* (non-Javadoc)
+     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setTurnBrakeMode(boolean)
+     */
     public void setTurnBrakeMode(boolean enable) {
         turnSparkMax.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
     }

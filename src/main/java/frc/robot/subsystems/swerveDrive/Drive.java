@@ -36,18 +36,24 @@ public class Drive extends SubsystemBase {
         6.0; // Need to be under the above speed for this length of time to switch to coast
     private static final double ledsFallenAngleDegrees = 60.0; // Threshold to detect falls
 
+    // Define Gyro IO and inputs
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+
+    // Define Module objects
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
+    // Constants for the drivebase
     private static final double maxLinearSpeed = 4.5;
     private static final double maxLinearAcceleration = 8.0;
     private static final double trackWidthX = Units.inchesToMeters(22.5);
     private static final double trackWidthY = Units.inchesToMeters(22.5);
-
     private double maxAngularSpeed = 4 * Math.PI;
+
+    // Define Kinematics object
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
 
+    // Initialize setpoints
     private ChassisSpeeds chassisSetpoint = new ChassisSpeeds();
     private ChassisSpeeds lastSetpoint = new ChassisSpeeds();
     private SwerveModuleState moduleSetpoint = new SwerveModuleState();
@@ -58,6 +64,7 @@ public class Drive extends SubsystemBase {
             new SwerveModuleState(),
             new SwerveModuleState()
         };
+    // Initialize trajectory info
     private Pose2d positionSetpointTrajectory = new Pose2d();
     private Twist2d twistSetpointTrajectory = new Twist2d();
     private ArrayList<Pose2d> positionTrajectory = new ArrayList<Pose2d>();
@@ -77,15 +84,18 @@ public class Drive extends SubsystemBase {
     private PIDController yController = new PIDController(kPy, kIy, 0.0);
     private PIDController headingController = new PIDController(kPHeading, kIHeading, 0.0);
 
+    
     private boolean isBrakeMode = false;
     private Timer lastMovementTimer = new Timer();
 
+    // Initialize estimated positions
     private double[] lastModulePositionsMeters = new double[] {0.0, 0.0, 0.0, 0.0};
     private Rotation2d lastGyroYaw = new Rotation2d();
     private Twist2d fieldVelocity = new Twist2d();
-    private Pose2d fieldPosition = new Pose2d();
+    // private Pose2d fieldPosition = new Pose2d(); Use poseEstimator instead
     private PoseEstimator poseEstimator;
 
+    // Control modes for the drive
     enum CONTROL_MODE {
         DISABLED,
         MODULE_SETPOINT,
@@ -135,7 +145,11 @@ public class Drive extends SubsystemBase {
         }
         Logger.getInstance().recordOutput("SwerveStates/Measured", measuredStates);
 
-        // Update odometry
+        /*
+         * UPDATE ODOMETRY 
+         */
+
+        // Get the change in position of each module
         SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
         for (int i = 0; i < 4; i++) {
           wheelDeltas[i] =
@@ -144,20 +158,29 @@ public class Drive extends SubsystemBase {
                   modules[i].getAngle());
           lastModulePositionsMeters[i] = modules[i].getPositionMeters();
         }
+        // Use kinematics to convert the change in position of each module -> change in position of the robot
         var twist = kinematics.toTwist2d(wheelDeltas);
+
+        // Use the gyro to get the change in heading of the robot, instead of the change in heading of each module
+        // Gyro is likely more accurate than the modules' encoders (due to slippage, etc)
         var gyroYaw = new Rotation2d(gyroInputs.yawPositionRad);
         if (gyroInputs.connected) {
             twist = new Twist2d(twist.dx, twist.dy, gyroYaw.minus(lastGyroYaw).getRadians());
         }
         lastGyroYaw = gyroYaw;
+
+        // Update pose estimator with the new data 
         // fieldPosition = fieldPosition.exp(twist);
         poseEstimator.addOdometryData(twist, Timer.getFPGATimestamp());
 
-        // Update field velocity
+        /* Update field velocity */
+        // Gets the speed/angle of each module and converts it to a robot velocity
         ChassisSpeeds chassisSpeeds = kinematics.toChassisSpeeds(measuredStates);
+        // Convert the robot velocity to a field velocity
         Translation2d linearFieldVelocity =
             new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)
                 .rotateBy(getYaw());
+        // Convert the field velocity to a twist (use gyro for rotation speed if connected)
         fieldVelocity =
             new Twist2d(
                 linearFieldVelocity.getX(),
@@ -166,8 +189,9 @@ public class Drive extends SubsystemBase {
                     ? gyroInputs.yawVelocityRadPerSec
                     : chassisSpeeds.omegaRadiansPerSecond);
 
+        // Record into "RealOutputs"
         Logger.getInstance().recordOutput("Odometry/FieldVelocity", new Pose2d(fieldVelocity.dx, fieldVelocity.dy, new Rotation2d(fieldVelocity.dtheta)));
-        Logger.getInstance().recordOutput("Odometry/FieldPosition", fieldPosition);
+        Logger.getInstance().recordOutput("Odometry/FieldPosition", getPose());
 
         if (DriverStation.isDisabled()) {
             controlMode = CONTROL_MODE.DISABLED;
@@ -187,11 +211,14 @@ public class Drive extends SubsystemBase {
                 return;
 
             case POSITION_SETPOINT:
+                // If there's no available trajectory, don't do anything
                 if (trajectoryCounter == -1) break;
+                // If we've reached the end of the trajectory, hold at the last setpoint
                 if (trajectoryCounter > positionTrajectory.size() - 1) {
                     trajectoryCounter = positionTrajectory.size() - 1;
                 }
 
+                // Get the position/velocity setpoints at the current point in the trajectory
                 positionSetpointTrajectory = positionTrajectory.get(trajectoryCounter);
                 twistSetpointTrajectory = twistTrajectory.get(trajectoryCounter);
 
@@ -199,18 +226,22 @@ public class Drive extends SubsystemBase {
                 System.out.println(positionSetpointTrajectory);
                 System.out.println(twistSetpointTrajectory);
 
+                // Record setpoints to "RealOutputs"
                 Logger.getInstance().recordOutput("Auto/FieldVelocity", new Pose2d(twistSetpointTrajectory.dx, twistSetpointTrajectory.dy, new Rotation2d(twistSetpointTrajectory.dtheta)));
                 Logger.getInstance().recordOutput("Auto/FieldPosition", positionSetpointTrajectory);
 
+                // Get the PID output for the desired setpoint (output in m/s)
                 double xPID = xController.calculate(getPose().getX(), positionSetpointTrajectory.getX());
                 double yPID = yController.calculate(getPose().getY(), positionSetpointTrajectory.getY());
                 double headingPID = headingController.calculate(getPose().getRotation().getRadians(), positionSetpointTrajectory.getRotation().getRadians());
 
+                // Add the PID output to the velocity setpoint
                 chassisSetpoint = new ChassisSpeeds(
                     twistSetpointTrajectory.dx + xPID,
                     twistSetpointTrajectory.dy + yPID,
                     twistSetpointTrajectory.dtheta + headingPID
                 );
+                // Convert to robot oriented and send the updated velocity setpoint to the velocity controller 
                 chassisSetpoint =
                     ChassisSpeeds.fromFieldRelativeSpeeds(
                         chassisSetpoint.vxMetersPerSecond,
@@ -229,7 +260,7 @@ public class Drive extends SubsystemBase {
             case CHASSIS_SETPOINT:
                 // Brief explanation here: https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/transformations.html
                 // For more detail, see chapter 10 here: https://file.tavsys.net/control/controls-engineering-in-frc.pdf
-                // Purpose: accounts for movement along an arc instead of a straight line, avoids skew
+                // Purpose: accounts for continuous movement along an arc instead of a discrete straight line, avoids skew
                 // More detail here: https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/47
                 var setpointTwist =
                 new Pose2d()
@@ -238,7 +269,7 @@ public class Drive extends SubsystemBase {
                             chassisSetpoint.vxMetersPerSecond * Constants.PERIOD,
                             chassisSetpoint.vyMetersPerSecond * Constants.PERIOD,
                             new Rotation2d(chassisSetpoint.omegaRadiansPerSecond * Constants.PERIOD)));
-                // takes the twist deltas and converts them to velocities
+                // Takes the twist deltas and converts them to velocities
                 var adjustedSpeeds =
                     new ChassisSpeeds(
                         setpointTwist.dx / Constants.PERIOD,
@@ -265,10 +296,10 @@ public class Drive extends SubsystemBase {
 
                 // System.out.println(adjustedSpeeds);
 
-                // uses the IK to convert from chassis velocities to individual swerve positions/velocities
+                // Uses the IK to convert from chassis velocities to individual swerve module positions/velocities
                 SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(adjustedSpeeds);
-                // System.out.println(setpointStates[0]);
-                // ensure a module isnt trying to go faster than max
+
+                // Ensure a module isnt trying to go faster than max
                 SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxLinearSpeed);
 
                 
@@ -293,7 +324,8 @@ public class Drive extends SubsystemBase {
                 Logger.getInstance().recordOutput("SwerveStates/Setpoints", setpointStates);
                 Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
                 break;
-
+            
+            /* Runs each mode at the same setpoint -- only used for testing */
             case MODULE_SETPOINT:
                 setpointStates = new SwerveModuleState[] {moduleSetpoint, moduleSetpoint, moduleSetpoint, moduleSetpoint};
                 lastSetpointStates = setpointStates;

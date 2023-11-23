@@ -23,11 +23,20 @@ public class Vision extends SubsystemBase {
     CameraIOInputsAutoLogged inputs = new CameraIOInputsAutoLogged();
     PoseEstimator poseEstimator;
 
+    /**
+     * Constructs a new Vision object
+     * 
+     * @param io The camera IO object
+     * @param poseEstimator The pose estimator
+     */
     public Vision(CameraIO io, PoseEstimator poseEstimator) {
         this.io = io;
         this.poseEstimator = poseEstimator;
     }
     
+    /* (non-Javadoc)
+     * @see edu.wpi.first.wpilibj2.command.Subsystem#periodic()
+     */
     public void periodic() {
         io.updateInputs(inputs);
         Logger.getInstance().processInputs("Vision", inputs);
@@ -37,10 +46,22 @@ public class Vision extends SubsystemBase {
         } 
     }
 
+    /**
+     * Returns the closest tag's transform relative to the robot
+     * 
+     * @return The closest tag's transform relative to the robot
+     */
     public Transform2d getTransformToClosestTag() {
         return new Transform2d(new Translation2d(inputs.primaryTagZ, inputs.primaryTagX), new Rotation2d(inputs.primaryTagHeading));
     }
-
+    
+    /**
+     * Returns the tag with the specified id
+     * If there are multiple tags with the same id, the closest one is returned
+     * 
+     * @param id The id of the tag to return
+     * @return The tag with the specified id
+     */
     public AprilTag getTagFromId(int id) {
         // Sort tags by distance from robot
         ArrayList<AprilTag> tagsCopy = new ArrayList<AprilTag>(inputs.tags.size());
@@ -61,10 +82,20 @@ public class Vision extends SubsystemBase {
         return null;
     }
 
+    /**
+     * Returns the latest pose estimate (2d)
+     * 
+     * @return The latest pose estimate (2d)
+     */
     public Pose2d getPoseEstimate() {
         return inputs.poseEstimate;
     }
 
+    /**
+     * Returns the latest pose estimate (3d)
+     * 
+     * @return The latest pose estimate (3d)
+     */
     public Pose3d getPoseEstimate3d() {
         return inputs.poseEstimate3d;
     }
