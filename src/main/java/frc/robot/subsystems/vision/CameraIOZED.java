@@ -37,19 +37,19 @@ public class CameraIOZED implements CameraIO {
         inputs.primaryTagId = (int) tagsTable.getEntry("primary_tag_id").getDouble(-1);
         inputs.primaryTagX = tagsTable.getEntry("primary_tag_x").getDouble(-1);
         inputs.primaryTagY = tagsTable.getEntry("primary_tag_y").getDouble(-1);
-        inputs.primaryTagZ = tagsTable.getEntry("primary_tag_z").getDouble(-1);
+        // inputs.primaryTagZ = tagsTable.getEntry("primary_tag_z").getDouble(-1);
         inputs.primaryTagHeading = tagsTable.getEntry("primary_tag_heading").getDouble(-1);
 
         // Values for all tags found by the camera
         double[] tagIds = tagsTable.getEntry("tag_ids").getDoubleArray(new double[] {});
         double[] tagXs = tagsTable.getEntry("tag_xs").getDoubleArray(new double[] {});
-        // inputs.tagYs = tagsTable.getEntry("tag_ys").getDoubleArray(new double[] {});
-        double[] tagZs = tagsTable.getEntry("tag_zs").getDoubleArray(new double[] {});
+        double[] tagYs = tagsTable.getEntry("tag_ys").getDoubleArray(new double[] {});
+        // double[] tagZs = tagsTable.getEntry("tag_zs").getDoubleArray(new double[] {});
         double[] tagHeadings = tagsTable.getEntry("tag_headings").getDoubleArray(new double[] {});
 
         ArrayList<AprilTag> tags = new ArrayList<AprilTag>(tagIds.length);
         for (int i = 0; i < tagIds.length; i++) {
-            tags.add(new AprilTag((int) tagIds[i], tagXs[i], tagZs[i], tagHeadings[i]));
+            tags.add(new AprilTag((int) tagIds[i], tagXs[i], tagYs[i], tagHeadings[i]));
         }
         inputs.tags = tags;
     }
