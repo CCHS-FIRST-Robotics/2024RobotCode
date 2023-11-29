@@ -2,6 +2,8 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
 import frc.robot.utils.AprilTag;
 
 import java.util.ArrayList;
@@ -14,6 +16,21 @@ import edu.wpi.first.math.geometry.Rotation3d;
 public class CameraIOZED implements CameraIO {
 
     NetworkTable tagsTable = NetworkTableInstance.getDefault().getTable("tags");
+
+    DoubleArraySubscriber pose2dSub = tagsTable.getDoubleArrayTopic("pose_estimate").subscribe(new double[] {-1, -1, -1});
+    DoubleArraySubscriber pose3dSub = tagsTable.getDoubleArrayTopic("pose_estimate_3d").subscribe(new double[] {-1, -1, -1, -1, -1, -1});
+
+    DoubleSubscriber primaryTagIdSub = tagsTable.getDoubleTopic("primary_tag_id").subscribe(-1);
+    DoubleSubscriber primaryTagXSub = tagsTable.getDoubleTopic("primary_tag_x").subscribe(-1);
+    DoubleSubscriber primaryTagYSub = tagsTable.getDoubleTopic("primary_tag_y").subscribe(-1);
+    DoubleSubscriber primaryTagZSub = tagsTable.getDoubleTopic("primary_tag_z").subscribe(-1);
+    DoubleSubscriber primaryTagHeadingSub = tagsTable.getDoubleTopic("primary_tag_heading").subscribe(-1);
+
+    DoubleArraySubscriber tagIdsSub = tagsTable.getDoubleArrayTopic("tag_ids").subscribe(new double[] {});
+    DoubleArraySubscriber tagXsSub = tagsTable.getDoubleArrayTopic("tag_xs").subscribe(new double[] {});
+    DoubleArraySubscriber tagYsSub = tagsTable.getDoubleArrayTopic("tag_ys").subscribe(new double[] {});
+    DoubleArraySubscriber tagZsSub = tagsTable.getDoubleArrayTopic("tag_zs").subscribe(new double[] {});
+    DoubleArraySubscriber tagHeadingsSub = tagsTable.getDoubleArrayTopic("tag_headings").subscribe(new double[] {});
 
     
     /**
@@ -28,25 +45,25 @@ public class CameraIOZED implements CameraIO {
      */
     public void updateInputs(CameraIOInputs inputs) {
         // Pose estimate from the zed (x, y, theta)
-        double[] pose2d = tagsTable.getEntry("pose_estimate").getDoubleArray(new double[] {-1, -1, -1});
-        double[] pose3d = tagsTable.getEntry("pose_estimate_3d").getDoubleArray(new double[] {-1, -1, -1, -1, -1, -1});
+        double[] pose2d = pose2dSub.get();
+        double[] pose3d = pose3dSub.get();
         // TODO: raising exception(?)
         // inputs.poseEstimate = new Pose2d(pose2d[0], pose2d[1], new Rotation2d(pose2d[2]));
         // inputs.poseEstimate3d = new Pose3d(pose3d[0], pose3d[1], pose3d[2], new Rotation3d(pose2d[3], pose2d[4], pose2d[5]));
 
         // Values from the primary (closest) tag
-        inputs.primaryTagId = (int) tagsTable.getEntry("primary_tag_id").getDouble(-1);
-        inputs.primaryTagX = tagsTable.getEntry("primary_tag_x").getDouble(-1);
-        inputs.primaryTagY = tagsTable.getEntry("primary_tag_y").getDouble(-1);
-        // inputs.primaryTagZ = tagsTable.getEntry("primary_tag_z").getDouble(-1);
-        inputs.primaryTagHeading = tagsTable.getEntry("primary_tag_heading").getDouble(-1);
+        inputs.primaryTagId = (int) primaryTagIdSub.get();
+        inputs.primaryTagX = primaryTagXSub.get();
+        inputs.primaryTagY = primaryTagYSub.get();
+        // inputs.primaryTagZ = primaryTagZSub.get();
+        inputs.primaryTagHeading = primaryTagHeadingSub.get();
 
         // Values for all tags found by the camera
-        double[] tagIds = tagsTable.getEntry("tag_ids").getDoubleArray(new double[] {});
-        double[] tagXs = tagsTable.getEntry("tag_xs").getDoubleArray(new double[] {});
-        double[] tagYs = tagsTable.getEntry("tag_ys").getDoubleArray(new double[] {});
-        // double[] tagZs = tagsTable.getEntry("tag_zs").getDoubleArray(new double[] {});
-        double[] tagHeadings = tagsTable.getEntry("tag_headings").getDoubleArray(new double[] {});
+        double[] tagIds = tagIdsSub.get();
+        double[] tagXs = tagXsSub.get();
+        double[] tagYs = tagYsSub.get();
+        // double[] tagZs = tagZsSub.get();
+        double[] tagHeadings = tagHeadingsSub.get();
 
         ArrayList<AprilTag> tags = new ArrayList<AprilTag>(tagIds.length);
         for (int i = 0; i < tagIds.length; i++) {
