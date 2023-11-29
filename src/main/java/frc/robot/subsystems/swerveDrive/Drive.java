@@ -45,7 +45,7 @@ public class Drive extends SubsystemBase {
 
     // Constants for the drivebase
     private static final double maxLinearSpeed = 4.5;
-    private static final double maxLinearAcceleration = 8.0;
+    private static final double maxLinearAcceleration = 4.0;
     private static final double trackWidthX = Units.inchesToMeters(22.5);
     private static final double trackWidthY = Units.inchesToMeters(22.5);
     private double maxAngularSpeed = 4 * Math.PI;
@@ -72,12 +72,12 @@ public class Drive extends SubsystemBase {
     private int trajectoryCounter = -1;
     
     // POSITION PID CONSTANTS
-    private double kPx = 0.0; // 0.5
-    private double kPy = 0.0; // 0.5
-    private double kPHeading = 0.0; // 0.5
+    private double kPx = 0.35; // 0.4
+    private double kPy = 0.35; // 0.35
+    private double kPHeading = 0.5; // 0.5
 
-    private double kIx = 0.0; // 0.3
-    private double kIy = 0.0; // 0.3
+    private double kIx = 0.12; // 0.15
+    private double kIy = 0.15; // 0.15
     private double kIHeading = 0.0; // 0.3
 
     private PIDController xController = new PIDController(kPx, kIx, 0.0);
@@ -222,9 +222,9 @@ public class Drive extends SubsystemBase {
                 positionSetpointTrajectory = positionTrajectory.get(trajectoryCounter);
                 twistSetpointTrajectory = twistTrajectory.get(trajectoryCounter);
 
-                System.out.println("SETPOINTS:");
-                System.out.println(positionSetpointTrajectory);
-                System.out.println(twistSetpointTrajectory);
+                // System.out.println("SETPOINTS:");
+                // System.out.println(positionSetpointTrajectory);
+                // System.out.println(twistSetpointTrajectory);
 
                 // Record setpoints to "RealOutputs"
                 Logger.getInstance().recordOutput("Auto/FieldVelocity", new Pose2d(twistSetpointTrajectory.dx, twistSetpointTrajectory.dy, new Rotation2d(twistSetpointTrajectory.dtheta)));
@@ -279,19 +279,19 @@ public class Drive extends SubsystemBase {
 
                 // desaturate speeds if above the max acceleration
                 // TODO: I think I already do this in the command... oml
-                double[] accelVector = {
-                    (adjustedSpeeds.vxMetersPerSecond - lastSetpoint.vxMetersPerSecond) / Constants.PERIOD,
-                    (adjustedSpeeds.vyMetersPerSecond - lastSetpoint.vyMetersPerSecond) / Constants.PERIOD
-                };
-                double acceleration = Math.sqrt(
-                    accelVector[0]*accelVector[0] + 
-                    accelVector[1]*accelVector[1]
-                );
-                double accelDir = Math.atan2(accelVector[1], accelVector[0]);
-                if (acceleration > maxLinearAcceleration) {
-                    adjustedSpeeds.vxMetersPerSecond = lastSetpoint.vxMetersPerSecond + Math.cos(accelDir) * maxLinearAcceleration * Constants.PERIOD;
-                    adjustedSpeeds.vyMetersPerSecond = lastSetpoint.vyMetersPerSecond + Math.sin(accelDir) * maxLinearAcceleration * Constants.PERIOD;
-                }
+                // double[] accelVector = {
+                //     (adjustedSpeeds.vxMetersPerSecond - lastSetpoint.vxMetersPerSecond) / Constants.PERIOD,
+                //     (adjustedSpeeds.vyMetersPerSecond - lastSetpoint.vyMetersPerSecond) / Constants.PERIOD
+                // };
+                // double acceleration = Math.sqrt(
+                //     accelVector[0]*accelVector[0] + 
+                //     accelVector[1]*accelVector[1]
+                // );
+                // double accelDir = Math.atan2(accelVector[1], accelVector[0]);
+                // if (acceleration > maxLinearAcceleration) {
+                //     adjustedSpeeds.vxMetersPerSecond = lastSetpoint.vxMetersPerSecond + Math.cos(accelDir) * maxLinearAcceleration * Constants.PERIOD;
+                //     adjustedSpeeds.vyMetersPerSecond = lastSetpoint.vyMetersPerSecond + Math.sin(accelDir) * maxLinearAcceleration * Constants.PERIOD;
+                // }
                 lastSetpoint = adjustedSpeeds;
 
                 // System.out.println(adjustedSpeeds);
@@ -352,12 +352,20 @@ public class Drive extends SubsystemBase {
     public void runVelocity(ChassisSpeeds speeds) {
         // Since DriveWithJoysticks is the default command and MoveToPose runs once
         // Keep drive running the position trajectory unless overridden (driver sets a nonzero speed with joysticks)
-        if (controlMode == CONTROL_MODE.POSITION_SETPOINT && speeds.equals(new ChassisSpeeds())) {
+        if (controlMode == CONTROL_MODE.POSITION_SETPOINT && speedsEqual(speeds, new ChassisSpeeds())) {
             return;
         }
         controlMode = CONTROL_MODE.CHASSIS_SETPOINT;
         chassisSetpoint = speeds;
     }
+
+    public static boolean speedsEqual(ChassisSpeeds speeds, ChassisSpeeds other) {
+        return (
+            speeds.vxMetersPerSecond == other.vxMetersPerSecond &&
+            speeds.vyMetersPerSecond == other.vyMetersPerSecond &&
+            speeds.omegaRadiansPerSecond == other.omegaRadiansPerSecond
+        );
+    } 
 
     public void runModules(SwerveModuleState setpoint) {
         controlMode = CONTROL_MODE.MODULE_SETPOINT;

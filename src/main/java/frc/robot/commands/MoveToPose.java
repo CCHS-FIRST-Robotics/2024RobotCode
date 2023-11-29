@@ -37,6 +37,9 @@ public class MoveToPose extends InstantCommand {
         Pose2d targetPose = targetPoseSupplier.get();
         Pose2d currentPose = drive.getPose();
         Twist2d currentVelocity = drive.getVelocity();
+        // System.out.println("TESTING");
+        // System.out.println(targetPose);
+        // System.out.println(currentPose);
 
         TrapezoidProfile.State targetXState = new TrapezoidProfile.State(targetPose.getX(), 0);
         TrapezoidProfile.State targetYState = new TrapezoidProfile.State(targetPose.getY(), 0);

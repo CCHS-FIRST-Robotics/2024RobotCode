@@ -28,11 +28,11 @@ public class ModuleIOSparkMax implements ModuleIO {
     private final SparkMaxPIDController turnSparkMaxPIDF;
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKp = 0.0001; 
+    private static final double driveKp = 0.00017; 
     private static final double driveKd = 0.0;
-    private static final double driveKi = 0.0;
+    private static final double driveKi = 0.000000; // 0.000008
     private static final double driveKs = 0.0;
-    private static final double driveKv = 0.15; 
+    private static final double driveKv = 0.17; 
 
     private static final double turnKp = 5; 
     private static final double turnKd = 0.00;
