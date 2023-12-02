@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerveDrive;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -71,17 +72,19 @@ public class Drive extends SubsystemBase {
     private ArrayList<Twist2d> twistTrajectory = new ArrayList<Twist2d>();
     private int trajectoryCounter = -1;
     
-    // POSITION PID CONSTANTS
+    // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
     private double kPx = 0.35; // 0.4
-    private double kPy = 0.35; // 0.35
+    private double kPy = 0.33; // 0.35
     private double kPHeading = 0.5; // 0.5
 
-    private double kIx = 0.12; // 0.15
-    private double kIy = 0.15; // 0.15
+    private double kIx = 0.12; // 0.12
+    private double kIy = 0.12; // 0.15
+    // private double kPlinear = 
     private double kIHeading = 0.0; // 0.3
 
     private PIDController xController = new PIDController(kPx, kIx, 0.0);
     private PIDController yController = new PIDController(kPy, kIy, 0.0);
+    // private PIDController linearController = new PIDController(kPHeading, kIHeading, coastThresholdMetersPerSec);
     private PIDController headingController = new PIDController(kPHeading, kIHeading, 0.0);
 
     
@@ -95,8 +98,10 @@ public class Drive extends SubsystemBase {
     // private Pose2d fieldPosition = new Pose2d(); Use poseEstimator instead
     private PoseEstimator poseEstimator;
 
+    int i = 0;
+
     // Control modes for the drive
-    enum CONTROL_MODE {
+    public enum CONTROL_MODE {
         DISABLED,
         MODULE_SETPOINT,
         CHASSIS_SETPOINT,
@@ -132,6 +137,7 @@ public class Drive extends SubsystemBase {
     }
 
     public void periodic() {
+        i++;
         gyroIO.updateInputs(gyroInputs);
         Logger.getInstance().processInputs("Drive/Gyro", gyroInputs);
         for (var module : modules) {
@@ -350,6 +356,7 @@ public class Drive extends SubsystemBase {
      * @param speeds Speeds in meters/sec
      */
     public void runVelocity(ChassisSpeeds speeds) {
+        // if (i % 50 == 0) System.out.println(controlMode);
         // Since DriveWithJoysticks is the default command and MoveToPose runs once
         // Keep drive running the position trajectory unless overridden (driver sets a nonzero speed with joysticks)
         if (controlMode == CONTROL_MODE.POSITION_SETPOINT && speedsEqual(speeds, new ChassisSpeeds())) {
@@ -396,6 +403,10 @@ public class Drive extends SubsystemBase {
                     lastSetpointStates[i].speedMetersPerSecond, getModuleTranslations()[i].getAngle()
                 );
         }
+    }
+
+    public void setControlMode(CONTROL_MODE mode) {
+        controlMode = mode;
     }
 
     /** Returns the maximum linear speed in meters per sec. */

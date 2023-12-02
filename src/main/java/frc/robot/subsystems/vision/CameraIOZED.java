@@ -47,9 +47,9 @@ public class CameraIOZED implements CameraIO {
         // Pose estimate from the zed (x, y, theta)
         double[] pose2d = pose2dSub.get();
         double[] pose3d = pose3dSub.get();
-        // TODO: raising exception(?)
-        // inputs.poseEstimate = new Pose2d(pose2d[0], pose2d[1], new Rotation2d(pose2d[2]));
-        // inputs.poseEstimate3d = new Pose3d(pose3d[0], pose3d[1], pose3d[2], new Rotation3d(pose2d[3], pose2d[4], pose2d[5]));
+
+        inputs.poseEstimate = new Pose2d(pose2d[0], pose2d[1], new Rotation2d(pose2d[2]));
+        inputs.poseEstimate3d = new Pose3d(pose3d[0], pose3d[1], pose3d[2], new Rotation3d(pose3d[3], pose3d[4], pose3d[5]));
 
         // Values from the primary (closest) tag
         inputs.primaryTagId = (int) primaryTagIdSub.get();
@@ -67,7 +67,14 @@ public class CameraIOZED implements CameraIO {
 
         ArrayList<AprilTag> tags = new ArrayList<AprilTag>(tagIds.length);
         for (int i = 0; i < tagIds.length; i++) {
-            tags.add(new AprilTag((int) tagIds[i], tagXs[i], tagYs[i], tagHeadings[i]));
+            tags.add(
+                new AprilTag(
+                    (int) tagIds[i], 
+                    tagXs[i], 
+                    tagYs[i], 
+                    tagHeadings[i]
+                )
+            );
         }
         inputs.tags = tags;
     }

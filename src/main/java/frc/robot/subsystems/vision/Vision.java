@@ -23,6 +23,8 @@ public class Vision extends SubsystemBase {
     CameraIOInputsAutoLogged inputs = new CameraIOInputsAutoLogged();
     PoseEstimator poseEstimator;
 
+    int i = 0;
+
     /**
      * Constructs a new Vision object
      * 
@@ -42,8 +44,17 @@ public class Vision extends SubsystemBase {
         Logger.getInstance().processInputs("Vision", inputs);
 
         if (getPoseEstimate3d().getX() > 0) {
-            // poseEstimator.addVisionData(getPoseEstimate3d(), Timer.getFPGATimestamp());
+            poseEstimator.addVisionData(getPoseEstimate3d(), Timer.getFPGATimestamp());
         } 
+
+        i++;
+        if (i % 20 == 0) {
+            System.out.println();
+            // System.out.print("Tag Distance: ");
+            // System.out.println(inputs.primaryTagX);
+            // System.out.print("Pose Estimate Distance: ");
+            // System.out.println(inputs.poseEstimate.getX());
+        }
     }
 
     /**
@@ -52,7 +63,7 @@ public class Vision extends SubsystemBase {
      * @return The closest tag's transform relative to the robot
      */
     public Transform2d getTransformToClosestTag() {
-        return new Transform2d(new Translation2d(inputs.primaryTagZ, inputs.primaryTagX), new Rotation2d(inputs.primaryTagHeading));
+        return new Transform2d(new Translation2d(inputs.primaryTagX, inputs.primaryTagY), new Rotation2d(inputs.primaryTagHeading));
     }
     
     /**

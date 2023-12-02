@@ -131,7 +131,7 @@ public class RobotContainer {
         );
 
         // Follow the nearest apriltag while the right trigger is held
-        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
+        controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
         
         // Generate a trajectory to a pose when the A button is pressed (and switch drive to position control)
         controller.a().onTrue(

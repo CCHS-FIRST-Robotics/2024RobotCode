@@ -2,6 +2,8 @@ package frc.robot.utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.geometry.Twist3d;
 
@@ -61,8 +63,20 @@ public class PoseEstimator {
     public void addVisionData(Pose3d visionPoseEstimate, double timestamp) {
         latestTimestamp = timestamp;
 
-        poseEstimate = visionPoseEstimate.toPose2d();
-        poseEstimate3d = visionPoseEstimate;
+        // This assumes that the vision pose estimate is in the same frame as the gyro
+        // Also, kinda assumes that the pose estimate rotation is the same as the gyro rotation
+        // (which it should be when there are just these two sources of data and the other is overriding this one)
+        Rotation2d gyroAngle = poseEstimate.getRotation();
+
+        poseEstimate = new Pose2d(visionPoseEstimate.toPose2d().getTranslation(), gyroAngle);
+        poseEstimate3d = new Pose3d(
+            visionPoseEstimate.getTranslation(), 
+            new Rotation3d(
+                visionPoseEstimate.getRotation().getX(), 
+                visionPoseEstimate.getRotation().getY(),
+                gyroAngle.getRadians()
+            )
+        );
     }
     
 }
