@@ -41,11 +41,21 @@ public class MoveToPose extends InstantCommand {
         Pose2d currentPose = drive.getPose();
         Twist2d currentVelocity = drive.getVelocity();
         
-        // System.out.println("TESTING");
-        // System.out.println(targetPose);
-        // System.out.println(currentPose);
+        System.out.println("TESTING");
+        System.out.println(targetPose);
+        System.out.println(currentPose);
+        System.out.println(targetVelocity);
+        System.out.println(currentVelocity);
 
-        var driveTrajectory = DriveTrajectoryGenerator.generateTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, constraints);
+        // TESTING GUIDE POIITNS
+        var guidePoints = new ArrayList<Pose2d>();
+        guidePoints.add(new Pose2d(.25, .1, new Rotation2d(Math.PI)));
+        guidePoints.add(new Pose2d(-.75, -.5, new Rotation2d(Math.PI * 3 * .75)));
+        var driveTrajectory = DriveTrajectoryGenerator.generateGuidedTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, constraints, guidePoints);
+
+        // var driveTrajectory = DriveTrajectoryGenerator.generateTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, constraints);
+        System.out.println("Writing trajectory to CSV");
+        driveTrajectory.toCSV();
         drive.runPosition(driveTrajectory.positionTrajectory, driveTrajectory.velocityTrajectory);
     }
 }

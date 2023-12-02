@@ -62,7 +62,31 @@ public class DriveTrajectoryGenerator {
         return new DriveTrajectory(poseTrajectory, velocityTrajectory);
     }
 
-    public static DriveTrajectory generateSinglePointTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints constraints) {
+    public static DriveTrajectory generateGuidedTrapezoidTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints constraints, ArrayList<Pose2d> guidePoints) {
+        var trajectories = new ArrayList<DriveTrajectory>();
+        for (int i = 0; i < guidePoints.size() + 1; i++) {
+            Pose2d startPoint = (i == 0) ? currentPose : guidePoints.get(i - 1);
+            Pose2d endPoint = (i == guidePoints.size()) ? targetPose : guidePoints.get(i);
+
+            Twist2d startVelocity = (i == 0) ? currentVelocity : new Twist2d();
+            Twist2d endVelocity = (i == guidePoints.size()) ? targetVelocity : new Twist2d();
+
+            trajectories.add(generateTrapezoidTrajectory(endPoint, endVelocity, startPoint, startVelocity, constraints));
+        }
         
+        DriveTrajectory finalTrajectory = new DriveTrajectory();
+        for (DriveTrajectory trajectory : trajectories) {
+            finalTrajectory.add(trajectory);
+        }
+        return finalTrajectory;
     }
+
+    // public static DriveTrajectory generateSinglePointTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints constraints) {
+        
+
+    //     poseTrajectory.add(targetPose);
+    //     velocityTrajectory.add(targetVelocity);
+
+    //     return new DriveTrajectory(poseTrajectory, velocityTrajectory);
+    // }
 }
