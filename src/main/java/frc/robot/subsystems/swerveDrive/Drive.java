@@ -1,5 +1,6 @@
 package frc.robot.subsystems.swerveDrive;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -45,11 +46,12 @@ public class Drive extends SubsystemBase {
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
     // Constants for the drivebase
-    private static final double maxLinearSpeed = 4.5;
+    private static double maxLinearSpeed = 4.5;
     private static final double maxLinearAcceleration = 4.0;
     private static final double trackWidthX = Units.inchesToMeters(22.5);
     private static final double trackWidthY = Units.inchesToMeters(22.5);
-    private double maxAngularSpeed = 4 * Math.PI;
+    private static final double maxAngularSpeed = 4 * Math.PI;
+    private static final double maxAngularAcceleration = 10 * Math.PI;
 
     // Define Kinematics object
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
@@ -71,6 +73,9 @@ public class Drive extends SubsystemBase {
     private ArrayList<Pose2d> positionTrajectory = new ArrayList<Pose2d>();
     private ArrayList<Twist2d> twistTrajectory = new ArrayList<Twist2d>();
     private int trajectoryCounter = -1;
+
+    private Rotation2d wiiRotation = new Rotation2d();
+    private Translation2d wiiLinearVelocity = new Translation2d();
     
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
     private double kPx = 0.35; // 0.4
@@ -86,7 +91,7 @@ public class Drive extends SubsystemBase {
     private PIDController yController = new PIDController(kPy, kIy, 0.0);
     // private PIDController linearController = new PIDController(kPHeading, kIHeading, coastThresholdMetersPerSec);
     private PIDController headingController = new PIDController(kPHeading, kIHeading, 0.0);
-
+    
     
     private boolean isBrakeMode = false;
     private Timer lastMovementTimer = new Timer();
@@ -98,6 +103,8 @@ public class Drive extends SubsystemBase {
     // private Pose2d fieldPosition = new Pose2d(); Use poseEstimator instead
     private PoseEstimator poseEstimator;
 
+    private boolean isWiiMode = false; 
+
     int i = 0;
 
     // Control modes for the drive
@@ -105,7 +112,8 @@ public class Drive extends SubsystemBase {
         DISABLED,
         MODULE_SETPOINT,
         CHASSIS_SETPOINT,
-        POSITION_SETPOINT
+        POSITION_SETPOINT,
+        WII_SETPOINT
     };
 
     CONTROL_MODE controlMode = CONTROL_MODE.DISABLED;
@@ -116,7 +124,8 @@ public class Drive extends SubsystemBase {
         ModuleIO frModuleIO,
         ModuleIO blModuleIO,
         ModuleIO brModuleIO,
-        PoseEstimator poseEstimator
+        PoseEstimator poseEstimator,
+        boolean isWiiMode
     ) {
         System.out.println("[Init] Creating Drive");
 
@@ -133,6 +142,13 @@ public class Drive extends SubsystemBase {
         // wait thats js im stupid
         for (var module : modules) {
             module.setBrakeMode(false);
+        }
+
+        if (isWiiMode) {
+            this.isWiiMode = true;
+
+            // reset max speeds
+            maxLinearSpeed = 0.5;
         }
     }
 
@@ -215,14 +231,41 @@ public class Drive extends SubsystemBase {
                 Logger.getInstance().recordOutput("SwerveStates/Setpoints", new double[] {});
                 Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
                 return;
+            
+            // TODO: THIS IS CURRENTLY VERY HACKY SO LIKE PROBABLY SHOULD REWRITE THIS
+            case WII_SETPOINT:
+                // constrain velocity to max speed
+                double rotError = wiiRotation.getRadians() - getPose().getRotation().getRadians();
+                double rotVelocity = MathUtil.clamp(
+                    rotError / Constants.PERIOD, 
+                    -getMaxAngularSpeedRadPerSec(),
+                    getMaxAngularSpeedRadPerSec()
+                );
+                // constrain velocity to max acceleration
+                rotVelocity = MathUtil.clamp(
+                    rotVelocity,
+                    getVelocity().dtheta - getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD,
+                    getVelocity().dtheta + getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD
+                );
 
+                trajectoryCounter = 0;
+                positionTrajectory = new ArrayList<>();
+                twistTrajectory = new ArrayList<>();
+                positionTrajectory.add(new Pose2d(getPose().getTranslation(), wiiRotation));
+                twistTrajectory.add(new Twist2d(wiiLinearVelocity.getX(), wiiLinearVelocity.getY(), rotVelocity));
+                /*
+                 * WARNING:
+                 * NO BREAK HERE
+                 * IT CONTINUES TO POSITION_SETPOINT CASE
+                 */
+                // fallthrough
             case POSITION_SETPOINT:
-                // If there's no available trajectory, don't do anything
-                if (trajectoryCounter == -1) break;
                 // If we've reached the end of the trajectory, hold at the last setpoint
                 if (trajectoryCounter > positionTrajectory.size() - 1) {
                     trajectoryCounter = positionTrajectory.size() - 1;
                 }
+                // If there's no available trajectory, don't do anything
+                if (trajectoryCounter == -1) break;
 
                 // Get the position/velocity setpoints at the current point in the trajectory
                 positionSetpointTrajectory = positionTrajectory.get(trajectoryCounter);
@@ -386,6 +429,12 @@ public class Drive extends SubsystemBase {
         trajectoryCounter = 0;
     }
 
+    public void runWii(Translation2d linearVelocity, Rotation2d rotation) {
+        controlMode = CONTROL_MODE.WII_SETPOINT;
+        wiiLinearVelocity = linearVelocity;
+        wiiRotation = rotation;
+    }
+
     /** Stops the drive. */
     public void stop() {
         runVelocity(new ChassisSpeeds());
@@ -422,6 +471,11 @@ public class Drive extends SubsystemBase {
     /** Returns the maximum angular speed in radians per sec. */
     public double getMaxAngularSpeedRadPerSec() {
         return maxAngularSpeed;
+    }
+
+    /** Returns the maximum angular acceleration in radians per sec. */
+    public double getMaxAngularAccelerationRadPerSecPerSec() {
+        return maxAngularAcceleration;
     }
 
     /** Returns the current pitch (Y rotation). */

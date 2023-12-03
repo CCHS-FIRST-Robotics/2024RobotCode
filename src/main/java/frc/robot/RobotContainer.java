@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.commands.DriveModules;
 import frc.robot.commands.DriveWithJoysticks;
+import frc.robot.commands.DriveWithWiimote;
 import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
 
@@ -30,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
@@ -47,6 +49,9 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
+    private final CommandGenericHID wiiRemote1 = new CommandGenericHID(2);
+    private final CommandGenericHID wiiRemote2 = new CommandGenericHID(3);
+    private final boolean useWiiRemotes = false;
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
@@ -64,7 +69,8 @@ public class RobotContainer {
                 new ModuleIOSparkMax(1), 
                 new ModuleIOSparkMax(2), 
                 new ModuleIOSparkMax(3),
-                poseEstimator
+                poseEstimator,
+                useWiiRemotes
             );
             camera = new Vision(new CameraIOZED(), poseEstimator);
             break;
@@ -77,7 +83,8 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim(),
-                poseEstimator
+                poseEstimator,
+                false
             );
             camera = new Vision(new CameraIOZED(), poseEstimator);
             break;
@@ -90,7 +97,8 @@ public class RobotContainer {
                 new ModuleIOSparkMax(1), 
                 new ModuleIOSparkMax(2), 
                 new ModuleIOSparkMax(3),
-                poseEstimator
+                poseEstimator,
+                false
             );
             camera = new Vision(new CameraIOZED(), poseEstimator);
             break;
@@ -101,6 +109,17 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
+    }
+
+    private Rotation2d getWiiPOV() {
+        double povX = wiiRemote1.getRawAxis(0); // should be binary (-1, 0, or 1)
+        double povY = wiiRemote1.getRawAxis(1);
+        if (Math.abs(povX) < .05) povX = 0; // deadband since 0 isnt 0 for some reason
+        if (Math.abs(povY) < .05) povY = 0;
+
+        if (povX == 0 && povY == 0) return new Rotation2d(-1);
+        double povAngle = Math.atan2(povY, povX);
+        return new Rotation2d(povAngle);
     }
 
     /**
@@ -120,15 +139,29 @@ public class RobotContainer {
         // ));
 
         // DRIVING WITH JOYSTICKS (NORMAL)
-        drive.setDefaultCommand(
-            new DriveWithJoysticks(
-                drive, 
-                () -> controller.getLeftX(), 
-                () -> -controller.getLeftY(), 
-                () -> controller.getRightX(), 
-                () -> {return 1.0;}
-            )
-        );
+        if (useWiiRemotes) {
+            drive.setDefaultCommand(
+                new DriveWithWiimote(
+                    drive,
+                    () -> wiiRemote1.getRawAxis(3),
+                    () -> wiiRemote1.getRawAxis(4),
+                    wiiRemote1.button(1),
+                    wiiRemote1.button(2),
+                    () -> getWiiPOV(),
+                    () -> {return 1.0;}
+                )
+            );
+        } else {
+            drive.setDefaultCommand(
+                new DriveWithJoysticks(
+                    drive, 
+                    () -> controller.getLeftX(), 
+                    () -> -controller.getLeftY(), 
+                    () -> controller.getRightX(), 
+                    () -> {return 1.0;}
+                )
+            );
+        }
 
         // Follow the nearest apriltag while the right trigger is held
         controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));

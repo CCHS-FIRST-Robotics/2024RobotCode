@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
 import frc.robot.*;
+import frc.robot.subsystems.mecaDrive.Drive;
 
 public class DriveTrajectoryGenerator {
     
@@ -16,7 +19,7 @@ public class DriveTrajectoryGenerator {
 
     }
 
-    public static DriveTrajectory generateTrapezoidTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints constraints) {
+    public static DriveTrajectory generateTrapezoidTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints linearConstraints, Constraints angularConstraints) {
 
         // System.out.println("TESTING");
         // System.out.println(targetPose);
@@ -30,9 +33,9 @@ public class DriveTrajectoryGenerator {
         TrapezoidProfile.State currentYState = new TrapezoidProfile.State(currentPose.getY(), currentVelocity.dy);
         TrapezoidProfile.State currentHeadingState = new TrapezoidProfile.State(currentPose.getRotation().getRadians(), currentVelocity.dtheta);
 
-        var profileX = new TrapezoidProfile(constraints, targetXState, currentXState);
-        var profileY = new TrapezoidProfile(constraints, targetYState, currentYState);
-        var profileHeading = new TrapezoidProfile(constraints, targetHeadingState, currentHeadingState);
+        var profileX = new TrapezoidProfile(linearConstraints, targetXState, currentXState);
+        var profileY = new TrapezoidProfile(linearConstraints, targetYState, currentYState);
+        var profileHeading = new TrapezoidProfile(angularConstraints, targetHeadingState, currentHeadingState);
 
         // Find the max time it takes to reach setpoint
         double timeToEnd = Math.max(Math.max(profileX.totalTime(), profileY.totalTime()), profileHeading.totalTime());
@@ -62,7 +65,7 @@ public class DriveTrajectoryGenerator {
         return new DriveTrajectory(poseTrajectory, velocityTrajectory);
     }
 
-    public static DriveTrajectory generateGuidedTrapezoidTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints constraints, ArrayList<Pose2d> guidePoints) {
+    public static DriveTrajectory generateGuidedTrapezoidTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints linearConstraints, Constraints angularConstraints, ArrayList<Pose2d> guidePoints) {
         var trajectories = new ArrayList<DriveTrajectory>();
         for (int i = 0; i < guidePoints.size() + 1; i++) {
             Pose2d startPoint = (i == 0) ? currentPose : guidePoints.get(i - 1);
@@ -71,7 +74,7 @@ public class DriveTrajectoryGenerator {
             Twist2d startVelocity = (i == 0) ? currentVelocity : new Twist2d();
             Twist2d endVelocity = (i == guidePoints.size()) ? targetVelocity : new Twist2d();
 
-            trajectories.add(generateTrapezoidTrajectory(endPoint, endVelocity, startPoint, startVelocity, constraints));
+            trajectories.add(generateTrapezoidTrajectory(endPoint, endVelocity, startPoint, startVelocity, linearConstraints, angularConstraints));
         }
         
         DriveTrajectory finalTrajectory = new DriveTrajectory();
@@ -80,6 +83,10 @@ public class DriveTrajectoryGenerator {
         }
         return finalTrajectory;
     }
+
+    // public static DriveTrajectory generateSplineTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints linearConstraints, Constraints angularConstraints, ArrayList<Pose2d> guidePoints) {
+        
+    // }
 
     // public static DriveTrajectory generateSinglePointTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints constraints) {
         

@@ -25,7 +25,8 @@ public class FollowAprilTag extends CommandBase {
 
     private static double FOLLOWING_DISTANCE = 1; // meters
     Supplier<Transform2d> tagTransformSuppier;
-    Constraints constraints;
+    Constraints linearConstraints;
+    Constraints angularConstraints;
     
     public FollowAprilTag(
         Drive drive,
@@ -35,7 +36,8 @@ public class FollowAprilTag extends CommandBase {
         this.drive = drive;
         this.vision = vision;
         this.tagTransformSuppier = () -> vision.getTransformToClosestTag();
-        this.constraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeedMetersPerSec(), drive.getMaxLinearAccelerationMetersPerSecPerSec());
+        linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeedMetersPerSec(), drive.getMaxLinearAccelerationMetersPerSecPerSec());
+        angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeedRadPerSec(), drive.getMaxAngularAccelerationRadPerSecPerSec());
     }
 
     public FollowAprilTag(
@@ -47,7 +49,8 @@ public class FollowAprilTag extends CommandBase {
         this.drive = drive;
         this.vision = vision;
         this.tagTransformSuppier = () -> vision.getTagFromId(tagId).getTransform();
-        this.constraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeedMetersPerSec(), drive.getMaxLinearAccelerationMetersPerSecPerSec());
+        linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeedMetersPerSec(), drive.getMaxLinearAccelerationMetersPerSecPerSec());
+        angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeedRadPerSec(), drive.getMaxAngularAccelerationRadPerSecPerSec());
     }
 
     @Override

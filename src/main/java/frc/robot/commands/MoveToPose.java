@@ -22,7 +22,9 @@ public class MoveToPose extends InstantCommand {
     TrapezoidProfile profileX;
     TrapezoidProfile profileY;
     TrapezoidProfile profileHeading;
-    TrapezoidProfile.Constraints constraints;
+    TrapezoidProfile.Constraints linearConstraints;
+    TrapezoidProfile.Constraints angularConstraints;
+    
 
     public MoveToPose(
         Drive drive,
@@ -31,7 +33,8 @@ public class MoveToPose extends InstantCommand {
         addRequirements(drive);
         this.drive = drive;
         this.targetPoseSupplier = targetPoseSupplier;
-        constraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeedMetersPerSec(), drive.getMaxLinearAccelerationMetersPerSecPerSec());
+        linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeedMetersPerSec(), drive.getMaxLinearAccelerationMetersPerSecPerSec());
+        angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeedRadPerSec(), drive.getMaxAngularAccelerationRadPerSecPerSec());
     }
 
     @Override
@@ -50,10 +53,10 @@ public class MoveToPose extends InstantCommand {
         // TESTING GUIDE POIITNS
         var guidePoints = new ArrayList<Pose2d>();
         guidePoints.add(new Pose2d(.25, .1, new Rotation2d(Math.PI)));
-        guidePoints.add(new Pose2d(-.75, -.5, new Rotation2d(Math.PI * 3 * .75)));
-        var driveTrajectory = DriveTrajectoryGenerator.generateGuidedTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, constraints, guidePoints);
+        guidePoints.add(new Pose2d(-.75, -.5, new Rotation2d(Math.PI * 3 * .25)));
+        var driveTrajectory = DriveTrajectoryGenerator.generateGuidedTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, linearConstraints, angularConstraints, guidePoints);
 
-        // var driveTrajectory = DriveTrajectoryGenerator.generateTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, constraints);
+        // var driveTrajectory = DriveTrajectoryGenerator.generateTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, linearConstraints, angularConstraints);
         System.out.println("Writing trajectory to CSV");
         driveTrajectory.toCSV();
         drive.runPosition(driveTrajectory.positionTrajectory, driveTrajectory.velocityTrajectory);
