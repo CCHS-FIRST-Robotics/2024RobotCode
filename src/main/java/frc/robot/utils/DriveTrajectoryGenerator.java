@@ -13,6 +13,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import frc.robot.*;
 import frc.robot.subsystems.mecaDrive.Drive;
 
+import com.choreo.lib.*;
+
 public class DriveTrajectoryGenerator {
     
     public DriveTrajectoryGenerator() {
@@ -84,16 +86,23 @@ public class DriveTrajectoryGenerator {
         return finalTrajectory;
     }
 
-    // public static DriveTrajectory generateSplineTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints linearConstraints, Constraints angularConstraints, ArrayList<Pose2d> guidePoints) {
-        
-    // }
+    public static DriveTrajectory generateChoreoTrajectoryFromFile(String path) {
+        ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
 
-    // public static DriveTrajectory generateSinglePointTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints constraints) {
-        
+        double timeToEnd = choreoTrajectory.getTotalTime();
 
-    //     poseTrajectory.add(targetPose);
-    //     velocityTrajectory.add(targetVelocity);
+        // Create a list of poses and velocities (represented as twists) for each time step
+        ArrayList<Pose2d> poseTrajectory = new ArrayList<Pose2d>();
+        ArrayList<Twist2d> velocityTrajectory = new ArrayList<Twist2d>();
 
-    //     return new DriveTrajectory(poseTrajectory, velocityTrajectory);
-    // }
+        for (int i = 0; i < (int) (timeToEnd / Constants.PERIOD) + 2; i++) {
+            double time = i * Constants.PERIOD;
+
+            ChoreoTrajectoryState state = choreoTrajectory.sample(time);
+            poseTrajectory.add(new Pose2d(state.x, state.y, new Rotation2d(state.heading)));
+            velocityTrajectory.add(new Twist2d(state.velocityX, state.velocityY, state.angularVelocity));
+        }
+
+        return new DriveTrajectory(poseTrajectory, velocityTrajectory);
+    }
 }

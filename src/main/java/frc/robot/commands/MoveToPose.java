@@ -51,10 +51,13 @@ public class MoveToPose extends InstantCommand {
         System.out.println(currentVelocity);
 
         // TESTING GUIDE POIITNS
-        var guidePoints = new ArrayList<Pose2d>();
-        guidePoints.add(new Pose2d(.25, .1, new Rotation2d(Math.PI)));
-        guidePoints.add(new Pose2d(-.75, -.5, new Rotation2d(Math.PI * 3 * .25)));
-        var driveTrajectory = DriveTrajectoryGenerator.generateGuidedTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, linearConstraints, angularConstraints, guidePoints);
+        // var guidePoints = new ArrayList<Pose2d>();
+        // guidePoints.add(new Pose2d(.25, .1, new Rotation2d(Math.PI)));
+        // guidePoints.add(new Pose2d(-.75, -.5, new Rotation2d(Math.PI * 3 * .25)));
+        // var driveTrajectory = DriveTrajectoryGenerator.generateGuidedTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, linearConstraints, angularConstraints, guidePoints);
+
+        // TESTING CHOREO TRAJ
+        var driveTrajectory = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile("NewPath");
 
         // var driveTrajectory = DriveTrajectoryGenerator.generateTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, linearConstraints, angularConstraints);
         System.out.println("Writing trajectory to CSV");
