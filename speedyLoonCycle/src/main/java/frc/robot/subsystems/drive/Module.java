@@ -65,8 +65,10 @@ public class Module{
 
     }
 
-    public void pidLoop(double targetSpeed){
-        driveMotor.get();
+    public void periodic(){
+        
+        // sure
+
     }
 
 }
