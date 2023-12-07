@@ -28,10 +28,8 @@
   "java.test.defaultConfig": "WPIlibUnitTests",
   "workbench.colorCustomizations": {
     
-    "editor.background": "#FF0000",
-    "activityBar.background": "#00FF00",
-    "sideBar.background": "#00FF00",
-    "tab.activeBackground": "#00FF00",
-
-  }
+    
+    
+  },
+  "workbench.colorTheme": "Red"
 }

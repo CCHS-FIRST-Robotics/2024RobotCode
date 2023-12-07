@@ -7,10 +7,12 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.drive.Drive;
 public class DriveWithJoysticks extends CommandBase{
     Subsystem subsystem;
+    Drive subsystemDrive;
     Supplier<Double> leftX, leftY;
  
     public DriveWithJoysticks(Drive subsystem, Supplier<Double> leftX, Supplier<Double> leftY) {
         this.subsystem = subsystem;
+        subsystemDrive = (Drive)subsystem;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
         this.leftX = leftX;
@@ -30,7 +32,14 @@ public class DriveWithJoysticks extends CommandBase{
     public void execute() {
         double x = leftX.get();
         double y = leftY.get();
-        
+        subsystemDrive.one.driveMotor.set(y);
+        subsystemDrive.one.turnMotor.set(x);
+        subsystemDrive.two.driveMotor.set(y);
+        subsystemDrive.two.turnMotor.set(x);
+        subsystemDrive.three.driveMotor.set(y);
+        subsystemDrive.three.turnMotor.set(x);
+        subsystemDrive.four.driveMotor.set(y);
+        subsystemDrive.four.turnMotor.set(x);
         
     }
 

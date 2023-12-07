@@ -9,12 +9,12 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 
 public class Module{
-    CANSparkMax driveMotor, turnMotor;
-    SparkMaxPIDController pidDriveController, pidTurnController;
+    public CANSparkMax driveMotor, turnMotor;
+    public SparkMaxPIDController pidDriveController, pidTurnController;
 
-    Canandcoder absoluteTurnEncoder;
+    public Canandcoder absoluteTurnEncoder;
 
-    RelativeEncoder relativeDriveEncoder, relativeTurnEncoder;
+    public RelativeEncoder relativeDriveEncoder, relativeTurnEncoder;
 
     public double driveKP, driveKI, driveKD, driveKIz,
                 driveKFF, driveKMaxOutput, driveKMinOutput;
@@ -28,7 +28,6 @@ public class Module{
         absoluteTurnEncoder = new Canandcoder(2);
         relativeDriveEncoder = driveMotor.getEncoder();
         relativeTurnEncoder = turnMotor.getEncoder();
-
         driveKP = 0.1; 
         driveKI = 0;
         driveKD = 0; 
