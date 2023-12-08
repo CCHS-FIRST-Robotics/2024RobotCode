@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -14,14 +15,15 @@ import frc.robot.*;
 import frc.robot.subsystems.mecaDrive.Drive;
 
 import com.choreo.lib.*;
+import com.ctre.phoenix6.controls.ControlRequest;
 
-public class DriveTrajectoryGenerator {
+public final class DriveTrajectoryGenerator {
     
-    public DriveTrajectoryGenerator() {
+    private DriveTrajectoryGenerator() {
 
     }
 
-    public static DriveTrajectory generateTrapezoidTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints linearConstraints, Constraints angularConstraints) {
+    public static DriveTrajectory generateTrapezoidTrajectory2(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints linearConstraints, Constraints angularConstraints) {
 
         // System.out.println("TESTING");
         // System.out.println(targetPose);
@@ -58,6 +60,59 @@ public class DriveTrajectoryGenerator {
             double dy = profileY.calculate(time).velocity;
             double dtheta = profileHeading.calculate(time).velocity;
             velocityTrajectory.add(new Twist2d(dx, dy, dtheta));
+
+            // System.out.println(i);
+            // System.out.println(new Pose2d(x, y, new Rotation2d(heading)));
+            // System.out.println(new Twist2d(dx, dy, dtheta));
+        }
+
+        return new DriveTrajectory(poseTrajectory, velocityTrajectory);
+    }
+
+    public static DriveTrajectory generateTrapezoidTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints linearConstraints, Constraints angularConstraints) {
+
+        // System.out.println("TESTING");
+        // System.out.println(targetPose);
+        // System.out.println(currentPose);
+
+        TrapezoidProfile.State targetHeadingState = new TrapezoidProfile.State(targetPose.getRotation().getRadians(), targetVelocity.dtheta);
+        TrapezoidProfile.State currentHeadingState = new TrapezoidProfile.State(currentPose.getRotation().getRadians(), currentVelocity.dtheta);
+
+        var profileHeading = new TrapezoidProfile(angularConstraints, targetHeadingState, currentHeadingState);
+
+        Translation2d[] translationTrajectory = new QuadraticProfile(Constants.PERIOD).getCombinedSetPoints(currentPose.getTranslation(), targetPose.getTranslation(), linearConstraints.maxVelocity, linearConstraints.maxAcceleration);
+
+        // Find the max time it takes to reach setpoint
+        double timeToEnd = Math.max(translationTrajectory.length * Constants.PERIOD, profileHeading.totalTime());
+
+        // Create a list of poses and velocities (represented as twists) for each time step
+        ArrayList<Pose2d> poseTrajectory = new ArrayList<Pose2d>();
+        ArrayList<Twist2d> velocityTrajectory = new ArrayList<Twist2d>();
+
+        var prevTranslation = currentPose.getTranslation();
+        // +2 so that the last point is included just in case (int) cuts it off
+        for (int i = 1; i < (int) (timeToEnd / Constants.PERIOD) + 2; i++) {
+            double time = i * Constants.PERIOD;
+
+            // Tranlation2d[] wont allow samples past the end of the trajectory, so use different index
+            int j = i;
+            if (j > translationTrajectory.length - 1) {
+                j = translationTrajectory.length - 1;
+            }
+
+            Translation2d translation = translationTrajectory[j];
+            double heading = profileHeading.calculate(time).position;
+            
+            poseTrajectory.add(new Pose2d(translation.getX(), translation.getY(), new Rotation2d(heading)));  
+            
+            double dtheta = profileHeading.calculate(time).velocity;
+            velocityTrajectory.add(new Twist2d(
+                (translation.getX() - prevTranslation.getX()) / Constants.PERIOD,  
+                (translation.getY() - prevTranslation.getY()) / Constants.PERIOD,
+                dtheta
+            ));
+
+            prevTranslation = translation;
 
             // System.out.println(i);
             // System.out.println(new Pose2d(x, y, new Rotation2d(heading)));

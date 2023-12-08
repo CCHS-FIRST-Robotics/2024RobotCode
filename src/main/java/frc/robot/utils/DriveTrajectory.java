@@ -1,6 +1,9 @@
 package frc.robot.utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import frc.robot.subsystems.mecaDrive.Drive;
 
@@ -56,6 +59,13 @@ public class DriveTrajectory {
         return combine(this, other);
     }
 
+    public void translateBy(Translation2d translation) {
+        for (int i = 0; i < this.positionTrajectory.size(); i++) {
+            Pose2d pose = this.positionTrajectory.get(i);
+            this.positionTrajectory.set(i, new Pose2d(pose.getTranslation().plus(translation), pose.getRotation()));
+        }
+    }
+
     public void print() {
         System.out.println("Position Trajectory:");
         for (Pose2d pose : this.positionTrajectory) {
@@ -68,8 +78,12 @@ public class DriveTrajectory {
     }
 
     public void toCSV() {
+        toCSV("trajectory");
+    }
+
+    public void toCSV(String filename) {
         try {
-            CSVWriter writer = new CSVWriter(new FileWriter("data/trajectory.csv"));
+            CSVWriter writer = new CSVWriter(new FileWriter("data/" + filename + ".csv"));
             String[] header = {"x", "y", "heading", "dx", "dy", "dtheta"};
             writer.writeNext(header);
             for (int i = 0; i < this.positionTrajectory.size(); i++) {

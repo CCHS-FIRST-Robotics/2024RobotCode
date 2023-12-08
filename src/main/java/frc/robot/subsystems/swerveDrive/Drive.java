@@ -27,7 +27,10 @@ import java.util.List;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.revrobotics.CANSparkMax.IdleMode;
+
 import frc.robot.Constants;
+import frc.robot.utils.DriveTrajectory;
 import frc.robot.utils.PoseEstimator;
 
 
@@ -46,12 +49,12 @@ public class Drive extends SubsystemBase {
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
     // Constants for the drivebase
-    private static double maxLinearSpeed = 4.5;
-    private static final double maxLinearAcceleration = 4.0;
+    private static double maxLinearSpeed = 4.0;
+    private static final double maxLinearAcceleration = 6.0;
     private static final double trackWidthX = Units.inchesToMeters(22.5);
     private static final double trackWidthY = Units.inchesToMeters(22.5);
-    private static final double maxAngularSpeed = 4 * Math.PI;
-    private static final double maxAngularAcceleration = 10 * Math.PI;
+    private static final double maxAngularSpeed = 3.5 * Math.PI;
+    private static final double maxAngularAcceleration = 4.5 * Math.PI;
 
     // Define Kinematics object
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
@@ -93,7 +96,7 @@ public class Drive extends SubsystemBase {
     private PIDController headingController = new PIDController(kPHeading, kIHeading, 0.0);
     
     
-    private boolean isBrakeMode = false;
+    private boolean isBrakeMode = true;
     private Timer lastMovementTimer = new Timer();
 
     // Initialize estimated positions
@@ -367,8 +370,12 @@ public class Drive extends SubsystemBase {
                 SwerveModuleState[] optimizedStates = new SwerveModuleState[4];
                 for (int i = 0; i < 4; i++) {
                     optimizedStates[i] = modules[i].runSetpoint(setpointStates[i]);
+                    
+                    // FOR TESTING ONLY
+                    // optimizedStates[i] = new SwerveModuleState();
                 }
 
+            
                 // Log setpoint states
                 Logger.getInstance().recordOutput("SwerveStates/Setpoints", setpointStates);
                 Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
@@ -429,6 +436,13 @@ public class Drive extends SubsystemBase {
         trajectoryCounter = 0;
     }
 
+    public void runPosition(DriveTrajectory driveTrajectory) {
+        controlMode = CONTROL_MODE.POSITION_SETPOINT;
+        this.positionTrajectory = driveTrajectory.positionTrajectory;
+        this.twistTrajectory = driveTrajectory.velocityTrajectory;
+        trajectoryCounter = 0;
+    }
+
     public void runWii(Translation2d linearVelocity, Rotation2d rotation) {
         controlMode = CONTROL_MODE.WII_SETPOINT;
         wiiLinearVelocity = linearVelocity;
@@ -456,6 +470,20 @@ public class Drive extends SubsystemBase {
 
     public void setControlMode(CONTROL_MODE mode) {
         controlMode = mode;
+    }
+
+    public void setDriveMotorsBrakeMode(boolean isEnabled) {
+        isBrakeMode = isEnabled;
+        for (int i = 0; i < 4; i++) {
+            modules[i].setBrakeMode(isBrakeMode);
+        }
+    }
+
+    public void toggleDriveMotorsBrakeMode() {
+        isBrakeMode = !isBrakeMode;
+        for (int i = 0; i < 4; i++) {
+            modules[i].setBrakeMode(isBrakeMode);
+        }
     }
 
     /** Returns the maximum linear speed in meters per sec. */

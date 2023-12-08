@@ -101,10 +101,13 @@ public class ModuleIOSparkMax implements ModuleIO {
             driveSparkMax.setInverted(true);
         }
 
-        driveSparkMax.setSmartCurrentLimit(40);
-        turnSparkMax.setSmartCurrentLimit(30);
+        driveSparkMax.setSmartCurrentLimit(60);
+        turnSparkMax.setSmartCurrentLimit(40);
         driveSparkMax.enableVoltageCompensation(12.0);
         turnSparkMax.enableVoltageCompensation(12.0);
+
+        driveSparkMax.setIdleMode(IdleMode.kBrake);
+        turnSparkMax.setIdleMode(IdleMode.kBrake);
 
         driveEncoder.setPosition(0.0);
         driveEncoder.setMeasurementPeriod(10);
@@ -115,7 +118,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnRelativeEncoder.setAverageDepth(2);
 
         // TODO: any other params/tuning?
-        turnAbsoluteEncoder.setAverageDepth(2 );
+        turnAbsoluteEncoder.setAverageDepth(8); // NOTE: changed from 2 since last tested run (12/3/23)
 
         driveSparkMax.setCANTimeout(0);
         turnSparkMax.setCANTimeout(0);

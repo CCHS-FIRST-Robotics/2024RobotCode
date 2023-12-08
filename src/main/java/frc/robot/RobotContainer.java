@@ -11,6 +11,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.commands.DriveModules;
@@ -26,8 +27,10 @@ import frc.robot.commands.MoveToPose;
 
 import frc.robot.subsystems.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
+import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.PoseEstimator;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -50,8 +53,8 @@ public class RobotContainer {
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
     private final CommandGenericHID wiiRemote1 = new CommandGenericHID(2);
-    private final CommandGenericHID wiiRemote2 = new CommandGenericHID(3);
-    private final boolean useWiiRemotes = false;
+    // private final CommandGenericHID wiiRemote2 = new CommandGenericHID(3);
+    private final boolean useWiiRemotes = true;
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
@@ -144,7 +147,10 @@ public class RobotContainer {
                 new DriveWithWiimote(
                     drive,
                     () -> wiiRemote1.getRawAxis(3),
-                    () -> wiiRemote1.getRawAxis(4),
+                    () -> {
+                        System.out.println(-MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1));
+                        return -MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1);
+                    },
                     wiiRemote1.button(1),
                     wiiRemote1.button(2),
                     () -> getWiiPOV(),
@@ -165,13 +171,38 @@ public class RobotContainer {
 
         // Follow the nearest apriltag while the right trigger is held
         controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
+
+        // Brake when the left trigger is held
+        controller.leftTrigger().whileTrue(
+            new RunCommand(drive::stopWithX, drive)
+        );
         
         // Generate a trajectory to a pose when the A button is pressed (and switch drive to position control)
         controller.a().onTrue(
             new MoveToPose(
                 drive, 
-                () -> {return new Pose2d(-1, -1, new Rotation2d(0));}
+                () -> {return new Pose2d(-3, -3.5, new Rotation2d(Math.PI * 3 * .25));}
             )
+        );
+
+        // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control
+        controller.x().onTrue(
+            drive.runOnce(
+                () -> {
+                    var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile("NewPath");
+                    // adjust so that the start of the trajectory is where the robot is
+                    traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
+                    traj.translateBy(drive.getPose().getTranslation()); 
+
+                    System.out.println("Writing trajectory to CSV");
+                    traj.toCSV("ChoreoTraj");
+                    drive.runPosition(traj);
+                }
+            )
+        );
+
+        controller.b().onTrue(
+            Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
         );
     }
 
