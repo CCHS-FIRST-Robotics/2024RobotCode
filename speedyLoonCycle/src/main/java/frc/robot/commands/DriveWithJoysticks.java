@@ -2,6 +2,8 @@ package frc.robot.commands;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.drive.Drive;
@@ -32,14 +34,10 @@ public class DriveWithJoysticks extends CommandBase{
     public void execute() {
         double x = leftX.get();
         double y = leftY.get();
-        subsystemDrive.one.driveMotor.set(y);
-        subsystemDrive.one.turnMotor.set(x);
-        subsystemDrive.two.driveMotor.set(y);
-        subsystemDrive.two.turnMotor.set(x);
-        subsystemDrive.three.driveMotor.set(y);
-        subsystemDrive.three.turnMotor.set(x);
-        subsystemDrive.four.driveMotor.set(y);
-        subsystemDrive.four.turnMotor.set(x);
+        // Rotation2d rotation = new Rot
+        SwerveModuleState move = new SwerveModuleState(x, new Rotation2d(y));
+
+
         
     }
 
