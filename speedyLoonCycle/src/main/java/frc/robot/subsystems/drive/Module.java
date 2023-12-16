@@ -66,15 +66,15 @@ public class Module{
     }
 
     public void periodic(){
-        // sure
-
+        // Feed forward loop (trust) (wtf does this mean?)
+        driveMotor.set(driveKFF);
+        turnMotor.set(turnKFF);
     }
 
 
     public void driveMotors(SwerveModuleState sms){
 
         // Swerve
-
         pidDriveController.setReference(
             metersPerSecondToRotationsPerSecond(sms.speedMetersPerSecond, 0.25), 
             ControlType.kVelocity);
