@@ -60,8 +60,8 @@ public class MoveToPose extends InstantCommand {
         // var driveTrajectory = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile("NewPath");
 
         var driveTrajectory = DriveTrajectoryGenerator.generateTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, linearConstraints, angularConstraints);
-        System.out.println("Writing trajectory to CSV");
-        driveTrajectory.toCSV("choreoTrajectory");
+        // System.out.println("Writing trajectory to CSV");
+        // driveTrajectory.toCSV("choreoTrajectory");
         drive.runPosition(driveTrajectory.positionTrajectory, driveTrajectory.velocityTrajectory);
     }
 }

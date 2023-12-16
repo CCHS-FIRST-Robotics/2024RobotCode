@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -36,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -54,7 +56,7 @@ public class RobotContainer {
     private final CommandXboxController controller = new CommandXboxController(0);
     private final CommandGenericHID wiiRemote1 = new CommandGenericHID(2);
     // private final CommandGenericHID wiiRemote2 = new CommandGenericHID(3);
-    private final boolean useWiiRemotes = true;
+    private final boolean useWiiRemotes = false;
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
@@ -181,21 +183,22 @@ public class RobotContainer {
         controller.a().onTrue(
             new MoveToPose(
                 drive, 
-                () -> {return new Pose2d(-3, -3.5, new Rotation2d(Math.PI * 3 * .25));}
+                () -> {return new Pose2d(0, 0, new Rotation2d(Math.PI * 3 * .25));}
             )
         );
 
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control
-        controller.x().onTrue(
+        new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
             drive.runOnce(
                 () -> {
-                    var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile("NewPath");
+                    String path = "CurveTest2";
+                    var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
                     // adjust so that the start of the trajectory is where the robot is
                     traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
                     traj.translateBy(drive.getPose().getTranslation()); 
 
                     System.out.println("Writing trajectory to CSV");
-                    traj.toCSV("ChoreoTraj");
+                    traj.toCSV(path);
                     drive.runPosition(traj);
                 }
             )

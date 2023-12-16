@@ -22,7 +22,7 @@ public class GyroIONavX implements GyroIO {
         
         inputs.rollVelocityRadPerSec = Units.degreesToRadians(navx.getRawGyroY());
         inputs.pitchVelocityRadPerSec = Units.degreesToRadians(navx.getRawGyroX());
-        inputs.yawVelocityRadPerSec = Units.degreesToRadians(navx.getRate());
+        inputs.yawVelocityRadPerSec = Units.degreesToRadians(-navx.getRawGyroZ()); // negative cuz its switched for some reason
     }
 }
 

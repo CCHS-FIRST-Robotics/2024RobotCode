@@ -93,6 +93,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnRelativeEncoder = turnSparkMax.getEncoder();
 
         driveSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
+        turnSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20); // report absolute encoder measurements at 20ms (default: 200ms)
 
         turnSparkMax.setInverted(isTurnMotorInverted);
         if (index == 2 || index == 3) {

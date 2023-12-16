@@ -100,7 +100,10 @@ public class DriveWithJoysticks extends CommandBase {
                 speeds.vyMetersPerSecond,
                 prevSpeeds.vyMetersPerSecond - drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD,
                 prevSpeeds.vyMetersPerSecond + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD),
-            speeds.omegaRadiansPerSecond
+            MathUtil.clamp(
+                speeds.omegaRadiansPerSecond,
+                prevSpeeds.omegaRadiansPerSecond - drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD,
+                prevSpeeds.omegaRadiansPerSecond + drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD)
         );
         prevSpeeds = speeds;
 

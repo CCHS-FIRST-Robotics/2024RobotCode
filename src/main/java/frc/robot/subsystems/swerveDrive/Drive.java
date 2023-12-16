@@ -19,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import java.util.ArrayList;
@@ -83,18 +84,17 @@ public class Drive extends SubsystemBase {
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
     private double kPx = 0.35; // 0.4
     private double kPy = 0.33; // 0.35
-    private double kPHeading = 0.5; // 0.5
+    private double kPHeading = 0.6; // 0.5
 
     private double kIx = 0.12; // 0.12
     private double kIy = 0.12; // 0.15
     // private double kPlinear = 
-    private double kIHeading = 0.0; // 0.3
+    private double kIHeading = 0.05; // 0.3
 
     private PIDController xController = new PIDController(kPx, kIx, 0.0);
     private PIDController yController = new PIDController(kPy, kIy, 0.0);
     // private PIDController linearController = new PIDController(kPHeading, kIHeading, coastThresholdMetersPerSec);
     private PIDController headingController = new PIDController(kPHeading, kIHeading, 0.0);
-    
     
     private boolean isBrakeMode = true;
     private Timer lastMovementTimer = new Timer();
@@ -134,6 +134,9 @@ public class Drive extends SubsystemBase {
 
         this.gyroIO = gyroIO;
         this.poseEstimator = poseEstimator;
+
+        // idk why it wont let me put it above??
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
 
         modules[0] = new Module(flModuleIO, 0);
         modules[1] = new Module(frModuleIO, 1);
