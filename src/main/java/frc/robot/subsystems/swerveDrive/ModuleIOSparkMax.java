@@ -111,15 +111,15 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMax.setIdleMode(IdleMode.kBrake);
 
         driveEncoder.setPosition(0.0);
-        driveEncoder.setMeasurementPeriod(10);
-        driveEncoder.setAverageDepth(2);
+        driveEncoder.setMeasurementPeriod(10); //TODO: test at 8ms (min)
+        driveEncoder.setAverageDepth(2); //TODO: test at 1 (min)
 
         turnRelativeEncoder.setPosition(0.0);
-        turnRelativeEncoder.setMeasurementPeriod(10);
-        turnRelativeEncoder.setAverageDepth(2);
+        turnRelativeEncoder.setMeasurementPeriod(10); //TODO: test at 8ms (min)
+        turnRelativeEncoder.setAverageDepth(2); //TODO: test at 1 (min)
 
         // TODO: any other params/tuning?
-        turnAbsoluteEncoder.setAverageDepth(8); // NOTE: changed from 2 since last tested run (12/3/23)
+        turnAbsoluteEncoder.setAverageDepth(2); // NOTE: changed from 8 since last tested run (12/15/23) -- was at 2 a couple weeks ago tho
 
         driveSparkMax.setCANTimeout(0);
         turnSparkMax.setCANTimeout(0);
