@@ -174,12 +174,16 @@ public class RobotContainer {
         }
 
         // Follow the nearest apriltag while the right trigger is held
-        controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
+        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
 
         // Brake when the left trigger is held
         controller.leftTrigger().whileTrue(
             new RunCommand(drive::stopWithX, drive)
         );
+
+        // controller.rightTrigger().whileTrue(
+        //     new RunCommand(drive::runCharacterization, drive)
+        // );
         
         // Generate a trajectory to a pose when the A button is pressed (and switch drive to position control)
         controller.a().onTrue(
@@ -211,22 +215,22 @@ public class RobotContainer {
             Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
         );
 
-        controller.y().onTrue(
-            new DriveInCircle(
-                drive,
-                () -> {
-                    return new Translation2d(1.0, 0.0);
-                    // return new Translation2d(.57/2.0, .57/2.0);
-                },
-                () -> {
-                    return 2.5;
-                },
-                () -> {
-                    return 2 * 2.5 / 1.0;
-                    // return 2.5 / (new Translation2d(.57/2.0, .57/2.0).getNorm());
-                }
-            )
-        );
+        // controller.y().onTrue(
+        //     new DriveInCircle(
+        //         drive,
+        //         () -> {
+        //             return new Translation2d(1.0, 0.0);
+        //             // return new Translation2d(.57/2.0, .57/2.0);
+        //         },
+        //         () -> {
+        //             return 2.5;
+        //         },
+        //         () -> {
+        //             return 2 * 2.5 / 1.0;
+        //             // return 2.5 / (new Translation2d(.57/2.0, .57/2.0).getNorm());
+        //         }
+        //     )
+        // );
     }
 
     /**

@@ -28,13 +28,13 @@ public class ModuleIOSparkMax implements ModuleIO {
     private final SparkMaxPIDController turnSparkMaxPIDF;
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKp = 0.00017; 
+    private static final double driveKp = 0.00016; 
     private static final double driveKd = 0.0;
     private static final double driveKi = 0.000000; // 0.000008
-    private static final double driveKs = 0.0;
-    private static final double driveKv = 0.17; 
+    private static final double driveKs = 0.19;
+    private static final double driveKv = 0.145; 
 
-    private static final double turnKp = 5; 
+    private static final double turnKp = 8; 
     private static final double turnKd = 0.00;
 
     private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv); // kV UNITS: VOLTS / (RAD PER SECOND)
@@ -111,12 +111,12 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMax.setIdleMode(IdleMode.kBrake);
 
         driveEncoder.setPosition(0.0);
-        driveEncoder.setMeasurementPeriod(10); //TODO: test at 8ms (min)
-        driveEncoder.setAverageDepth(2); //TODO: test at 1 (min)
+        driveEncoder.setMeasurementPeriod(8);
+        driveEncoder.setAverageDepth(2); 
 
         turnRelativeEncoder.setPosition(0.0);
-        turnRelativeEncoder.setMeasurementPeriod(10); //TODO: test at 8ms (min)
-        turnRelativeEncoder.setAverageDepth(2); //TODO: test at 1 (min)
+        turnRelativeEncoder.setMeasurementPeriod(10); 
+        turnRelativeEncoder.setAverageDepth(2); 
 
         // TODO: any other params/tuning?
         turnAbsoluteEncoder.setAverageDepth(2); // NOTE: changed from 8 since last tested run (12/15/23) -- was at 2 a couple weeks ago tho

@@ -108,6 +108,8 @@ public class Drive extends SubsystemBase {
 
     private boolean isWiiMode = false; 
 
+    private double characterizationVolts = 0.0; // 0.19
+
     int i = 0;
 
     // Control modes for the drive
@@ -116,7 +118,8 @@ public class Drive extends SubsystemBase {
         MODULE_SETPOINT,
         CHASSIS_SETPOINT,
         POSITION_SETPOINT,
-        WII_SETPOINT
+        WII_SETPOINT,
+        CHARACTERIZING
     };
 
     CONTROL_MODE controlMode = CONTROL_MODE.DISABLED;
@@ -237,6 +240,17 @@ public class Drive extends SubsystemBase {
                 Logger.getInstance().recordOutput("SwerveStates/Setpoints", new double[] {});
                 Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
                 return;
+            
+            case CHARACTERIZING:
+                // Run in characterization mode
+                for (var module : modules) {
+                    module.runCharacterization(characterizationVolts);
+                }
+
+                // Clear setpoint logs
+                Logger.getInstance().recordOutput("SwerveStates/Setpoints", new double[] {});
+                Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
+                break;
             
             // TODO: THIS IS CURRENTLY VERY HACKY SO LIKE PROBABLY SHOULD REWRITE THIS
             case WII_SETPOINT:
@@ -450,6 +464,10 @@ public class Drive extends SubsystemBase {
         controlMode = CONTROL_MODE.WII_SETPOINT;
         wiiLinearVelocity = linearVelocity;
         wiiRotation = rotation;
+    }
+
+    public void runCharacterization() {
+        controlMode = CONTROL_MODE.CHARACTERIZING;
     }
 
     /** Stops the drive. */

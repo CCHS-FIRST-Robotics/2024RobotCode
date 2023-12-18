@@ -86,8 +86,8 @@ public class Module {
      * periodically.
      */
     public void runCharacterization(double volts) {
-        // io.setTurnVoltage(turnFeedback.calculate(getAngle().getRadians(), 0.0));
-        // io.setDriveVoltage(volts);
+        io.setTurnPosition(0);
+        io.setDriveVoltage(volts);
     }
 
     /** Disables all outputs to motors (sets voltage to 0). */
