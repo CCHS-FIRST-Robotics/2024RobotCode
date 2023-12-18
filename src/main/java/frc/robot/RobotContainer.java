@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.commands.DriveInCircle;
 import frc.robot.commands.DriveModules;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.DriveWithWiimote;
@@ -188,7 +190,8 @@ public class RobotContainer {
         );
 
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control
-        new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
+        // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
+        controller.x().onTrue(
             drive.runOnce(
                 () -> {
                     String path = "CurveTest2";
@@ -206,6 +209,23 @@ public class RobotContainer {
 
         controller.b().onTrue(
             Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
+        );
+
+        controller.y().onTrue(
+            new DriveInCircle(
+                drive,
+                () -> {
+                    return new Translation2d(1.0, 0.0);
+                    // return new Translation2d(.57/2.0, .57/2.0);
+                },
+                () -> {
+                    return 2.5;
+                },
+                () -> {
+                    return 2 * 2.5 / 1.0;
+                    // return 2.5 / (new Translation2d(.57/2.0, .57/2.0).getNorm());
+                }
+            )
         );
     }
 
