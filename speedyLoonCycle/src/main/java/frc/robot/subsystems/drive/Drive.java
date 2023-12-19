@@ -11,12 +11,47 @@ public class Drive extends SubsystemBase{
     private Rotation2d robotAngle;
     private SwerveModuleState moduleState;
 
+    public static class Constants{
+        public final static double MAGIC_SPEED = 4d;
+        public final static double WHEEL_RADIUS_METERS = 0.0508d;
+        public final static int SECONDS_IN_A_MINUTE = 60;
+        public final static int RADII_IN_A_DIAMETER = 2;
+        public final static double DRIVE_GEAR_RATIO = 6.74603174603;
+        public final static double TURN_GEAR_RATIO = 21.4285714286;
+        
+        public final static double getMaxSpeed(){
+            return MAGIC_SPEED;
+        }
+
+        public final static double getWheelRadiusMeters(){
+            return WHEEL_RADIUS_METERS;
+        }
+
+        public final static int getSecondsInAMinute(){
+            return SECONDS_IN_A_MINUTE;
+        }
+
+        public final static int getRadiiInADiameter(){
+            return RADII_IN_A_DIAMETER;
+        }
+        
+        public final static double getDriveGearRatio(){
+            return DRIVE_GEAR_RATIO;
+        }
+
+        public final static double getTurnGearRatio(){
+            return TURN_GEAR_RATIO;
+        }
+        
+    }
+
     public Drive(){
         robotSpeeds = new ChassisSpeeds();
         modules = new Module[4];
         for(int i = 0; i < modules.length; i++){
             modules[i] = new Module();
         }
+        moduleState = new SwerveModuleState(0, new Rotation2d());
     }
 
     public void swerveThatShi(SwerveModuleState whatWeWant){
@@ -29,7 +64,7 @@ public class Drive extends SubsystemBase{
         // robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(goalpos, robotAngle);
         // setState();
         for(int i = 0; i < modules.length; i++){
-            modules[i].periodic();
+            modules[i].periodic(); // update only (trust)
             modules[i].driveMotors(moduleState);
         }
     }

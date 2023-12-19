@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.drive.Drive;
 public class DriveWithJoysticks extends CommandBase{
+    double magic = 4d;
     Subsystem subsystem;
     Drive subsystemDrive;
     Supplier<Double> leftX, leftY;
@@ -35,9 +36,8 @@ public class DriveWithJoysticks extends CommandBase{
         double x = leftX.get();
         double y = leftY.get();
         // Rotation2d rotation = new Rot
-        SwerveModuleState move = new SwerveModuleState(x, new Rotation2d(y * Math.PI));
+        SwerveModuleState move = new SwerveModuleState(y * magic, new Rotation2d(x * Math.PI));
         subsystemDrive.swerveThatShi(move);
-
         
     }
 

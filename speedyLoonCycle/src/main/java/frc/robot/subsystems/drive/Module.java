@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMax;
 
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 
@@ -14,7 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 public class Module{
     private CANSparkMax driveMotor, turnMotor;
     private SparkMaxPIDController pidDriveController, pidTurnController;
-    private Canandcoder absoluteTurnEncoder;
+    private SparkMaxAbsoluteEncoder absoluteTurnEncoder;
     private RelativeEncoder relativeDriveEncoder, relativeTurnEncoder;
     private double driveKP, driveKI, driveKD, driveKIprivate, driveKIz,
              driveKFF, driveKMaxOutput, driveKMinOutput;
@@ -25,7 +26,7 @@ public class Module{
     public Module() {
         driveMotor = new CANSparkMax(1, CANSparkMaxLowLevel.MotorType.kBrushless);
         turnMotor = new CANSparkMax(2, CANSparkMaxLowLevel.MotorType.kBrushless);
-        absoluteTurnEncoder = new Canandcoder(2);
+        absoluteTurnEncoder = turnMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         relativeDriveEncoder = driveMotor.getEncoder();
         relativeTurnEncoder = turnMotor.getEncoder();
         driveKP = 0.1; 
@@ -46,8 +47,10 @@ public class Module{
         
         pidDriveController = driveMotor.getPIDController();
         pidDriveController.setFeedbackDevice(relativeDriveEncoder);
-        
 
+        pidTurnController = turnMotor.getPIDController();
+        pidTurnController.setFeedbackDevice(absoluteTurnEncoder);
+    
         pidDriveController.setP(driveKP);
         pidDriveController.setI(driveKI);
         pidDriveController.setD(driveKD);
@@ -66,9 +69,7 @@ public class Module{
     }
 
     public void periodic(){
-        // Feed forward loop (trust) (wtf does this mean?)
-        driveMotor.set(driveKFF);
-        turnMotor.set(turnKFF);
+        // do not trust
     }
 
 
@@ -76,15 +77,16 @@ public class Module{
 
         // Swerve
         pidDriveController.setReference(
-            metersPerSecondToRotationsPerSecond(sms.speedMetersPerSecond, 0.25), 
+            metersPerSecondToRotationsPerMinute(sms.speedMetersPerSecond), 
             ControlType.kVelocity);
         pidTurnController.setReference(sms.angle.getRotations(), ControlType.kPosition);
 
-
     }
 
-    public double metersPerSecondToRotationsPerSecond(double metersPerSecond, double wheelRadiusMeters){
-        return 60 * metersPerSecond / (2 * Math.PI * wheelRadiusMeters);
+    public double metersPerSecondToRotationsPerMinute(double metersPerSecond){
+        return Drive.Constants.getDriveGearRatio() * 
+        Drive.Constants.getSecondsInAMinute() * metersPerSecond / 
+        (Drive.Constants.getRadiiInADiameter() * Math.PI * Drive.Constants.getWheelRadiusMeters());
     }
 }
 /*
