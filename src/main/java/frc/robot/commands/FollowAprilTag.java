@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -13,6 +14,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.swerveDrive.Drive;
 import frc.robot.subsystems.swerveDrive.Drive.CONTROL_MODE;
 import frc.robot.subsystems.vision.Vision;
@@ -67,12 +69,37 @@ public class FollowAprilTag extends CommandBase {
             return;
         }
 
-        // Pose2d targetPose = currentPose
-        //     .plus(transformToTag) // transform to tag (ie get field relative pose of tag)
-        //     .plus(new Transform2d(new Translation2d(-FOLLOWING_DISTANCE, 0), new Rotation2d())); // move pose to FOLLOWING_DISTANCE in front of tag
-        Twist2d targetVelocity = new Twist2d();
+        Pose2d targetPose = currentPose
+            .plus(transformToTag) // transform to tag (ie get field relative pose of tag)
+            .plus(new Transform2d(new Translation2d(-FOLLOWING_DISTANCE, 0), new Rotation2d())); // move pose to FOLLOWING_DISTANCE in front of tag
+        
+        Twist2d targetVelocity = new Twist2d(
+            (targetPose.getX() - currentPose.getX()) / Constants.PERIOD,
+            (targetPose.getY() - currentPose.getY()) / Constants.PERIOD,
+            (targetPose.getRotation().getRadians() - currentPose.getRotation().getRadians()) / Constants.PERIOD
+        );
 
-        Pose2d targetPose = new Pose2d(FOLLOWING_DISTANCE, 0, transformToTag.getRotation().times(-1));
+        // Constrain to max accel
+        targetVelocity = new Twist2d(
+            MathUtil.clamp(
+                targetVelocity.dx,
+                currentVelocity.dx - drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD,
+                currentVelocity.dx + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD
+            ),
+            MathUtil.clamp(
+                targetVelocity.dy,
+                currentVelocity.dy - drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD,
+                currentVelocity.dy + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD
+            ),
+            MathUtil.clamp(
+                targetVelocity.dtheta,
+                currentVelocity.dtheta - drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD,
+                currentVelocity.dtheta + drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD
+            )
+        );
+        
+        // Twist2d targetVelocity = new Twist2d();
+        // Pose2d targetPose = new Pose2d(FOLLOWING_DISTANCE, 0, transformToTag.getRotation().times(-1));
         
 
         // create trajectory to send to drive -- just one point, might want to make a motion profile later

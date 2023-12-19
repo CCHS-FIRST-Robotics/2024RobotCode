@@ -55,7 +55,7 @@ public class Drive extends SubsystemBase {
     private static final double trackWidthX = Units.inchesToMeters(22.5);
     private static final double trackWidthY = Units.inchesToMeters(22.5);
     private static final double maxAngularSpeed = 3.5 * Math.PI;
-    private static final double maxAngularAcceleration = 4.5 * Math.PI;
+    private static final double maxAngularAcceleration = 6 * Math.PI;
 
     // Define Kinematics object
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
@@ -83,7 +83,7 @@ public class Drive extends SubsystemBase {
     
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
     private double kPx = 0.35; // 0.4
-    private double kPy = 0.33; // 0.35
+    private double kPy = 0.35; // 0.33
     private double kPHeading = 0.6; // 0.5
 
     private double kIx = 0.12; // 0.12

@@ -18,6 +18,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.Constants;
 
 public class ModuleIOSparkMax implements ModuleIO {
     /* MOTOR CONTROLLERS + PID */
@@ -28,16 +29,17 @@ public class ModuleIOSparkMax implements ModuleIO {
     private final SparkMaxPIDController turnSparkMaxPIDF;
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKp = 0.00016; 
+    private static final double driveKp = 0.00015; 
     private static final double driveKd = 0.0;
     private static final double driveKi = 0.000000; // 0.000008
     private static final double driveKs = 0.19;
-    private static final double driveKv = 0.145; 
+    private static final double driveKv = 0.135; 
+    private static final double driveKa = 0.0148; 
 
     private static final double turnKp = 8; 
     private static final double turnKd = 0.00;
 
-    private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv); // kV UNITS: VOLTS / (RAD PER SECOND)
+    private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa); // kV UNITS: VOLTS / (RAD PER SECOND)
 
     /* ENCODERS */
     private final RelativeEncoder driveEncoder; // NEO Encoder
@@ -49,6 +51,8 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     private final boolean isTurnMotorInverted = false;
     // private final Rotation2d absoluteEncoderOffset;
+
+    private double prevVelocityRadPerSec;
 
     int index;
 
@@ -190,8 +194,10 @@ public class ModuleIOSparkMax implements ModuleIO {
             motorRPM,
             CANSparkMax.ControlType.kVelocity,
             0,
-            driveFeedforward.calculate(velocityRadPerSec)
+            // driveFeedforward.calculate(velocityRadPerSec)
+            driveFeedforward.calculate(prevVelocityRadPerSec, velocityRadPerSec, Constants.PERIOD)
         );
+        prevVelocityRadPerSec = velocityRadPerSec;
     }
 
     /* (non-Javadoc)

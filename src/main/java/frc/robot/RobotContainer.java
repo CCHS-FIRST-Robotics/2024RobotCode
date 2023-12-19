@@ -231,6 +231,24 @@ public class RobotContainer {
         //         }
         //     )
         // );
+
+        controller.y().whileTrue(
+            new DriveInCircle(
+                drive,
+                () -> {
+                    // return new Translation2d(1.0, 0.0);
+                    return new Translation2d(.57/2.0, .57/2.0);
+                },
+                () -> {
+                    // return 2.5;
+                    return 0.75;
+                },
+                () -> {
+                    // return 2.5 / 1.0;
+                    return 0.75 / (new Translation2d(.57/2.0, .57/2.0).getNorm());
+                }
+            )
+        );
     }
 
     /**
