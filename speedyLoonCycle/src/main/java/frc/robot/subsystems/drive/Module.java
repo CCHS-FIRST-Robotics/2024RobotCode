@@ -29,7 +29,7 @@ public class Module{
         absoluteTurnEncoder = turnMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         relativeDriveEncoder = driveMotor.getEncoder();
         relativeTurnEncoder = turnMotor.getEncoder();
-        driveKP = 0.1; 
+        driveKP = 0;
         driveKI = 0;
         driveKD = 0; 
         driveKIz = 0; 
@@ -37,7 +37,7 @@ public class Module{
         driveKMaxOutput = 1; 
         driveKMinOutput = -1;
 
-        turnKP = 0.1; 
+        turnKP = 0; 
         turnKI = 0;
         turnKD = 0;
         turnKIz = 0; 
@@ -54,7 +54,7 @@ public class Module{
         pidDriveController.setP(driveKP);
         pidDriveController.setI(driveKI);
         pidDriveController.setD(driveKD);
-        pidDriveController.setIZone(driveKIz); 
+        pidDriveController.setIZone(driveKIz);
         pidDriveController.setFF(driveKFF); 
         pidDriveController.setOutputRange(driveKMinOutput, driveKMaxOutput); 
 
@@ -66,6 +66,9 @@ public class Module{
         pidTurnController.setOutputRange(turnKMinOutput, turnKMaxOutput); 
 
 
+        pidTurnController.setPositionPIDWrappingEnabled(true); 
+        pidTurnController.setPositionPIDWrappingMinInput(0);
+        pidTurnController.setPositionPIDWrappingMaxInput(1);
     }
 
     public void periodic(){
@@ -79,6 +82,7 @@ public class Module{
         pidDriveController.setReference(
             metersPerSecondToRotationsPerMinute(sms.speedMetersPerSecond), 
             ControlType.kVelocity);
+    
         pidTurnController.setReference(sms.angle.getRotations(), ControlType.kPosition);
 
     }
