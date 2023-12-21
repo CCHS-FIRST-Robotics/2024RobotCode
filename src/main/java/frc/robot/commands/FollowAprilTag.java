@@ -29,6 +29,8 @@ public class FollowAprilTag extends CommandBase {
     Supplier<Transform2d> tagTransformSuppier;
     Constraints linearConstraints;
     Constraints angularConstraints;
+
+    Twist2d prevVelocity = new Twist2d();
     
     public FollowAprilTag(
         Drive drive,
@@ -76,27 +78,30 @@ public class FollowAprilTag extends CommandBase {
         Twist2d targetVelocity = new Twist2d(
             (targetPose.getX() - currentPose.getX()) / Constants.PERIOD,
             (targetPose.getY() - currentPose.getY()) / Constants.PERIOD,
-            (targetPose.getRotation().getRadians() - currentPose.getRotation().getRadians()) / Constants.PERIOD
+            0
+            // (targetPose.getRotation().getRadians() - currentPose.getRotation().getRadians()) / Constants.PERIOD
         );
+        targetPose = new Pose2d(targetPose.getTranslation(), currentPose.getRotation());
 
         // Constrain to max accel
         targetVelocity = new Twist2d(
             MathUtil.clamp(
                 targetVelocity.dx,
-                currentVelocity.dx - drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD,
-                currentVelocity.dx + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD
+                prevVelocity.dx - drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD,
+                prevVelocity.dx + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD
             ),
             MathUtil.clamp(
                 targetVelocity.dy,
-                currentVelocity.dy - drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD,
-                currentVelocity.dy + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD
+                prevVelocity.dy - drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD,
+                prevVelocity.dy + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD
             ),
             MathUtil.clamp(
                 targetVelocity.dtheta,
-                currentVelocity.dtheta - drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD,
-                currentVelocity.dtheta + drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD
+                prevVelocity.dtheta - drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD,
+                prevVelocity.dtheta + drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD
             )
         );
+        prevVelocity = targetVelocity;
         
         // Twist2d targetVelocity = new Twist2d();
         // Pose2d targetPose = new Pose2d(FOLLOWING_DISTANCE, 0, transformToTag.getRotation().times(-1));

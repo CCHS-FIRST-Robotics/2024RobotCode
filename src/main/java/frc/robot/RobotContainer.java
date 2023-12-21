@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -52,7 +53,7 @@ public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private final Vision camera;
-    private final PoseEstimator poseEstimator = new PoseEstimator();
+    private final PoseEstimator poseEstimator;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -76,10 +77,9 @@ public class RobotContainer {
                 new ModuleIOSparkMax(1), 
                 new ModuleIOSparkMax(2), 
                 new ModuleIOSparkMax(3),
-                poseEstimator,
                 useWiiRemotes
             );
-            camera = new Vision(new CameraIOZED(), poseEstimator);
+            camera = new Vision(new CameraIOZED());
             break;
 
         // Sim robot, instantiate physics sim IO implementations
@@ -90,10 +90,9 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim(),
-                poseEstimator,
                 false
             );
-            camera = new Vision(new CameraIOZED(), poseEstimator);
+            camera = new Vision(new CameraIOZED());
             break;
 
         // Replayed robot, disable IO implementations
@@ -101,15 +100,24 @@ public class RobotContainer {
             drive = new Drive(
                 new GyroIONavX(),
                 new ModuleIOSparkMax(0), 
-                new ModuleIOSparkMax(1), 
+                new ModuleIOSparkMax(1),
                 new ModuleIOSparkMax(2), 
                 new ModuleIOSparkMax(3),
-                poseEstimator,
                 false
             );
-            camera = new Vision(new CameraIOZED(), poseEstimator);
+            camera = new Vision(new CameraIOZED());
             break;
         }
+
+        poseEstimator = new PoseEstimator(
+            drive.getKinematics(),
+            drive.getPose().getRotation(),
+            drive.getModulePositions(),
+            drive.getPose()
+        );
+
+        drive.setPoseEstimator(poseEstimator);
+        camera.setPoseEstimator(poseEstimator);
 
         // Set up auto routines
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
@@ -174,7 +182,7 @@ public class RobotContainer {
         }
 
         // Follow the nearest apriltag while the right trigger is held
-        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
+        controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
 
         // Brake when the left trigger is held
         controller.leftTrigger().whileTrue(
@@ -198,7 +206,7 @@ public class RobotContainer {
         controller.x().onTrue(
             drive.runOnce(
                 () -> {
-                    String path = "CurveTest2";
+                    String path = "RC";
                     var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
                     // adjust so that the start of the trajectory is where the robot is
                     traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
@@ -211,23 +219,23 @@ public class RobotContainer {
             )
         );
 
-        controller.b().onTrue(
-            Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
-        );
+        // controller.b().onTrue(
+        //     Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
+        // );
+
 
         // controller.y().onTrue(
         //     new DriveInCircle(
         //         drive,
         //         () -> {
-        //             return new Translation2d(1.0, 0.0);
+        //             return getRadius();
         //             // return new Translation2d(.57/2.0, .57/2.0);
         //         },
         //         () -> {
-        //             return 2.5;
+        //             return getVelocity();
         //         },
         //         () -> {
-        //             return 2 * 2.5 / 1.0;
-        //             // return 2.5 / (new Translation2d(.57/2.0, .57/2.0).getNorm());
+        //             return getAngularVelocity();
         //         }
         //     )
         // );
@@ -236,7 +244,7 @@ public class RobotContainer {
             new DriveInCircle(
                 drive,
                 () -> {
-                    // return new Translation2d(1.0, 0.0);
+                    // return new Translation2d(2.0, 0.0);
                     return new Translation2d(.57/2.0, .57/2.0);
                 },
                 () -> {
@@ -244,11 +252,34 @@ public class RobotContainer {
                     return 0.75;
                 },
                 () -> {
-                    // return 2.5 / 1.0;
+                    // return 4 * 2.5 / 2.0;
                     return 0.75 / (new Translation2d(.57/2.0, .57/2.0).getNorm());
                 }
             )
         );
+    }
+
+    private double applyPreferences(double input, double exponent, double deadzone) {
+        if (Math.abs(input) < deadzone) {
+            return 0;
+        }
+        return Math.pow(Math.abs(input), exponent) * Math.signum(input);
+    }
+
+    private Translation2d getRadius() {
+        double leftY = applyPreferences(controller.getLeftY(), 2.0, .1);
+        return new Translation2d(.5 + 1.5 * Math.abs(leftY), 0.0);
+    }
+
+    private double getVelocity() {
+        double leftX = applyPreferences(controller.getLeftX(), 2.0, .1);
+        return 2 * leftX;
+    }
+
+    private double getAngularVelocity() {
+        if (getRadius().getNorm() == 0) return 0;
+        double rightX = applyPreferences(controller.getRightX(), 2.0, .1);
+        return (1 + rightX) * getVelocity() / getRadius().getNorm();
     }
 
     /**

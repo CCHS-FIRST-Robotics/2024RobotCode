@@ -77,5 +77,7 @@ public class CameraIOZED implements CameraIO {
             );
         }
         inputs.tags = tags;
+
+        inputs.timestampSeconds = pose2dSub.getLastChange();
     }
 }

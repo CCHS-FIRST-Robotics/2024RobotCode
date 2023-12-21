@@ -1,23 +1,45 @@
 package frc.robot.utils;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.geometry.Twist3d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.numbers.*;
 
-public class PoseEstimator {
+public class PoseEstimator extends SwerveDrivePoseEstimator {
     
     double latestTimestamp = -1;
     Pose2d poseEstimate = new Pose2d();
-    Pose3d poseEstimate3d = new Pose3d();
+    Pose3d poseEstimate3d = new Pose3d(); 
+
+    // LinearFilter visionXFilter = LinearFilter.movingAverage(10);
+    LinearFilter visionYFilter = LinearFilter.movingAverage(30);
+
+    MedianFilter visionXFilter = new MedianFilter(10);
+    // MedianFilter visionYFilter = new MedianFilter(20);
+
+    static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
+    static final Matrix<N3, N1> defaultVisionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
 
     /**
      * Constructs a new PoseEstimator object
      */
-    public PoseEstimator() {
-
+    public PoseEstimator(SwerveDriveKinematics kinematics,
+        Rotation2d gyroAngle,
+        SwerveModulePosition[] modulePositions,
+        Pose2d initialPoseMeters
+    ){
+        super(kinematics, gyroAngle, modulePositions, initialPoseMeters, defaultStateStdDevs, defaultVisionMeasurementStdDevs);
     }
 
     /**
@@ -26,6 +48,15 @@ public class PoseEstimator {
      * @return The latest 2d pose estimate
      */
     public Pose2d getPoseEstimate() {
+        return getEstimatedPosition();
+    }
+
+    /**
+     * Returns the latest 2d pose estimate
+     * 
+     * @return The latest 2d pose estimate
+     */
+    public Pose2d getPoseEstimateOld() {
         return poseEstimate;
     }
 
@@ -36,6 +67,14 @@ public class PoseEstimator {
      */
     public Pose3d getPoseEstimate3d() {
         return poseEstimate3d;
+    }
+
+    public Matrix<N3, N1> getDefaultStateStdDevs() {
+        return defaultStateStdDevs;
+    }
+
+    public Matrix<N3, N1> getDefaultVisionMeasurementStdDevs() {
+        return defaultVisionMeasurementStdDevs;
     }
 
     /**
@@ -68,7 +107,11 @@ public class PoseEstimator {
         // (which it should be when there are just these two sources of data and the other is overriding this one)
         Rotation2d gyroAngle = poseEstimate.getRotation();
 
-        poseEstimate = new Pose2d(visionPoseEstimate.toPose2d().getTranslation(), gyroAngle);
+        // Filter x, y values
+        double x = visionXFilter.calculate(visionPoseEstimate.getX());
+        double y = visionYFilter.calculate(visionPoseEstimate.getY());
+
+        poseEstimate = new Pose2d(new Translation2d(x, y), gyroAngle);
         poseEstimate3d = new Pose3d(
             visionPoseEstimate.getTranslation(), 
             new Rotation3d(

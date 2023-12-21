@@ -1,11 +1,14 @@
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.AprilTag;
@@ -31,9 +34,8 @@ public class Vision extends SubsystemBase {
      * @param io The camera IO object
      * @param poseEstimator The pose estimator
      */
-    public Vision(CameraIO io, PoseEstimator poseEstimator) {
+    public Vision(CameraIO io) {
         this.io = io;
-        this.poseEstimator = poseEstimator;
     }
     
     /* (non-Javadoc)
@@ -44,7 +46,14 @@ public class Vision extends SubsystemBase {
         Logger.getInstance().processInputs("Vision", inputs);
 
         if (getPoseEstimate3d().getX() > 0) {
-            poseEstimator.addVisionData(getPoseEstimate3d(), Timer.getFPGATimestamp());
+            // poseEstimator.addVisionData(getPoseEstimate3d(), Timer.getFPGATimestamp())
+            Pose2d poseEsimate = getPoseEstimate(); 
+            Matrix<N3, N1> visionStdScale = VecBuilder.fill(
+                poseEsimate.getTranslation().getX(),
+                poseEsimate.getTranslation().getY(),
+                poseEsimate.getTranslation().getNorm()
+            );
+            poseEstimator.addVisionMeasurement(poseEsimate, getTimestampSeconds(), poseEstimator.getDefaultStateStdDevs().elementTimes(visionStdScale));
         } 
 
         i++;
@@ -93,6 +102,10 @@ public class Vision extends SubsystemBase {
         return null;
     }
 
+    public void setPoseEstimator(PoseEstimator poseEstimator) {
+        this.poseEstimator = poseEstimator;
+    }
+
     /**
      * Returns the latest pose estimate (2d)
      * 
@@ -109,5 +122,9 @@ public class Vision extends SubsystemBase {
      */
     public Pose3d getPoseEstimate3d() {
         return inputs.poseEstimate3d;
+    }
+
+    public double getTimestampSeconds() {
+        return inputs.timestampSeconds;
     }
 }

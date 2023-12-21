@@ -50,15 +50,15 @@ public class Drive extends SubsystemBase {
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
     // Constants for the drivebase
-    private static double maxLinearSpeed = 4.0;
-    private static final double maxLinearAcceleration = 6.0;
+    private static double maxLinearSpeed = 4.5;
+    private static final double maxLinearAcceleration = 7.0;
     private static final double trackWidthX = Units.inchesToMeters(22.5);
     private static final double trackWidthY = Units.inchesToMeters(22.5);
-    private static final double maxAngularSpeed = 3.5 * Math.PI;
-    private static final double maxAngularAcceleration = 6 * Math.PI;
+    private static final double maxAngularSpeed = 3 * Math.PI;
+    private static final double maxAngularAcceleration = 5 * Math.PI;
 
     // Define Kinematics object
-    private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
+    private SwerveDriveKinematics kinematics = getKinematics();
 
     // Initialize setpoints
     private ChassisSpeeds chassisSetpoint = new ChassisSpeeds();
@@ -84,7 +84,7 @@ public class Drive extends SubsystemBase {
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
     private double kPx = 0.35; // 0.4
     private double kPy = 0.35; // 0.33
-    private double kPHeading = 0.6; // 0.5
+    private double kPHeading = 0.5; // 0.5
 
     private double kIx = 0.12; // 0.12
     private double kIy = 0.12; // 0.15
@@ -130,13 +130,11 @@ public class Drive extends SubsystemBase {
         ModuleIO frModuleIO,
         ModuleIO blModuleIO,
         ModuleIO brModuleIO,
-        PoseEstimator poseEstimator,
         boolean isWiiMode
     ) {
         System.out.println("[Init] Creating Drive");
 
         this.gyroIO = gyroIO;
-        this.poseEstimator = poseEstimator;
 
         // idk why it wont let me put it above??
         headingController.enableContinuousInput(-Math.PI, Math.PI);
@@ -150,8 +148,12 @@ public class Drive extends SubsystemBase {
         // whats the difference between this and modules.forEach(()=> )
         // wait thats js im stupid
         for (var module : modules) {
-            module.setBrakeMode(false);
+            module.setBrakeMode(isBrakeMode);
         }
+
+        xController.setTolerance(.05);
+        yController.setTolerance(.05);
+        headingController.setTolerance(.05);
 
         if (isWiiMode) {
             this.isWiiMode = true;
@@ -181,14 +183,9 @@ public class Drive extends SubsystemBase {
          */
 
         // Get the change in position of each module
-        SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
-        for (int i = 0; i < 4; i++) {
-          wheelDeltas[i] =
-              new SwerveModulePosition(
-                  (modules[i].getPositionMeters() - lastModulePositionsMeters[i]),
-                  modules[i].getAngle());
-          lastModulePositionsMeters[i] = modules[i].getPositionMeters();
-        }
+        //TODO: make sure there's no harm in turning this into a method (it was just written here before)
+        SwerveModulePosition[] wheelDeltas = getModulePositions();
+
         // Use kinematics to convert the change in position of each module -> change in position of the robot
         var twist = kinematics.toTwist2d(wheelDeltas);
 
@@ -202,7 +199,8 @@ public class Drive extends SubsystemBase {
 
         // Update pose estimator with the new data 
         // fieldPosition = fieldPosition.exp(twist);
-        poseEstimator.addOdometryData(twist, Timer.getFPGATimestamp());
+        // poseEstimator.addOdometryData(twist, Timer.getFPGATimestamp());
+        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), gyroYaw, wheelDeltas);
 
         /* Update field velocity */
         // Gets the speed/angle of each module and converts it to a robot velocity
@@ -565,6 +563,27 @@ public class Drive extends SubsystemBase {
             new Translation2d(trackWidthX / 2.0, -trackWidthY / 2.0),
             new Translation2d(-trackWidthX / 2.0, -trackWidthY / 2.0)
         };
+    }
+
+    public SwerveModulePosition[] getModulePositions() {
+        SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
+        for (int i = 0; i < 4; i++) {
+          wheelDeltas[i] =
+              new SwerveModulePosition(
+                  (modules[i].getPositionMeters() - lastModulePositionsMeters[i]),
+                  modules[i].getAngle());
+          lastModulePositionsMeters[i] = modules[i].getPositionMeters();
+        }
+        return wheelDeltas;
+    }
+
+    public SwerveDriveKinematics getKinematics() {
+        if (kinematics != null) return kinematics;
+        return new SwerveDriveKinematics(getModuleTranslations());
+    }
+
+    public void setPoseEstimator(PoseEstimator poseEstimator) {
+        this.poseEstimator = poseEstimator;
     }
 
     public Pose2d getPose() {

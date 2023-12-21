@@ -25,6 +25,8 @@ public interface CameraIO {
         // Localization data
         Pose2d poseEstimate = new Pose2d();
         Pose3d poseEstimate3d = new Pose3d();
+
+        double timestampSeconds = 0;
     }
 
     /** Updates the set of loggable inputs. */
