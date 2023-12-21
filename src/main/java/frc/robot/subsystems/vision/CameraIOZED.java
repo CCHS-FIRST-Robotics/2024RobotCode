@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 
 public class CameraIOZED implements CameraIO {
 
@@ -48,7 +49,8 @@ public class CameraIOZED implements CameraIO {
         double[] pose2d = pose2dSub.get();
         double[] pose3d = pose3dSub.get();
 
-        inputs.poseEstimate = new Pose2d(pose2d[0], pose2d[1], new Rotation2d(pose2d[2]));
+        inputs.poseEstimate = new Pose2d(pose2d[0], pose2d[1], new Rotation2d(Units.degreesToRadians(pose2d[2])));
+        inputs.poseEstimateArray = pose2d;
         inputs.poseEstimate3d = new Pose3d(pose3d[0], pose3d[1], pose3d[2], new Rotation3d(pose3d[3], pose3d[4], pose3d[5]));
 
         // Values from the primary (closest) tag
@@ -78,6 +80,7 @@ public class CameraIOZED implements CameraIO {
         }
         inputs.tags = tags;
 
-        inputs.timestampSeconds = pose2dSub.getLastChange();
+        // Convert from ns to sec
+        inputs.timestampSeconds = pose2dSub.getLastChange() / 1000000;
     }
 }

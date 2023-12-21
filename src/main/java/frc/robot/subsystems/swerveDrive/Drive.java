@@ -164,6 +164,7 @@ public class Drive extends SubsystemBase {
     }
 
     public void periodic() {
+        // System.out.println("HI IM RUNNING");
         i++;
         gyroIO.updateInputs(gyroInputs);
         Logger.getInstance().processInputs("Drive/Gyro", gyroInputs);

@@ -24,6 +24,7 @@ public interface CameraIO {
 
         // Localization data
         Pose2d poseEstimate = new Pose2d();
+        double[] poseEstimateArray = new double[] {-1, -1, -1};
         Pose3d poseEstimate3d = new Pose3d();
 
         double timestampSeconds = 0;

@@ -15,10 +15,11 @@ import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.*;
+import edu.wpi.first.wpilibj.Timer;
 
 public class PoseEstimator extends SwerveDrivePoseEstimator {
     
-    double latestTimestamp = -1;
+    double latestTimestamp = Timer.getFPGATimestamp();
     Pose2d poseEstimate = new Pose2d();
     Pose3d poseEstimate3d = new Pose3d(); 
 
@@ -28,8 +29,19 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
     MedianFilter visionXFilter = new MedianFilter(10);
     // MedianFilter visionYFilter = new MedianFilter(20);
 
-    static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
-    static final Matrix<N3, N1> defaultVisionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
+    static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.003, 0.003, 0.0002);
+
+    /*
+     * .002, .035, .035 at .5m
+     * .025, .145, .17 at 1m
+     * .022, .085, .08 at 1.5m
+     * .01, .045, .1 at 2m
+     * .007, .188, .1 at 2.5m
+     * .045, .16, .1 at 3m
+     * Linear fit with distance -> slope: 0.01, 0.05, .1
+     */
+    static final Matrix<N3, N1> defaultVisionMeasurementStdDevs = VecBuilder.fill(.01, .06, .1);
+
 
     /**
      * Constructs a new PoseEstimator object

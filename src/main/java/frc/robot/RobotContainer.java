@@ -111,9 +111,9 @@ public class RobotContainer {
 
         poseEstimator = new PoseEstimator(
             drive.getKinematics(),
-            drive.getPose().getRotation(),
+            drive.getYaw(),
             drive.getModulePositions(),
-            drive.getPose()
+            new Pose2d()
         );
 
         drive.setPoseEstimator(poseEstimator);

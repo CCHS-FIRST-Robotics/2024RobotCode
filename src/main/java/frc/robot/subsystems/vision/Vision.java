@@ -47,13 +47,13 @@ public class Vision extends SubsystemBase {
 
         if (getPoseEstimate3d().getX() > 0) {
             // poseEstimator.addVisionData(getPoseEstimate3d(), Timer.getFPGATimestamp())
-            Pose2d poseEsimate = getPoseEstimate(); 
-            Matrix<N3, N1> visionStdScale = VecBuilder.fill(
-                poseEsimate.getTranslation().getX(),
-                poseEsimate.getTranslation().getY(),
-                poseEsimate.getTranslation().getNorm()
-            );
-            poseEstimator.addVisionMeasurement(poseEsimate, getTimestampSeconds(), poseEstimator.getDefaultStateStdDevs().elementTimes(visionStdScale));
+            // Matrix<N3, N1> visionStdScale = VecBuilder.fill(
+            //     inputs.primaryTagX,
+            //     inputs.primaryTagY,
+            //     Math.hypot(inputs.primaryTagX, inputs.primaryTagY)
+            // );
+            Logger.getInstance().recordOutput("Vision/PoseEstimate", getPoseEstimate());
+            poseEstimator.addVisionMeasurement(getPoseEstimate(), getTimestampSeconds(), poseEstimator.getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
         } 
 
         i++;
