@@ -49,7 +49,7 @@ public class Drive extends SubsystemBase{
         robotSpeeds = new ChassisSpeeds();
         modules = new Module[4];
         for(int i = 0; i < modules.length; i++){
-            modules[i] = new Module();
+            modules[i] = new Module(i);
         }
         moduleState = new SwerveModuleState(0, new Rotation2d());
     }

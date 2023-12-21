@@ -36,7 +36,7 @@ public class DriveWithJoysticks extends CommandBase{
         double x = leftX.get();
         double y = leftY.get();
         // Rotation2d rotation = new Rot
-        SwerveModuleState move = new SwerveModuleState(y * magic, new Rotation2d(x * Math.PI));
+        SwerveModuleState move = new SwerveModuleState(y * Drive.Constants.getMaxSpeed(), new Rotation2d(x * Math.PI));
         subsystemDrive.swerveThatShi(move);
         
     }

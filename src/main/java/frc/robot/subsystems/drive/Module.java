@@ -21,11 +21,13 @@ public class Module{
              driveKFF, driveKMaxOutput, driveKMinOutput;
     private double turnKP, turnKI, turnKD, turnKIzprivate, turnKIz,
                 turnKFF, turnKMaxOutput, turnKMinOutput;
+
+    int i;
     
 
-    public Module() {
-        driveMotor = new CANSparkMax(1, CANSparkMaxLowLevel.MotorType.kBrushless);
-        turnMotor = new CANSparkMax(2, CANSparkMaxLowLevel.MotorType.kBrushless);
+    public Module(int id) {
+        driveMotor = new CANSparkMax(2 * id + 1, CANSparkMaxLowLevel.MotorType.kBrushless);
+        turnMotor = new CANSparkMax(2 * id + 2, CANSparkMaxLowLevel.MotorType.kBrushless);
         absoluteTurnEncoder = turnMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         relativeDriveEncoder = driveMotor.getEncoder();
         relativeTurnEncoder = turnMotor.getEncoder();
@@ -37,7 +39,7 @@ public class Module{
         driveKMaxOutput = 1; 
         driveKMinOutput = -1;
 
-        turnKP = 0; 
+        turnKP = 10; 
         turnKI = 0;
         turnKD = 0;
         turnKIz = 0; 
@@ -73,17 +75,20 @@ public class Module{
 
     public void periodic(){
         // do not trust
+        i++;
     }
 
 
     public void driveMotors(SwerveModuleState sms){
-
+        if (i % 20 == 0) System.out.println(sms.angle.getRotations());
         // Swerve
         pidDriveController.setReference(
             metersPerSecondToRotationsPerMinute(sms.speedMetersPerSecond), 
             ControlType.kVelocity);
     
-        pidTurnController.setReference(sms.angle.getRotations(), ControlType.kPosition);
+            pidTurnController.setReference(.5d, ControlType.kVoltage);
+        // pidTurnController.setReference(.5, ControlType.kPosition);
+
 
     }
 
