@@ -177,22 +177,19 @@ public class Drive extends SubsystemBase {
         Logger.getInstance().recordOutput("Odometry/FieldPosition", getPose());
 
         if (DriverStation.isDisabled()) {
-            controlMode = CONTROL_MODE.DISABLED;
+            // Stop moving while disabled
+            for (var module : modules) {
+                module.stop();
+            }
+
+            // Clear setpoint logs
+            Logger.getInstance().recordOutput("SwerveStates/Setpoints", new double[] {});
+            Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
+            return;
         }
 
         // Run modules
         switch (controlMode) {
-            case DISABLED:
-                // Stop moving while disabled
-                for (var module : modules) {
-                    module.stop();
-                }
-
-                // Clear setpoint logs
-                Logger.getInstance().recordOutput("SwerveStates/Setpoints", new double[] {});
-                Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
-                return;
-            
             case CHARACTERIZING:
                 // Run in characterization mode
                 for (var module : modules) {
