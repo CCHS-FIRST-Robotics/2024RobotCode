@@ -31,8 +31,6 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import frc.robot.Constants;
-import frc.robot.utils.DriveTrajectory;
-import frc.robot.utils.PoseEstimator;
 
 
 public class Drive extends SubsystemBase {
@@ -71,30 +69,7 @@ public class Drive extends SubsystemBase {
             new SwerveModuleState(),
             new SwerveModuleState()
         };
-    // Initialize trajectory info
-    private Pose2d positionSetpointTrajectory = new Pose2d();
-    private Twist2d twistSetpointTrajectory = new Twist2d();
-    private ArrayList<Pose2d> positionTrajectory = new ArrayList<Pose2d>();
-    private ArrayList<Twist2d> twistTrajectory = new ArrayList<Twist2d>();
-    private int trajectoryCounter = -1;
 
-    private Rotation2d wiiRotation = new Rotation2d();
-    private Translation2d wiiLinearVelocity = new Translation2d();
-    
-    // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
-    private double kPx = 0.35; // 0.4
-    private double kPy = 0.35; // 0.33
-    private double kPHeading = 0.5; // 0.5
-
-    private double kIx = 0.12; // 0.12
-    private double kIy = 0.12; // 0.15
-    // private double kPlinear = 
-    private double kIHeading = 0.05; // 0.3
-
-    private PIDController xController = new PIDController(kPx, kIx, 0.0);
-    private PIDController yController = new PIDController(kPy, kIy, 0.0);
-    // private PIDController linearController = new PIDController(kPHeading, kIHeading, coastThresholdMetersPerSec);
-    private PIDController headingController = new PIDController(kPHeading, kIHeading, 0.0);
     
     private boolean isBrakeMode = true;
     private Timer lastMovementTimer = new Timer();
@@ -103,10 +78,6 @@ public class Drive extends SubsystemBase {
     private double[] lastModulePositionsMeters = new double[] {0.0, 0.0, 0.0, 0.0};
     private Rotation2d lastGyroYaw = new Rotation2d();
     private Twist2d fieldVelocity = new Twist2d();
-    // private Pose2d fieldPosition = new Pose2d(); Use poseEstimator instead
-    private PoseEstimator poseEstimator;
-
-    private boolean isWiiMode = false; 
 
     private double characterizationVolts = 0.0; // 0.19
 
@@ -117,8 +88,6 @@ public class Drive extends SubsystemBase {
         DISABLED,
         MODULE_SETPOINT,
         CHASSIS_SETPOINT,
-        POSITION_SETPOINT,
-        WII_SETPOINT,
         CHARACTERIZING
     };
 
@@ -129,15 +98,11 @@ public class Drive extends SubsystemBase {
         ModuleIO flModuleIO,
         ModuleIO frModuleIO,
         ModuleIO blModuleIO,
-        ModuleIO brModuleIO,
-        boolean isWiiMode
+        ModuleIO brModuleIO
     ) {
         System.out.println("[Init] Creating Drive");
 
         this.gyroIO = gyroIO;
-
-        // idk why it wont let me put it above??
-        headingController.enableContinuousInput(-Math.PI, Math.PI);
 
         modules[0] = new Module(flModuleIO, 0);
         modules[1] = new Module(frModuleIO, 1);
@@ -149,17 +114,6 @@ public class Drive extends SubsystemBase {
         // wait thats js im stupid
         for (var module : modules) {
             module.setBrakeMode(isBrakeMode);
-        }
-
-        xController.setTolerance(.05);
-        yController.setTolerance(.05);
-        headingController.setTolerance(.05);
-
-        if (isWiiMode) {
-            this.isWiiMode = true;
-
-            // reset max speeds
-            maxLinearSpeed = 0.5;
         }
     }
 
@@ -198,10 +152,9 @@ public class Drive extends SubsystemBase {
         }
         lastGyroYaw = gyroYaw;
 
-        // Update pose estimator with the new data 
-        // fieldPosition = fieldPosition.exp(twist);
-        // poseEstimator.addOdometryData(twist, Timer.getFPGATimestamp());
-        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), gyroYaw, wheelDeltas);
+
+        // TO ANYONE USING TEMPLATE:
+        //TODO: create a variable to store pose, and use pose.exp(twist) to update it
 
         /* Update field velocity */
         // Gets the speed/angle of each module and converts it to a robot velocity
@@ -251,80 +204,6 @@ public class Drive extends SubsystemBase {
                 Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
                 break;
             
-            // TODO: THIS IS CURRENTLY VERY HACKY SO LIKE PROBABLY SHOULD REWRITE THIS
-            case WII_SETPOINT:
-                // constrain velocity to max speed
-                double rotError = wiiRotation.getRadians() - getPose().getRotation().getRadians();
-                double rotVelocity = MathUtil.clamp(
-                    rotError / Constants.PERIOD, 
-                    -getMaxAngularSpeedRadPerSec(),
-                    getMaxAngularSpeedRadPerSec()
-                );
-                // constrain velocity to max acceleration
-                rotVelocity = MathUtil.clamp(
-                    rotVelocity,
-                    getVelocity().dtheta - getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD,
-                    getVelocity().dtheta + getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD
-                );
-
-                trajectoryCounter = 0;
-                positionTrajectory = new ArrayList<>();
-                twistTrajectory = new ArrayList<>();
-                positionTrajectory.add(new Pose2d(getPose().getTranslation(), wiiRotation));
-                twistTrajectory.add(new Twist2d(wiiLinearVelocity.getX(), wiiLinearVelocity.getY(), rotVelocity));
-                /*
-                 * WARNING:
-                 * NO BREAK HERE
-                 * IT CONTINUES TO POSITION_SETPOINT CASE
-                 */
-                // fallthrough
-            case POSITION_SETPOINT:
-                // If we've reached the end of the trajectory, hold at the last setpoint
-                if (trajectoryCounter > positionTrajectory.size() - 1) {
-                    trajectoryCounter = positionTrajectory.size() - 1;
-                }
-                // If there's no available trajectory, don't do anything
-                if (trajectoryCounter == -1) break;
-
-                // Get the position/velocity setpoints at the current point in the trajectory
-                positionSetpointTrajectory = positionTrajectory.get(trajectoryCounter);
-                twistSetpointTrajectory = twistTrajectory.get(trajectoryCounter);
-
-                // System.out.println("SETPOINTS:");
-                // System.out.println(positionSetpointTrajectory);
-                // System.out.println(twistSetpointTrajectory);
-
-                // Record setpoints to "RealOutputs"
-                Logger.getInstance().recordOutput("Auto/FieldVelocity", new Pose2d(twistSetpointTrajectory.dx, twistSetpointTrajectory.dy, new Rotation2d(twistSetpointTrajectory.dtheta)));
-                Logger.getInstance().recordOutput("Auto/FieldPosition", positionSetpointTrajectory);
-
-                // Get the PID output for the desired setpoint (output in m/s)
-                double xPID = xController.calculate(getPose().getX(), positionSetpointTrajectory.getX());
-                double yPID = yController.calculate(getPose().getY(), positionSetpointTrajectory.getY());
-                double headingPID = headingController.calculate(getPose().getRotation().getRadians(), positionSetpointTrajectory.getRotation().getRadians());
-
-                // Add the PID output to the velocity setpoint
-                chassisSetpoint = new ChassisSpeeds(
-                    twistSetpointTrajectory.dx + xPID,
-                    twistSetpointTrajectory.dy + yPID,
-                    twistSetpointTrajectory.dtheta + headingPID
-                );
-                // Convert to robot oriented and send the updated velocity setpoint to the velocity controller 
-                chassisSetpoint =
-                    ChassisSpeeds.fromFieldRelativeSpeeds(
-                        chassisSetpoint.vxMetersPerSecond,
-                        chassisSetpoint.vyMetersPerSecond,
-                        chassisSetpoint.omegaRadiansPerSecond,
-                        getYaw()
-                    );
-                
-                trajectoryCounter++;
-                /*
-                 * WARNING:
-                 * NO BREAK HERE
-                 * IT CONTINUES TO CHASSIS_SETPOINT CASE
-                 */
-                // fallthrough
             case CHASSIS_SETPOINT:
                 // Brief explanation here: https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/transformations.html
                 // For more detail, see chapter 10 here: https://file.tavsys.net/control/controls-engineering-in-frc.pdf
@@ -345,21 +224,6 @@ public class Drive extends SubsystemBase {
                         setpointTwist.dtheta / Constants.PERIOD
                     );
 
-                // desaturate speeds if above the max acceleration
-                // TODO: I think I already do this in the command... oml
-                // double[] accelVector = {
-                //     (adjustedSpeeds.vxMetersPerSecond - lastSetpoint.vxMetersPerSecond) / Constants.PERIOD,
-                //     (adjustedSpeeds.vyMetersPerSecond - lastSetpoint.vyMetersPerSecond) / Constants.PERIOD
-                // };
-                // double acceleration = Math.sqrt(
-                //     accelVector[0]*accelVector[0] + 
-                //     accelVector[1]*accelVector[1]
-                // );
-                // double accelDir = Math.atan2(accelVector[1], accelVector[0]);
-                // if (acceleration > maxLinearAcceleration) {
-                //     adjustedSpeeds.vxMetersPerSecond = lastSetpoint.vxMetersPerSecond + Math.cos(accelDir) * maxLinearAcceleration * Constants.PERIOD;
-                //     adjustedSpeeds.vyMetersPerSecond = lastSetpoint.vyMetersPerSecond + Math.sin(accelDir) * maxLinearAcceleration * Constants.PERIOD;
-                // }
                 lastSetpoint = adjustedSpeeds;
 
                 // System.out.println(adjustedSpeeds);
@@ -422,12 +286,6 @@ public class Drive extends SubsystemBase {
      * @param speeds Speeds in meters/sec
      */
     public void runVelocity(ChassisSpeeds speeds) {
-        // if (i % 50 == 0) System.out.println(controlMode);
-        // Since DriveWithJoysticks is the default command and MoveToPose runs once
-        // Keep drive running the position trajectory unless overridden (driver sets a nonzero speed with joysticks)
-        if (controlMode == CONTROL_MODE.POSITION_SETPOINT && speedsEqual(speeds, new ChassisSpeeds())) {
-            return;
-        }
         controlMode = CONTROL_MODE.CHASSIS_SETPOINT;
         chassisSetpoint = speeds;
     }
@@ -443,26 +301,6 @@ public class Drive extends SubsystemBase {
     public void runModules(SwerveModuleState setpoint) {
         controlMode = CONTROL_MODE.MODULE_SETPOINT;
         moduleSetpoint = setpoint;
-    }
-
-    public void runPosition(ArrayList<Pose2d> poseTrajectory, ArrayList<Twist2d> twistTrajectory) {
-        controlMode = CONTROL_MODE.POSITION_SETPOINT;
-        this.positionTrajectory = poseTrajectory;
-        this.twistTrajectory = twistTrajectory;
-        trajectoryCounter = 0;
-    }
-
-    public void runPosition(DriveTrajectory driveTrajectory) {
-        controlMode = CONTROL_MODE.POSITION_SETPOINT;
-        this.positionTrajectory = driveTrajectory.positionTrajectory;
-        this.twistTrajectory = driveTrajectory.velocityTrajectory;
-        trajectoryCounter = 0;
-    }
-
-    public void runWii(Translation2d linearVelocity, Rotation2d rotation) {
-        controlMode = CONTROL_MODE.WII_SETPOINT;
-        wiiLinearVelocity = linearVelocity;
-        wiiRotation = rotation;
     }
 
     public void runCharacterization() {
@@ -583,12 +421,9 @@ public class Drive extends SubsystemBase {
         return new SwerveDriveKinematics(getModuleTranslations());
     }
 
-    public void setPoseEstimator(PoseEstimator poseEstimator) {
-        this.poseEstimator = poseEstimator;
-    }
-
+    //TODO: IMPLEMENT THIS METHOD
     public Pose2d getPose() {
-        return poseEstimator.getPoseEstimate();
+        return new Pose2d();
     } 
 
     public Twist2d getVelocity() {
