@@ -37,9 +37,9 @@ public final class DriveTrajectoryGenerator {
         TrapezoidProfile.State currentYState = new TrapezoidProfile.State(currentPose.getY(), currentVelocity.dy);
         TrapezoidProfile.State currentHeadingState = new TrapezoidProfile.State(currentPose.getRotation().getRadians(), currentVelocity.dtheta);
 
-        var profileX = new TrapezoidProfile(linearConstraints, targetXState, currentXState);
-        var profileY = new TrapezoidProfile(linearConstraints, targetYState, currentYState);
-        var profileHeading = new TrapezoidProfile(angularConstraints, targetHeadingState, currentHeadingState);
+        var profileX = new TrapezoidProfile(linearConstraints);
+        var profileY = new TrapezoidProfile(linearConstraints);
+        var profileHeading = new TrapezoidProfile(angularConstraints);
 
         // Find the max time it takes to reach setpoint
         double timeToEnd = Math.max(Math.max(profileX.totalTime(), profileY.totalTime()), profileHeading.totalTime());
@@ -51,14 +51,14 @@ public final class DriveTrajectoryGenerator {
         for (int i = 1; i < (int) (timeToEnd / Constants.PERIOD) + 2; i++) {
             double time = i * Constants.PERIOD;
 
-            double x = profileX.calculate(time).position;
-            double y = profileY.calculate(time).position;
-            double heading = profileHeading.calculate(time).position;
+            double x = profileX.calculate(time, currentXState, targetXState).position;
+            double y = profileY.calculate(time, currentYState, targetYState).position;
+            double heading = profileHeading.calculate(time, currentHeadingState, targetHeadingState).position;
             poseTrajectory.add(new Pose2d(x, y, new Rotation2d(heading)));  
             
-            double dx = profileX.calculate(time).velocity;
-            double dy = profileY.calculate(time).velocity;
-            double dtheta = profileHeading.calculate(time).velocity;
+            double dx = profileX.calculate(time, currentXState, targetXState).velocity;
+            double dy = profileY.calculate(time, currentYState, targetYState).velocity;
+            double dtheta = profileHeading.calculate(time, currentHeadingState, targetHeadingState).velocity;
             velocityTrajectory.add(new Twist2d(dx, dy, dtheta));
 
             // System.out.println(i);
@@ -78,7 +78,7 @@ public final class DriveTrajectoryGenerator {
         TrapezoidProfile.State targetHeadingState = new TrapezoidProfile.State(targetPose.getRotation().getRadians(), targetVelocity.dtheta);
         TrapezoidProfile.State currentHeadingState = new TrapezoidProfile.State(currentPose.getRotation().getRadians(), currentVelocity.dtheta);
 
-        var profileHeading = new TrapezoidProfile(angularConstraints, targetHeadingState, currentHeadingState);
+        var profileHeading = new TrapezoidProfile(angularConstraints);
 
         Translation2d[] translationTrajectory = new QuadraticProfile(Constants.PERIOD).getCombinedSetPoints(currentPose.getTranslation(), targetPose.getTranslation(), linearConstraints.maxVelocity, linearConstraints.maxAcceleration);
 
@@ -101,11 +101,11 @@ public final class DriveTrajectoryGenerator {
             }
 
             Translation2d translation = translationTrajectory[j];
-            double heading = profileHeading.calculate(time).position;
+            double heading = profileHeading.calculate(time, currentHeadingState, targetHeadingState).position;
             
             poseTrajectory.add(new Pose2d(translation.getX(), translation.getY(), new Rotation2d(heading)));  
             
-            double dtheta = profileHeading.calculate(time).velocity;
+            double dtheta = profileHeading.calculate(time, currentHeadingState, targetHeadingState).velocity;
             velocityTrajectory.add(new Twist2d(
                 (translation.getX() - prevTranslation.getX()) / Constants.PERIOD,  
                 (translation.getY() - prevTranslation.getY()) / Constants.PERIOD,

@@ -13,14 +13,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.swerveDrive.Drive;
 import frc.robot.subsystems.swerveDrive.Drive.CONTROL_MODE;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.utils.DriveTrajectoryGenerator;
 
-public class FollowAprilTag extends CommandBase {
+public class FollowAprilTag extends Command {
 
     Drive drive;
     Vision vision;
@@ -52,7 +52,7 @@ public class FollowAprilTag extends CommandBase {
         addRequirements(drive, vision);
         this.drive = drive;
         this.vision = vision;
-        this.tagTransformSuppier = () -> vision.getTagFromId(tagId).getTransform();
+        // this.tagTransformSuppier = () -> vision.getTagFromId(tagId).getTransform();
         linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeedMetersPerSec(), drive.getMaxLinearAccelerationMetersPerSecPerSec());
         angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeedRadPerSec(), drive.getMaxAngularAccelerationRadPerSecPerSec());
     }

@@ -167,7 +167,7 @@ public class Drive extends SubsystemBase {
         // System.out.println("HI IM RUNNING");
         i++;
         gyroIO.updateInputs(gyroInputs);
-        Logger.getInstance().processInputs("Drive/Gyro", gyroInputs);
+        Logger.processInputs("Drive/Gyro", gyroInputs);
         for (var module : modules) {
             module.periodic();
         }
@@ -177,7 +177,7 @@ public class Drive extends SubsystemBase {
         for (int i = 0; i < 4; i++) {
             measuredStates[i] = modules[i].getState();
         }
-        Logger.getInstance().recordOutput("SwerveStates/Measured", measuredStates);
+        Logger.recordOutput("SwerveStates/Measured", measuredStates);
 
         /*
          * UPDATE ODOMETRY 
@@ -220,8 +220,8 @@ public class Drive extends SubsystemBase {
                     : chassisSpeeds.omegaRadiansPerSecond);
 
         // Record into "RealOutputs"
-        Logger.getInstance().recordOutput("Odometry/FieldVelocity", new Pose2d(fieldVelocity.dx, fieldVelocity.dy, new Rotation2d(fieldVelocity.dtheta)));
-        Logger.getInstance().recordOutput("Odometry/FieldPosition", getPose());
+        Logger.recordOutput("Odometry/FieldVelocity", new Pose2d(fieldVelocity.dx, fieldVelocity.dy, new Rotation2d(fieldVelocity.dtheta)));
+        Logger.recordOutput("Odometry/FieldPosition", getPose());
 
         if (DriverStation.isDisabled()) {
             controlMode = CONTROL_MODE.DISABLED;
@@ -236,8 +236,8 @@ public class Drive extends SubsystemBase {
                 }
 
                 // Clear setpoint logs
-                Logger.getInstance().recordOutput("SwerveStates/Setpoints", new double[] {});
-                Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
+                Logger.recordOutput("SwerveStates/Setpoints", new double[] {});
+                Logger.recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
                 return;
             
             case CHARACTERIZING:
@@ -247,8 +247,8 @@ public class Drive extends SubsystemBase {
                 }
 
                 // Clear setpoint logs
-                Logger.getInstance().recordOutput("SwerveStates/Setpoints", new double[] {});
-                Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
+                Logger.recordOutput("SwerveStates/Setpoints", new double[] {});
+                Logger.recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
                 break;
             
             // TODO: THIS IS CURRENTLY VERY HACKY SO LIKE PROBABLY SHOULD REWRITE THIS
@@ -295,8 +295,8 @@ public class Drive extends SubsystemBase {
                 // System.out.println(twistSetpointTrajectory);
 
                 // Record setpoints to "RealOutputs"
-                Logger.getInstance().recordOutput("Auto/FieldVelocity", new Pose2d(twistSetpointTrajectory.dx, twistSetpointTrajectory.dy, new Rotation2d(twistSetpointTrajectory.dtheta)));
-                Logger.getInstance().recordOutput("Auto/FieldPosition", positionSetpointTrajectory);
+                Logger.recordOutput("Auto/FieldVelocity", new Pose2d(twistSetpointTrajectory.dx, twistSetpointTrajectory.dy, new Rotation2d(twistSetpointTrajectory.dtheta)));
+                Logger.recordOutput("Auto/FieldPosition", positionSetpointTrajectory);
 
                 // Get the PID output for the desired setpoint (output in m/s)
                 double xPID = xController.calculate(getPose().getX(), positionSetpointTrajectory.getX());
@@ -393,8 +393,8 @@ public class Drive extends SubsystemBase {
 
             
                 // Log setpoint states
-                Logger.getInstance().recordOutput("SwerveStates/Setpoints", setpointStates);
-                Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
+                Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+                Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
                 break;
             
             /* Runs each mode at the same setpoint -- only used for testing */
@@ -410,8 +410,8 @@ public class Drive extends SubsystemBase {
                 }
 
                 // Log setpoint states
-                Logger.getInstance().recordOutput("SwerveStates/Setpoints", setpointStates);
-                Logger.getInstance().recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
+                Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+                Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
                 break;
         }
     }

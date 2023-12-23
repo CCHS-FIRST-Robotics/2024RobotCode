@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.vision.CameraIO.CameraIOInputs;
 import frc.robot.utils.AprilTag;
 import frc.robot.utils.PoseEstimator;
 
@@ -23,7 +24,7 @@ import org.littletonrobotics.junction.Logger;
 public class Vision extends SubsystemBase {
     
     CameraIO io;
-    CameraIOInputsAutoLogged inputs = new CameraIOInputsAutoLogged();
+    CameraIOInputs inputs = new CameraIOInputs();
     PoseEstimator poseEstimator;
 
     int i = 0;
@@ -43,7 +44,7 @@ public class Vision extends SubsystemBase {
      */
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.getInstance().processInputs("Vision", inputs);
+        Logger.processInputs("Vision", inputs);
 
         if (getPoseEstimate3d().getX() > 0) {
             // poseEstimator.addVisionData(getPoseEstimate3d(), Timer.getFPGATimestamp())
@@ -52,7 +53,7 @@ public class Vision extends SubsystemBase {
             //     inputs.primaryTagY,
             //     Math.hypot(inputs.primaryTagX, inputs.primaryTagY)
             // );
-            Logger.getInstance().recordOutput("Vision/PoseEstimate", getPoseEstimate());
+            Logger.recordOutput("Vision/PoseEstimate", getPoseEstimate());
             poseEstimator.addVisionMeasurement(getPoseEstimate(), getTimestampSeconds(), poseEstimator.getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
         } 
 

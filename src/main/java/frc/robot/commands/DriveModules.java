@@ -9,10 +9,10 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
 
-public class DriveModules extends CommandBase {
+public class DriveModules extends Command {
     Drive drive;
     Supplier<Double> linearSpeedSupplier;
     Supplier<Double> angularPositionSupplier;

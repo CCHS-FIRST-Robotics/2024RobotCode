@@ -10,7 +10,6 @@ public class GyroIONavX implements GyroIO {
     public GyroIONavX() {
         System.out.println("[Init] Creating GyroIONavX");
         navx = new AHRS();
-        navx.calibrate();
         navx.reset();
     }
 

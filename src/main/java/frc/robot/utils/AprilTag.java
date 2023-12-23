@@ -40,6 +40,17 @@ public class AprilTag {
     }
 
     /**
+     * Constructs a new AprilTag object from a pose (transform) from the robot to the tag
+     * 
+     * @param id The ID of the tag
+     * @param transform The pose (transform) from the robot to the tag
+     */
+    public AprilTag(int id, Pose2d pose) {
+        this.id = id;
+        this.transform = pose.minus(new Pose2d());
+    }
+
+    /**
      * Returns the ID of the tag
      * 
      * @return The ID of the tag

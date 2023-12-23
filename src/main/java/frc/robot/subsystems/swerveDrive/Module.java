@@ -40,7 +40,7 @@ public class Module {
     public void periodic() {
         double prevVel = getVelocityMetersPerSec();
         io.updateInputs(inputs);
-        Logger.getInstance().processInputs("Drive/Module" + Integer.toString(index), inputs);
+        Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
         double acceleration = (getVelocityMetersPerSec() - prevVel) / 0.02;
         // if (Math.abs(acceleration) > 50) System.out.println(acceleration);
 
