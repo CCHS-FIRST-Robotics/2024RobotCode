@@ -1,5 +1,8 @@
 package frc.robot.commands;
 
+import edu.wpi.first.units.*;
+import static edu.wpi.first.units.Units.*;
+
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
@@ -33,8 +36,8 @@ public class MoveToPose extends InstantCommand {
         addRequirements(drive);
         this.drive = drive;
         this.targetPoseSupplier = targetPoseSupplier;
-        linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeedMetersPerSec(), drive.getMaxLinearAccelerationMetersPerSecPerSec());
-        angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeedRadPerSec(), drive.getMaxAngularAccelerationRadPerSecPerSec());
+        linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeed().in(MetersPerSecond), drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond));
+        angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeed().in(RadiansPerSecond), drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)));
     }
 
     @Override

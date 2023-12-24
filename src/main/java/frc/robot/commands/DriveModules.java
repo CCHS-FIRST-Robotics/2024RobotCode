@@ -12,6 +12,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
 
+import edu.wpi.first.units.*;
+import static edu.wpi.first.units.Units.*;
+
 public class DriveModules extends Command {
     Drive drive;
     Supplier<Double> linearSpeedSupplier;
@@ -49,12 +52,12 @@ public class DriveModules extends Command {
         linearSpeed = applyPreferences(linearSpeed, Constants.LIENAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
         linearSpeed *= linearSpeedMultiplierSupplier.get();
 
-        linearSpeed *= drive.getMaxLinearSpeedMetersPerSec();
+        linearSpeed *= drive.getMaxLinearSpeed().in(MetersPerSecond);
 
         linearSpeed = MathUtil.clamp(
             linearSpeed,
-            prevSpeed - drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD,
-            prevSpeed + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD
+            prevSpeed - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
+            prevSpeed + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD
         );
         
         drive.runModules(new SwerveModuleState(

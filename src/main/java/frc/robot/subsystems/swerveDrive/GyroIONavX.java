@@ -1,7 +1,8 @@
 package frc.robot.subsystems.swerveDrive;
 
 import com.kauailabs.navx.frc.*;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.*;
+import static edu.wpi.first.units.Units.*;
 
 /** IO implementation for NavX */
 public class GyroIONavX implements GyroIO {
@@ -15,13 +16,13 @@ public class GyroIONavX implements GyroIO {
 
     public void updateInputs(GyroIOInputs inputs) {
         inputs.connected = navx.isConnected();
-        inputs.rollPositionRad = Units.degreesToRadians(navx.getRoll());
-        inputs.pitchPositionRad = Units.degreesToRadians(navx.getPitch());
-        inputs.yawPositionRad = Units.degreesToRadians(navx.getYaw());
+        inputs.rollPosition = Degrees.of(navx.getRoll());
+        inputs.pitchPosition = Degrees.of(navx.getPitch());
+        inputs.yawPosition = Degrees.of(navx.getYaw());
         
-        inputs.rollVelocityRadPerSec = Units.degreesToRadians(navx.getRawGyroY());
-        inputs.pitchVelocityRadPerSec = Units.degreesToRadians(navx.getRawGyroX());
-        inputs.yawVelocityRadPerSec = Units.degreesToRadians(-navx.getRawGyroZ()); // negative cuz its switched for some reason
+        inputs.rollVelocity = DegreesPerSecond.of(navx.getRawGyroY());
+        inputs.pitchVelocity = DegreesPerSecond.of(navx.getRawGyroX());
+        inputs.yawVelocity = DegreesPerSecond.of(-navx.getRawGyroZ()); // negative cuz its switched for some reason
     }
 }
 

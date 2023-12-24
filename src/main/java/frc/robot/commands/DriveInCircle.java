@@ -19,6 +19,9 @@ import frc.robot.subsystems.swerveDrive.Drive.CONTROL_MODE;
 import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.DriveTrajectory;
 
+import edu.wpi.first.units.*;
+import static edu.wpi.first.units.Units.*;
+
 
 public class DriveInCircle extends Command {
     
@@ -66,8 +69,8 @@ public class DriveInCircle extends Command {
         // Angular acceleration constraint
         rotationalSpeed = MathUtil.clamp(
             rotationalSpeed,
-            prevRotationalSpeed - drive.getMaxAngularAccelerationRadPerSecPerSec() / 2 * Constants.PERIOD,
-            prevRotationalSpeed + drive.getMaxAngularAccelerationRadPerSecPerSec() / 2 * Constants.PERIOD
+            prevRotationalSpeed - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) / 2 * Constants.PERIOD,
+            prevRotationalSpeed + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) / 2 * Constants.PERIOD
         );
         prevRotationalSpeed = rotationalSpeed;
 
@@ -77,16 +80,16 @@ public class DriveInCircle extends Command {
         double rotationalSpeedMultiplier = rotationalSpeed / (linearSpeed / radius);
 
         // Centripetal acceleration constraint
-        if (linearSpeed*linearSpeed / radius > drive.getMaxLinearAccelerationMetersPerSecPerSec()) {
+        if (linearSpeed*linearSpeed / radius > drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond)) {
             // Adjust linear speed to limit centripetal acceleation
-            linearSpeed = Math.sqrt(drive.getMaxLinearAccelerationMetersPerSecPerSec() * radius);
+            linearSpeed = Math.sqrt(drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * radius);
         }
 
         // Linear acceleration constraint (divided by 2, since I want to be extra careful not to lose traction)
         linearSpeed = MathUtil.clamp(
             linearSpeed,
-            prevLinearSpeed - drive.getMaxLinearAccelerationMetersPerSecPerSec() / 2 * Constants.PERIOD,
-            prevLinearSpeed + drive.getMaxLinearAccelerationMetersPerSecPerSec() / 2 * Constants.PERIOD
+            prevLinearSpeed - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) / 2 * Constants.PERIOD,
+            prevLinearSpeed + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) / 2 * Constants.PERIOD
         );
         prevLinearSpeed = linearSpeed;
 

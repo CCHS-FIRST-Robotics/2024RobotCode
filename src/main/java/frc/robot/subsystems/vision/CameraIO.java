@@ -13,14 +13,17 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import frc.robot.utils.AprilTag;
 
+import edu.wpi.first.units.*;
+import static edu.wpi.first.units.Units.*;
+
 public interface CameraIO {
     public static class CameraIOInputs implements LoggableInputs {
         // Values from the primary (closest) tag
         public int primaryTagId = -1;
-        public double primaryTagX = -1;
-        public double primaryTagY = -1;
-        public double primaryTagZ = -1;
-        public double primaryTagHeading = -1;
+        public Measure<Distance> primaryTagX = Meters.of(-1);
+        public Measure<Distance> primaryTagY = Meters.of(-1);
+        public Measure<Distance> primaryTagZ = Meters.of(-1);
+        public Measure<Angle> primaryTagHeading = Radians.of(-1);
 
         // Values for all tags found by the camera
         int numTags = 0;
@@ -28,10 +31,10 @@ public interface CameraIO {
 
         // Localization data
         Pose2d poseEstimate = new Pose2d(-1, -1, new Rotation2d(-1));
-        double[] poseEstimateArray = new double[] {-1, -1, -1};
+        // double[] poseEstimateArray = new double[] {-1, -1, -1};
         Pose3d poseEstimate3d = new Pose3d(-1, -1, -1, new Rotation3d(-1, -1, -1));
 
-        double timestampSeconds = 0;
+        Measure<Time> timestamp = Seconds.of(0);
 
         /*
          * IMPLEMENTS LOGGABLE INPUTS MANUALLY (NOT AUTOLOG) TO LOG CUSTOM AprilTag OBJECTS
@@ -55,7 +58,7 @@ public interface CameraIO {
             table.put("poseEstimate2d", poseEstimate);
             table.put("poseEstimate3d", poseEstimate3d);
 
-            table.put("timestampSeconds", timestampSeconds);
+            table.put("timestampSeconds", timestamp);
         }
 
         @Override
@@ -76,7 +79,7 @@ public interface CameraIO {
             poseEstimate = table.get("poseEstimate2d", poseEstimate);
             poseEstimate3d = table.get("poseEstimate3d", poseEstimate3d);
 
-            timestampSeconds = table.get("timestampSeconds", timestampSeconds);
+            timestamp = table.get("timestampSeconds", timestamp);
         }
     }
 

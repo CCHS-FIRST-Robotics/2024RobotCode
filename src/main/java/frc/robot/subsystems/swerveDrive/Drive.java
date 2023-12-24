@@ -16,7 +16,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.*;
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -27,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.littletonrobotics.junction.Logger;
+import org.opencv.ml.ANN_MLP;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
@@ -36,11 +38,11 @@ import frc.robot.utils.PoseEstimator;
 
 
 public class Drive extends SubsystemBase {
-    private static final double coastThresholdMetersPerSec =
-        0.05; // Need to be under this to switch to coast when disabling
-    private static final double coastThresholdSecs =
-        6.0; // Need to be under the above speed for this length of time to switch to coast
-    private static final double ledsFallenAngleDegrees = 60.0; // Threshold to detect falls
+    private static final Measure<Velocity<Distance>> coastThresholdMetersPerSec =
+        MetersPerSecond.of(0.05); // Need to be under this to switch to coast when disabling
+    private static final Measure<Velocity<Distance>> coastThresholdSecs =
+        MetersPerSecond.of(6.0); // Need to be under the above speed for this length of time to switch to coast
+    private static final Measure<Angle> ledsFallenAngle = Degrees.of(60.0); // Threshold to detect falls
 
     // Define Gyro IO and inputs
     private final GyroIO gyroIO;
@@ -50,12 +52,12 @@ public class Drive extends SubsystemBase {
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
     // Constants for the drivebase
-    private static double maxLinearSpeed = 4.5;
-    private static final double maxLinearAcceleration = 7.0;
-    private static final double trackWidthX = Units.inchesToMeters(22.5);
-    private static final double trackWidthY = Units.inchesToMeters(22.5);
-    private static final double maxAngularSpeed = 3 * Math.PI;
-    private static final double maxAngularAcceleration = 5 * Math.PI;
+    private static Measure<Velocity<Distance>> maxLinearSpeed = MetersPerSecond.of(4.5);
+    private static final Measure<Velocity<Velocity<Distance>>> maxLinearAcceleration = MetersPerSecondPerSecond.of(7.0);
+    private static final Measure<Distance> trackWidthX = Inches.of(22.5);
+    private static final Measure<Distance> trackWidthY = Inches.of(22.5);
+    private static final Measure<Velocity<Angle>> maxAngularSpeed = RadiansPerSecond.of(3 * Math.PI);
+    private static final Measure<Velocity<Velocity<Angle>>> maxAngularAcceleration = RadiansPerSecond.per(Seconds).of(5 * Math.PI);
 
     // Define Kinematics object
     private SwerveDriveKinematics kinematics = getKinematics();
@@ -108,7 +110,7 @@ public class Drive extends SubsystemBase {
 
     private boolean isWiiMode = false; 
 
-    private double characterizationVolts = 0.0; // 0.19
+    private Measure<Voltage> characterizationVolts = Volts.of(0.0); // 0.19
 
     int i = 0;
 
@@ -159,7 +161,7 @@ public class Drive extends SubsystemBase {
             this.isWiiMode = true;
 
             // reset max speeds
-            maxLinearSpeed = 0.5;
+            maxLinearSpeed = MetersPerSecond.of(0.5);
         }
     }
 
@@ -192,7 +194,7 @@ public class Drive extends SubsystemBase {
 
         // Use the gyro to get the change in heading of the robot, instead of the change in heading of each module
         // Gyro is likely more accurate than the modules' encoders (due to slippage, etc)
-        var gyroYaw = new Rotation2d(gyroInputs.yawPositionRad);
+        var gyroYaw = new Rotation2d(gyroInputs.yawPosition.in(Radians));
         if (gyroInputs.connected) {
             twist = new Twist2d(twist.dx, twist.dy, gyroYaw.minus(lastGyroYaw).getRadians());
         }
@@ -216,7 +218,7 @@ public class Drive extends SubsystemBase {
                 linearFieldVelocity.getX(),
                 linearFieldVelocity.getY(),
                 gyroInputs.connected
-                    ? gyroInputs.yawVelocityRadPerSec
+                    ? gyroInputs.yawVelocity.in(RadiansPerSecond)
                     : chassisSpeeds.omegaRadiansPerSecond);
 
         // Record into "RealOutputs"
@@ -257,14 +259,14 @@ public class Drive extends SubsystemBase {
                 double rotError = wiiRotation.getRadians() - getPose().getRotation().getRadians();
                 double rotVelocity = MathUtil.clamp(
                     rotError / Constants.PERIOD, 
-                    -getMaxAngularSpeedRadPerSec(),
-                    getMaxAngularSpeedRadPerSec()
+                    -getMaxAngularSpeed().in(RadiansPerSecond),
+                    getMaxAngularSpeed().in(RadiansPerSecond)
                 );
                 // constrain velocity to max acceleration
                 rotVelocity = MathUtil.clamp(
                     rotVelocity,
-                    getVelocity().dtheta - getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD,
-                    getVelocity().dtheta + getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD
+                    getVelocity().dtheta - getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD,
+                    getVelocity().dtheta + getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD
                 );
 
                 trajectoryCounter = 0;
@@ -507,62 +509,62 @@ public class Drive extends SubsystemBase {
     }
 
     /** Returns the maximum linear speed in meters per sec. */
-    public double getMaxLinearSpeedMetersPerSec() {
+    public Measure<Velocity<Distance>> getMaxLinearSpeed() {
         return maxLinearSpeed;
     }
 
     /** Returns the maximum linear acceleration in meters per sec per sec. */
-    public double getMaxLinearAccelerationMetersPerSecPerSec() {
+    public Measure<Velocity<Velocity<Distance>>> getMaxLinearAcceleration() {
         return maxLinearAcceleration;
     }
 
     /** Returns the maximum angular speed in radians per sec. */
-    public double getMaxAngularSpeedRadPerSec() {
+    public Measure<Velocity<Angle>> getMaxAngularSpeed() {
         return maxAngularSpeed;
     }
 
     /** Returns the maximum angular acceleration in radians per sec. */
-    public double getMaxAngularAccelerationRadPerSecPerSec() {
+    public Measure<Velocity<Velocity<Angle>>> getMaxAngularAcceleration() {
         return maxAngularAcceleration;
     }
 
     /** Returns the current pitch (Y rotation). */
     public Rotation2d getPitch() {
-        return new Rotation2d(gyroInputs.pitchPositionRad);
+        return new Rotation2d(gyroInputs.pitchPosition.in(Radians));
     }
 
     /** Returns the current roll (X rotation). */
     public Rotation2d getRoll() {
-        return new Rotation2d(gyroInputs.rollPositionRad);
+        return new Rotation2d(gyroInputs.rollPosition.in(Radians));
     }
 
     /** Returns the current yaw (Z rotation). */
     public Rotation2d getYaw() {
-        return new Rotation2d(gyroInputs.yawPositionRad);
+        return new Rotation2d(gyroInputs.yawPosition.in(Radians));
     }
 
     /** Returns the current yaw velocity (Z rotation) in radians per second. */
     public double getYawVelocity() {
-        return gyroInputs.yawVelocityRadPerSec;
+        return gyroInputs.yawVelocity.in(RadiansPerSecond);
     }
 
     /** Returns the current pitch velocity (Y rotation) in radians per second. */
     public double getPitchVelocity() {
-        return gyroInputs.pitchVelocityRadPerSec;
+        return gyroInputs.pitchVelocity.in(RadiansPerSecond);
     }
 
     /** Returns the current roll velocity (X rotation) in radians per second. */
     public double getRollVelocity() {
-        return gyroInputs.rollVelocityRadPerSec;
+        return gyroInputs.rollVelocity.in(RadiansPerSecond);
     }
 
     /** Returns an array of module translations. */
     public Translation2d[] getModuleTranslations() {
         return new Translation2d[] {
-            new Translation2d(-trackWidthX / 2.0, trackWidthY / 2.0),
-            new Translation2d(trackWidthX / 2.0, trackWidthY / 2.0),
-            new Translation2d(trackWidthX / 2.0, -trackWidthY / 2.0),
-            new Translation2d(-trackWidthX / 2.0, -trackWidthY / 2.0)
+            new Translation2d(-trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0),
+            new Translation2d(trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0),
+            new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
+            new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0)
         };
     }
 
@@ -581,6 +583,18 @@ public class Drive extends SubsystemBase {
     public SwerveDriveKinematics getKinematics() {
         if (kinematics != null) return kinematics;
         return new SwerveDriveKinematics(getModuleTranslations());
+    }
+
+    public PIDController getXController() {
+        return xController;
+    }
+
+    public PIDController getYController() {
+        return yController;
+    }
+
+    public PIDController getHeadingController() {
+        return headingController;
     }
 
     public void setPoseEstimator(PoseEstimator poseEstimator) {

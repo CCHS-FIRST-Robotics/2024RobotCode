@@ -15,6 +15,9 @@ import frc.robot.subsystems.vision.CameraIO.CameraIOInputs;
 import frc.robot.utils.AprilTag;
 import frc.robot.utils.PoseEstimator;
 
+import edu.wpi.first.units.*;
+import static edu.wpi.first.units.Units.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,8 +56,7 @@ public class Vision extends SubsystemBase {
             //     inputs.primaryTagY,
             //     Math.hypot(inputs.primaryTagX, inputs.primaryTagY)
             // );
-            Logger.recordOutput("Vision/PoseEstimate", getPoseEstimate());
-            poseEstimator.addVisionMeasurement(getPoseEstimate(), getTimestampSeconds(), poseEstimator.getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
+            poseEstimator.addVisionMeasurement(getPoseEstimate(), getTimestamp().in(Seconds), poseEstimator.getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
         } 
 
         i++;
@@ -125,7 +127,7 @@ public class Vision extends SubsystemBase {
         return inputs.poseEstimate3d;
     }
 
-    public double getTimestampSeconds() {
-        return inputs.timestampSeconds;
+    public Measure<Time> getTimestamp() {
+        return inputs.timestamp;
     }
 }

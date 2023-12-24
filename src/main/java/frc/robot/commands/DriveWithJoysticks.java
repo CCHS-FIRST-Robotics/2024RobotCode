@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 
+import edu.wpi.first.units.*;
+import static edu.wpi.first.units.Units.*;
+
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -68,9 +71,9 @@ public class DriveWithJoysticks extends Command {
         // Convert to meters per second
         ChassisSpeeds speeds =
             new ChassisSpeeds(
-                linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                angularSpeed * drive.getMaxAngularSpeedRadPerSec()
+                linearVelocity.getX() * drive.getMaxLinearSpeed().in(MetersPerSecond),
+                linearVelocity.getY() * drive.getMaxLinearSpeed().in(MetersPerSecond),
+                angularSpeed * drive.getMaxAngularSpeed().in(RadiansPerSecond)
             );
 
         // Convert from field relative
@@ -96,16 +99,16 @@ public class DriveWithJoysticks extends Command {
         new ChassisSpeeds(
             MathUtil.clamp(
                 speeds.vxMetersPerSecond,
-                prevSpeeds.vxMetersPerSecond - drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD,
-                prevSpeeds.vxMetersPerSecond + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD),
+                prevSpeeds.vxMetersPerSecond - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
+                prevSpeeds.vxMetersPerSecond + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD),
             MathUtil.clamp(
                 speeds.vyMetersPerSecond,
-                prevSpeeds.vyMetersPerSecond - drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD,
-                prevSpeeds.vyMetersPerSecond + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD),
+                prevSpeeds.vyMetersPerSecond - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
+                prevSpeeds.vyMetersPerSecond + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD),
             MathUtil.clamp(
                 speeds.omegaRadiansPerSecond,
-                prevSpeeds.omegaRadiansPerSecond - drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD,
-                prevSpeeds.omegaRadiansPerSecond + drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD)
+                prevSpeeds.omegaRadiansPerSecond - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
+                prevSpeeds.omegaRadiansPerSecond + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD)
         );
         prevSpeeds = speeds;
 

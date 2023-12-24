@@ -12,7 +12,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.util.Units;
+
+import edu.wpi.first.units.*;
+import static edu.wpi.first.units.Units.*;
 
 public class CameraIOZED implements CameraIO {
 
@@ -49,16 +51,16 @@ public class CameraIOZED implements CameraIO {
         double[] pose2d = pose2dSub.get();
         double[] pose3d = pose3dSub.get();
 
-        inputs.poseEstimate = new Pose2d(pose2d[0], pose2d[1], new Rotation2d(Units.degreesToRadians(pose2d[2])));
-        inputs.poseEstimateArray = pose2d;
+        inputs.poseEstimate = new Pose2d(pose2d[0], pose2d[1], new Rotation2d(Degrees.of(pose2d[2]).in(Radians)));
+        // inputs.poseEstimateArray = pose2d;
         inputs.poseEstimate3d = new Pose3d(pose3d[0], pose3d[1], pose3d[2], new Rotation3d(pose3d[3], pose3d[4], pose3d[5]));
 
         // Values from the primary (closest) tag
         inputs.primaryTagId = (int) primaryTagIdSub.get();
-        inputs.primaryTagX = primaryTagXSub.get();
-        inputs.primaryTagY = primaryTagYSub.get();
+        inputs.primaryTagX = Meters.of(primaryTagXSub.get());
+        inputs.primaryTagY = Meters.of(primaryTagYSub.get());
         // inputs.primaryTagZ = primaryTagZSub.get();
-        inputs.primaryTagHeading = primaryTagHeadingSub.get();
+        inputs.primaryTagHeading = Radians.of(primaryTagHeadingSub.get());
 
         // Values for all tags found by the camera
         double[] tagIds = tagIdsSub.get();
@@ -80,7 +82,6 @@ public class CameraIOZED implements CameraIO {
         }
         inputs.tags = tags;
 
-        // Convert from ns to sec
-        inputs.timestampSeconds = pose2dSub.getLastChange() / 1000000;
+        inputs.timestamp = Milliseconds.of(pose2dSub.getLastChange() / 1000); // timestamp in nanoseconds
     }
 }

@@ -20,6 +20,9 @@ import frc.robot.subsystems.swerveDrive.Drive.CONTROL_MODE;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.utils.DriveTrajectoryGenerator;
 
+import edu.wpi.first.units.*;
+import static edu.wpi.first.units.Units.*;
+
 public class FollowAprilTag extends Command {
 
     Drive drive;
@@ -40,8 +43,8 @@ public class FollowAprilTag extends Command {
         this.drive = drive;
         this.vision = vision;
         this.tagTransformSuppier = () -> vision.getTransformToClosestTag();
-        linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeedMetersPerSec(), drive.getMaxLinearAccelerationMetersPerSecPerSec());
-        angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeedRadPerSec(), drive.getMaxAngularAccelerationRadPerSecPerSec());
+        linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeed().in(MetersPerSecond), drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond));
+        angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeed().in(RadiansPerSecond), drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)));
     }
 
     public FollowAprilTag(
@@ -53,8 +56,8 @@ public class FollowAprilTag extends Command {
         this.drive = drive;
         this.vision = vision;
         // this.tagTransformSuppier = () -> vision.getTagFromId(tagId).getTransform();
-        linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeedMetersPerSec(), drive.getMaxLinearAccelerationMetersPerSecPerSec());
-        angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeedRadPerSec(), drive.getMaxAngularAccelerationRadPerSecPerSec());
+        linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeed().in(MetersPerSecond), drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond));
+        angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeed().in(RadiansPerSecond), drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)));
     }
 
     @Override
@@ -87,18 +90,18 @@ public class FollowAprilTag extends Command {
         targetVelocity = new Twist2d(
             MathUtil.clamp(
                 targetVelocity.dx,
-                prevVelocity.dx - drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD,
-                prevVelocity.dx + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD
+                prevVelocity.dx - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
+                prevVelocity.dx + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD
             ),
             MathUtil.clamp(
                 targetVelocity.dy,
-                prevVelocity.dy - drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD,
-                prevVelocity.dy + drive.getMaxLinearAccelerationMetersPerSecPerSec() * Constants.PERIOD
+                prevVelocity.dy - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
+                prevVelocity.dy + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD
             ),
             MathUtil.clamp(
                 targetVelocity.dtheta,
-                prevVelocity.dtheta - drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD,
-                prevVelocity.dtheta + drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD
+                prevVelocity.dtheta - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
+                prevVelocity.dtheta + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD
             )
         );
         prevVelocity = targetVelocity;
