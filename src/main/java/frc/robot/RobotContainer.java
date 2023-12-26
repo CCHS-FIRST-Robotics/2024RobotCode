@@ -9,11 +9,15 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -85,7 +89,7 @@ public class RobotContainer {
         // Sim robot, instantiate physics sim IO implementations
         case SIM:
             drive = new Drive(
-                new GyroIONavX(),
+                new GyroIO() {},
                 new ModuleIOSim(), 
                 new ModuleIOSim(),
                 new ModuleIOSim(),
@@ -111,7 +115,7 @@ public class RobotContainer {
 
         poseEstimator = new PoseEstimator(
             drive.getKinematics(),
-            drive.getYaw(),
+            new Rotation2d(),
             drive.getModulePositions(),
             new Pose2d()
         );
@@ -206,11 +210,11 @@ public class RobotContainer {
         controller.x().onTrue(
             drive.runOnce(
                 () -> {
-                    String path = "RC";
+                    String path = "MPRAuto2Fast";
                     var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
                     // adjust so that the start of the trajectory is where the robot is
                     traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
-                    traj.translateBy(drive.getPose().getTranslation()); 
+                    traj.translateBy(drive.getPose().getTranslation());
 
                     System.out.println("Writing trajectory to CSV");
                     traj.toCSV(path);

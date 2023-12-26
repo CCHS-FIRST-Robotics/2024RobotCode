@@ -50,6 +50,7 @@ public class Vision extends SubsystemBase {
         Logger.processInputs("Vision", inputs);
 
         if (getPoseEstimate3d().getX() > 0) {
+            System.out.println("Adding Vision Pose");
             // poseEstimator.addVisionData(getPoseEstimate3d(), Timer.getFPGATimestamp())
             // Matrix<N3, N1> visionStdScale = VecBuilder.fill(
             //     inputs.primaryTagX,

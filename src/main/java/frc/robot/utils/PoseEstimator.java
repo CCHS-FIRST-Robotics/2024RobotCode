@@ -133,5 +133,23 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
             )
         );
     }
+
+    @Override
+    public void addVisionMeasurement(Pose2d poseEstimate, double timestamp) {
+        System.out.println("Adding vision measurement");
+        super.addVisionMeasurement(poseEstimate, timestamp);
+    }
+
+    @Override
+    public void addVisionMeasurement(Pose2d poseEstimate, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
+        System.out.println("Adding vision measurement");
+        super.addVisionMeasurement(poseEstimate, timestamp, visionMeasurementStdDevs);
+    }
+
+    @Override
+    public Pose2d updateWithTime(double timestamp, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
+        // System.out.println("Adding odom measurement");
+        return super.updateWithTime(timestamp, gyroAngle, modulePositions);
+    }
     
 }

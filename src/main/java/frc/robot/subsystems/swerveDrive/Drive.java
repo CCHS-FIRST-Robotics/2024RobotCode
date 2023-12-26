@@ -105,7 +105,7 @@ public class Drive extends SubsystemBase {
     private double[] lastModulePositionsMeters = new double[] {0.0, 0.0, 0.0, 0.0};
     private Rotation2d lastGyroYaw = new Rotation2d();
     private Twist2d fieldVelocity = new Twist2d();
-    // private Pose2d fieldPosition = new Pose2d(); Use poseEstimator instead
+    private Pose2d fieldPosition = new Pose2d(); // Use poseEstimator instead
     private PoseEstimator poseEstimator;
 
     private boolean isWiiMode = false; 
@@ -187,10 +187,11 @@ public class Drive extends SubsystemBase {
 
         // Get the change in position of each module
         //TODO: make sure there's no harm in turning this into a method (it was just written here before)
-        SwerveModulePosition[] wheelDeltas = getModulePositions();
+        SwerveModulePosition[] wheelDeltas = getModuleDeltas();
 
         // Use kinematics to convert the change in position of each module -> change in position of the robot
         var twist = kinematics.toTwist2d(wheelDeltas);
+        Logger.recordOutput("Odometry/RobotTwist", twist);
 
         // Use the gyro to get the change in heading of the robot, instead of the change in heading of each module
         // Gyro is likely more accurate than the modules' encoders (due to slippage, etc)
@@ -201,9 +202,13 @@ public class Drive extends SubsystemBase {
         lastGyroYaw = gyroYaw;
 
         // Update pose estimator with the new data 
-        // fieldPosition = fieldPosition.exp(twist);
+        fieldPosition = fieldPosition.exp(twist);
         // poseEstimator.addOdometryData(twist, Timer.getFPGATimestamp());
-        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), gyroYaw, wheelDeltas);
+        poseEstimator.updateWithTime(
+            Timer.getFPGATimestamp(), 
+            (gyroInputs.connected ? gyroYaw : fieldPosition.getRotation()), 
+            getModulePositions()
+        );
 
         /* Update field velocity */
         // Gets the speed/angle of each module and converts it to a robot velocity
@@ -222,7 +227,8 @@ public class Drive extends SubsystemBase {
                     : chassisSpeeds.omegaRadiansPerSecond);
 
         // Record into "RealOutputs"
-        Logger.recordOutput("Odometry/FieldVelocity", new Pose2d(fieldVelocity.dx, fieldVelocity.dy, new Rotation2d(fieldVelocity.dtheta)));
+        Logger.recordOutput("Odometry/FieldVelocity", fieldVelocity);
+        Logger.recordOutput("Odometry/WheelPosition", fieldPosition);
         Logger.recordOutput("Odometry/FieldPosition", getPose());
 
         if (DriverStation.isDisabled()) {
@@ -236,10 +242,10 @@ public class Drive extends SubsystemBase {
                 for (var module : modules) {
                     module.stop();
                 }
-
+                // System.out.println("DISABLED");
                 // Clear setpoint logs
-                Logger.recordOutput("SwerveStates/Setpoints", new double[] {});
-                Logger.recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
+                Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
+                Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
                 return;
             
             case CHARACTERIZING:
@@ -247,10 +253,10 @@ public class Drive extends SubsystemBase {
                 for (var module : modules) {
                     module.runCharacterization(characterizationVolts);
                 }
-
+                // System.out.println("RUNNING");
                 // Clear setpoint logs
-                Logger.recordOutput("SwerveStates/Setpoints", new double[] {});
-                Logger.recordOutput("SwerveStates/SetpointsOptimized", new double[] {});
+                Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
+                Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
                 break;
             
             // TODO: THIS IS CURRENTLY VERY HACKY SO LIKE PROBABLY SHOULD REWRITE THIS
@@ -328,6 +334,8 @@ public class Drive extends SubsystemBase {
                  */
                 // fallthrough
             case CHASSIS_SETPOINT:
+                
+
                 // Brief explanation here: https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/transformations.html
                 // For more detail, see chapter 10 here: https://file.tavsys.net/control/controls-engineering-in-frc.pdf
                 // Purpose: accounts for continuous movement along an arc instead of a discrete straight line, avoids skew
@@ -393,7 +401,9 @@ public class Drive extends SubsystemBase {
                     // optimizedStates[i] = new SwerveModuleState();
                 }
 
-            
+                // System.out.println("GOT HERE " + setpointStates[0].angle.getDegrees());
+                // Logger.recordOutput("SwerveStates/Test", setpointStates);
+
                 // Log setpoint states
                 Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
                 Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
@@ -540,7 +550,8 @@ public class Drive extends SubsystemBase {
 
     /** Returns the current yaw (Z rotation). */
     public Rotation2d getYaw() {
-        return new Rotation2d(gyroInputs.yawPosition.in(Radians));
+        // return new Rotation2d(gyroInputs.yawPosition.in(Radians));
+        return getPose().getRotation();
     }
 
     /** Returns the current yaw velocity (Z rotation) in radians per second. */
@@ -568,7 +579,7 @@ public class Drive extends SubsystemBase {
         };
     }
 
-    public SwerveModulePosition[] getModulePositions() {
+    public SwerveModulePosition[] getModuleDeltas() {
         SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
         for (int i = 0; i < 4; i++) {
           wheelDeltas[i] =
@@ -578,6 +589,17 @@ public class Drive extends SubsystemBase {
           lastModulePositionsMeters[i] = modules[i].getPositionMeters();
         }
         return wheelDeltas;
+    }
+
+    public SwerveModulePosition[] getModulePositions() {
+        SwerveModulePosition[] wheelPos = new SwerveModulePosition[4];
+        for (int i = 0; i < 4; i++) {
+          wheelPos[i] =
+              new SwerveModulePosition(
+                  (modules[i].getPositionMeters()),
+                  modules[i].getAngle());
+        }
+        return wheelPos;
     }
 
     public SwerveDriveKinematics getKinematics() {

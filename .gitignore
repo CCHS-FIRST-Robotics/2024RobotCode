@@ -173,6 +173,8 @@ out/
 
 # Simulation data log directory
 logs/
+# for some reason wpilogs got created(???) (not in that ^ folder) so ignoring those too for now
+*.wpilog
 
 # Folder that has CTRE Phoenix Sim device config storage
 ctre_sim/
