@@ -11,10 +11,12 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.vision.CameraIO.CameraIOInputs;
 import frc.robot.utils.AprilTag;
 import frc.robot.utils.PoseEstimator;
-
+import frc.robot.utils.TimestampedPose2d;
+import frc.robot.utils.TimestampedPose3d;
 import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
 
@@ -29,6 +31,7 @@ public class Vision extends SubsystemBase {
     CameraIO io;
     CameraIOInputs inputs = new CameraIOInputs();
     PoseEstimator poseEstimator;
+    boolean poseReset = false;
 
     int i = 0;
 
@@ -40,6 +43,8 @@ public class Vision extends SubsystemBase {
      */
     public Vision(CameraIO io) {
         this.io = io;
+
+        Logger.recordOutput("AprilTagLocations", Constants.APRIL_TAG_LOCATIONS);
     }
     
     /* (non-Javadoc)
@@ -49,16 +54,31 @@ public class Vision extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Vision", inputs);
 
-        if (getPoseEstimate3d().getX() > 0) {
-            System.out.println("Adding Vision Pose");
+        if (getPoseEstimate3d().pose.getX() > 0) {
+            TimestampedPose2d pose = getPoseEstimate();
+            if (!poseReset) {
+                poseEstimator.resetPosition(
+                    poseEstimator.getPoseEstimate().getRotation(), 
+                    poseEstimator.getPrevModulePositions(), 
+                    pose.pose
+                );
+                poseReset = true;
+            }
+            // System.out.println("Adding Vision Pose");
             // poseEstimator.addVisionData(getPoseEstimate3d(), Timer.getFPGATimestamp())
             // Matrix<N3, N1> visionStdScale = VecBuilder.fill(
             //     inputs.primaryTagX,
             //     inputs.primaryTagY,
             //     Math.hypot(inputs.primaryTagX, inputs.primaryTagY)
             // );
-            poseEstimator.addVisionMeasurement(getPoseEstimate(), getTimestamp().in(Seconds), poseEstimator.getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
+            
+            poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp, poseEstimator.getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
         } 
+        
+        if (getZedPoseEstimate().pose.getX() > 0) {
+            TimestampedPose2d pose = getZedPoseEstimate();
+            poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp, getZedPoseCovar());
+        }
 
         i++;
         if (i % 20 == 0) {
@@ -92,8 +112,8 @@ public class Vision extends SubsystemBase {
         Collections.copy(tagsCopy, inputs.tags); 
         Collections.sort(tagsCopy, (AprilTag a, AprilTag b) -> {
             return Double.compare(
-                a.transform.getTranslation().getDistance(new Translation2d()),
-                b.transform.getTranslation().getDistance(new Translation2d())
+                a.transform.getTranslation().toTranslation2d().getDistance(new Translation2d()),
+                b.transform.getTranslation().toTranslation2d().getDistance(new Translation2d())
             );
         });
         
@@ -115,8 +135,8 @@ public class Vision extends SubsystemBase {
      * 
      * @return The latest pose estimate (2d)
      */
-    public Pose2d getPoseEstimate() {
-        return inputs.poseEstimate;
+    public TimestampedPose2d getPoseEstimate() {
+        return inputs.tagPoseEstimate;
     }
 
     /**
@@ -124,11 +144,29 @@ public class Vision extends SubsystemBase {
      * 
      * @return The latest pose estimate (3d)
      */
-    public Pose3d getPoseEstimate3d() {
-        return inputs.poseEstimate3d;
+    public TimestampedPose3d getPoseEstimate3d() {
+        return inputs.tagPoseEstimate3d;
     }
 
-    public Measure<Time> getTimestamp() {
-        return inputs.timestamp;
+    /**
+     * Returns the latest pose estimate (2d)
+     * 
+     * @return The latest pose estimate (2d)
+     */
+    public TimestampedPose2d getZedPoseEstimate() {
+        return inputs.zedPoseEstimate;
+    }
+
+    /**
+     * Returns the latest pose estimate (3d)
+     * 
+     * @return The latest pose estimate (3d)
+     */
+    public TimestampedPose3d getZedPoseEstimate3d() {
+        return inputs.zedPoseEstimate3d;
+    }
+
+    public Matrix<N3, N1> getZedPoseCovar() {
+        return inputs.zedPoseCovar;
     }
 }

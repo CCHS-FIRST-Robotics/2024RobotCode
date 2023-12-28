@@ -2,6 +2,7 @@ package frc.robot.utils;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.filter.MedianFilter;
@@ -17,6 +18,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.wpilibj.Timer;
 
+
 public class PoseEstimator extends SwerveDrivePoseEstimator {
     
     double latestTimestamp = Timer.getFPGATimestamp();
@@ -29,7 +31,10 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
     MedianFilter visionXFilter = new MedianFilter(10);
     // MedianFilter visionYFilter = new MedianFilter(20);
 
+    
+    // static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(10, 10, 10); // for testing (only use vision, essentially)
     static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.003, 0.003, 0.0002);
+    SwerveModulePosition[] prevModulePositions = new SwerveModulePosition[4];
 
     /*
      * .002, .035, .035 at .5m
@@ -89,6 +94,10 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
         return defaultVisionMeasurementStdDevs;
     }
 
+    public SwerveModulePosition[] getPrevModulePositions() {
+        return prevModulePositions;
+    }
+
     /**
      * Adds odometry data to the pose estimator (pose exponential)
      * 
@@ -136,20 +145,20 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
 
     @Override
     public void addVisionMeasurement(Pose2d poseEstimate, double timestamp) {
-        System.out.println("Adding vision measurement");
+        // System.out.println("Adding vision measurement");
         super.addVisionMeasurement(poseEstimate, timestamp);
     }
 
     @Override
     public void addVisionMeasurement(Pose2d poseEstimate, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
-        System.out.println("Adding vision measurement");
+        // System.out.println("Adding vision measurement");
         super.addVisionMeasurement(poseEstimate, timestamp, visionMeasurementStdDevs);
     }
 
     @Override
     public Pose2d updateWithTime(double timestamp, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
         // System.out.println("Adding odom measurement");
+        prevModulePositions = modulePositions;
         return super.updateWithTime(timestamp, gyroAngle, modulePositions);
-    }
-    
+    }   
 }

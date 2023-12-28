@@ -5,12 +5,14 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 public class AprilTag {
     
     public int id;
-    public Transform2d transform;
+    public Transform3d transform;
 
     /**
      * Constructs a new AprilTag object from the x, y, and heading of the robot to the tag
@@ -22,9 +24,9 @@ public class AprilTag {
      */
     public AprilTag(int id, double x, double y, double heading) {
         this.id = id;
-        this.transform = new Transform2d(
-            new Translation2d(x, y),
-            new Rotation2d(heading)
+        this.transform = new Transform3d(
+            new Translation3d(x, y, 0),
+            new Rotation3d(0, 0, heading)
         ); 
     }
 
@@ -34,7 +36,7 @@ public class AprilTag {
      * @param id The ID of the tag
      * @param transform The transform from the robot to the tag
      */
-    public AprilTag(int id, Transform2d transform) {
+    public AprilTag(int id, Transform3d transform) {
         this.id = id;
         this.transform = transform;
     }
@@ -45,9 +47,9 @@ public class AprilTag {
      * @param id The ID of the tag
      * @param transform The pose (transform) from the robot to the tag
      */
-    public AprilTag(int id, Pose2d pose) {
+    public AprilTag(int id, Pose3d pose) {
         this.id = id;
-        this.transform = pose.minus(new Pose2d());
+        this.transform = pose.minus(new Pose3d());
     }
 
     /**
@@ -65,7 +67,7 @@ public class AprilTag {
      * @return The transform from the robot to the tag
      */
     public Transform2d getTransform() {
-        return transform;
+        return new Transform2d(transform.getTranslation().toTranslation2d(), transform.getRotation().toRotation2d());
     }
 
     /**
@@ -74,7 +76,16 @@ public class AprilTag {
      * @return The pose of the robot to the tag
      */
     public Pose2d getPose2d() {
-        return new Pose2d(transform.getTranslation(), transform.getRotation());
+        return getPose3d().toPose2d();
+    }
+
+    /**
+     * Returns the pose of the transform from robot to the tag
+     * 
+     * @return The pose of the robot to the tag
+     */
+    public Pose3d getPose3d() {
+        return new Pose3d(transform.getTranslation(), transform.getRotation());
     }
 
     /**
@@ -83,7 +94,7 @@ public class AprilTag {
      * @return The distance from the robot to the tag
      */
     public double getDistance() {
-        return transform.getTranslation().getDistance(new Translation2d());
+        return transform.getTranslation().toTranslation2d().getDistance(new Translation2d());
     }
 
     /**
@@ -110,6 +121,6 @@ public class AprilTag {
      * @return The heading of the robot to the tag
      */
     public double getHeading() {
-        return transform.getRotation().getRadians();
+        return transform.getRotation().getZ();
     }
 }
