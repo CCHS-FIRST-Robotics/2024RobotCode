@@ -5,6 +5,7 @@
 package frc.robot;
 
 import org.ejml.data.CMatrixRMaj;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
@@ -215,6 +216,9 @@ public class RobotContainer {
                     // adjust so that the start of the trajectory is where the robot is
                     traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
                     traj.translateBy(drive.getPose().getTranslation());
+
+                    System.out.println("recording pos traj");
+                    Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
 
                     System.out.println("Writing trajectory to CSV");
                     traj.toCSV(path);
