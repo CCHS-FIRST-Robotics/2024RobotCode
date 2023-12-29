@@ -77,7 +77,7 @@ public class Vision extends SubsystemBase {
         
         if (getZedPoseEstimate().pose.getX() > 0) {
             TimestampedPose2d pose = getZedPoseEstimate();
-            poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp, getZedPoseCovar());
+            poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp, getZedPoseStd());
         }
 
         i++;
@@ -166,7 +166,11 @@ public class Vision extends SubsystemBase {
         return inputs.zedPoseEstimate3d;
     }
 
-    public Matrix<N3, N1> getZedPoseCovar() {
-        return inputs.zedPoseCovar;
+    public Matrix<N3, N1> getZedPoseStd() {
+        return VecBuilder.fill(
+            Math.sqrt(inputs.zedPoseCovar.get(0, 0)),
+            Math.sqrt(inputs.zedPoseCovar.get(1, 0)),
+            Math.sqrt(inputs.zedPoseCovar.get(2, 0))
+        );
     }
 }

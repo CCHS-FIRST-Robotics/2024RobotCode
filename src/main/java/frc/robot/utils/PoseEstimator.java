@@ -2,6 +2,7 @@ package frc.robot.utils;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.LinearQuadraticRegulator;
 import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -30,6 +31,8 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
 
     MedianFilter visionXFilter = new MedianFilter(10);
     // MedianFilter visionYFilter = new MedianFilter(20);
+    // KalmanFilter
+    // LinearQuadraticRegulator
 
     
     // static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(10, 10, 10); // for testing (only use vision, essentially)
