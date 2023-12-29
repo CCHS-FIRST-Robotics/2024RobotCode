@@ -570,7 +570,7 @@ public class Drive extends SubsystemBase {
     }
 
     /** Returns an array of module translations. */
-    public Translation2d[] getModuleTranslations() {
+    public static Translation2d[] getModuleTranslations() {
         return new Translation2d[] {
             new Translation2d(-trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0),
             new Translation2d(trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0),

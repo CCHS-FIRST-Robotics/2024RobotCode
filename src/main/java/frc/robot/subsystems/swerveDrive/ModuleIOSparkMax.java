@@ -107,7 +107,7 @@ public class ModuleIOSparkMax implements ModuleIO {
             driveSparkMax.setInverted(true);
         }
 
-        driveSparkMax.setSmartCurrentLimit(60);
+        driveSparkMax.setSmartCurrentLimit(50);
         turnSparkMax.setSmartCurrentLimit(40);
         driveSparkMax.enableVoltageCompensation(12.0);
         turnSparkMax.enableVoltageCompensation(12.0);
