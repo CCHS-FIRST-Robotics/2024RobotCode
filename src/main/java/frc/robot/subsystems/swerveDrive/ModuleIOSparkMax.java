@@ -52,6 +52,9 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
     private final double turnAfterEncoderReduction = 150.0 / 7.0;
+    // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
+    // This may need to be tuned to your individual robot
+    private static final double couplingRatio = 50d / 14d; // equal to the first stage gear ratio
 
     private final Queue<Double> drivePositionQueue;
     private final Queue<Double> turnPositionQueue;
@@ -155,8 +158,11 @@ public class ModuleIOSparkMax implements ModuleIO {
      */
     public void updateInputs(ModuleIOInputs inputs) {
         // update drive motor info
-        inputs.drivePositionRad =
+        inputs.driveRawPositionRad = // doesnt account for coupling
             Rotations.of(driveEncoder.getPosition() / driveAfterEncoderReduction);
+        //TODO: CHECK THAT COUPLING WAS ADDED CORRECTLY (paritcularly, sign might be off)
+        inputs.drivePositionRad =
+            Rotations.of((driveEncoder.getPosition() - turnRelativeEncoder.getPosition() * couplingRatio) / driveAfterEncoderReduction);
         inputs.driveVelocityRadPerSec =
             Rotations.per(Minute).of(driveEncoder.getVelocity()
                 / driveAfterEncoderReduction);

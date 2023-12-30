@@ -117,6 +117,10 @@ public class Module {
     }
 
     /** Returns the current drive position of the module in meters. */
+    public double getRawPositionMeters() {
+        return inputs.driveRawPositionRad.in(Radians) * wheelRadius.in(Meters);
+    }
+
     public double getPositionMeters() {
         return inputs.drivePositionRad.in(Radians) * wheelRadius.in(Meters);
     }
