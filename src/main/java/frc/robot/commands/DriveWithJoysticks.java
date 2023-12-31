@@ -80,16 +80,15 @@ public class DriveWithJoysticks extends Command {
         // Calcaulate new linear components
         Translation2d linearVelocity = new Translation2d(linearSpeed, linearDirection);
 
-
         // APPLY ABSOLUTE HEADING CONTROL
         if (angularSpeed == 0) {
             double povSetpoint = Radians.convertFrom(headingAngleSupplier.get(), Degrees);
-            headingSetpoint = povSetpoint == -1 ? headingSetpoint : povSetpoint;
+            headingSetpoint = headingAngleSupplier.get() == -1 ? headingSetpoint : povSetpoint;
             double rotError = headingSetpoint - drive.getPose().getRotation().getRadians();
 
             // constrain to max velocity
             double rotVelocity = MathUtil.clamp(
-                rotError / Constants.PERIOD, 
+                rotError / Constants.PERIOD,
                 -drive.getMaxAngularSpeed().in(RadiansPerSecond),
                 drive.getMaxAngularSpeed().in(RadiansPerSecond)
             );
@@ -106,6 +105,8 @@ public class DriveWithJoysticks extends Command {
             angularSpeed = rotVelocity + headingController.calculate(drive.getPose().getRotation().getRadians(), headingSetpoint);
             // divide by max speed to get as a percentage of max (for continuity with joystick control)
             angularSpeed = angularSpeed / drive.getMaxAngularSpeed().in(RadiansPerSecond);
+        } else {
+            headingSetpoint = drive.getPose().getRotation().getRadians();
         }
 
         // Convert to meters per second
