@@ -38,6 +38,7 @@ public final class Constants {
     }
 
     public static final double PERIOD = .02;
+    public static final double ODOMETRY_FREQUENCY = 250; // Hz
 
     // TODO: change to tunable numbers
     public static final double LIENAR_SPEED_EXPONENT = 2;

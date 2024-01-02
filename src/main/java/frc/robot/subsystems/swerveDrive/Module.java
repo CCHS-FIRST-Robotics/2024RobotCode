@@ -37,10 +37,17 @@ public class Module {
         // turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
     }
 
+    /**
+   * Update inputs without running the rest of the periodic logic. This is useful since these
+   * updates need to be properly thread-locked.
+   */
+    public void updateInputs() {
+        io.updateInputs(inputs);
+    }
+
     /** Updates inputs and checks tunable numbers. */
     public void periodic() {
         // double prevVel = getVelocityMetersPerSec();
-        io.updateInputs(inputs);
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
         // double acceleration = (getVelocityMetersPerSec() - prevVel) / 0.02;
         // if (Math.abs(acceleration) > 50) System.out.println(acceleration);

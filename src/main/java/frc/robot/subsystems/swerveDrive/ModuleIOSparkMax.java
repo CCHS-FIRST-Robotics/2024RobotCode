@@ -18,6 +18,9 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
+
+import java.util.Queue;
+
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.Constants;
 
@@ -49,6 +52,9 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
     private final double turnAfterEncoderReduction = 150.0 / 7.0;
+
+    private final Queue<Double> drivePositionQueue;
+    private final Queue<Double> turnPositionQueue;
 
     private final boolean isTurnMotorInverted = false;
     // private final Rotation2d absoluteEncoderOffset;
@@ -97,8 +103,18 @@ public class ModuleIOSparkMax implements ModuleIO {
         driveEncoder = driveSparkMax.getEncoder();
         turnRelativeEncoder = turnSparkMax.getEncoder();
 
-        driveSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
+        // driveSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
         turnSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20); // report absolute encoder measurements at 20ms (default: 200ms)
+
+        driveSparkMax.setPeriodicFramePeriod(
+        PeriodicFrame.kStatus2, (int) (1000.0 / Constants.ODOMETRY_FREQUENCY));
+        turnSparkMax.setPeriodicFramePeriod(
+            PeriodicFrame.kStatus2, (int) (1000.0 / Constants.ODOMETRY_FREQUENCY));
+        drivePositionQueue =
+            SparkMaxOdometryThread.getInstance().registerSignal(driveEncoder::getPosition);
+        turnPositionQueue =
+            SparkMaxOdometryThread.getInstance().registerSignal(turnRelativeEncoder::getPosition);
+
 
         turnSparkMax.setInverted(isTurnMotorInverted);
         if (index == 2 || index == 3) {
@@ -128,7 +144,6 @@ public class ModuleIOSparkMax implements ModuleIO {
 
         driveSparkMax.setCANTimeout(0);
         turnSparkMax.setCANTimeout(0);
-
 
         // System.out.println("TESTING");
         // System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
