@@ -77,7 +77,8 @@ public class Module {
         optimizedState.speedMetersPerSecond *= Math.cos(inputs.turnAbsolutePositionRad.in(Radians) - optimizedState.angle.getRadians());
 
         // Run drive controller
-        Measure<Velocity<Angle>> velocityRadPerSec = RadiansPerSecond.of(optimizedState.speedMetersPerSecond / wheelRadius.in(Meters));
+        // System.out.println(wheelRadius.in(Meters));
+        double velocityRadPerSec = optimizedState.speedMetersPerSecond / wheelRadius.in(Meters);
         io.setDriveVelocity(velocityRadPerSec);
 
         return optimizedState;
