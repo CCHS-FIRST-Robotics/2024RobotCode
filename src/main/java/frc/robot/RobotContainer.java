@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import org.ejml.data.CMatrixRMaj;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -20,6 +22,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.commands.DriveInCircle;
@@ -28,6 +31,9 @@ import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.DriveWithWiimote;
 import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmIOFalcon500;
+import frc.robot.subsystems.arm.ArmIOSim;
 
 // import frc.robot.subsystems.mecaDrive.Drive;
 // import frc.robot.subsystems.mecaDrive.DriveIO;
@@ -57,6 +63,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final Arm arm;
     private final Vision camera;
     private final PoseEstimator poseEstimator;
 
@@ -85,6 +92,7 @@ public class RobotContainer {
                 useWiiRemotes
             );
             camera = new Vision(new CameraIOZED());
+            arm = new Arm(new ArmIOFalcon500(0));
             break;
 
         // Sim robot, instantiate physics sim IO implementations
@@ -98,6 +106,7 @@ public class RobotContainer {
                 false
             );
             camera = new Vision(new CameraIOZED());
+            arm = new Arm(new ArmIOSim());
             break;
 
         // Replayed robot, disable IO implementations
@@ -111,6 +120,7 @@ public class RobotContainer {
                 false
             );
             camera = new Vision(new CameraIOZED());
+            arm = new Arm(new ArmIOFalcon500(0));
             break;
         }
 
@@ -140,6 +150,13 @@ public class RobotContainer {
         if (povX == 0 && povY == 0) return new Rotation2d(-1);
         double povAngle = Math.atan2(povY, povX);
         return new Rotation2d(povAngle);
+    }
+
+    public Translation2d getTargetTranslation(Pose3d targetPose) {
+        Pose2d currentPose = drive.getPose();
+
+        Translation2d translationToTargetGround = currentPose.getTranslation().minus(targetPose.getTranslation().toTranslation2d());
+        return new Translation2d(translationToTargetGround.getNorm(), targetPose.getZ());
     }
 
     /**
@@ -178,11 +195,11 @@ public class RobotContainer {
             drive.setDefaultCommand(
                 new DriveWithJoysticks(
                     drive, 
-                    () -> controller.getLeftX(), 
+                    controller::getLeftX, 
                     () -> -controller.getLeftY(), 
-                    () -> controller.getRightX(), 
+                    controller::getRightX, 
                     () -> {return 1.0;},
-                    () -> controller.getHID().getPOV()
+                    () -> Rotation2d.fromDegrees(controller.getHID().getPOV())
                 )
             );
         }
@@ -193,6 +210,24 @@ public class RobotContainer {
         // Brake when the left trigger is held
         controller.leftTrigger().whileTrue(
             new RunCommand(drive::stopWithX, drive)
+        );
+
+        controller.rightTrigger().whileTrue(
+            new DriveWithJoysticks(
+                drive, 
+                controller::getLeftX, 
+                () -> -controller.getLeftY(), 
+                controller::getRightX, 
+                () -> {return 1.0;},
+                () -> {
+                    Translation2d targetTranslation = getTargetTranslation(new Pose3d());
+                    return targetTranslation.getAngle();
+                }
+            ).alongWith(
+                arm.alignWithTarget(
+                    () -> getTargetTranslation(new Pose3d())
+                )
+            )
         );
 
         // controller.rightTrigger().whileTrue(

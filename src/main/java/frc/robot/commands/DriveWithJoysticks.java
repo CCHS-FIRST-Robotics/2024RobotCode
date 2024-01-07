@@ -26,7 +26,7 @@ public class DriveWithJoysticks extends Command {
     Supplier<Double> linearYSpeedSupplier;
     Supplier<Double> angularSpeedSupplier;
     Supplier<Double> linearSpeedMultiplierSupplier;
-    Supplier<Integer> headingAngleSupplier;
+    Supplier<Rotation2d> headingAngleSupplier;
 
     double headingSetpoint;
     double prevHeadingSetpoint;
@@ -40,7 +40,7 @@ public class DriveWithJoysticks extends Command {
         Supplier<Double> leftYSupplier, 
         Supplier<Double> rightXSupplier,
         Supplier<Double> linearSpeedMultiplierSupplier,
-        Supplier<Integer> dPadSupplier 
+        Supplier<Rotation2d> headingSupplier 
     ) {
         addRequirements(drive);
         this.drive = drive;
@@ -51,7 +51,7 @@ public class DriveWithJoysticks extends Command {
 
         this.linearSpeedMultiplierSupplier = linearSpeedMultiplierSupplier;
         
-        headingAngleSupplier = dPadSupplier;
+        headingAngleSupplier = headingSupplier;
     }
 
     @Override
@@ -82,8 +82,7 @@ public class DriveWithJoysticks extends Command {
 
         // APPLY ABSOLUTE HEADING CONTROL
         if (angularSpeed == 0) {
-            double povSetpoint = Radians.convertFrom(headingAngleSupplier.get(), Degrees);
-            headingSetpoint = headingAngleSupplier.get() == -1 ? headingSetpoint : povSetpoint;
+            headingSetpoint = headingAngleSupplier.get().getDegrees() == -1 ? headingSetpoint : headingAngleSupplier.get().getRadians();
             double rotError = headingSetpoint - drive.getPose().getRotation().getRadians();
 
             // constrain to max velocity
