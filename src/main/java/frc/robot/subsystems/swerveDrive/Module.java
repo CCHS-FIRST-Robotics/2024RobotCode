@@ -107,7 +107,7 @@ public class Module {
         }
 
         // Run drive controller
-        Measure<Velocity<Angle>> velocityRadPerSec = RadiansPerSecond.of(optimizedState.speedMetersPerSecond / wheelRadius.in(Meters));
+        double velocityRadPerSec = (optimizedState.speedMetersPerSecond / wheelRadius.in(Meters));
         io.setDriveVelocity(velocityRadPerSec);
 
         prevSetpoint = optimizedState; 
