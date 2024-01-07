@@ -210,12 +210,8 @@ public class Module {
     }
 
     /** Returns the current drive position of the module in meters. */
-    public double getRawPositionMeters() {
-        return inputs.drivePositionRad.in(Radians) * wheelRadius.in(Meters);
-    }
-
     public double getPositionMeters() {
-        return getRawPositionMeters() - getAngle() * couplingRatioDriveRotorToCANandcoder;
+        return inputs.drivePositionRad.in(Radians) * wheelRadius.in(Meters);
     }
 
     /** Returns the current drive velocity of the module in meters per second. */
