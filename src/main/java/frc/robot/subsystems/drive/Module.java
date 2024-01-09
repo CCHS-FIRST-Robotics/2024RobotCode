@@ -1,21 +1,23 @@
 package frc.robot.subsystems.drive;
 
 
-import com.reduxrobotics.sensors.canandcoder.Canandcoder;
+// import com.reduxrobotics.sensors.canandcoder.Canandcoder;
 import com.revrobotics.CANSparkMax;
 
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
 
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class Module{
     private CANSparkMax driveMotor, turnMotor;
-    private SparkMaxPIDController pidDriveController, pidTurnController;
-    private SparkMaxAbsoluteEncoder absoluteTurnEncoder;
+    private SparkPIDController pidDriveController, pidTurnController;
+    private SparkAbsoluteEncoder absoluteTurnEncoder;
     private RelativeEncoder relativeDriveEncoder, relativeTurnEncoder;
     private double driveKP, driveKI, driveKD, driveKIprivate, driveKIz,
              driveKFF, driveKMaxOutput, driveKMinOutput;
@@ -26,26 +28,26 @@ public class Module{
     
 
     public Module(int id) {
-        driveMotor = new CANSparkMax(2 * id + 1, CANSparkMaxLowLevel.MotorType.kBrushless);
-        turnMotor = new CANSparkMax(2 * id + 2, CANSparkMaxLowLevel.MotorType.kBrushless);
+        driveMotor = new CANSparkMax(2 * id + 2, CANSparkMaxLowLevel.MotorType.kBrushless);
+        turnMotor = new CANSparkMax(2 * id + 1, CANSparkMaxLowLevel.MotorType.kBrushless);
         absoluteTurnEncoder = turnMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         relativeDriveEncoder = driveMotor.getEncoder();
         relativeTurnEncoder = turnMotor.getEncoder();
-        driveKP = 0;
-        driveKI = 0;
-        driveKD = 0; 
-        driveKIz = 0; 
-        driveKFF = 0;
-        driveKMaxOutput = 1; 
-        driveKMinOutput = -1;
+        driveKP = 0.0002d;
+        driveKI = 0d;
+        driveKD = 0d; 
+        driveKIz = 0d; 
+        driveKFF = 0d;
+        driveKMaxOutput = 1d; 
+        driveKMinOutput = -1d;
 
-        turnKP = 10; 
-        turnKI = 0;
-        turnKD = 0;
-        turnKIz = 0; 
-        turnKFF = 0; 
-        turnKMaxOutput = 1; 
-        turnKMinOutput = -1;
+        turnKP = 5d; 
+        turnKI = 0d;
+        turnKD = 0d;
+        turnKIz = 0d; 
+        turnKFF = 0d; 
+        turnKMaxOutput = 1d; 
+        turnKMinOutput = -1d;
         
         pidDriveController = driveMotor.getPIDController();
         pidDriveController.setFeedbackDevice(relativeDriveEncoder);
@@ -80,13 +82,19 @@ public class Module{
 
 
     public void driveMotors(SwerveModuleState sms){
-        if (i % 20 == 0) System.out.println(sms.angle.getRotations());
+        if (i % 50 == 0){
+            System.out.println("----------");
+            System.out.println(metersPerSecondToRotationsPerMinute(sms.speedMetersPerSecond));
+            System.out.println(relativeDriveEncoder.getVelocity());
+            System.out.println(driveMotor.getAppliedOutput());
+        }
         // Swerve
         pidDriveController.setReference(
             metersPerSecondToRotationsPerMinute(sms.speedMetersPerSecond), 
             ControlType.kVelocity);
     
-            pidTurnController.setReference(.5d, ControlType.kVoltage);
+        pidTurnController.setReference(sms.angle.getRotations(), ControlType.kPosition);
+            // pidTurnController.setReference(.5d, ControlType.kVoltage);
         // pidTurnController.setReference(.5, ControlType.kPosition);
 
 

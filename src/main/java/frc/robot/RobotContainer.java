@@ -37,7 +37,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     drive = new Drive();
-    driveWithJoysticks = new DriveWithJoysticks(drive, () -> 1d, () -> 1d);
+    driveWithJoysticks = new DriveWithJoysticks(drive, () -> m_driverController.getLeftX(), () -> m_driverController.getLeftY());
     // Configure the trigger bindings
     configureBindings();
 
