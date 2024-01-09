@@ -92,7 +92,7 @@ public class RobotContainer {
                 useWiiRemotes
             );
             camera = new Vision(new CameraIOZED());
-            arm = new Arm(new ArmIOFalcon500(0));
+            arm = new Arm(new ArmIOFalcon500(40));
             break;
 
         // Sim robot, instantiate physics sim IO implementations
@@ -197,7 +197,7 @@ public class RobotContainer {
                     drive, 
                     controller::getLeftX, 
                     () -> -controller.getLeftY(), 
-                    controller::getRightX, 
+                    () -> 0.65 * controller.getRightX(), 
                     () -> {return 1.0;},
                     () -> Rotation2d.fromDegrees(controller.getHID().getPOV())
                 )

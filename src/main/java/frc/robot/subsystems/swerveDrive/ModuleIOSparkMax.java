@@ -31,11 +31,11 @@ public class ModuleIOSparkMax implements ModuleIO {
     private final SparkMaxPIDController turnSparkMaxPIDF;
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKp = 0.00015; 
+    private static final double driveKp = 0.00015; // 0.00015 
     private static final double driveKd = 0.0;
     private static final double driveKi = 0.000000; // 0.000008
-    private static final double driveKs = 0.19;
-    private static final double driveKv = 0.135; // From NEO datasheet (473kV): 0.136194 V/(rad/s) - https://www.wolframalpha.com/input?i=1%2F%28473+*+2pi%2F60%29+*+%2850.0+%2F+14.0%29+*+%2817.0+%2F+27.0%29+*+%2845.0+%2F+15.0%29
+    private static final double driveKs = 0.17;
+    private static final double driveKv = 0.132; // From NEO datasheet (473kV): 0.136194 V/(rad/s) - https://www.wolframalpha.com/input?i=1%2F%28473+*+2pi%2F60%29+*+%2850.0+%2F+14.0%29+*+%2817.0+%2F+27.0%29+*+%2845.0+%2F+15.0%29
     private static final double driveKa = 0.014; // 0.0148
 
     private static final double turnKp = 8; 
@@ -118,7 +118,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMax.setIdleMode(IdleMode.kBrake);
 
         driveEncoder.setPosition(0.0);
-        driveEncoder.setMeasurementPeriod(8);
+        driveEncoder.setMeasurementPeriod(10);
         driveEncoder.setAverageDepth(2); 
 
         turnRelativeEncoder.setPosition(0.0);
@@ -133,8 +133,8 @@ public class ModuleIOSparkMax implements ModuleIO {
 
 
         System.out.println("TESTING");
-        System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
-        System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
+        // System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
+        // System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
     }
 
     /* (non-Javadoc)

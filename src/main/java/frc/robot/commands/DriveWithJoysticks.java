@@ -9,6 +9,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,6 +35,8 @@ public class DriveWithJoysticks extends Command {
     double prevHeadingSetpoint;
     PIDController headingController;
 
+    TrapezoidProfile angularProfile;
+
     ChassisSpeeds prevSpeeds;
     
     public DriveWithJoysticks(
@@ -52,6 +57,8 @@ public class DriveWithJoysticks extends Command {
         this.linearSpeedMultiplierSupplier = linearSpeedMultiplierSupplier;
         
         headingAngleSupplier = headingSupplier;
+
+        angularProfile = new TrapezoidProfile(new Constraints(drive.getMaxAngularSpeed(), drive.getMaxAngularAcceleration()));
     }
 
     @Override
@@ -83,29 +90,17 @@ public class DriveWithJoysticks extends Command {
         // APPLY ABSOLUTE HEADING CONTROL
         if (angularSpeed == 0) {
             headingSetpoint = headingAngleSupplier.get().getDegrees() == -1 ? headingSetpoint : headingAngleSupplier.get().getRadians();
-            double rotError = headingSetpoint - drive.getPose().getRotation().getRadians();
-
-            // constrain to max velocity
-            double rotVelocity = MathUtil.clamp(
-                rotError / Constants.PERIOD,
-                -drive.getMaxAngularSpeed().in(RadiansPerSecond),
-                drive.getMaxAngularSpeed().in(RadiansPerSecond)
+            State nextState = angularProfile.calculate(
+                Constants.PERIOD, // calcaulate for next timestep
+                new State(drive.getYaw().getRadians(), drive.getVelocity().dtheta), // current state
+                new State(headingSetpoint, 0) // goal state
             );
 
-            // constrain velocity to max acceleration
-            rotVelocity = MathUtil.clamp(
-                rotVelocity,
-                (headingSetpoint - prevHeadingSetpoint) / Constants.PERIOD - drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD,
-                (headingSetpoint - prevHeadingSetpoint) / Constants.PERIOD + drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD
-            );
-
-            prevHeadingSetpoint = headingSetpoint;
-
-            angularSpeed = rotVelocity + headingController.calculate(drive.getPose().getRotation().getRadians(), headingSetpoint);
+            angularSpeed = nextState.velocity + headingController.calculate(drive.getYaw().getRadians(), nextState.position);
             // divide by max speed to get as a percentage of max (for continuity with joystick control)
             angularSpeed = angularSpeed / drive.getMaxAngularSpeed().in(RadiansPerSecond);
         } else {
-            headingSetpoint = drive.getPose().getRotation().getRadians();
+            headingSetpoint = drive.getYaw().getRadians();
         }
 
         // Convert to meters per second
@@ -147,8 +142,8 @@ public class DriveWithJoysticks extends Command {
                 prevSpeeds.vyMetersPerSecond + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD),
             MathUtil.clamp(
                 speeds.omegaRadiansPerSecond,
-                prevSpeeds.omegaRadiansPerSecond - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
-                prevSpeeds.omegaRadiansPerSecond + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD)
+                prevSpeeds.omegaRadiansPerSecond - drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD,
+                prevSpeeds.omegaRadiansPerSecond + drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD)
         );
         prevSpeeds = speeds;
 
