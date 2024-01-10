@@ -1,17 +1,17 @@
 package frc.robot.subsystems.swerveDrive;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.hardware.CANcoder;
+// import com.ctre.phoenix6.configs.CANcoderConfiguration;
+// import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxAbsoluteEncoder;
-import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkAbsoluteEncoder;
+import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -27,8 +27,8 @@ public class ModuleIOSparkMax implements ModuleIO {
     private final CANSparkMax driveSparkMax;
     private final CANSparkMax turnSparkMax;
 
-    private final SparkMaxPIDController driveSparkMaxPIDF;
-    private final SparkMaxPIDController turnSparkMaxPIDF;
+    private final SparkPIDController driveSparkMaxPIDF;
+    private final SparkPIDController turnSparkMaxPIDF;
 
     // TODO: update constants in periodic once tunable is set up
     private static final double driveKp = 0.00015; // 0.00015 
@@ -89,7 +89,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMaxPIDF.setPositionPIDWrappingMinInput(0);
         turnSparkMaxPIDF.setPositionPIDWrappingMaxInput(1);
 
-        turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
+        turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
         // absoluteEncoderOffset = new Rotation2d(-3.03887450);
         turnSparkMaxPIDF.setFeedbackDevice(turnAbsoluteEncoder);
 
