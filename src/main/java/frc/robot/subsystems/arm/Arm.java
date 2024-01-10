@@ -4,13 +4,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.*;
 
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.units.*;
 
@@ -30,10 +31,13 @@ public class Arm extends SubsystemBase {
     /** Updates inputs and checks tunable numbers. */
     public void periodic() {
         io.updateInputs(inputs);
+        Logger.processInputs("Arm", inputs);
+        // io.setDriveVoltage(Volts.of(1));
+        setArmAngle(Degrees.of(90));
     }
 
     public void setArmAngle(Measure<Angle> angle) {
-        io.setDrivePosition(angle);
+        io.setDrivePosition(Degrees.of(90));
     }
 
     public Measure<Angle> getArmAngle() {

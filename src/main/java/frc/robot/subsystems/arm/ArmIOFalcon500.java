@@ -37,14 +37,13 @@ public class ArmIOFalcon500 implements ArmIO {
     StatusSignal<Double> driveCurrentSignal;
     StatusSignal<Double> driveTempSignal;
 
-
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKp = .1;
+    private static final double driveKp = 100;
     private static final double driveKd = 0.0;
     private static final double driveKi = 0.000000;
     private static final double driveKv = 0.113; // (from falcon500 spec sheet) UNITS: Volts / (Rotations / Second)
 
-    private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
+    private final double gearRatio = 100.0;
 
     private final boolean isMotorInverted = false;
     private final Rotation2d absoluteEncoderOffset = new Rotation2d();
@@ -59,19 +58,19 @@ public class ArmIOFalcon500 implements ArmIO {
         driveCurrentSignal = driveFalcon.getSupplyCurrent();
         driveTempSignal = driveFalcon.getDeviceTemp();
 
-        driveMMConfig.MotionMagicCruiseVelocity = .5; // 1 rotation every 5 seconds
-        driveMMConfig.MotionMagicAcceleration = .5; // 1 second to reach max speed
-        driveMMConfig.MotionMagicJerk = 5; // .1 seconds to reach max accel
+        driveMMConfig.MotionMagicCruiseVelocity = 5; // 1 rotation every 1 seconds
+        driveMMConfig.MotionMagicAcceleration = 10; // 1 second to reach max speed
+        driveMMConfig.MotionMagicJerk = 30; // .1 seconds to reach max accel
 
         drivePID.kP = driveKp;
         drivePID.kI = driveKi;
         drivePID.kD = driveKd;
         drivePID.kV = driveKv;
 
-        driveFeedbackConfig.SensorToMechanismRatio = driveAfterEncoderReduction;
+        driveFeedbackConfig.SensorToMechanismRatio = gearRatio;
 
-        driveFalconConfig.Voltage.PeakForwardVoltage = 4;
-        driveFalconConfig.Voltage.PeakReverseVoltage = -4;
+        driveFalconConfig.Voltage.PeakForwardVoltage = 12;
+        driveFalconConfig.Voltage.PeakReverseVoltage = -12;
 
         driveFalcon.setPosition(absoluteEncoderOffset.getRotations());
 
@@ -96,7 +95,7 @@ public class ArmIOFalcon500 implements ArmIO {
         );
 
         inputs.drivePosition = Rotations.of(drivePositionSignal.getValueAsDouble());
-        inputs.driveVelocity = RotationsPerSecond.of(driveVelocitySignal.getValueAsDouble());
+        inputs.driveVelocity = RotationsPerSecond.of(driveVelocitySignal.getValueAsDouble()) ;
         inputs.driveAppliedVolts = Volts.of(driveAppliedVoltageSignal.getValueAsDouble());
         inputs.driveCurrent = Amps.of(driveCurrentSignal.getValueAsDouble());
         inputs.driveTemp = Celsius.of(driveTempSignal.getValueAsDouble());
@@ -109,7 +108,7 @@ public class ArmIOFalcon500 implements ArmIO {
 
     @Override
     public void setDrivePosition(Measure<Angle> positionRad) {
-        driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Radians)).withSlot(0));
+        driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
     }
 
     // @Override

@@ -5,6 +5,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.swerveDrive.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -22,6 +23,8 @@ import static edu.wpi.first.units.Units.*;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 public class DriveWithJoysticks extends Command {
 
     Drive drive;
@@ -31,8 +34,11 @@ public class DriveWithJoysticks extends Command {
     Supplier<Double> linearSpeedMultiplierSupplier;
     Supplier<Rotation2d> headingAngleSupplier;
 
-    double headingSetpoint;
+    double headingGoal;
+    @AutoLogOutput(key= "Auto/JoystickHeadingSetpoint")
     double prevHeadingSetpoint;
+    @AutoLogOutput(key= "Auto/JoystickHeadingVelSetpoint")
+    double prevHeadingSpeed;
     PIDController headingController;
 
     TrapezoidProfile angularProfile;
@@ -89,18 +95,27 @@ public class DriveWithJoysticks extends Command {
 
         // APPLY ABSOLUTE HEADING CONTROL
         if (angularSpeed == 0) {
-            headingSetpoint = headingAngleSupplier.get().getDegrees() == -1 ? headingSetpoint : headingAngleSupplier.get().getRadians();
+            headingGoal = headingAngleSupplier.get().getDegrees() == -1 ? headingGoal : headingAngleSupplier.get().getRadians();
+            double currentHeadingRad = drive.getYaw().getRadians();
+        
+            State targetState = new State(headingGoal, 0);
+            State currentState = new State(prevHeadingSetpoint, prevHeadingSpeed);
+            optimizeStates(currentState, targetState, currentHeadingRad); // take shortest path to next angle
+
             State nextState = angularProfile.calculate(
                 Constants.PERIOD, // calcaulate for next timestep
-                new State(drive.getYaw().getRadians(), drive.getVelocity().dtheta), // current state
-                new State(headingSetpoint, 0) // goal state
+                currentState, // current state
+                targetState // goal state
             );
 
             angularSpeed = nextState.velocity + headingController.calculate(drive.getYaw().getRadians(), nextState.position);
             // divide by max speed to get as a percentage of max (for continuity with joystick control)
             angularSpeed = angularSpeed / drive.getMaxAngularSpeed().in(RadiansPerSecond);
+
+            prevHeadingSetpoint = nextState.position;
+            prevHeadingSpeed = nextState.velocity;
         } else {
-            headingSetpoint = drive.getYaw().getRadians();
+            headingGoal = drive.getYaw().getRadians();
         }
 
         // Convert to meters per second
@@ -162,5 +177,21 @@ public class DriveWithJoysticks extends Command {
             return 0;
         }
         return Math.pow(Math.abs(input), exponent) * Math.signum(input);
+    }
+
+    private void optimizeStates(State currentState, State targetState, double currentHeading) {
+        // Get error which is the smallest distance between goal and measurement
+        double errorBound = (Math.PI - (-Math.PI)) / 2.0;
+        double goalMinDistance =
+            MathUtil.inputModulus(targetState.position - currentHeading, -errorBound, errorBound);
+        double setpointMinDistance =
+            MathUtil.inputModulus(currentState.position - currentHeading, -errorBound, errorBound);
+
+        // Recompute the profile goal with the smallest error, thus giving the shortest path. The goal
+        // may be outside the input range after this operation, but that's OK because the controller
+        // will still go there and report an error of zero. In other words, the setpoint only needs to
+        // be offset from the measurement by the input range modulus; they don't need to be equal.
+        targetState.position = goalMinDistance + currentHeading;
+        currentState.position = setpointMinDistance + currentHeading;
     }
 }

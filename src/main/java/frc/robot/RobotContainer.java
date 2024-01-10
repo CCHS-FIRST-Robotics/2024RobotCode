@@ -92,7 +92,7 @@ public class RobotContainer {
                 useWiiRemotes
             );
             camera = new Vision(new CameraIOZED());
-            arm = new Arm(new ArmIOFalcon500(40));
+            arm = new Arm(new ArmIOFalcon500(9));
             break;
 
         // Sim robot, instantiate physics sim IO implementations
