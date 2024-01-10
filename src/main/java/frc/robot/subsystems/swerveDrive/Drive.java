@@ -30,7 +30,7 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 import org.opencv.ml.ANN_MLP;
 
-import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import frc.robot.Constants;
 import frc.robot.utils.DriveTrajectory;
