@@ -15,6 +15,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.*;
@@ -113,6 +114,8 @@ public class ArmIOFalcon500 implements ArmIO {
 
     @Override
     public void setDrivePosition(Measure<Angle> positionRad) {
+        // for testing, dont let the arm go past 90 degrees in either direction
+        positionRad = Radians.of(MathUtil.clamp(positionRad.in(Radians), -Math.PI/2.0, Math.PI/2.0));
         driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
     }
 
