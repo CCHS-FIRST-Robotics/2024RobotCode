@@ -3,6 +3,7 @@ package frc.robot.subsystems.arm;
 import org.littletonrobotics.junction.AutoLog;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -48,6 +49,8 @@ public class ArmIOFalcon500 implements ArmIO {
     private final boolean isMotorInverted = false;
     private final Rotation2d absoluteEncoderOffset = new Rotation2d();
 
+    Orchestra orchestra = new Orchestra();
+
     int index;
 
     public ArmIOFalcon500(int motorID) {
@@ -73,6 +76,8 @@ public class ArmIOFalcon500 implements ArmIO {
         driveFalconConfig.Voltage.PeakReverseVoltage = -12;
 
         driveFalcon.setPosition(absoluteEncoderOffset.getRotations());
+
+        orchestra.addInstrument(driveFalcon);
 
         StatusCode status = StatusCode.StatusCodeNotInitialized;
         for(int i = 0; i < 5; ++i) {
@@ -109,6 +114,28 @@ public class ArmIOFalcon500 implements ArmIO {
     @Override
     public void setDrivePosition(Measure<Angle> positionRad) {
         driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
+    }
+
+    public void setMusicTrack(String path) {
+        // Attempt to load the chrp
+        var status = orchestra.loadMusic(path);
+
+        if (!status.isOK()) {
+        // log error
+            System.out.println("MUSIC LOADING ERROR\n" + status.toString());
+        }
+    }
+
+    public void playMusic() {
+        orchestra.play();
+    }
+
+    public void pauseMusic() {
+        orchestra.pause();
+    }
+
+    public void stopMusic() {
+        orchestra.stop();
     }
 
     // @Override

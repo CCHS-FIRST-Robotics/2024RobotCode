@@ -33,11 +33,11 @@ public class Arm extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
         // io.setDriveVoltage(Volts.of(1));
-        setArmAngle(Degrees.of(90));
+        // setArmAngle(Degrees.of(90));
     }
 
     public void setArmAngle(Measure<Angle> angle) {
-        io.setDrivePosition(Degrees.of(90));
+        // io.setDrivePosition(Degrees.of(90));
     }
 
     public Measure<Angle> getArmAngle() {
@@ -62,5 +62,14 @@ public class Arm extends SubsystemBase {
             Rotation2d targetArmAngle = targetTranslation.get().minus(armOffset).getAngle();
             setArmAngle(Radians.of(targetArmAngle.getRadians()));
         });
+    }
+
+    public Command playMusic(String path) {
+        return runOnce(
+                () -> io.setMusicTrack(path)
+            )
+            .andThen(() -> {
+                io.playMusic();
+            });
     }
 }
