@@ -33,7 +33,7 @@ public interface ModuleIO {
     public default void setTurnVoltage(Measure<Voltage> volts) {}
 
     /** Run the drive motor at the specified velocity. */
-    public default void setDriveVelocity(double velocityRadPerSec) {}
+    public default void setDriveVelocity(Measure<Velocity<Angle>> velocityRadPerSec) {}
 
     /** Run the turn motor to the specified position. */
     public default void setTurnPosition(Measure<Angle> positionRad) {}

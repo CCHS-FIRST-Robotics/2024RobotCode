@@ -79,7 +79,7 @@ public class Module {
         // Run drive controller
         // System.out.println(wheelRadius.in(Meters));
         double velocityRadPerSec = optimizedState.speedMetersPerSecond / wheelRadius.in(Meters);
-        io.setDriveVelocity(velocityRadPerSec);
+        io.setDriveVelocity(RadiansPerSecond.of(velocityRadPerSec));
 
         return optimizedState;
     }
@@ -130,9 +130,19 @@ public class Module {
         return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
     }
 
+    /** Returns the drive position in radians. */
+    public Measure<Angle> getCharacterizationPosition() {
+        return inputs.drivePositionRad;
+    }
+
     /** Returns the drive velocity in radians/sec. */
     public Measure<Velocity<Angle>> getCharacterizationVelocity() {
         return inputs.driveVelocityRadPerSec;
+    }
+
+    /** Returns the drive voltage in volts. */
+    public Measure<Voltage> getCharacterizationVoltage() {
+        return inputs.driveAppliedVolts;
     }
 
     /** Returns the drive wheel radius. */

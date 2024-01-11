@@ -18,10 +18,14 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.MutableMeasure.mutable;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -110,7 +114,39 @@ public class Drive extends SubsystemBase {
 
     private boolean isWiiMode = false; 
 
-    private Measure<Voltage> characterizationVolts = Volts.of(0.0); // 0.19
+    // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+    private final MutableMeasure<Voltage> characterizationVolts = mutable(Volts.of(0));
+    // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+    private final MutableMeasure<Distance> characterizationDistance = mutable(Meters.of(0));
+    // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+    private final MutableMeasure<Velocity<Distance>> characterizationVelocity = mutable(MetersPerSecond.of(0));
+
+    SysIdRoutine characterizationRoutine = new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(
+                // Tell SysId how to plumb the driving voltage to the motors.
+                (Measure<Voltage> volts) -> {
+                    runCharacterization(volts);
+                },
+                // Tell SysId how to record a frame of data for each motor on the mechanism being
+                // characterized
+                log -> {
+                    // Record a frame for the left motors.  Since these share an encoder, we consider
+                    // the entire group to be one motor.
+                    log.motor("drive-0")
+                        .voltage(
+                            characterizationVolts.mut_replace(modules[0].getCharacterizationVoltage().in(Volts), Volts)
+                        )
+                        .linearPosition(
+                            characterizationDistance.mut_replace(modules[0].getPositionMeters(), Meters)
+                        )
+                        .linearVelocity(
+                            characterizationVelocity.mut_replace(modules[0].getVelocityMetersPerSec(), MetersPerSecond)
+                        );
+                },
+                this
+            )
+        );
 
     int i = 0;
 
@@ -477,8 +513,9 @@ public class Drive extends SubsystemBase {
         wiiRotation = rotation;
     }
 
-    public void runCharacterization() {
+    public void runCharacterization(Measure<Voltage> volts) {
         controlMode = CONTROL_MODE.CHARACTERIZING;
+        characterizationVolts.mut_replace(volts.in(Volts), Volts);
     }
 
     /** Stops the drive. */
@@ -629,5 +666,13 @@ public class Drive extends SubsystemBase {
 
     public Twist2d getVelocity() {
         return fieldVelocity;
+    }
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return characterizationRoutine.quasistatic(direction);
+    }
+    
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return characterizationRoutine.dynamic(direction);
     }
 }

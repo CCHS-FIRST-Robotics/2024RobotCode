@@ -46,6 +46,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -187,7 +188,7 @@ public class RobotContainer {
         }
 
         // Follow the nearest apriltag while the right trigger is held
-        controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
+        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
 
         // Brake when the left trigger is held
         controller.leftTrigger().whileTrue(
@@ -197,6 +198,9 @@ public class RobotContainer {
         // controller.rightTrigger().whileTrue(
         //     new RunCommand(drive::runCharacterization, drive)
         // );
+        
+        // controller.rightTrigger().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
+        // controller.rightTrigger().whileTrue(drive.sysIdDynamic(Direction.kForward));
         
         // Generate a trajectory to a pose when the A button is pressed (and switch drive to position control)
         controller.a().onTrue(

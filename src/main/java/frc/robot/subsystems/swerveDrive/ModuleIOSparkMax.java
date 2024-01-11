@@ -54,8 +54,8 @@ public class ModuleIOSparkMax implements ModuleIO {
     private final boolean isTurnMotorInverted = false;
     // private final Rotation2d absoluteEncoderOffset;
 
-    // private Measure<Velocity<Angle>> prevVelocity = RadiansPerSecond.of(0.0);
-    private double prevVelocity = 0;
+    private Measure<Velocity<Angle>> prevVelocity = RadiansPerSecond.of(0.0);
+    // private double prevVelocity = 0;
 
     int index;
 
@@ -192,7 +192,7 @@ public class ModuleIOSparkMax implements ModuleIO {
     /* (non-Javadoc)
      * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVelocity(double)
      */
-    public void setDriveVelocity(double velocity) {
+    public void setDriveVelocity(Measure<Velocity<Angle>> velocity) {
         // velocity = velocity.times(driveAfterEncoderReduction);
         // System.out.println(velocity.in(Rotations.per(Minute)));
         // System.out.println(velocity.baseUnitMagnitude());
@@ -200,13 +200,13 @@ public class ModuleIOSparkMax implements ModuleIO {
         // System.out.println(Rotations.per(Minute).convertFrom(velocity, RadiansPerSecond));
 
         driveSparkMaxPIDF.setReference(
-            // velocity.in(Rotations.per(Minute)),
-            velocity * (60) / (2*Math.PI) * driveAfterEncoderReduction,
+            velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
+            // velocity * (60) / (2*Math.PI) * driveAfterEncoderReduction,
             CANSparkMax.ControlType.kVelocity,
             0,
             // driveFeedforward.calculate(velocityRadPerSec)
-            // driveFeedforward.calculate(prevVelocity.in(RadiansPerSecond), velocity.in(RadiansPerSecond), Constants.PERIOD),
-            driveFeedforward.calculate(prevVelocity, velocity, Constants.PERIOD)
+            driveFeedforward.calculate(prevVelocity.in(RadiansPerSecond), velocity.in(RadiansPerSecond), Constants.PERIOD)
+            // driveFeedforward.calculate(prevVelocity, velocity, Constants.PERIOD)
         );
         prevVelocity = velocity;
     }
