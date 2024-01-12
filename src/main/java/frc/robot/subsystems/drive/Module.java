@@ -1,6 +1,8 @@
 package frc.robot.subsystems.drive;
 
 
+import org.littletonrobotics.junction.Logger;
+
 // import com.reduxrobotics.sensors.canandcoder.Canandcoder;
 import com.revrobotics.CANSparkMax;
 
@@ -10,8 +12,11 @@ import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.SparkPIDController;
+
+
 import com.revrobotics.CANSparkBase.ControlType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class Module{
@@ -23,7 +28,7 @@ public class Module{
              driveKFF, driveKMaxOutput, driveKMinOutput;
     private double turnKP, turnKI, turnKD, turnKIzprivate, turnKIz,
                 turnKFF, turnKMaxOutput, turnKMinOutput;
-
+    private int id;
     int i;
     
 
@@ -33,6 +38,7 @@ public class Module{
         absoluteTurnEncoder = turnMotor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
         relativeDriveEncoder = driveMotor.getEncoder();
         relativeTurnEncoder = turnMotor.getEncoder();
+        this.id = id;
         driveKP = 0.0002d;
         driveKI = 0d;
         driveKD = 0d; 
@@ -82,22 +88,36 @@ public class Module{
 
 
     public void driveMotors(SwerveModuleState sms){
-        if (i % 50 == 0){
-            System.out.println("----------");
-            System.out.println(metersPerSecondToRotationsPerMinute(sms.speedMetersPerSecond));
-            System.out.println(relativeDriveEncoder.getVelocity());
-            System.out.println(driveMotor.getAppliedOutput());
-        }
+        // if (i % 50 == 0){
+        //     System.out.println("----------");
+        //     System.out.println(metersPerSecondToRotationsPerMinute(sms.speedMetersPerSecond));
+        //     System.out.println(relativeDriveEncoder.getVelocity());
+        //     System.out.println(driveMotor.getAppliedOutput());
+        // }
         // Swerve
         pidDriveController.setReference(
             metersPerSecondToRotationsPerMinute(sms.speedMetersPerSecond), 
             ControlType.kVelocity);
     
         pidTurnController.setReference(sms.angle.getRotations(), ControlType.kPosition);
+        Logger.recordOutput("driveAppliedOutput" + id, driveMotor.getAppliedOutput());
+        Logger.recordOutput("turnAppliedOutput" + id, turnMotor.getAppliedOutput());
+        Logger.recordOutput("driveVelocity" + id, relativeDriveEncoder.getVelocity());
+        // Logger.recordOutput("turnVelocity" + id, relativeTurnEncoder.getVelocity());
+        // Logger.recordOutput("drivePosition" + id, relativeDriveEncoder.getPosition());
+        Logger.recordOutput("turnPosition" + id, 
+       convert( absoluteTurnEncoder.getPosition()));
+        
+
             // pidTurnController.setReference(.5d, ControlType.kVoltage);
         // pidTurnController.setReference(.5, ControlType.kPosition);
 
 
+    }
+
+    public double convert(double i){
+        // return i * 2 * Math.PI > Math.PI ? 0 - (i * 2 * Math.PI - Math.PI)  : i * 2 * Math.PI;
+        return MathUtil.inputModulus(2* Math.PI * i, -Math.PI, Math.PI);
     }
 
     public double metersPerSecondToRotationsPerMinute(double metersPerSecond){

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drive;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -7,12 +9,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Drive extends SubsystemBase{
     private Module[] modules;
+    @AutoLogOutput
     private ChassisSpeeds robotSpeeds;
+    @AutoLogOutput
     private Rotation2d robotAngle;
+    @AutoLogOutput
     private SwerveModuleState moduleState;
 
     public static class Constants{
-        public final static double MAGIC_SPEED = 4d;
+        public final static double MAX_SPEED = 4d;
         public final static double WHEEL_RADIUS_METERS = 0.0508d;
         public final static int SECONDS_IN_A_MINUTE = 60;
         public final static int RADII_IN_A_DIAMETER = 2;
@@ -20,7 +25,7 @@ public class Drive extends SubsystemBase{
         public final static double TURN_GEAR_RATIO = 21.4285714286;
         
         public final static double getMaxSpeed(){
-            return MAGIC_SPEED;
+            return MAX_SPEED;
         }
 
         public final static double getWheelRadiusMeters(){
