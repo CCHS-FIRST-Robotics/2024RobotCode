@@ -22,7 +22,7 @@ public class Arm extends SubsystemBase {
 
     // length and position of the arm in relation to the robot's center
     private final double armLength = 0.0; // TODO: set this
-    private final Translation2d armOffset = new Translation2d(0.0, 0.0); // TODO: set this 
+    private final Translation2d armOffset = new Translation2d(0.0, .425); // TODO: set this 
 
     public Arm(ArmIO io) {
         this.io = io;
@@ -37,7 +37,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void setArmAngle(Measure<Angle> angle) {
-        // io.setDrivePosition(Degrees.of(90));
+        io.setDrivePosition(angle);
     }
 
     public Measure<Angle> getArmAngle() {
@@ -56,11 +56,12 @@ public class Arm extends SubsystemBase {
         return new Translation2d(armLength, new Rotation2d(getArmAngle().in(Radians))).plus(armOffset);
     }
 
-    public Command alignWithTarget(Supplier<Translation2d> targetTranslation) {
+    public Command alignWithTarget(Supplier<Translation2d> translationToTargetGround, Supplier<Pose3d> targetPose) {
         return run(() -> {
             Translation2d armOffset = getArmOffset();
-            Rotation2d targetArmAngle = targetTranslation.get().minus(armOffset).getAngle();
-            setArmAngle(Radians.of(targetArmAngle.getRadians()));
+            Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.get().getNorm(), targetPose.get().getZ());
+            Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
+            setArmAngle(Radians.of(Math.PI/2.0 - targetArmAngle.getRadians())); // add 90 degrees since 0 is vertical
         });
     }
 

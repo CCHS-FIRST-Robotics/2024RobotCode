@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveWithJoysticks extends Command {
 
@@ -35,9 +36,7 @@ public class DriveWithJoysticks extends Command {
     Supplier<Rotation2d> headingAngleSupplier;
 
     double headingGoal;
-    @AutoLogOutput(key= "Auto/JoystickHeadingSetpoint")
     double prevHeadingSetpoint;
-    @AutoLogOutput(key= "Auto/JoystickHeadingVelSetpoint")
     double prevHeadingSpeed;
     PIDController headingController;
 
@@ -51,7 +50,7 @@ public class DriveWithJoysticks extends Command {
         Supplier<Double> leftYSupplier, 
         Supplier<Double> rightXSupplier,
         Supplier<Double> linearSpeedMultiplierSupplier,
-        Supplier<Rotation2d> headingSupplier 
+        Supplier<Rotation2d> headingSupplier
     ) {
         addRequirements(drive);
         this.drive = drive;
@@ -94,7 +93,7 @@ public class DriveWithJoysticks extends Command {
         Translation2d linearVelocity = new Translation2d(linearSpeed, linearDirection);
 
         // APPLY ABSOLUTE HEADING CONTROL
-        if (angularSpeed == 0 && false) {
+        if (angularSpeed == 0) {
             headingGoal = headingAngleSupplier.get().getDegrees() == -1 ? headingGoal : headingAngleSupplier.get().getRadians();
             double currentHeadingRad = drive.getYaw().getRadians();
         
@@ -109,6 +108,7 @@ public class DriveWithJoysticks extends Command {
             );
 
             angularSpeed = nextState.velocity + headingController.calculate(drive.getYaw().getRadians(), nextState.position);
+            if (headingController.atSetpoint()) angularSpeed = 0;
             // divide by max speed to get as a percentage of max (for continuity with joystick control)
             angularSpeed = angularSpeed / drive.getMaxAngularSpeed().in(RadiansPerSecond);
 
@@ -116,7 +116,11 @@ public class DriveWithJoysticks extends Command {
             prevHeadingSpeed = nextState.velocity;
         } else {
             headingGoal = drive.getYaw().getRadians();
+            prevHeadingSetpoint = headingGoal;
+            prevHeadingSpeed = drive.getVelocity().dtheta;
         }
+        Logger.recordOutput("Auto/JoystickHeadingSetpoint", prevHeadingSetpoint);
+        Logger.recordOutput("Auto/JoystickHeadingVelSetpoint", prevHeadingSpeed);
 
         // Convert to meters per second
         ChassisSpeeds speeds =

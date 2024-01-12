@@ -24,6 +24,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.commands.DriveInCircle;
 import frc.robot.commands.DriveModules;
@@ -155,8 +156,8 @@ public class RobotContainer {
     public Translation2d getTargetTranslation(Pose3d targetPose) {
         Pose2d currentPose = drive.getPose();
 
-        Translation2d translationToTargetGround = currentPose.getTranslation().minus(targetPose.getTranslation().toTranslation2d());
-        return new Translation2d(translationToTargetGround.getNorm(), targetPose.getZ());
+        Translation2d translationToTargetGround = targetPose.getTranslation().toTranslation2d().minus(currentPose.getTranslation());
+        return translationToTargetGround;
     }
 
     /**
@@ -212,6 +213,7 @@ public class RobotContainer {
             new RunCommand(drive::stopWithX, drive)
         );
 
+        Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
         controller.rightTrigger().whileTrue(
             new DriveWithJoysticks(
                 drive, 
@@ -220,12 +222,13 @@ public class RobotContainer {
                 controller::getRightX, 
                 () -> {return 1.0;},
                 () -> {
-                    Translation2d targetTranslation = getTargetTranslation(new Pose3d());
+                    Translation2d targetTranslation = getTargetTranslation(targetPose);
                     return targetTranslation.getAngle();
                 }
             ).alongWith(
                 arm.alignWithTarget(
-                    () -> getTargetTranslation(new Pose3d())
+                    () -> getTargetTranslation(targetPose),
+                    () -> targetPose
                 )
             )
         );
@@ -242,7 +245,7 @@ public class RobotContainer {
             )
         );
 
-        controller.b().onTrue(arm.playMusic("minecraft.chrp"));
+        controller.b().onTrue(arm.playMusic("mario.chrp"));
 
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
         // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(

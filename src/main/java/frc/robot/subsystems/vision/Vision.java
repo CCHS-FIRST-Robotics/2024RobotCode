@@ -76,8 +76,8 @@ public class Vision extends SubsystemBase {
         } 
         
         if (getZedPoseEstimate().pose.getX() > 0) {
-            TimestampedPose2d pose = getZedPoseEstimate();
-            poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp, getZedPoseStd());
+            // TimestampedPose2d pose = getZedPoseEstimate();
+            // poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp, getZedPoseStd());
         }
 
         i++;

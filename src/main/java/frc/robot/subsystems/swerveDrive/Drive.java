@@ -86,7 +86,7 @@ public class Drive extends SubsystemBase {
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
     private double kPx = 0.35; // 0.4
     private double kPy = 0.35; // 0.33
-    private double kPHeading = 0.2; // 0.5
+    private double kPHeading = 0.25; // 0.5
 
     private double kIx = 0.12; // 0.12
     private double kIy = 0.12; // 0.15
@@ -153,9 +153,9 @@ public class Drive extends SubsystemBase {
             module.setBrakeMode(isBrakeMode);
         }
 
-        xController.setTolerance(.05);
-        yController.setTolerance(.05);
-        headingController.setTolerance(.05);
+        xController.setTolerance(.01);
+        yController.setTolerance(.01);
+        headingController.setTolerance(.005);
 
         if (isWiiMode) {
             this.isWiiMode = true;
