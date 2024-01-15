@@ -89,6 +89,7 @@ public class Module {
      * periodically.
      */
     public void runCharacterization(Measure<Voltage> volts) {
+        // System.out.println(volts.in(Volts));
         io.setTurnPosition(Radians.of(0.0));
         io.setDriveVoltage(volts);
     }

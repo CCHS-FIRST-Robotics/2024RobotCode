@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.SPI;
  * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static final Mode currentMode = Mode.REAL;
+    public static final Mode currentMode = Mode.SIM;
 
     public static enum Mode {
         /** Running on a real robot. */
@@ -43,7 +43,7 @@ public final class Constants {
     public static final double LIENAR_SPEED_EXPONENT = 2;
     public static final double ANGULAR_SPEED_EXPONENT = 2.5;
 
-    public static final double ANALOG_DEADZONE = .05;
+    public static final double ANALOG_DEADZONE = .15;
 
     // TODO: Should this be its own file?
     public static class HardwareConstants {

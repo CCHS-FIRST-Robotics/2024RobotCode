@@ -118,7 +118,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMax.setIdleMode(IdleMode.kBrake);
 
         driveEncoder.setPosition(0.0);
-        driveEncoder.setMeasurementPeriod(8);
+        driveEncoder.setMeasurementPeriod(10);
         driveEncoder.setAverageDepth(2); 
 
         turnRelativeEncoder.setPosition(0.0);

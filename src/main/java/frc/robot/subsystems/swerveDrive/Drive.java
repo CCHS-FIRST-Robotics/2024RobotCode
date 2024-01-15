@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -30,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.littletonrobotics.junction.Logger;
 import org.opencv.ml.ANN_MLP;
@@ -37,6 +39,7 @@ import org.opencv.ml.ANN_MLP;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 import frc.robot.utils.DriveTrajectory;
 import frc.robot.utils.PoseEstimator;
 
@@ -114,13 +117,38 @@ public class Drive extends SubsystemBase {
 
     private boolean isWiiMode = false; 
 
+
     // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
     private final MutableMeasure<Voltage> characterizationVolts = mutable(Volts.of(0));
+
     // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
     private final MutableMeasure<Distance> characterizationDistance = mutable(Meters.of(0));
     // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
     private final MutableMeasure<Velocity<Distance>> characterizationVelocity = mutable(MetersPerSecond.of(0));
-
+    
+    // Mutable holder for unit-safe angular distance values, persisted to avoid reallocation.
+    private final MutableMeasure<Angle> characterizationDistanceAngular = mutable(Radians.of(0));
+    // Mutable holder for unit-safe angular velocity values, persisted to avoid reallocation.
+    private final MutableMeasure<Velocity<Angle>> characterizationVelocityAngular = mutable(RadiansPerSecond.of(0));
+    
+    // Tell SysId how to record a frame of data for each motor on the mechanism being
+    // characterized (real uses URCL, sim uses manual logging)
+    Consumer<SysIdRoutineLog> log = (Constants.currentMode == Mode.REAL) ? 
+                null : log -> {
+                    // Record a frame for the left motors.  Since these share an encoder, we consider
+                    // the entire group to be one motor.
+                    log.motor("drive-0")
+                        .voltage(
+                            characterizationVolts
+                        )
+                        .angularPosition(
+                            characterizationDistanceAngular.mut_replace(modules[0].getCharacterizationPosition())
+                        )
+                        .angularVelocity(
+                            characterizationVelocityAngular.mut_replace(modules[0].getCharacterizationVelocity())
+                        );
+                };
+                
     SysIdRoutine characterizationRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(),
             new SysIdRoutine.Mechanism(
@@ -128,22 +156,7 @@ public class Drive extends SubsystemBase {
                 (Measure<Voltage> volts) -> {
                     runCharacterization(volts);
                 },
-                // Tell SysId how to record a frame of data for each motor on the mechanism being
-                // characterized
-                log -> {
-                    // Record a frame for the left motors.  Since these share an encoder, we consider
-                    // the entire group to be one motor.
-                    log.motor("drive-0")
-                        .voltage(
-                            characterizationVolts.mut_replace(modules[0].getCharacterizationVoltage().in(Volts), Volts)
-                        )
-                        .linearPosition(
-                            characterizationDistance.mut_replace(modules[0].getPositionMeters(), Meters)
-                        )
-                        .linearVelocity(
-                            characterizationVelocity.mut_replace(modules[0].getVelocityMetersPerSec(), MetersPerSecond)
-                        );
-                },
+                log,
                 this
             )
         );
@@ -289,6 +302,7 @@ public class Drive extends SubsystemBase {
                 for (var module : modules) {
                     module.runCharacterization(characterizationVolts);
                 }
+                // System.out.println(characterizationVolts.in(Volts));
                 // System.out.println("RUNNING");
                 // Clear setpoint logs
                 Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
@@ -674,5 +688,12 @@ public class Drive extends SubsystemBase {
     
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return characterizationRoutine.dynamic(direction);
+    }
+
+    public Command sysIdFull() {
+        return characterizationRoutine.quasistatic(SysIdRoutine.Direction.kForward)
+            .andThen(characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
+            .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward))
+            .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
     }
 }

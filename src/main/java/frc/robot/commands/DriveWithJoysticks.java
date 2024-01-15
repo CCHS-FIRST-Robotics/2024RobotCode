@@ -107,8 +107,8 @@ public class DriveWithJoysticks extends Command {
                 prevSpeeds.vyMetersPerSecond + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD),
             MathUtil.clamp(
                 speeds.omegaRadiansPerSecond,
-                prevSpeeds.omegaRadiansPerSecond - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
-                prevSpeeds.omegaRadiansPerSecond + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD)
+                prevSpeeds.omegaRadiansPerSecond - drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD,
+                prevSpeeds.omegaRadiansPerSecond + drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD)
         );
         prevSpeeds = speeds;
 

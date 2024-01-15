@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.littletonrobotics.urcl.URCL;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -50,7 +51,7 @@ public class Robot extends LoggedRobot {
             Logger.recordMetadata("GitDirty", "Unknown");
             break;
         }
-
+        
         // Set up data receivers & replay source
         switch (Constants.currentMode) {
         // Running on a real robot, log to a USB stick
@@ -77,9 +78,10 @@ public class Robot extends LoggedRobot {
         // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
         // Logger.getInstance().disableDeterministicTimestamps()
 
-        // Start AdvantageKit logger
+        // Start AdvantageKit & URCL loggers
+        Logger.registerURCL(URCL.startExternal());
         Logger.start();
-
+        
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.
         robotContainer = new RobotContainer();

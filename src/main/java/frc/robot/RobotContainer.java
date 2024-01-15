@@ -201,6 +201,7 @@ public class RobotContainer {
         
         // controller.rightTrigger().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
         // controller.rightTrigger().whileTrue(drive.sysIdDynamic(Direction.kForward));
+        controller.rightTrigger().whileTrue(drive.sysIdFull());
         
         // Generate a trajectory to a pose when the A button is pressed (and switch drive to position control)
         controller.a().onTrue(

@@ -55,7 +55,7 @@ public class ModuleIOSim implements ModuleIO {
 
         turnPID.enableContinuousInput(0, 1);
 
-        driveSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(driveKv, driveKa), DCMotor.getNEO(1), driveAfterEncoderReduction);
+        driveSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(driveKv, driveKa), DCMotor.getNEO(1), 1);
     }
 
     public void updateInputs(ModuleIOInputs inputs) {
@@ -78,13 +78,13 @@ public class ModuleIOSim implements ModuleIO {
         inputs.turnCurrentAmps = Amps.of(Math.abs(turnSim.getCurrentDrawAmps()));
     }
 
-    public void setDriveVoltage(double volts) {
-        driveAppliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+    public void setDriveVoltage(Measure<Voltage> volts) {
+        driveAppliedVolts = MathUtil.clamp(volts.in(Volts), -12.0, 12.0);
         driveSim.setInputVoltage(driveAppliedVolts);
     }
 
-    public void setTurnVoltage(double volts) {
-        turnAppliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+    public void setTurnVoltage(Measure<Voltage> volts) {
+        turnAppliedVolts = MathUtil.clamp(volts.in(Volts), -12.0, 12.0);
         turnSim.setInputVoltage(turnAppliedVolts);
     }
 
@@ -97,7 +97,7 @@ public class ModuleIOSim implements ModuleIO {
         ) + driveFF.calculate(prevVelocity.in(RadiansPerSecond), velocity.in(RadiansPerSecond), Constants.PERIOD);
 
         prevVelocity = velocity;
-        setDriveVoltage(volts);
+        setDriveVoltage(Volts.of(volts));
         // driveSim.setState(driveSim.getAngularPositionRad(), velocityRadPerSec.in(RadiansPerSecond));
     }
 
@@ -115,7 +115,7 @@ public class ModuleIOSim implements ModuleIO {
             position.in(Rotations)
         );
 
-        setTurnVoltage(volts);
+        setTurnVoltage(Volts.of(volts));
         // turnSim.setState(turnRelativePositionRad, turnSim.getAngularVelocityRadPerSec());
     }
 }
