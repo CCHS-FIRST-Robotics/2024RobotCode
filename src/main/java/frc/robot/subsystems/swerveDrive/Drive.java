@@ -148,9 +148,14 @@ public class Drive extends SubsystemBase {
                             characterizationVelocityAngular.mut_replace(modules[0].getCharacterizationVelocity())
                         );
                 };
-                
+    
     SysIdRoutine characterizationRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(),
+            new SysIdRoutine.Config(
+                Volts.per(Second).of(.8),
+                Volts.of(3),
+                Seconds.of(5),
+                (state) -> Logger.recordOutput("SysIdTestState", state.toString())
+            ),
             new SysIdRoutine.Mechanism(
                 // Tell SysId how to plumb the driving voltage to the motors.
                 (Measure<Voltage> volts) -> {
@@ -184,6 +189,7 @@ public class Drive extends SubsystemBase {
         boolean isWiiMode
     ) {
         System.out.println("[Init] Creating Drive");
+        Logger.recordOutput("SysIdTestState", "none");
 
         this.gyroIO = gyroIO;
 
