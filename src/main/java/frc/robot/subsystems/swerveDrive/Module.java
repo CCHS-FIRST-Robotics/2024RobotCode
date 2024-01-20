@@ -58,7 +58,7 @@ public class Module {
         // double acceleration = (getVelocityMetersPerSec() - prevVel) / 0.02;
         // if (Math.abs(acceleration) > 50) System.out.println(acceleration);
 
-        // until we figure out how to use the logger
+    // until we figure out how to use the logger
         // SmartDashboard.putNumber("Drive Position", Units.radiansToDegrees(inputs.drivePositionRad));
         // SmartDashboard.putNumber("Drive Velocity", Units.radiansToDegrees(inputs.driveVelocityRadPerSec));
         // SmartDashboard.putNumber("Turn Absolute Position", Units.radiansToDegrees(inputs.turnAbsolutePositionRad));
@@ -88,11 +88,12 @@ public class Module {
         // does some fancy things to move only in the direction you want while theres an error
         // draw out the current/desired vectors, and remember that cos is like the dot product, 
         // it projects one vector onto the other, idk I cant make sense of it rn im tired asf
+        double maxVolts = inputs.driveAverageBusVoltage.in(Volts);
         optimizedState.speedMetersPerSecond *= Math.cos(inputs.turnAbsolutePositionRad.in(Radians) - optimizedState.angle.getRadians());
         optimizedState.speedMetersPerSecond = MathUtil.clamp(
             optimizedState.speedMetersPerSecond,
-            getMaxVelocity(-12, prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, kV, kA) * wheelRadius.in(Meters),
-            getMaxVelocity(12, prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, kV, kA) * wheelRadius.in(Meters)
+            getMaxVelocity(-maxVolts, prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, kV, kA) * wheelRadius.in(Meters),
+            getMaxVelocity(maxVolts, prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, kV, kA) * wheelRadius.in(Meters)
         );
 
         Translation2d moduleAcceleration = SwerveKinematicUtils.getModuleAccelerations(

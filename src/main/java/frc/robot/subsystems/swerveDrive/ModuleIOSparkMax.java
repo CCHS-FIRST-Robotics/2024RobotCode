@@ -15,6 +15,7 @@ import com.revrobotics.SparkMaxPIDController;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
@@ -49,6 +50,9 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
     private final double turnAfterEncoderReduction = 150.0 / 7.0;
+
+    private final MedianFilter driveVoltageFilter = new MedianFilter(1000);
+    private final MedianFilter turnVoltageFilter = new MedianFilter(1000);
 
     private final boolean isTurnMotorInverted = false;
     // private final Rotation2d absoluteEncoderOffset;
@@ -146,6 +150,7 @@ public class ModuleIOSparkMax implements ModuleIO {
             Rotations.per(Minute).of(driveEncoder.getVelocity()
                 / driveAfterEncoderReduction);
         inputs.driveAppliedVolts = Volts.of(driveSparkMax.getAppliedOutput() * driveSparkMax.getBusVoltage());
+        inputs.driveAverageBusVoltage = Volts.of(driveVoltageFilter.calculate(driveSparkMax.getBusVoltage()));
         inputs.driveCurrentAmps = Amps.of(driveSparkMax.getOutputCurrent());
         inputs.driveTempCelcius = Celsius.of(driveSparkMax.getMotorTemperature());
 
@@ -169,6 +174,7 @@ public class ModuleIOSparkMax implements ModuleIO {
             Rotations.per(Minute).of(turnRelativeEncoder.getVelocity()
                 / turnAfterEncoderReduction);
         inputs.turnAppliedVolts = Volts.of(turnSparkMax.getAppliedOutput() * turnSparkMax.getBusVoltage());
+        inputs.turnAverageBusVoltage = Volts.of(turnVoltageFilter.calculate(turnSparkMax.getBusVoltage()));
         inputs.turnCurrentAmps =Amps.of(turnSparkMax.getOutputCurrent());
         inputs.turnTempCelcius = Celsius.of(turnSparkMax.getMotorTemperature());
     }
