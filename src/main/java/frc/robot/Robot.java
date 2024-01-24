@@ -12,6 +12,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
 
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -58,6 +60,7 @@ public class Robot extends LoggedRobot {
         case REAL:
             // Logger.addDataReceiver(new WPILOGWriter());
             Logger.addDataReceiver(new NT4Publisher());
+            // new PowerDistribution(0, ModuleType.kCTRE); // Enables power distribution logging
             break;
 
         // Running a physics simulator, log to local folder
