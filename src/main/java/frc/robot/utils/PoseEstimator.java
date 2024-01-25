@@ -48,7 +48,7 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
      * .045, .16, .1 at 3m
      * Linear fit with distance -> slope: 0.01, 0.05, .1
      */
-    static final Matrix<N3, N1> defaultVisionMeasurementStdDevs = VecBuilder.fill(.01, .06, .1);
+    static final Matrix<N3, N1> defaultVisionMeasurementStdDevs = VecBuilder.fill(.015, .15, .1);
 
 
     /**

@@ -18,7 +18,7 @@ public class GyroIONavX implements GyroIO {
         inputs.connected = navx.isConnected();
         inputs.rollPosition = Degrees.of(navx.getRoll());
         inputs.pitchPosition = Degrees.of(navx.getPitch());
-        inputs.yawPosition = Degrees.of(navx.getYaw());
+        inputs.yawPosition = Degrees.of(-navx.getYaw()); // negative cuz its switched for some reason
         
         inputs.rollVelocity = DegreesPerSecond.of(navx.getRawGyroY());
         inputs.pitchVelocity = DegreesPerSecond.of(navx.getRawGyroX());
