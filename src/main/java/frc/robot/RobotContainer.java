@@ -181,7 +181,7 @@ public class RobotContainer {
                     drive, 
                     () -> controller.getLeftX(), 
                     () -> -controller.getLeftY(), 
-                    () -> controller.getRightX(), 
+                    () -> -controller.getRightX(), 
                     () -> {return 1.0;}
                 )
             );
@@ -216,11 +216,11 @@ public class RobotContainer {
         controller.x().onTrue(
             drive.runOnce(
                 () -> {
-                    String path = "MPRAuto2Fast";
+                    String path = "ThirdFloorTest1";
                     var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
                     // adjust so that the start of the trajectory is where the robot is
-                    traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
-                    traj.translateBy(drive.getPose().getTranslation());
+                    // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
+                    // traj.translateBy(drive.getPose().getTranslation());
 
                     System.out.println("recording pos traj");
                     Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));

@@ -86,8 +86,8 @@ public final class Constants {
 
     public static final Pose3d[] APRIL_TAG_LOCATIONS = {
         new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)),
-        new Pose3d(0, 1, 0, new Rotation3d(0, 0, 0)),
         new Pose3d(0, 2, 0, new Rotation3d(0, 0, 0)),
+        new Pose3d(0, 1, 0, new Rotation3d(0, 0, 0)),
         new Pose3d(0, 3, 0, new Rotation3d(0, 0, 0)),
     };
 }

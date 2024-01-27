@@ -53,15 +53,16 @@ public class Vision extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Vision", inputs);
+        
 
         if (getPoseEstimate3d().pose.getX() > 0) {
             TimestampedPose2d pose = getPoseEstimate();
             if (!poseReset) {
-                poseEstimator.resetPosition(
-                    poseEstimator.getPoseEstimate().getRotation(), 
-                    poseEstimator.getPrevModulePositions(), 
-                    pose.pose
-                );
+                // poseEstimator.resetPosition(
+                //     poseEstimator.getPoseEstimate().getRotation(), 
+                //     poseEstimator.getPrevModulePositions(), 
+                //     pose.pose
+                // );
                 poseReset = true;
             }
             // System.out.println("Adding Vision Pose");
@@ -71,8 +72,10 @@ public class Vision extends SubsystemBase {
             //     inputs.primaryTagY,
             //     Math.hypot(inputs.primaryTagX, inputs.primaryTagY)
             // );
-            
-            poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp, poseEstimator.getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
+            if (i % 50 == 0) System.err.println("pose added");
+            Logger.recordOutput("testRecordedPose", pose.pose);
+            Logger.recordOutput("testRecordedTimestamp", pose.timestamp);
+            poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp / 1000000, poseEstimator.getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
         } 
         
         if (getZedPoseEstimate().pose.getX() > 0) {

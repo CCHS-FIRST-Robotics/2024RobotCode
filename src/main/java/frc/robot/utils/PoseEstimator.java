@@ -1,5 +1,7 @@
 package frc.robot.utils;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.LinearQuadraticRegulator;
@@ -48,7 +50,7 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
      * .045, .16, .1 at 3m
      * Linear fit with distance -> slope: 0.01, 0.05, .1
      */
-    static final Matrix<N3, N1> defaultVisionMeasurementStdDevs = VecBuilder.fill(.015, .15, .1);
+    static final Matrix<N3, N1> defaultVisionMeasurementStdDevs = VecBuilder.fill(.025, .15, 1);
 
 
     /**
@@ -155,12 +157,14 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
     @Override
     public void addVisionMeasurement(Pose2d poseEstimate, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
         // System.out.println("Adding vision measurement");
+        Logger.recordOutput("visionTimestamp", timestamp);
         super.addVisionMeasurement(poseEstimate, timestamp, visionMeasurementStdDevs);
     }
 
     @Override
     public Pose2d updateWithTime(double timestamp, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
         // System.out.println("Adding odom measurement");
+        Logger.recordOutput("odomTimestamp", timestamp);
         prevModulePositions = modulePositions;
         return super.updateWithTime(timestamp, gyroAngle, modulePositions);
     }   

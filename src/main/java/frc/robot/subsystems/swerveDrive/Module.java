@@ -63,6 +63,7 @@ public class Module {
     public SwerveModuleState runSetpoint(SwerveModuleState targetState) {
         // Optimize state based on current angle
         var optimizedState = SwerveModuleState.optimize(targetState, getAngle());
+        // optimizedState = targetState; // for testing ONLY
 
         // Run turn controller
         // io.setTurnVoltage(

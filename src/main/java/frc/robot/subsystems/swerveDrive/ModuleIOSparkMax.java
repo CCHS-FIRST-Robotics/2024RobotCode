@@ -51,13 +51,13 @@ public class ModuleIOSparkMax implements ModuleIO {
     private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
     private final double turnAfterEncoderReduction = 150.0 / 7.0;
 
-    private final boolean isTurnMotorInverted = false;
+    private final boolean isTurnMotorInverted = true;
     // private final Rotation2d absoluteEncoderOffset;
 
     private Measure<Velocity<Angle>> prevVelocity = RadiansPerSecond.of(0.0);
     // private double prevVelocity = 0;
 
-    int index;
+    public int index;
 
     /**
      * Constructs a new ModuleIOSparkMax object
@@ -90,6 +90,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMaxPIDF.setPositionPIDWrappingMaxInput(1);
 
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
+        turnAbsoluteEncoder.setInverted(isTurnMotorInverted);
         // absoluteEncoderOffset = new Rotation2d(-3.03887450);
         turnSparkMaxPIDF.setFeedbackDevice(turnAbsoluteEncoder);
 
