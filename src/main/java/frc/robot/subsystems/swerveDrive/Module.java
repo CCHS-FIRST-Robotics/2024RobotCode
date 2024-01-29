@@ -1,16 +1,20 @@
-
 package frc.robot.subsystems.swerveDrive;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.ExponentialProfile;
 import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.utils.SwerveKinematicUtils;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -21,7 +25,10 @@ public class Module {
     private final int index;
     
     // TODO: switch to tunable numbers w/ smartdash
-    private static final Measure<Distance> wheelRadius = Units.Inches.of(2); // 2"; .0508m
+    private static final Measure<Distance> wheelRadius = Inches.of(2); // 2"; .0508m
+    private static final Measure<Distance> trackWidth = Inches.of(22.5);
+
+    private SwerveModuleState prevSetpoint = new SwerveModuleState(0, new Rotation2d(0));
 
     /**
      * Constructs a new Module (subsytem) object
@@ -45,7 +52,7 @@ public class Module {
         // double acceleration = (getVelocityMetersPerSec() - prevVel) / 0.02;
         // if (Math.abs(acceleration) > 50) System.out.println(acceleration);
 
-        // until we figure out how to use the logger
+    // until we figure out how to use the logger
         // SmartDashboard.putNumber("Drive Position", Units.radiansToDegrees(inputs.drivePositionRad));
         // SmartDashboard.putNumber("Drive Velocity", Units.radiansToDegrees(inputs.driveVelocityRadPerSec));
         // SmartDashboard.putNumber("Turn Absolute Position", Units.radiansToDegrees(inputs.turnAbsolutePositionRad));
@@ -76,13 +83,52 @@ public class Module {
         // draw out the current/desired vectors, and remember that cos is like the dot product, 
         // it projects one vector onto the other, idk I cant make sense of it rn im tired asf
         optimizedState.speedMetersPerSecond *= Math.cos(inputs.turnAbsolutePositionRad.in(Radians) - optimizedState.angle.getRadians());
+        optimizedState.speedMetersPerSecond = MathUtil.clamp(
+            optimizedState.speedMetersPerSecond,
+            getMaxVelocity(-inputs.driveAverageBusVoltage.in(Volts), prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, io.driveKv, io.driveKa) * wheelRadius.in(Meters),
+            getMaxVelocity(inputs.driveAverageBusVoltage.in(Volts), prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, io.driveKv, io.driveKa) * wheelRadius.in(Meters)
+        );
 
         // Run drive controller
         // System.out.println(wheelRadius.in(Meters));
         double velocityRadPerSec = optimizedState.speedMetersPerSecond / wheelRadius.in(Meters);
         io.setDriveVelocity(RadiansPerSecond.of(velocityRadPerSec));
 
+        prevSetpoint = optimizedState; 
         return optimizedState;
+    }
+    
+    /**
+     * Calculates the maximum possible velocity of a DC Motor, given
+     * parameters of the motor and the current velocity.
+     * 
+     * xₖ₊₁ = A_d xₖ + B_d uₖ where
+     *   A = -Kᵥ/Kₐ
+     *   B = 1/Kₐ
+     *   A_d = eᴬᵀ
+     *   B_d = A⁻¹(A_d − I)B
+     * 
+     * true max (xₖ₊₁=xₖ): x = (I − A_d)⁻¹B_duₖ
+     * 
+     * @param maxControlInput Maximum voltage input to the motor
+     * @param currentVelocity Current velocity of the motor (previous setpoint)
+     * @param dt Time to achieve the next setpoint (period)
+     * @param kV Motor kV (Volts/RadiansPerSecond)
+     * @param kA Motor kA (Volts/RadiansPerSecondPerSecond)
+     * @return The max achievable velocity given the control max control input
+     */
+    public static double getMaxVelocity(double maxControlInput, double currentVelocity, double dt, double kV, double kA) {
+        double A = -kV / kA;
+        double B = 1 / kA;
+        double A_d = Math.exp(A * dt);
+        double B_d = (1 / A) * (A_d - 1) * B;
+
+        // System.out.println("true max (m/s): " + 1/(1 - A_d) * B_d * maxControlInput * 0.0508);
+        return (A_d * currentVelocity + B_d * maxControlInput);
+    }
+
+    public Translation2d getModuleTranslation() {
+        return Drive.getModuleTranslations()[index];
     }
 
     /**

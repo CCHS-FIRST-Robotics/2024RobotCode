@@ -4,6 +4,7 @@ import frc.robot.Constants;
 
 import frc.robot.subsystems.swerveDrive.*;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -25,6 +26,11 @@ public class DriveWithJoysticks extends Command {
     Supplier<Double> linearYSpeedSupplier;
     Supplier<Double> angularSpeedSupplier;
     Supplier<Double> linearSpeedMultiplierSupplier;
+    Supplier<Integer> headingAngleSupplier;
+
+    double headingSetpoint;
+    double prevHeadingSetpoint;
+    PIDController headingController;
 
     ChassisSpeeds prevSpeeds;
     
@@ -33,19 +39,25 @@ public class DriveWithJoysticks extends Command {
         Supplier<Double> leftXSupplier, 
         Supplier<Double> leftYSupplier, 
         Supplier<Double> rightXSupplier,
-        Supplier<Double> linearSpeedMultiplierSupplier
+        Supplier<Double> linearSpeedMultiplierSupplier,
+        Supplier<Integer> dPadSupplier 
     ) {
         addRequirements(drive);
         this.drive = drive;
+
         linearYSpeedSupplier = leftXSupplier;
         linearXSpeedSupplier = leftYSupplier;
         angularSpeedSupplier = rightXSupplier;
+
         this.linearSpeedMultiplierSupplier = linearSpeedMultiplierSupplier;
+        
+        headingAngleSupplier = dPadSupplier;
     }
 
     @Override
     public void initialize() {
         prevSpeeds = new ChassisSpeeds();
+        headingController = drive.getHeadingController();
     }
 
     @Override
@@ -67,6 +79,35 @@ public class DriveWithJoysticks extends Command {
 
         // Calcaulate new linear components
         Translation2d linearVelocity = new Translation2d(linearSpeed, linearDirection);
+
+        // APPLY ABSOLUTE HEADING CONTROL
+        if (angularSpeed == 0) {
+            double povSetpoint = Radians.convertFrom(headingAngleSupplier.get(), Degrees);
+            headingSetpoint = headingAngleSupplier.get() == -1 ? headingSetpoint : povSetpoint;
+            double rotError = headingSetpoint - drive.getPose().getRotation().getRadians();
+
+            // constrain to max velocity
+            double rotVelocity = MathUtil.clamp(
+                rotError / Constants.PERIOD,
+                -drive.getMaxAngularSpeed().in(RadiansPerSecond),
+                drive.getMaxAngularSpeed().in(RadiansPerSecond)
+            );
+
+            // constrain velocity to max acceleration
+            rotVelocity = MathUtil.clamp(
+                rotVelocity,
+                (headingSetpoint - prevHeadingSetpoint) / Constants.PERIOD - drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD,
+                (headingSetpoint - prevHeadingSetpoint) / Constants.PERIOD + drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD
+            );
+
+            prevHeadingSetpoint = headingSetpoint;
+
+            angularSpeed = rotVelocity + headingController.calculate(drive.getPose().getRotation().getRadians(), headingSetpoint);
+            // divide by max speed to get as a percentage of max (for continuity with joystick control)
+            angularSpeed = angularSpeed / drive.getMaxAngularSpeed().in(RadiansPerSecond);
+        } else {
+            headingSetpoint = drive.getPose().getRotation().getRadians();
+        }
 
         // Convert to meters per second
         ChassisSpeeds speeds =

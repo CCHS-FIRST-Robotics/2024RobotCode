@@ -182,7 +182,8 @@ public class RobotContainer {
                     () -> controller.getLeftX(), 
                     () -> -controller.getLeftY(), 
                     () -> -controller.getRightX(), 
-                    () -> {return 1.0;}
+                    () -> {return 1.0;},
+                    () -> controller.getHID().getPOV()
                 )
             );
         }

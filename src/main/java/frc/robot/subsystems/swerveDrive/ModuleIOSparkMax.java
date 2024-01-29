@@ -15,6 +15,7 @@ import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
@@ -31,15 +32,15 @@ public class ModuleIOSparkMax implements ModuleIO {
     private final SparkPIDController turnSparkMaxPIDF;
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKp = 0.00001; // 00015
-    private static final double driveKd = 0.0;
-    private static final double driveKi = 0.000000; // 0.000008
-    private static final double driveKs = 0.0; // 0.19
-    private static final double driveKv = 0.136898; // From NEO datasheet (473kV): 0.136194 V/(rad/s) - https://www.wolframalpha.com/input?i=1%2F%28473+*+2pi%2F60%29+*+%2850.0+%2F+14.0%29+*+%2817.0+%2F+27.0%29+*+%2845.0+%2F+15.0%29
-    private static final double driveKa = 0.020864; // 0.0148
+    public double driveKp = 0.00001; // 00015
+    public double driveKd = 0.0;
+    public double driveKi = 0.000000; // 0.000008
+    public double driveKs = 0.0; // 0.19
+    public double driveKv = 0.136898; // From NEO datasheet (473kV): 0.136194 V/(rad/s) - https://www.wolframalpha.com/input?i=1%2F%28473+*+2pi%2F60%29+*+%2850.0+%2F+14.0%29+*+%2817.0+%2F+27.0%29+*+%2845.0+%2F+15.0%29
+    public double driveKa = 0.020864; // 0.0148
 
-    private static final double turnKp = 8; 
-    private static final double turnKd = 0.00;
+    public double turnKp = 8; 
+    public double turnKd = 0.00;
 
     private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa); // kV UNITS: VOLTS / (RAD PER SECOND)
 
@@ -50,6 +51,9 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
     private final double turnAfterEncoderReduction = 150.0 / 7.0;
+
+    private final MedianFilter driveVoltageFilter = new MedianFilter(1000);
+    private final MedianFilter turnVoltageFilter = new MedianFilter(1000);
 
     private final boolean isTurnMotorInverted = true;
     // private final Rotation2d absoluteEncoderOffset;
@@ -110,7 +114,7 @@ public class ModuleIOSparkMax implements ModuleIO {
             driveSparkMax.setInverted(true);
         }
 
-        driveSparkMax.setSmartCurrentLimit(60);
+        driveSparkMax.setSmartCurrentLimit(50);
         turnSparkMax.setSmartCurrentLimit(40);
         driveSparkMax.enableVoltageCompensation(12.0);
         turnSparkMax.enableVoltageCompensation(12.0);
@@ -149,6 +153,7 @@ public class ModuleIOSparkMax implements ModuleIO {
             Rotations.per(Minute).of(driveEncoder.getVelocity()
                 / driveAfterEncoderReduction);
         inputs.driveAppliedVolts = Volts.of(driveSparkMax.getAppliedOutput() * driveSparkMax.getBusVoltage());
+        inputs.driveAverageBusVoltage = Volts.of(driveVoltageFilter.calculate(driveSparkMax.getBusVoltage()));
         inputs.driveCurrentAmps = Amps.of(driveSparkMax.getOutputCurrent());
         inputs.driveTempCelcius = Celsius.of(driveSparkMax.getMotorTemperature());
 
@@ -172,6 +177,7 @@ public class ModuleIOSparkMax implements ModuleIO {
             Rotations.per(Minute).of(turnRelativeEncoder.getVelocity()
                 / turnAfterEncoderReduction);
         inputs.turnAppliedVolts = Volts.of(turnSparkMax.getAppliedOutput() * turnSparkMax.getBusVoltage());
+        inputs.turnAverageBusVoltage = Volts.of(turnVoltageFilter.calculate(turnSparkMax.getBusVoltage()));
         inputs.turnCurrentAmps =Amps.of(turnSparkMax.getOutputCurrent());
         inputs.turnTempCelcius = Celsius.of(turnSparkMax.getMotorTemperature());
     }
