@@ -5,10 +5,14 @@ import frc.robot.Constants;
 import frc.robot.subsystems.swerveDrive.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +23,9 @@ import static edu.wpi.first.units.Units.*;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 public class DriveWithJoysticks extends Command {
 
     Drive drive;
@@ -26,11 +33,14 @@ public class DriveWithJoysticks extends Command {
     Supplier<Double> linearYSpeedSupplier;
     Supplier<Double> angularSpeedSupplier;
     Supplier<Double> linearSpeedMultiplierSupplier;
-    Supplier<Integer> headingAngleSupplier;
+    Supplier<Rotation2d> headingAngleSupplier;
 
-    double headingSetpoint;
+    double headingGoal;
     double prevHeadingSetpoint;
+    double prevHeadingSpeed;
     PIDController headingController;
+
+    TrapezoidProfile angularProfile;
 
     ChassisSpeeds prevSpeeds;
     
@@ -40,7 +50,7 @@ public class DriveWithJoysticks extends Command {
         Supplier<Double> leftYSupplier, 
         Supplier<Double> rightXSupplier,
         Supplier<Double> linearSpeedMultiplierSupplier,
-        Supplier<Integer> dPadSupplier 
+        Supplier<Rotation2d> headingSupplier
     ) {
         addRequirements(drive);
         this.drive = drive;
@@ -51,7 +61,9 @@ public class DriveWithJoysticks extends Command {
 
         this.linearSpeedMultiplierSupplier = linearSpeedMultiplierSupplier;
         
-        headingAngleSupplier = dPadSupplier;
+        headingAngleSupplier = headingSupplier;
+
+        angularProfile = new TrapezoidProfile(new Constraints(drive.getMaxAngularSpeed(), drive.getMaxAngularAcceleration()));
     }
 
     @Override
@@ -82,32 +94,33 @@ public class DriveWithJoysticks extends Command {
 
         // APPLY ABSOLUTE HEADING CONTROL
         if (angularSpeed == 0) {
-            double povSetpoint = Radians.convertFrom(headingAngleSupplier.get(), Degrees);
-            headingSetpoint = headingAngleSupplier.get() == -1 ? headingSetpoint : povSetpoint;
-            double rotError = headingSetpoint - drive.getPose().getRotation().getRadians();
+            headingGoal = headingAngleSupplier.get().getDegrees() == -1 ? headingGoal : headingAngleSupplier.get().getRadians();
+            double currentHeadingRad = drive.getYaw().getRadians();
+        
+            State targetState = new State(headingGoal, 0);
+            State currentState = new State(prevHeadingSetpoint, prevHeadingSpeed);
+            optimizeStates(currentState, targetState, currentHeadingRad); // take shortest path to next angle
 
-            // constrain to max velocity
-            double rotVelocity = MathUtil.clamp(
-                rotError / Constants.PERIOD,
-                -drive.getMaxAngularSpeed().in(RadiansPerSecond),
-                drive.getMaxAngularSpeed().in(RadiansPerSecond)
+            State nextState = angularProfile.calculate(
+                Constants.PERIOD, // calcaulate for next timestep
+                currentState, // current state
+                targetState // goal state
             );
 
-            // constrain velocity to max acceleration
-            rotVelocity = MathUtil.clamp(
-                rotVelocity,
-                (headingSetpoint - prevHeadingSetpoint) / Constants.PERIOD - drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD,
-                (headingSetpoint - prevHeadingSetpoint) / Constants.PERIOD + drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD
-            );
-
-            prevHeadingSetpoint = headingSetpoint;
-
-            angularSpeed = rotVelocity + headingController.calculate(drive.getPose().getRotation().getRadians(), headingSetpoint);
+            angularSpeed = nextState.velocity + headingController.calculate(drive.getYaw().getRadians(), nextState.position);
+            if (headingController.atSetpoint()) angularSpeed = 0;
             // divide by max speed to get as a percentage of max (for continuity with joystick control)
             angularSpeed = angularSpeed / drive.getMaxAngularSpeed().in(RadiansPerSecond);
+
+            prevHeadingSetpoint = nextState.position;
+            prevHeadingSpeed = nextState.velocity;
         } else {
-            headingSetpoint = drive.getPose().getRotation().getRadians();
+            headingGoal = drive.getYaw().getRadians();
+            prevHeadingSetpoint = headingGoal;
+            prevHeadingSpeed = drive.getVelocity().dtheta;
         }
+        Logger.recordOutput("Auto/JoystickHeadingSetpoint", prevHeadingSetpoint);
+        Logger.recordOutput("Auto/JoystickHeadingVelSetpoint", prevHeadingSpeed);
 
         // Convert to meters per second
         ChassisSpeeds speeds =
@@ -168,5 +181,21 @@ public class DriveWithJoysticks extends Command {
             return 0;
         }
         return Math.pow(Math.abs(input), exponent) * Math.signum(input);
+    }
+
+    private void optimizeStates(State currentState, State targetState, double currentHeading) {
+        // Get error which is the smallest distance between goal and measurement
+        double errorBound = (Math.PI - (-Math.PI)) / 2.0;
+        double goalMinDistance =
+            MathUtil.inputModulus(targetState.position - currentHeading, -errorBound, errorBound);
+        double setpointMinDistance =
+            MathUtil.inputModulus(currentState.position - currentHeading, -errorBound, errorBound);
+
+        // Recompute the profile goal with the smallest error, thus giving the shortest path. The goal
+        // may be outside the input range after this operation, but that's OK because the controller
+        // will still go there and report an error of zero. In other words, the setpoint only needs to
+        // be offset from the measurement by the input range modulus; they don't need to be equal.
+        targetState.position = goalMinDistance + currentHeading;
+        currentState.position = setpointMinDistance + currentHeading;
     }
 }

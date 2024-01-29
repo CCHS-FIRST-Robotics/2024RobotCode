@@ -63,7 +63,7 @@ public class Drive extends SubsystemBase {
     private static final Measure<Velocity<Velocity<Distance>>> maxLinearAcceleration = MetersPerSecondPerSecond.of(7.0);
     private static final Measure<Distance> trackWidthX = Inches.of(22.5);
     private static final Measure<Distance> trackWidthY = Inches.of(22.5);
-    private static final Measure<Velocity<Angle>> maxAngularSpeed = RadiansPerSecond.of(4 * Math.PI);
+    private static final Measure<Velocity<Angle>> maxAngularSpeed = RadiansPerSecond.of(8 * Math.PI);
     private static final Measure<Velocity<Velocity<Angle>>> maxAngularAcceleration = RadiansPerSecond.per(Seconds).of(6 * Math.PI);
 
     // Define Kinematics object
@@ -93,12 +93,12 @@ public class Drive extends SubsystemBase {
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
     private double kPx = 0.35; // 0.4
     private double kPy = 0.35; // 0.33
-    private double kPHeading = 0.5; // 0.5
+    private double kPHeading = 0.25; // 0.5
 
     private double kIx = 0.12; // 0.12
     private double kIy = 0.12; // 0.15
     // private double kPlinear = 
-    private double kIHeading = 0.05; // 0.3
+    private double kIHeading = 0.00; // 0.05
 
     private PIDController xController = new PIDController(kPx, kIx, 0.0);
     private PIDController yController = new PIDController(kPy, kIy, 0.0);
@@ -208,9 +208,9 @@ public class Drive extends SubsystemBase {
             module.setBrakeMode(isBrakeMode);
         }
 
-        xController.setTolerance(.05);
-        yController.setTolerance(.05);
-        headingController.setTolerance(.05);
+        xController.setTolerance(.01);
+        yController.setTolerance(.01);
+        headingController.setTolerance(.005);
 
         if (isWiiMode) {
             this.isWiiMode = true;
@@ -390,7 +390,6 @@ public class Drive extends SubsystemBase {
                  */
                 // fallthrough
             case CHASSIS_SETPOINT:
-                
 
                 // Brief explanation here: https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/transformations.html
                 // For more detail, see chapter 10 here: https://file.tavsys.net/control/controls-engineering-in-frc.pdf

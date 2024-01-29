@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import org.ejml.data.CMatrixRMaj;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -20,7 +22,9 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.commands.DriveInCircle;
 import frc.robot.commands.DriveModules;
@@ -143,6 +147,13 @@ public class RobotContainer {
         return new Rotation2d(povAngle);
     }
 
+    public Translation2d getTargetTranslation(Pose3d targetPose) {
+        Pose2d currentPose = drive.getPose();
+
+        Translation2d translationToTargetGround = targetPose.getTranslation().toTranslation2d().minus(currentPose.getTranslation());
+        return translationToTargetGround;
+    }
+
     /**
      * Use this method to define your button->command mappings. Buttons can be
      * created by instantiating a {@link GenericHID} or one of its subclasses
@@ -179,11 +190,11 @@ public class RobotContainer {
             drive.setDefaultCommand(
                 new DriveWithJoysticks(
                     drive, 
-                    () -> controller.getLeftX(), 
+                    controller::getLeftX, 
                     () -> -controller.getLeftY(), 
                     () -> -controller.getRightX(), 
                     () -> {return 1.0;},
-                    () -> controller.getHID().getPOV()
+                    () -> Rotation2d.fromDegrees(controller.getHID().getPOV())
                 )
             );
         }
@@ -194,6 +205,21 @@ public class RobotContainer {
         // Brake when the left trigger is held
         controller.leftTrigger().whileTrue(
             new RunCommand(drive::stopWithX, drive)
+        );
+
+        Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
+        controller.rightTrigger().whileTrue(
+            new DriveWithJoysticks(
+                drive, 
+                controller::getLeftX, 
+                () -> -controller.getLeftY(), 
+                controller::getRightX, 
+                () -> {return 1.0;},
+                () -> {
+                    Translation2d targetTranslation = getTargetTranslation(targetPose);
+                    return targetTranslation.getAngle();
+                }
+            )
         );
 
         // controller.rightTrigger().whileTrue(
