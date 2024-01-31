@@ -22,7 +22,7 @@ public class GyroIONavX implements GyroIO {
         
         inputs.rollVelocity = DegreesPerSecond.of(navx.getRawGyroY());
         inputs.pitchVelocity = DegreesPerSecond.of(navx.getRawGyroX());
-        inputs.yawVelocity = DegreesPerSecond.of(-navx.getRawGyroZ()); // negative cuz its switched for some reason
+        inputs.yawVelocity = DegreesPerSecond.of(navx.getRawGyroZ()); 
     }
 }
 

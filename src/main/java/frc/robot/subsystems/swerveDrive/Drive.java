@@ -93,7 +93,7 @@ public class Drive extends SubsystemBase {
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
     private double kPx = 0.35; // 0.4
     private double kPy = 0.35; // 0.33
-    private double kPHeading = 0.25; // 0.5
+    private double kPHeading = 2; // 0.25 // 0.5
 
     private double kIx = 0.12; // 0.12
     private double kIy = 0.12; // 0.15
@@ -366,6 +366,10 @@ public class Drive extends SubsystemBase {
                 double xPID = xController.calculate(getPose().getX(), positionSetpointTrajectory.getX());
                 double yPID = yController.calculate(getPose().getY(), positionSetpointTrajectory.getY());
                 double headingPID = headingController.calculate(getPose().getRotation().getRadians(), positionSetpointTrajectory.getRotation().getRadians());
+
+                if (xController.atSetpoint()) xPID = 0;
+                if (yController.atSetpoint()) yPID = 0;
+                if (headingController.atSetpoint()) headingPID = 0;
 
                 // Add the PID output to the velocity setpoint
                 chassisSetpoint = new ChassisSpeeds(

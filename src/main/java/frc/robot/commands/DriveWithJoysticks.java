@@ -94,12 +94,13 @@ public class DriveWithJoysticks extends Command {
 
         // APPLY ABSOLUTE HEADING CONTROL
         if (angularSpeed == 0) {
-            headingGoal = headingAngleSupplier.get().getDegrees() == -1 ? headingGoal : headingAngleSupplier.get().getRadians();
+            headingGoal = headingAngleSupplier.get().getDegrees() == -1 ? headingGoal : MathUtil.angleModulus(headingAngleSupplier.get().getRadians());
             double currentHeadingRad = drive.getYaw().getRadians();
         
             State targetState = new State(headingGoal, 0);
             State currentState = new State(prevHeadingSetpoint, prevHeadingSpeed);
-            optimizeStates(currentState, targetState, currentHeadingRad); // take shortest path to next angle
+            //TODO: bugged, fix optimization
+            // optimizeStates(currentState, targetState, currentHeadingRad); // take shortest path to next angle
 
             State nextState = angularProfile.calculate(
                 Constants.PERIOD, // calcaulate for next timestep
@@ -115,10 +116,15 @@ public class DriveWithJoysticks extends Command {
             prevHeadingSetpoint = nextState.position;
             prevHeadingSpeed = nextState.velocity;
         } else {
-            headingGoal = drive.getYaw().getRadians();
-            prevHeadingSetpoint = headingGoal;
+            prevHeadingSetpoint = drive.getYaw().getRadians();
             prevHeadingSpeed = drive.getVelocity().dtheta;
+
+            // calculate how far we would travel if we stopped now
+            double getStoppingDistance = getStoppingDistance(prevHeadingSpeed, drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)));
+            headingGoal = prevHeadingSetpoint + getStoppingDistance * Math.signum(prevHeadingSpeed);
+            headingGoal = MathUtil.angleModulus(headingGoal);
         }
+        Logger.recordOutput("Auto/JoystickHeadingGoal", headingGoal);
         Logger.recordOutput("Auto/JoystickHeadingSetpoint", prevHeadingSetpoint);
         Logger.recordOutput("Auto/JoystickHeadingVelSetpoint", prevHeadingSpeed);
 
@@ -183,19 +189,25 @@ public class DriveWithJoysticks extends Command {
         return Math.pow(Math.abs(input), exponent) * Math.signum(input);
     }
 
-    private void optimizeStates(State currentState, State targetState, double currentHeading) {
-        // Get error which is the smallest distance between goal and measurement
-        double errorBound = (Math.PI - (-Math.PI)) / 2.0;
-        double goalMinDistance =
-            MathUtil.inputModulus(targetState.position - currentHeading, -errorBound, errorBound);
-        double setpointMinDistance =
-            MathUtil.inputModulus(currentState.position - currentHeading, -errorBound, errorBound);
+    // TODO: fix (bugged currently)
+    // private void optimizeStates(State currentState, State targetState, double currentHeading) {
+    //     // Get error which is the smallest distance between goal and measurement
+    //     double errorBound = (Math.PI - (-Math.PI)) / 2.0;
+    //     double goalMinDistance =
+    //         MathUtil.inputModulus(targetState.position - currentHeading, -errorBound, errorBound);
+    //     double setpointMinDistance =
+    //         MathUtil.inputModulus(currentState.position - currentHeading, -errorBound, errorBound);
 
-        // Recompute the profile goal with the smallest error, thus giving the shortest path. The goal
-        // may be outside the input range after this operation, but that's OK because the controller
-        // will still go there and report an error of zero. In other words, the setpoint only needs to
-        // be offset from the measurement by the input range modulus; they don't need to be equal.
-        targetState.position = goalMinDistance + currentHeading;
-        currentState.position = setpointMinDistance + currentHeading;
+    //     // Recompute the profile goal with the smallest error, thus giving the shortest path. The goal
+    //     // may be outside the input range after this operation, but that's OK because the controller
+    //     // will still go there and report an error of zero. In other words, the setpoint only needs to
+    //     // be offset from the measurement by the input range modulus; they don't need to be equal.
+    //     targetState.position = goalMinDistance + currentHeading;
+    //     currentState.position = setpointMinDistance + currentHeading;
+    // }
+    
+
+    public double getStoppingDistance(double currentSpeed, double maxAcceleration) {
+        return 0.5 * Math.pow(currentSpeed, 2) / maxAcceleration;
     }
 }
