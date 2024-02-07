@@ -113,6 +113,7 @@ public class Drive extends SubsystemBase {
     private Rotation2d lastGyroYaw = new Rotation2d();
     private Twist2d fieldVelocity = new Twist2d();
     private Pose2d fieldPosition = new Pose2d(); // Use poseEstimator instead
+    private Pose2d rawFieldPosition = new Pose2d(); // doesnt account for coa
     private PoseEstimator poseEstimator;
 
     private boolean isWiiMode = false; 

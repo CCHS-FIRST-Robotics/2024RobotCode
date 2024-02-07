@@ -51,6 +51,9 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
     private final double turnAfterEncoderReduction = 150.0 / 7.0;
+    // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
+    // This may need to be tuned to your individual robot
+    private static final double couplingRatio = 50d / 14d; // equal to the first stage gear ratio
 
     private final MedianFilter driveVoltageFilter = new MedianFilter(1000);
     private final MedianFilter turnVoltageFilter = new MedianFilter(1000);
@@ -129,6 +132,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnRelativeEncoder.setPosition(0.0);
         turnRelativeEncoder.setMeasurementPeriod(10); 
         turnRelativeEncoder.setAverageDepth(2); 
+        turnRelativeEncoder.setPositionConversionFactor(1);
 
         // TODO: any other params/tuning?
         turnAbsoluteEncoder.setAverageDepth(2); // NOTE: changed from 8 since last tested run (12/15/23) -- was at 2 a couple weeks ago tho
@@ -138,8 +142,8 @@ public class ModuleIOSparkMax implements ModuleIO {
 
 
         System.out.println("TESTING");
-        // System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
-        // System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
+        System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
+        System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
     }
 
     /* (non-Javadoc)
@@ -147,8 +151,11 @@ public class ModuleIOSparkMax implements ModuleIO {
      */
     public void updateInputs(ModuleIOInputs inputs) {
         // update drive motor info
-        inputs.drivePositionRad =
+        inputs.driveRawPositionRad = // doesnt account for coupling
             Rotations.of(driveEncoder.getPosition() / driveAfterEncoderReduction);
+        //TODO: CHECK THAT COUPLING WAS ADDED CORRECTLY 
+        inputs.drivePositionRad =
+            Rotations.of((driveEncoder.getPosition() + turnRelativeEncoder.getPosition() / turnAfterEncoderReduction * couplingRatio) / driveAfterEncoderReduction);
         inputs.driveVelocityRadPerSec =
             Rotations.per(Minute).of(driveEncoder.getVelocity()
                 / driveAfterEncoderReduction);

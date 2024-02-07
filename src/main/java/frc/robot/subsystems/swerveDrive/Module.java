@@ -76,7 +76,8 @@ public class Module {
         // io.setTurnVoltage(
         //     turnFeedback.calculate(getAngle().getRadians(), optimizedState.angle.getRadians())
         // );
-        io.setTurnPosition(Radians.of(optimizedState.angle.getRadians()));
+        // io.setTurnPosition(Radians.of(optimizedState.angle.getRadians()));
+        io.setTurnVoltage(Volts.of(1));
 
         // Update velocity based on turn error
         // does some fancy things to move only in the direction you want while theres an error
@@ -150,7 +151,7 @@ public class Module {
     /** Sets whether brake mode is enabled. */
     public void setBrakeMode(boolean enabled) {
         io.setDriveBrakeMode(enabled);
-        io.setTurnBrakeMode(enabled);
+        io.setTurnBrakeMode(false);
     }
 
     /** Returns the current turn angle of the module. */
@@ -159,6 +160,10 @@ public class Module {
     }
 
     /** Returns the current drive position of the module in meters. */
+    public double getRawPositionMeters() {
+        return inputs.driveRawPositionRad.in(Radians) * wheelRadius.in(Meters);
+    }
+
     public double getPositionMeters() {
         return inputs.drivePositionRad.in(Radians) * wheelRadius.in(Meters);
     }
@@ -171,6 +176,11 @@ public class Module {
     /** Returns the module position (turn angle and drive position). */
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(getPositionMeters(), getAngle());
+    }
+
+    /** Returns the module position (turn angle and drive position). */
+    public SwerveModulePosition getRawPosition() {
+        return new SwerveModulePosition(getRawPositionMeters(), getAngle());
     }
 
     /** Returns the module state (turn angle and drive velocity). */
