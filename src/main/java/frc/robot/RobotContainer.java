@@ -33,12 +33,12 @@ import frc.robot.commands.DriveWithWiimote;
 import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
 
-// import frc.robot.subsystems.mecaDrive.Drive;
-// import frc.robot.subsystems.mecaDrive.DriveIO;
-// import frc.robot.subsystems.mecaDrive.DriveIOSim;
-// import frc.robot.subsystems.mecaDrive.DriveIOSparkMax;
+import frc.robot.subsystems.mecaDrive.Drive;
+import frc.robot.subsystems.mecaDrive.DriveIO;
+import frc.robot.subsystems.mecaDrive.DriveIOSim;
+import frc.robot.subsystems.mecaDrive.DriveIOSparkMax;
 
-import frc.robot.subsystems.swerveDrive.*;
+// import frc.robot.subsystems.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.PoseEstimator;
@@ -82,12 +82,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         case REAL:
             drive = new Drive(
-                new GyroIONavX(),
-                new ModuleIOSparkMax(0), 
-                new ModuleIOSparkMax(1), 
-                new ModuleIOSparkMax(2), 
-                new ModuleIOSparkMax(3),
-                useWiiRemotes
+                new DriveIOSparkMax()
             );
             camera = new Vision(new CameraIOZED());
             break;
@@ -95,12 +90,7 @@ public class RobotContainer {
         // Sim robot, instantiate physics sim IO implementations
         case SIM:
             drive = new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(), 
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                false
+                new DriveIOSim()
             );
             camera = new Vision(new CameraIOZED());
             break;
@@ -108,26 +98,21 @@ public class RobotContainer {
         // Replayed robot, disable IO implementations
         default:
             drive = new Drive(
-                new GyroIONavX(),
-                new ModuleIOSparkMax(0), 
-                new ModuleIOSparkMax(1),
-                new ModuleIOSparkMax(2), 
-                new ModuleIOSparkMax(3),
-                false
+                new DriveIOSparkMax()
             );
             camera = new Vision(new CameraIOZED());
             break;
         }
 
-        poseEstimator = new PoseEstimator(
-            drive.getKinematics(),
-            new Rotation2d(),
-            drive.getModulePositions(),
-            new Pose2d()
-        );
+        // poseEstimator = new PoseEstimator(
+        //     drive.getKinematics(),
+        //     new Rotation2d(),
+        //     drive.getModulePositions(),
+        //     new Pose2d()
+        // );
 
-        drive.setPoseEstimator(poseEstimator);
-        camera.setPoseEstimator(poseEstimator);
+        // drive.setPoseEstimator(poseEstimator);
+        // camera.setPoseEstimator(poseEstimator);
 
         // Set up auto routines
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
@@ -171,33 +156,16 @@ public class RobotContainer {
         // ));
 
         // DRIVING WITH JOYSTICKS (NORMAL)
-        if (useWiiRemotes) {
-            drive.setDefaultCommand(
-                new DriveWithWiimote(
-                    drive,
-                    () -> wiiRemote1.getRawAxis(3),
-                    () -> {
-                        System.out.println(-MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1));
-                        return -MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1);
-                    },
-                    wiiRemote1.button(1),
-                    wiiRemote1.button(2),
-                    () -> getWiiPOV(),
-                    () -> {return 1.0;}
-                )
-            );
-        } else {
-            drive.setDefaultCommand(
-                new DriveWithJoysticks(
-                    drive, 
-                    controller::getLeftX, 
-                    () -> -controller.getLeftY(), 
-                    () -> -controller.getRightX(), 
-                    () -> {return 1.0;},
-                    () -> Rotation2d.fromDegrees(controller.getHID().getPOV())
-                )
-            );
-        }
+        drive.setDefaultCommand(
+            new DriveWithJoysticks(
+                drive, 
+                controller::getLeftX, 
+                () -> -controller.getLeftY(), 
+                () -> -controller.getRightX(), 
+                () -> {return 1.0;},
+                () -> Rotation2d.fromDegrees(controller.getHID().getPOV())
+            )
+        );
 
         // Follow the nearest apriltag while the right trigger is held
         // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));

@@ -1,4 +1,5 @@
 package frc.robot.subsystems.mecaDrive;
+import frc.robot.Constants;
 import frc.robot.Constants.HardwareConstants;
 
 import org.littletonrobotics.junction.Logger;
@@ -10,10 +11,13 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.mecaDrive.DriveIOInputsAutoLogged;
-
+import frc.robot.subsystems.swerveDrive.GyroIO;
+import frc.robot.subsystems.swerveDrive.GyroIO.GyroIOInputs;
+import frc.robot.subsystems.swerveDrive.GyroIOInputsAutoLogged;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.drive.MecanumDrive.WheelSpeeds;
-
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
@@ -25,6 +29,12 @@ public class Drive extends SubsystemBase {
 
   private final DriveIO io;
   private final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
+
+  private final double maxLinearVelocity = 3.0; // meters per second
+  private final double maxLinearAcceleration = 3.0; // meters per second squared
+
+  private final double maxAngularVelocity = 2 * Math.PI; // radians per second
+  private final double maxAngularAcceleration = 2 * Math.PI; // radians per second squared
 
   // Odometry class for tracking robot pose
   MecanumDriveOdometry odometry =
@@ -42,11 +52,11 @@ public class Drive extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.getInstance().processInputs("Drive", inputs);
+    Logger.processInputs("Drive", inputs);
 
     // Update odometry and log the new pose
     odometry.update(getHeading(), getWheelPositions());
-    Logger.getInstance().recordOutput("Odometry", getPose());
+    Logger.recordOutput("Odometry", getPose());
   }
 
   /**
@@ -66,6 +76,35 @@ public class Drive extends SubsystemBase {
         speeds = MecanumDrive.driveCartesianIK(xSpeed, ySpeed, rot);
       }
       io.setVoltage(speeds.frontRight * 12, speeds.frontLeft * 12, speeds.rearRight * 12, speeds.rearLeft * 12);
+  }
+
+  /**
+     * Drives the robot at given x, y and theta speeds. Speeds range from [-1, 1] and the linear
+     * speeds have no effect on the angular speed.
+     *
+     * @param xSpeed Speed of the robot in the x direction (forward/backwards).
+     * @param ySpeed Speed of the robot in the y direction (sideways).
+     * @param rot Angular rate of the robot.
+     * @param fieldRelative Whether the provided x and y speeds are relative to the field.
+     */
+    public void drive(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
+      
+      if (fieldRelative) {
+        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+          chassisSpeeds.vxMetersPerSecond,
+          chassisSpeeds.vyMetersPerSecond,
+          chassisSpeeds.omegaRadiansPerSecond,
+          getHeading()
+        );
+      }
+      chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, Constants.PERIOD);
+      MecanumDriveWheelSpeeds speeds = getKinematics().toWheelSpeeds(chassisSpeeds);
+      io.setVelocity(
+        speeds.frontRightMetersPerSecond, 
+        speeds.frontLeftMetersPerSecond, 
+        speeds.rearRightMetersPerSecond, 
+        speeds.rearLeftMetersPerSecond
+      );
   }
 
   /** Stops the drive. */
@@ -136,4 +175,8 @@ public class Drive extends SubsystemBase {
 		velocity *= Math.PI * HardwareConstants.MECANUM_WHEEL_DIAMETER;
 		return velocity;
 	}
+
+  private MecanumDriveKinematics getKinematics() {
+    return HardwareConstants.MECANUM_KINEMATICS;
+  }
 }

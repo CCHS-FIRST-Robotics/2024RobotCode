@@ -25,4 +25,8 @@ public interface DriveIO {
   /** Run open loop at the specified voltage. */
   public default void setVoltage(double frVolts, double flVolts, double brVolts, double blVolts) {
   }
+
+  /** Run open (closed?) loop at the specified velocity. */
+  public default void setVelocity(double frVelocity, double flVelocity, double brVelocity, double blVelocity) {
+  }
 }
