@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.*;
 
 public class Arm extends SubsystemBase {
-    
+
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
 
