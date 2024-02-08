@@ -174,7 +174,7 @@ public class DriveWithJoysticks extends Command {
 
         // System.out.println(speeds.omegaRadiansPerSecond);
         
-        drive.runVelocity(speeds);
+        drive.drive(speeds, true);
     }
 
     @Override

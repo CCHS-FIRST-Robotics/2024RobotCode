@@ -15,7 +15,9 @@ public interface DriveIO {
     public double brVelocityRaw = 0.0;
     public double blVelocityRaw = 0.0;
 
+    public boolean gyroConnected = false;
     public double gyroYawRad = 0.0;
+    public double gyroYawVelocity = 0.0;
   }
 
   /** Updates the set of loggable inputs. */

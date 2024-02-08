@@ -2,12 +2,17 @@ package frc.robot.subsystems.mecaDrive;
 import frc.robot.Constants;
 import frc.robot.Constants.HardwareConstants;
 
+import static edu.wpi.first.units.Units.*;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.mecaDrive.DriveIOInputsAutoLogged;
@@ -22,6 +27,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator;
 
 public class Drive extends SubsystemBase {
@@ -30,11 +36,11 @@ public class Drive extends SubsystemBase {
   private final DriveIO io;
   private final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
 
-  private final double maxLinearVelocity = 3.0; // meters per second
-  private final double maxLinearAcceleration = 3.0; // meters per second squared
+  private final Measure<Velocity<Distance>> maxLinearVelocity = MetersPerSecond.of(3); // meters per second
+  private final Measure<Velocity<Velocity<Distance>>> maxLinearAcceleration = MetersPerSecondPerSecond.of(3); // meters per second squared
 
-  private final double maxAngularVelocity = 2 * Math.PI; // radians per second
-  private final double maxAngularAcceleration = 2 * Math.PI; // radians per second squared
+  private final Measure<Velocity<Angle>> maxAngularVelocity = RadiansPerSecond.of(2 * Math.PI); // radians per second
+  private final Measure<Velocity<Velocity<Angle>>> maxAngularAcceleration = RadiansPerSecond.per(Second).of(2 * Math.PI); // radians per second squared
 
   // Odometry class for tracking robot pose
   MecanumDriveOdometry odometry =
@@ -42,7 +48,12 @@ public class Drive extends SubsystemBase {
         HardwareConstants.MECANUM_KINEMATICS,
         new Rotation2d(),
         new MecanumDriveWheelPositions()
-);
+  );
+
+  double thetaKp = 0.0;
+  double thetaKi = 0.0;
+  double thetaKd = 0.0;
+  PIDController thetaController = new PIDController(thetaKp, thetaKi, thetaKd);
 
   /** Creates a new Drive. */
   public Drive(DriveIO io) {
@@ -55,7 +66,7 @@ public class Drive extends SubsystemBase {
     Logger.processInputs("Drive", inputs);
 
     // Update odometry and log the new pose
-    odometry.update(getHeading(), getWheelPositions());
+    odometry.update(getYaw(), getWheelPositions());
     Logger.recordOutput("Odometry", getPose());
   }
 
@@ -71,7 +82,7 @@ public class Drive extends SubsystemBase {
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
       WheelSpeeds speeds;
       if (fieldRelative) {
-        speeds = MecanumDrive.driveCartesianIK(xSpeed, ySpeed, rot, getHeading());
+        speeds = MecanumDrive.driveCartesianIK(xSpeed, ySpeed, rot, getYaw());
       } else {
         speeds = MecanumDrive.driveCartesianIK(xSpeed, ySpeed, rot);
       }
@@ -94,7 +105,7 @@ public class Drive extends SubsystemBase {
           chassisSpeeds.vxMetersPerSecond,
           chassisSpeeds.vyMetersPerSecond,
           chassisSpeeds.omegaRadiansPerSecond,
-          getHeading()
+          getYaw()
         );
       }
       chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, Constants.PERIOD);
@@ -123,10 +134,10 @@ public class Drive extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(getHeading(), getWheelPositions(), pose);
+    odometry.resetPosition(getYaw(), getWheelPositions(), pose);
   }
 
-  public Rotation2d getHeading() {
+  public Rotation2d getYaw() {
     return new Rotation2d(-inputs.gyroYawRad);
   }
 
@@ -145,6 +156,15 @@ public class Drive extends SubsystemBase {
       convertVelocity(inputs.frVelocityRaw),
       convertVelocity(inputs.blVelocityRaw),
       convertVelocity(inputs.brVelocityRaw)
+    );
+  }
+
+  public Twist2d getVelocity() {
+    ChassisSpeeds speeds = getKinematics().toChassisSpeeds(getWheelSpeeds());
+    return new Twist2d(
+      speeds.vxMetersPerSecond,
+      speeds.vyMetersPerSecond, 
+      inputs.gyroConnected ? inputs.gyroYawVelocity : speeds.omegaRadiansPerSecond
     );
   }
 
@@ -176,7 +196,27 @@ public class Drive extends SubsystemBase {
 		return velocity;
 	}
 
-  private MecanumDriveKinematics getKinematics() {
+  public MecanumDriveKinematics getKinematics() {
     return HardwareConstants.MECANUM_KINEMATICS;
+  }
+
+  public Measure<Velocity<Distance>> getMaxLinearSpeed() {
+    return maxLinearVelocity;
+  }
+
+  public Measure<Velocity<Velocity<Distance>>> getMaxLinearAcceleration() {
+    return maxLinearAcceleration;
+  }
+
+  public Measure<Velocity<Angle>> getMaxAngularSpeed() {
+    return maxAngularVelocity;
+  }
+
+  public Measure<Velocity<Velocity<Angle>>> getMaxAngularAcceleration() {
+    return maxAngularAcceleration;
+  }
+
+  public PIDController getHeadingController() {
+    return thetaController;
   }
 }

@@ -53,7 +53,9 @@ public class DriveIOFalcon500 implements DriveIO {
     inputs.brVelocityRaw = brMotor.getVelocity().getValue();
     inputs.blVelocityRaw = blMotor.getVelocity().getValue();
     
-    inputs.gyroYawRad = imu.getYaw();
+    inputs.gyroConnected = imu.isConnected();
+    inputs.gyroYawRad = imu.getYaw() * (Math.PI / 180d); 
+    inputs.gyroYawVelocity = imu.getRate() * (Math.PI / 180d);
   }
 
   @Override

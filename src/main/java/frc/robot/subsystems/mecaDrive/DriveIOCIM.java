@@ -65,7 +65,9 @@ public class DriveIOCIM implements DriveIO {
     inputs.brVelocityRaw = brMotor.getSelectedSensorVelocity();
     inputs.blVelocityRaw = blMotor.getSelectedSensorVelocity();
     
-    inputs.gyroYawRad = imu.getYaw();
+    inputs.gyroConnected = imu.isConnected();
+    inputs.gyroYawRad = imu.getYaw() * (2 * Math.PI / 180d);
+    inputs.gyroYawVelocity = imu.getRate() * (Math.PI / 180d);
   }
 
   public void setVoltage(double frVolts, double flVolts, double brVolts, double blVolts) {

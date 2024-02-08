@@ -26,12 +26,15 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.commands.DriveInCircle;
-import frc.robot.commands.DriveModules;
-import frc.robot.commands.DriveWithJoysticks;
-import frc.robot.commands.DriveWithWiimote;
-import frc.robot.commands.FollowAprilTag;
-import frc.robot.commands.MoveToPose;
+
+import frc.robot.commands.mecaDriveCommands.*;
+
+// import frc.robot.commands.DriveInCircle;
+// import frc.robot.commands.DriveModules;
+// import frc.robot.commands.DriveWithJoysticks;
+// import frc.robot.commands.DriveWithWiimote;
+// import frc.robot.commands.FollowAprilTag;
+// import frc.robot.commands.MoveToPose;
 
 import frc.robot.subsystems.mecaDrive.Drive;
 import frc.robot.subsystems.mecaDrive.DriveIO;
@@ -63,7 +66,7 @@ public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private final Vision camera;
-    private final PoseEstimator poseEstimator;
+    // private final PoseEstimator poseEstimator;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -171,9 +174,9 @@ public class RobotContainer {
         // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
 
         // Brake when the left trigger is held
-        controller.leftTrigger().whileTrue(
-            new RunCommand(drive::stopWithX, drive)
-        );
+        // controller.leftTrigger().whileTrue(
+        //     new RunCommand(drive::stopWithX, drive)
+        // );
 
         Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
         controller.rightTrigger().whileTrue(
@@ -196,36 +199,36 @@ public class RobotContainer {
         
         // controller.rightTrigger().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
         // controller.rightTrigger().whileTrue(drive.sysIdDynamic(Direction.kForward));
-        controller.rightTrigger().whileTrue(drive.sysIdFull());
+        // controller.rightTrigger().whileTrue(drive.sysIdFull());
         
         // Generate a trajectory to a pose when the A button is pressed (and switch drive to position control)
-        controller.a().onTrue(
-            new MoveToPose(
-                drive, 
-                () -> {return new Pose2d(0, 0, new Rotation2d(Math.PI * 3 * .25));}
-            )
-        );
+        // controller.a().onTrue(
+        //     new MoveToPose(
+        //         drive, 
+        //         () -> {return new Pose2d(0, 0, new Rotation2d(Math.PI * 3 * .25));}
+        //     )
+        // );
 
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
         // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
-        controller.x().onTrue(
-            drive.runOnce(
-                () -> {
-                    String path = "ThirdFloorTest1";
-                    var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
-                    // adjust so that the start of the trajectory is where the robot is
-                    // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
-                    // traj.translateBy(drive.getPose().getTranslation());
+        // controller.x().onTrue(
+        //     drive.runOnce(
+        //         () -> {
+        //             String path = "ThirdFloorTest1";
+        //             var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
+        //             // adjust so that the start of the trajectory is where the robot is
+        //             // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
+        //             // traj.translateBy(drive.getPose().getTranslation());
 
-                    System.out.println("recording pos traj");
-                    Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
+        //             System.out.println("recording pos traj");
+        //             Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
 
-                    System.out.println("Writing trajectory to CSV");
-                    traj.toCSV(path);
-                    drive.runPosition(traj);
-                }
-            )
-        );
+        //             System.out.println("Writing trajectory to CSV");
+        //             traj.toCSV(path);
+        //             drive.runPosition(traj);
+        //         }
+        //     )
+        // );
 
         // controller.b().onTrue(
         //     Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
@@ -248,23 +251,23 @@ public class RobotContainer {
         //     )
         // );
 
-        controller.y().whileTrue(
-            new DriveInCircle(
-                drive,
-                () -> {
-                    // return new Translation2d(2.0, 0.0);
-                    return new Translation2d(.57/2.0, .57/2.0);
-                },
-                () -> {
-                    // return 2.5;
-                    return 0.75;
-                },
-                () -> {
-                    // return 4 * 2.5 / 2.0;
-                    return 0.75 / (new Translation2d(.57/2.0, .57/2.0).getNorm());
-                }
-            )
-        );
+        // controller.y().whileTrue(
+        //     new DriveInCircle(
+        //         drive,
+        //         () -> {
+        //             // return new Translation2d(2.0, 0.0);
+        //             return new Translation2d(.57/2.0, .57/2.0);
+        //         },
+        //         () -> {
+        //             // return 2.5;
+        //             return 0.75;
+        //         },
+        //         () -> {
+        //             // return 4 * 2.5 / 2.0;
+        //             return 0.75 / (new Translation2d(.57/2.0, .57/2.0).getNorm());
+        //         }
+        //     )
+        // );
     }
 
     private double applyPreferences(double input, double exponent, double deadzone) {
