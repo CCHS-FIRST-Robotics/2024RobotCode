@@ -17,9 +17,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.*;
+
 import static edu.wpi.first.units.Units.*;
 
 import java.util.function.Supplier;
@@ -31,10 +31,11 @@ public class ArmIOFalcon500 implements ArmIO {
 
     // Uhh Feedforward momment!
     private ArmFeedforward driveFeedforward;
-    private static final double driveFeedforwardKg = 10;
-    private static final double driveFeedforwardKs = 10;
-    private static final double driveFeedforwardKv = 10;
+    private static final double driveFeedforwardKg = 0;
+    private static final double driveFeedforwardKs = 0;
+    private static final double driveFeedforwardKv = 0;
     private static final double driveFeedforwardKa = 0;
+
 
     private final MotionMagicVoltage driveMotionMagic = new MotionMagicVoltage(0);
     private final MotionMagicConfigs driveMMConfig = driveFalconConfig.MotionMagic;
@@ -132,14 +133,20 @@ public class ArmIOFalcon500 implements ArmIO {
         // for testing, dont let the arm go past 90 degrees in either direction
         // positionRad = Radians.of(MathUtil.clamp(positionRad.in(Radians), -Math.PI/2.0, Math.PI/2.0));
         positionRad = Radians.of(MathUtil.clamp(positionRad.in(Radians), Math.PI/6, Math.PI/3));  //uhh probably incorrect fix?
-        // driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
+        driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
 
         // lol this is NOT going to work
         driveFalcon.setControl(driveMotionMagic.withFeedForward(
             driveFeedforward.calculate(
                 positionRad.in(Radians),
                 0)
-            ));
+            ).withPosition(
+                positionRad.in(Rotations)).
+            withSlot(0)
+        );
+        
+
+        
     }
 
     public void setMusicTrack(String path) {
