@@ -15,7 +15,7 @@ public class Shooter {
     double kP = 0.0;
     double kI = 0.0;
     double kD = 0.0;
-
+    double gearRatio = 1; // motor to flywheel
     SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(kS, kV, kA);
     PIDController pid = new PIDController(kP, kI, kD);
 
@@ -31,7 +31,7 @@ public class Shooter {
     }
     public double getVelocity(){
         StatusSignal<Double> motor = motor1.getVelocity();
-        double motorspeed = motor.getValue() * 2 * Math.PI * radius;
+        double motorspeed = motor.getValue() * 2 * Math.PI * radius / gearRatio;
         return motorspeed;
     }
     public void setVelocity(double targetVelocity){
