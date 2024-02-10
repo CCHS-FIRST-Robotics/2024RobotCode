@@ -1,6 +1,5 @@
 package frc.robot;
 import com.ctre.phoenix6.StatusSignal;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 // Create motor objects in Shooter.java, write simple methods for setting the voltage of motors and getting data from encoders.
@@ -18,7 +17,6 @@ public class Shooter {
     double gearRatio = 1; // motor to flywheel
     SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(kS, kV, kA);
     PIDController pid = new PIDController(kP, kI, kD);
-
     private double radius;
     public Shooter(){
 
@@ -39,4 +37,5 @@ public class Shooter {
         volts += pid.calculate(getVelocity(), targetVelocity);
         motor1.setVoltage(volts);
     }
+
 }
