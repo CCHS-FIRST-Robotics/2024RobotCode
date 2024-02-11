@@ -36,6 +36,8 @@ import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 import org.opencv.ml.ANN_MLP;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.FollowPathHolonomic;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import frc.robot.Constants;
@@ -45,6 +47,7 @@ import frc.robot.utils.PoseEstimator;
 
 
 public class Drive extends SubsystemBase {
+    
     private static final Measure<Velocity<Distance>> coastThresholdMetersPerSec =
         MetersPerSecond.of(0.05); // Need to be under this to switch to coast when disabling
     private static final Measure<Velocity<Distance>> coastThresholdSecs =
@@ -95,15 +98,19 @@ public class Drive extends SubsystemBase {
     private double kPy = 0.35; // 0.33
     private double kPHeading = 2; // 0.25 // 0.5
 
+    private double kDx = 0.35; // 0.4
+    private double kDy = 0.35; // 0.33
+    private double kDHeading = 2; // 0.25 // 0.5
+
     private double kIx = 0.12; // 0.12
     private double kIy = 0.12; // 0.15
     // private double kPlinear = 
     private double kIHeading = 0.00; // 0.05
 
-    private PIDController xController = new PIDController(kPx, kIx, 0.0);
-    private PIDController yController = new PIDController(kPy, kIy, 0.0);
+    private PIDController xController = new PIDController(kPx, kIx, kDx);
+    private PIDController yController = new PIDController(kPy, kIy, kDy);
     // private PIDController linearController = new PIDController(kPHeading, kIHeading, coastThresholdMetersPerSec);
-    private PIDController headingController = new PIDController(kPHeading, kIHeading, 0.0);
+    private PIDController headingController = new PIDController(kPHeading, kIHeading, kDHeading);
     
     private boolean isBrakeMode = true;
     private Timer lastMovementTimer = new Timer();
@@ -286,6 +293,8 @@ public class Drive extends SubsystemBase {
         Logger.recordOutput("Odometry/FieldVelocity", fieldVelocity);
         Logger.recordOutput("Odometry/WheelPosition", fieldPosition);
         Logger.recordOutput("Odometry/FieldPosition", getPose());
+
+        
 
         if (DriverStation.isDisabled()) {
             controlMode = CONTROL_MODE.DISABLED;
