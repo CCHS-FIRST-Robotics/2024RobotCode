@@ -243,7 +243,7 @@ public class RobotContainer {
         controller.x().onTrue(
             drive.runOnce(
                 () -> {
-                    String path = "ThirdFloorTest1";
+                    String path = "NoteAuto";
                     var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
                     // adjust so that the start of the trajectory is where the robot is
                     // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
