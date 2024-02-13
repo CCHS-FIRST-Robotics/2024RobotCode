@@ -39,7 +39,7 @@ import frc.robot.commands.mecaDriveCommands.*;
 import frc.robot.subsystems.mecaDrive.Drive;
 import frc.robot.subsystems.mecaDrive.DriveIO;
 import frc.robot.subsystems.mecaDrive.DriveIOSim;
-import frc.robot.subsystems.mecaDrive.DriveIOSparkMax;
+import frc.robot.subsystems.mecaDrive.DriveIOCIM;
 
 // import frc.robot.subsystems.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
@@ -85,7 +85,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         case REAL:
             drive = new Drive(
-                new DriveIOSparkMax()
+                new DriveIOCIM()
             );
             camera = new Vision(new CameraIOZED());
             break;
@@ -101,7 +101,7 @@ public class RobotContainer {
         // Replayed robot, disable IO implementations
         default:
             drive = new Drive(
-                new DriveIOSparkMax()
+                new DriveIOCIM()
             );
             camera = new Vision(new CameraIOZED());
             break;

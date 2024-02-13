@@ -22,10 +22,10 @@ public class DriveIOCIM implements DriveIO {
     private final double kV = 1023.0/20660.0; // idk it was taken from some phoenix example, should double check
 
   public DriveIOCIM() {
-    frMotor = new TalonSRX(1);
-    flMotor = new TalonSRX(2);
-    brMotor = new TalonSRX(3);
-    blMotor = new TalonSRX(4);
+    frMotor = new TalonSRX(2);
+    flMotor = new TalonSRX(10);
+    brMotor = new TalonSRX(5);
+    blMotor = new TalonSRX(11);
 
     TalonSRXConfiguration config = new TalonSRXConfiguration();
     config.peakCurrentLimit = 40; // the peak current, in amps
