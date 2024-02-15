@@ -78,9 +78,15 @@ public class DriveIOCIM implements DriveIO {
   }
 
     public void setVelocity(double frVelocity, double flVelocity, double brVelocity, double blVelocity) {
-        frMotor.set(TalonSRXControlMode.Velocity, frVelocity);
-        flMotor.set(TalonSRXControlMode.Velocity, flVelocity);
-        brMotor.set(TalonSRXControlMode.Velocity, brVelocity);
-        blMotor.set(TalonSRXControlMode.Velocity, blVelocity);
+      setVoltage(
+        frVelocity / 3.0 * 12, 
+        flVelocity / 3.0 * 12, 
+        brVelocity / 3.0 * 12, 
+        blVelocity / 3.0 * 12
+      );
+        // frMotor.set(TalonSRXControlMode.Velocity, frVelocity);
+        // flMotor.set(TalonSRXControlMode.Velocity, flVelocity);
+        // brMotor.set(TalonSRXControlMode.Velocity, brVelocity);
+        // blMotor.set(TalonSRXControlMode.Velocity, blVelocity);
     }
 }
