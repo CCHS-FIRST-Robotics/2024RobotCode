@@ -28,5 +28,6 @@ public interface GyroIO {
         public Measure<Velocity<Angle>> yawVelocity = RadiansPerSecond.of(0.0);
     }
 
-    public default void updateInputs(GyroIOInputs inputs) {}
+    public default void updateInputs(GyroIOInputs inputs) {
+    }
 }
