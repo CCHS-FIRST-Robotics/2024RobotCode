@@ -29,7 +29,7 @@ public class Drive extends SubsystemBase {
         speedMetersPerSecond = 0;
 
         maxLinearSpeed = 4.6;
-        maxAngularSpeed = maxLinearSpeed / WHEEL_RADIUS;
+        maxAngularSpeed = maxLinearSpeed / WHEEL_RADIUS; //not the wheel
 
         modules = new Module[4];
         for (int i = 0; i < modules.length; i++) {
@@ -48,7 +48,7 @@ public class Drive extends SubsystemBase {
     public void setState(ChassisSpeeds goalSpeeds, Rotation2d goalAngle) {
         speeds = ChassisSpeeds.fromFieldRelativeSpeeds(goalSpeeds, goalAngle);
         state.speedMetersPerSecond = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
-        state.angle = goalAngle;
+        state.angle = goalAngle; 
     }
 
     public double getMaxLinearSpeed() {

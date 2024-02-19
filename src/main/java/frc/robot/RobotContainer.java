@@ -27,14 +27,12 @@ public class RobotContainer {
   private DriveWithJoysticks driveWithJoysticks;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandJoystick joystick =
-      new CommandJoystick(OperatorConstants.kDriverControllerPort);
+  private final CommandXboxController joystick =
+      new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     drive = new Drive();
-    driveWithJoysticks = new DriveWithJoysticks(drive, () -> joystick.getX(), () -> joystick.getY());
-    // how to schedule commands??
 
 
     /*
@@ -56,13 +54,18 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    // new Trigger(drive::exampleCondition)
-    //     .onTrue(new ExampleCommand(m_exampleSubsystem));
+    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    new Trigger(m_exampleSubsystem::exampleCondition)
+        .onTrue(new ExampleCommand(m_exampleSubsystem));
 
-    // // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // // cancelling on release.
-    // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
+    // cancelling on release.
+    joystick.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+
+    //drive.setDefaultCommand --> sets it as the thing that runs when nothing else is scheduled
+
+    driveWithJoysticks = new DriveWithJoysticks(drive, () -> joystick.getX(), () -> joystick.getY());
+
   }
 
   /**

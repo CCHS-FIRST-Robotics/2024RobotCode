@@ -79,7 +79,7 @@ public class Module {
     }
 
     public void setReferences(SwerveModuleState state) {
-        turnPIDController.setReference(state.angle.getRotations(), ControlType.kVelocity);
+        turnPIDController.setReference(state.angle.getRotations(), ControlType.kPosition);
         drivePIDController.setReference(metersPerSecondToRPM(state.speedMetersPerSecond), ControlType.kVelocity);
     }
 
