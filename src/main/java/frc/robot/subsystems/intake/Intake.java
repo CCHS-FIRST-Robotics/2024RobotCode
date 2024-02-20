@@ -1,48 +1,41 @@
 package frc.robot.subsystems.intake;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.commands.FollowPathHolonomic;
-
-import frc.robot.Constants;
-
-// switch statements or smth
-// too many set voltage methods
-
-// connects RobotContainer and the command scheduler with the motor object
 public class Intake extends SubsystemBase {
-    IntakeIOCIM io;
-    boolean buttonHeld;
-    boolean noteThere;
-    SlewRateLimiter voltLimiter = new SlewRateLimiter(6);
-    IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged(); // class created by MotorIO interface
+    IntakeIO io;
+    double volts = 0;
+    double startTime; // temp
+    IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
-    public Intake() {
-        io = new IntakeIOCIM(12, 13);
+    public Intake(IntakeIO io) {
+        this.io = io;
     }
 
-    public void start(int volts) {
-        io.setVoltage(voltLimiter.calculate(volts));
+    public void start(double v) {
+        volts = v;
+        startTime = Timer.getFPGATimestamp();
     }
 
     public void stop() {
-        buttonHeld = false;
+        volts = 0;
     }
 
     @Override
     public void periodic() {
-        noteThere = io.motor.getSupplyCurrent() > 12;
+        io.updateInputs(inputs);
+        Logger.processInputs("intake", inputs);
 
-        if (!buttonHeld && !noteThere) {
-            io.setVoltage(0);
-            voltLimiter.reset(0);
+        // for when we have an encoder:
+        // if(inputs.motor1Current > 15 && inputs.motor1Velocity > 5000 * (volts / 12)){
+        if (inputs.motor1Current > 15 && Timer.getFPGATimestamp() - startTime > 0.4) {
+            volts = 0;
         }
 
-        // log data
-        io.updateInputs(inputs);
-        Logger.processInputs("motorVoltage", inputs);
-        Logger.recordOutput("motorCurrent", io.motor.getSupplyCurrent());
+        Logger.recordOutput("Intaking", volts != 0);
+
+        io.setVoltage(volts);
     }
 }

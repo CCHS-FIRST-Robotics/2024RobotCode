@@ -4,22 +4,27 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 
 public class IntakeIOCIM implements IntakeIO {
-    TalonSRX motor, follower;
+    TalonSRX motor1, motor2;
 
     public IntakeIOCIM(int port1, int port2) {
-        motor = new TalonSRX(port1);
-        follower = new TalonSRX(port2);
-        follower.follow(motor);
+        motor1 = new TalonSRX(port1);
+        motor2 = new TalonSRX(port2);
     }
 
+    @Override
     public void setVoltage(double volts) {
-        motor.set(TalonSRXControlMode.PercentOutput, volts / 12);
+        motor1.set(TalonSRXControlMode.PercentOutput, volts / 12);
+        motor2.set(TalonSRXControlMode.PercentOutput, volts / 12);
     }
 
+    @Override
     public void updateInputs(IntakeIOInputs inputs) {
-        inputs.motorCurrent = motor.getSupplyCurrent();
-        inputs.motorVoltage = motor.getMotorOutputVoltage();
-        inputs.motorVelocity = motor.getSelectedSensorVelocity();
-        inputs.motorTemperature = motor.getTemperature();
+        inputs.motor1Voltage = motor1.getMotorOutputVoltage();
+        inputs.motor1Current = motor1.getSupplyCurrent();
+        inputs.motor1Velocity = motor1.getSelectedSensorVelocity();
+
+        inputs.motor2Voltage = motor2.getMotorOutputVoltage();
+        inputs.motor2Current = motor2.getSupplyCurrent();
+        inputs.motor2Velocity = motor2.getSelectedSensorVelocity();
     }
 }

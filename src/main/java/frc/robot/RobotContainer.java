@@ -34,6 +34,7 @@ import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
 import frc.robot.commands.ThreeNoteAuto;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIOFalcon;
 
 // import frc.robot.subsystems.mecaDrive.Drive;
 // import frc.robot.subsystems.mecaDrive.DriveIO;
@@ -93,7 +94,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 useWiiRemotes
             );
-            intake = new Intake();
+            intake = new Intake(new IntakeIOFalcon(0, 0));
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -107,7 +108,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 false
             );
-			intake = new Intake();
+			intake = new Intake(new IntakeIOFalcon(0, 0)); // TODO: CHANGE TO SIM IMPL!
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -121,7 +122,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 false
             );
-			intake = new Intake();
+			intake = new Intake(new IntakeIOFalcon(0, 0));
             camera = new Vision(new CameraIOZED());
             break;
         }

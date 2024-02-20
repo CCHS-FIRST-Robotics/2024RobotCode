@@ -4,30 +4,41 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 
-// manages logging data and motor
 public class IntakeIOFalcon implements IntakeIO {
-    TalonFX motor, follower;
+    TalonFX motor1, motor2;
 
-    StatusSignal<Double> voltageSignal = motor.getMotorVoltage();
-    StatusSignal<Double> currentSignal = motor.getSupplyCurrent();
-    StatusSignal<Double> velocitySignal = motor.getVelocity();
-    StatusSignal<Double> tempSignal = motor.getDeviceTemp();
+    StatusSignal<Double> voltageSignal1 = motor1.getMotorVoltage();
+    StatusSignal<Double> currentSignal1 = motor1.getSupplyCurrent();
+    StatusSignal<Double> velocitySignal1 = motor1.getVelocity();
+    StatusSignal<Double> tempSignal1 = motor1.getDeviceTemp();
+
+    StatusSignal<Double> voltageSignal2 = motor2.getMotorVoltage();
+    StatusSignal<Double> currentSignal2 = motor2.getSupplyCurrent();
+    StatusSignal<Double> velocitySignal2 = motor2.getVelocity();
+    StatusSignal<Double> tempSignal2 = motor2.getDeviceTemp();
 
     public IntakeIOFalcon(int port1, int port2) {
-        motor = new TalonFX(port1);
-        follower = new TalonFX(port2);
+        motor1 = new TalonFX(port1);
+        motor2 = new TalonFX(port2);
     }
 
+    @Override
     public void setVoltage(double volts) {
-        motor.setVoltage(volts);
-        follower.setVoltage(volts); // as far as I can find, there is no .follow() method for TalonFX
+        motor1.setVoltage(volts);
+        motor2.setVoltage(volts);
     }
 
+    @Override
     public void updateInputs(IntakeIOInputs inputs) {
-        BaseStatusSignal.refreshAll(voltageSignal, currentSignal, velocitySignal, tempSignal);
-        inputs.motorVoltage = voltageSignal.getValue();
-        inputs.motorCurrent = currentSignal.getValue();
-        inputs.motorVelocity = velocitySignal.getValue();
-        inputs.motorTemperature = tempSignal.getValue();
+        BaseStatusSignal.refreshAll(voltageSignal1, currentSignal1, velocitySignal1,
+                voltageSignal2, currentSignal2, velocitySignal2);
+
+        inputs.motor1Voltage = voltageSignal1.getValue();
+        inputs.motor1Current = currentSignal1.getValue();
+        inputs.motor1Velocity = velocitySignal1.getValue();
+
+        inputs.motor2Voltage = voltageSignal2.getValue();
+        inputs.motor2Current = currentSignal2.getValue();
+        inputs.motor2Velocity = velocitySignal2.getValue();
     }
 }
