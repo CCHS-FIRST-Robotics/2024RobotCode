@@ -3,6 +3,9 @@ package frc.robot.subsystems.intake;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.commands.FollowPathHolonomic;
+
 import frc.robot.Constants;
 
 // switch statements or smth
@@ -15,6 +18,7 @@ public class Intake extends SubsystemBase {
     boolean noteThere;
     SlewRateLimiter voltLimiter = new SlewRateLimiter(6);
     IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged(); // class created by MotorIO interface
+    FollowPathHolonomic
 
     public Intake() {
         io = new IntakeIOCIM(12, 13);

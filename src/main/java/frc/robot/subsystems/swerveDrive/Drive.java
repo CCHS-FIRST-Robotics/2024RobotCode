@@ -43,6 +43,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.utils.DriveTrajectory;
+import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.PoseEstimator;
 
 
@@ -726,5 +727,15 @@ public class Drive extends SubsystemBase {
             .andThen(characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
             .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward))
             .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+    }
+
+    public Command followTrajectory(DriveTrajectory traj) {
+        return runOnce(
+                () -> {
+                    System.out.println("recording pos traj");
+                    Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
+                    runPosition(traj);
+                }
+            );
     }
 }

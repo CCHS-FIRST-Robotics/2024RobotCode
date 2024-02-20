@@ -32,6 +32,8 @@ import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.DriveWithWiimote;
 import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
+import frc.robot.commands.ThreeNoteAuto;
+import frc.robot.subsystems.intake.Intake;
 
 // import frc.robot.subsystems.mecaDrive.Drive;
 // import frc.robot.subsystems.mecaDrive.DriveIO;
@@ -41,6 +43,7 @@ import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.DriveTrajectoryGenerator;
+import frc.robot.utils.MechanismsPath;
 import frc.robot.utils.PoseEstimator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -62,6 +65,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final Intake intake;
     private final Vision camera;
     private final PoseEstimator poseEstimator;
 
@@ -89,6 +93,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 useWiiRemotes
             );
+            intake = new Intake();
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -170,34 +175,34 @@ public class RobotContainer {
         //     () -> 0.5 + 0.5 * controller.getRightTriggerAxis()
         // ));
 
-        // DRIVING WITH JOYSTICKS (NORMAL)
-        if (useWiiRemotes) {
-            drive.setDefaultCommand(
-                new DriveWithWiimote(
-                    drive,
-                    () -> wiiRemote1.getRawAxis(3),
-                    () -> {
-                        System.out.println(-MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1));
-                        return -MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1);
-                    },
-                    wiiRemote1.button(1),
-                    wiiRemote1.button(2),
-                    () -> getWiiPOV(),
-                    () -> {return 1.0;}
-                )
-            );
-        } else {
-            drive.setDefaultCommand(
-                new DriveWithJoysticks(
-                    drive, 
-                    controller::getLeftX, 
-                    () -> -controller.getLeftY(), 
-                    () -> -controller.getRightX(), 
-                    () -> {return 1.0;},
-                    () -> Rotation2d.fromDegrees(controller.getHID().getPOV())
-                )
-            );
-        }
+        // // DRIVING WITH JOYSTICKS (NORMAL)
+        // if (useWiiRemotes) {
+        //     drive.setDefaultCommand(
+        //         new DriveWithWiimote(
+        //             drive,
+        //             () -> wiiRemote1.getRawAxis(3),
+        //             () -> {
+        //                 System.out.println(-MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1));
+        //                 return -MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1);
+        //             },
+        //             wiiRemote1.button(1),
+        //             wiiRemote1.button(2),
+        //             () -> getWiiPOV(),
+        //             () -> {return 1.0;}
+        //         )
+        //     );
+        // } else {
+        //     drive.setDefaultCommand(
+        //         new DriveWithJoysticks(
+        //             drive, 
+        //             controller::getLeftX, 
+        //             () -> -controller.getLeftY(), 
+        //             () -> -controller.getRightX(), 
+        //             () -> {return 1.0;},
+        //             () -> Rotation2d.fromDegrees(controller.getHID().getPOV())
+        //         )
+        //     );
+        // }
 
         // Follow the nearest apriltag while the right trigger is held
         // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
@@ -239,11 +244,13 @@ public class RobotContainer {
         );
 
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
-        // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
-        controller.x().onTrue(
+        String path = "SThreeNote";
+        new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
+        // controller.x().onTrue(
+
             drive.runOnce(
                 () -> {
-                    String path = "NoteAuto";
+                    
                     var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
                     // adjust so that the start of the trajectory is where the robot is
                     // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
@@ -256,7 +263,7 @@ public class RobotContainer {
                     traj.toCSV(path);
                     drive.runPosition(traj);
                 }
-            )
+            ).asProxy().andThen(new ThreeNoteAuto(drive, intake, new MechanismsPath(path)))
         );
 
         // controller.b().onTrue(
