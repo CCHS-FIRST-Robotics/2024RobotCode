@@ -14,6 +14,8 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.units.*;
 
 // rev sucks
@@ -23,19 +25,32 @@ public class Arm extends SubsystemBase {
 
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
-
+    private SysIdRoutine sysIdRoutine;
+    private SignalLogger signalLogger;
     // length and position of the arm in relation to the robot's center
     private final double armLength = 0.0; // TODO: set this
     private final Translation2d armOffset = new Translation2d(0.0, .425); // TODO: set this 
 
     public Arm(ArmIO io) {
         this.io = io;
+        sysIdRoutine = new SysIdRoutine(
+            new SysIdRoutine.Config(), 
+            new SysIdRoutine.Mechanism(
+            (Measure<Voltage> volts) -> {
+                io.setDriveVoltage(volts);
+            },
+            null, this
+        ));
+        SignalLogger.start();
     }
 
     /** Updates inputs and checks tunable numbers. */
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
+        SignalLogger.writeDouble("Position", this.getArmAngle().in(Radians));
+        SignalLogger.writeDouble("Velocity", this.getArmVelocity().in(RadiansPerSecond));
+        
         // io.setDriveVoltage(Volts.of(1));
         // setArmAngle(Degrees.of(90));
     }

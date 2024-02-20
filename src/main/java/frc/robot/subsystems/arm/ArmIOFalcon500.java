@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -17,6 +18,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.fasterxml.jackson.databind.JsonSerializable.Base;
 
 import edu.wpi.first.math.MathUtil;
@@ -25,6 +27,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 
 
@@ -35,16 +38,12 @@ public class ArmIOFalcon500 implements ArmIO {
     private final TalonFXConfiguration driveFalconConfig = new TalonFXConfiguration();
 
     // Uhh Feedforward momment!
-    private ArmFeedforward driveFeedforward;
     private static final double driveFeedforwardKg = 0;
     private static final double driveFeedforwardKs = 0;
     private static final double driveFeedforwardKv = 0;
     private static final double driveFeedforwardKa = 0;
 
     // I rise! FeedFwd momment!
-    private static final int measuredKWhenHorizontal = 0; // TODO: Measure + fill
-    private static final double kTicksPerRadian = 0; // TODO: Measure + fill
-    private static final double maxGravityFF = 0;
 
 
 
@@ -58,6 +57,7 @@ public class ArmIOFalcon500 implements ArmIO {
     StatusSignal<Double> driveAppliedVoltageSignal;
     StatusSignal<Double> driveCurrentSignal;
     StatusSignal<Double> driveTempSignal;
+
 
     // TODO: update constants in periodic once tunable is set up
     private static final double driveKp = 100;
@@ -85,20 +85,22 @@ public class ArmIOFalcon500 implements ArmIO {
         driveMMConfig.MotionMagicCruiseVelocity = 5; // 1 rotation every 1 seconds
         driveMMConfig.MotionMagicAcceleration = 10; // 1 second to reach max speed
         driveMMConfig.MotionMagicJerk = 30; // .1 seconds to reach max accel
-
-
         
+        
+        
+
         // Feedforward momment!
-        driveFeedforward = new ArmFeedforward(
-            driveFeedforwardKs,
-            driveFeedforwardKg,
-            driveFeedforwardKv,
-            driveFeedforwardKa);
+
 
         drivePID.kP = driveKp;
         drivePID.kI = driveKi;
         drivePID.kD = driveKd;
         drivePID.kV = driveKv;
+        drivePID.GravityType = GravityTypeValue.Arm_Cosine;
+        drivePID.kA = driveFeedforwardKa;
+        drivePID.kG = driveFeedforwardKg;
+        drivePID.kS = driveFeedforwardKs;
+        drivePID.kV = driveFeedforwardKv;
 
         driveFeedbackConfig.SensorToMechanismRatio = gearRatio;
 
@@ -117,6 +119,9 @@ public class ArmIOFalcon500 implements ArmIO {
         if (!status.isOK()) {
             System.out.println("Could not configure device. Error: " + status.toString());
         }
+
+        // tatus!!!!
+        
     }
 
     @Override
@@ -149,23 +154,9 @@ public class ArmIOFalcon500 implements ArmIO {
         // driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
 
         // lol this is NOT going to work
+        driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
+    
 
-        // driveFalcon.setControl(driveMotionMagic.withFeedForward(
-        //     driveFeedforward.calculate(
-        //         positionRad.in(Radians),
-        //         0)
-        //     ).withPosition(
-        //         positionRad.in(Rotations)).
-        //     withSlot(0)
-        // );
-
-        double cosineScalar = Math.cos(
-            (Radians.convertFrom(driveFalcon.getPosition().getValue(), Rotations) - measuredKWhenHorizontal)
-            / kTicksPerRadian);
-
-        driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations))
-                            .withFeedForward(maxGravityFF * cosineScalar).withSlot(0));
-        
 
         
     }
