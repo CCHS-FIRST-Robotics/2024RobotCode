@@ -107,6 +107,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 false
             );
+			intake = new Intake();
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -120,6 +121,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 false
             );
+			intake = new Intake();
             camera = new Vision(new CameraIOZED());
             break;
         }
@@ -247,7 +249,6 @@ public class RobotContainer {
         String path = "SThreeNote";
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
         // controller.x().onTrue(
-
             drive.runOnce(
                 () -> {
                     

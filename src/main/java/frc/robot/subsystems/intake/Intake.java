@@ -18,7 +18,6 @@ public class Intake extends SubsystemBase {
     boolean noteThere;
     SlewRateLimiter voltLimiter = new SlewRateLimiter(6);
     IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged(); // class created by MotorIO interface
-    FollowPathHolonomic
 
     public Intake() {
         io = new IntakeIOCIM(12, 13);
