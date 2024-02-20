@@ -6,38 +6,36 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.littletonrobotics.junction.Logger;
 
+// be able to intake (turns off automatically), shoot (moves towards shooter), and outtake
+
 public class Intake extends SubsystemBase {
     IntakeIO io;
-    int volts = 0;
-    boolean buttonHeld;
-    boolean noteThere;
+    double volts = 0;
     IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
     public Intake(IntakeIO io) {
         this.io = io;
     }
 
-    public void start(int v) {
+    public void start(double v) {
         volts = v;
-        buttonHeld = true;
     }
 
     public void stop() {
-        buttonHeld = false;
+        volts = 0;
+    }
+
+    public boolean checkNoteThere() {
+        if (inputs.motorCurrent > 15 && inputs.motorVelocity > 5000 * (volts / 12)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("intake", inputs);
-        Logger.recordOutput("intakeCurrent", inputs.motorCurrent);
-
-        noteThere = inputs.motorCurrent > 12;
-
-        // turns motors off if button isn't held and note isn't detected
-        if (!buttonHeld && !noteThere) {
-            volts = 0;
-        }
 
         io.setVoltage(volts);
     }
