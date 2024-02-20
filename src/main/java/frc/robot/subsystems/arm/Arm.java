@@ -50,7 +50,7 @@ public class Arm extends SubsystemBase {
         Logger.processInputs("Arm", inputs);
         SignalLogger.writeDouble("Position", this.getArmAngle().in(Radians));
         SignalLogger.writeDouble("Velocity", this.getArmVelocity().in(RadiansPerSecond));
-        
+        // trust!
         // io.setDriveVoltage(Volts.of(1));
         // setArmAngle(Degrees.of(90));
     }
