@@ -94,7 +94,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 useWiiRemotes
             );
-            intake = new Intake(new IntakeIOFalcon(0, 0));
+            intake = new Intake(new IntakeIOFalcon(1, 1));
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -108,7 +108,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 false
             );
-			intake = new Intake(new IntakeIOFalcon(0, 0)); // TODO: CHANGE TO SIM IMPL!
+			intake = new Intake(new IntakeIOFalcon(1, 1)); // TODO: CHANGE TO SIM IMPL!
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -122,7 +122,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 false
             );
-			intake = new Intake(new IntakeIOFalcon(0, 0));
+			intake = new Intake(new IntakeIOFalcon(1, 1));
             camera = new Vision(new CameraIOZED());
             break;
         }

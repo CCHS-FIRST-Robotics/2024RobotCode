@@ -2,13 +2,15 @@ package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.swerveDrive.ModuleIOInputsAutoLogged;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
     IntakeIO io;
     double volts = 0;
     double startTime; // temp
-    IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
     public Intake(IntakeIO io) {
         this.io = io;

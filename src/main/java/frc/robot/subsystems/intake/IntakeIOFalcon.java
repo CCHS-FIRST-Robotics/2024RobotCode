@@ -7,19 +7,30 @@ import com.ctre.phoenix6.StatusSignal;
 public class IntakeIOFalcon implements IntakeIO {
     TalonFX motor1, motor2;
 
-    StatusSignal<Double> voltageSignal1 = motor1.getMotorVoltage();
-    StatusSignal<Double> currentSignal1 = motor1.getSupplyCurrent();
-    StatusSignal<Double> velocitySignal1 = motor1.getVelocity();
-    StatusSignal<Double> tempSignal1 = motor1.getDeviceTemp();
+    StatusSignal<Double> voltageSignal1;
+    StatusSignal<Double> currentSignal1;
+    StatusSignal<Double> velocitySignal1;
+    StatusSignal<Double> tempSignal1;
 
-    StatusSignal<Double> voltageSignal2 = motor2.getMotorVoltage();
-    StatusSignal<Double> currentSignal2 = motor2.getSupplyCurrent();
-    StatusSignal<Double> velocitySignal2 = motor2.getVelocity();
-    StatusSignal<Double> tempSignal2 = motor2.getDeviceTemp();
+    StatusSignal<Double> voltageSignal2;
+    StatusSignal<Double> currentSignal2;
+    StatusSignal<Double> velocitySignal2;
+    StatusSignal<Double> tempSignal2;
+    
 
     public IntakeIOFalcon(int port1, int port2) {
         motor1 = new TalonFX(port1);
         motor2 = new TalonFX(port2);
+
+        voltageSignal1 = motor1.getMotorVoltage();
+        currentSignal1 = motor1.getSupplyCurrent();
+        velocitySignal1 = motor1.getVelocity();
+        tempSignal1 = motor1.getDeviceTemp();
+
+        voltageSignal2 = motor2.getMotorVoltage();
+        currentSignal2 = motor2.getSupplyCurrent();
+        velocitySignal2 = motor2.getVelocity();
+        tempSignal2 = motor2.getDeviceTemp();
     }
 
     @Override
