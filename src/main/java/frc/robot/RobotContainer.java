@@ -14,6 +14,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -36,6 +37,10 @@ import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.PoseEstimator;
+import frc.robot.subsystems.noteIO.arm.*;
+import frc.robot.subsystems.noteIO.intake.*;
+import frc.robot.subsystems.noteIO.shooter.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -53,11 +58,16 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
  * scheduler calls). Instead, the structure of the robot (including subsystems,
  * commands, and button mappings) should be declared here.
  */
+
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private final Vision camera;
     private final PoseEstimator poseEstimator;
+
+	private final Arm arm;
+	private final Intake intake;
+	private final Shooter shooter;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -125,6 +135,9 @@ public class RobotContainer {
 
         // Set up auto routines
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+		arm = new Arm();
+		intake = new Intake(null);
+		shooter = new Shooter(new ShooterIOCIM(Constants.shooterPort));
 
         // Configure the button bindings
         configureButtonBindings();

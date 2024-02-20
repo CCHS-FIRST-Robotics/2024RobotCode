@@ -37,6 +37,12 @@ public final class Constants {
         REPLAY
     }
 
+    public static final int intakePort1 = 5;
+    public static final int intakePort2 = 3;
+    public static final int shooterPort = 100;
+
+    // colin shit (do not look)
+
     public static final double PERIOD = .02;
 
     // TODO: change to tunable numbers
