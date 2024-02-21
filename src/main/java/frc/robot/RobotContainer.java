@@ -321,17 +321,13 @@ public class RobotContainer {
         // intake
         controller.a().onTrue(intake.getIntakeCommand(10));
 
-        // shoot
-        controller.b().onTrue(!shooterPrimed ?
-        // prime shooter
+        controller.b().onTrue(
+                // prime shooter
                 new InstantCommand(() -> shooter.start(10), shooter)
-                        .andThen(new InstantCommand(() -> shooterPrimed = true))
-                : // shoot
-                intake.getShootCommand(10)
-                        .andThen(new InstantCommand(() -> shooter.stop(), shooter))
-                        .andThen(new InstantCommand(() -> shooterPrimed = false))
-
-        );
+                        // shoot
+                        .andThen(intake.getShootCommand(10)
+                                // stop shooter
+                                .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
     }
 
     private double applyPreferences(double input, double exponent, double deadzone) {
