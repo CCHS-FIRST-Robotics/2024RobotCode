@@ -37,8 +37,9 @@ public final class Constants {
         REPLAY
     }
 
-    public static final int intakePort = 5;
-    public static final int shooterPort = 100;
+    public static final int intakeID = 5;
+    public static final int shooterID1 = 100;
+    public static final int shooterID2 = 100;
 
     // colin shit (do not look)
 

@@ -138,8 +138,8 @@ public class RobotContainer {
         // Set up auto routines
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
 		arm = new Arm();
-		intake = new Intake(new IntakeIONeo(Constants.intakePort));
-		shooter = new Shooter(new ShooterIOCIM(Constants.shooterPort));
+		intake = new Intake(new IntakeIONeo(Constants.intakeID));
+		shooter = new Shooter(new ShooterIOCIM(Constants.shooterID1, Constants.shooterID2));
 
         configureButtonBindings();
     }

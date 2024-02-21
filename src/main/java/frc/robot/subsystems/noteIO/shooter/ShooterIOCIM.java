@@ -6,30 +6,32 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 
 public class ShooterIOCIM implements ShooterIO {
-    TalonSRX motor;
+    TalonSRX motor1, motor2;
     SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0, 0);
     PIDController pid = new PIDController(0, 0, 0);
 
-    public ShooterIOCIM(int port) {
-        motor = new TalonSRX(port);
+    public ShooterIOCIM(int id1, int id2) {
+        motor1 = new TalonSRX(id1);
+        motor2 = new TalonSRX(id2);
     }
 
     @Override
     public void setVelocity(double velocity) {
         double feedForwardVolts = feedForward.calculate(velocity);
-        double pidVolts = pid.calculate(motor.getSelectedSensorVelocity(), velocity);
-        this.setVoltage(feedForwardVolts + pidVolts);
+        double pidVolts = pid.calculate(motor1.getSelectedSensorVelocity(), velocity);
+        setVoltage(feedForwardVolts + pidVolts);
     }
 
     @Override
     public void setVoltage(double volts) {
-        motor.set(TalonSRXControlMode.PercentOutput, volts / 12);
+        motor1.set(TalonSRXControlMode.PercentOutput, volts / 12);
+        motor2.set(TalonSRXControlMode.PercentOutput, volts / 12);
     }
 
     @Override
     public void updateInputs(ShooterIOInputsAutoLogged inputs) {
-        inputs.motorVoltage = motor.getMotorOutputVoltage();
-        inputs.motorCurrent = motor.getSupplyCurrent();
-        inputs.motorVelocity = motor.getSelectedSensorVelocity();
+        inputs.motorVoltage = motor1.getMotorOutputVoltage();
+        inputs.motorCurrent = motor1.getSupplyCurrent();
+        inputs.motorVelocity = motor1.getSelectedSensorVelocity();
     }
 }

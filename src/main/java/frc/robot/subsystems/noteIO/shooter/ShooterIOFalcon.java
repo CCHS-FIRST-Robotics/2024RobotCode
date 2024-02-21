@@ -7,17 +7,18 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 
 public class ShooterIOFalcon implements ShooterIO {
-    TalonFX motor;
+    TalonFX motor1, motor2;
     SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0, 0);
     PIDController pid = new PIDController(0, 0, 0);
 
-    StatusSignal<Double> voltageSignal = motor.getMotorVoltage();
-    StatusSignal<Double> currentSignal = motor.getSupplyCurrent();
-    StatusSignal<Double> velocitySignal = motor.getVelocity();
-    StatusSignal<Double> tempSignal = motor.getDeviceTemp();
+    StatusSignal<Double> voltageSignal = motor1.getMotorVoltage();
+    StatusSignal<Double> currentSignal = motor1.getSupplyCurrent();
+    StatusSignal<Double> velocitySignal = motor1.getVelocity();
+    StatusSignal<Double> tempSignal = motor1.getDeviceTemp();
 
-    public ShooterIOFalcon(int port) {
-        motor = new TalonFX(port);
+    public ShooterIOFalcon(int id1, int id2) {
+        motor1 = new TalonFX(id1);
+        motor2 = new TalonFX(id2);
     }
 
     @Override
@@ -29,7 +30,8 @@ public class ShooterIOFalcon implements ShooterIO {
 
     @Override
     public void setVoltage(double volts) {
-        motor.setVoltage(volts);
+        motor1.setVoltage(volts);
+        motor2.setVoltage(volts);
     }
 
     @Override

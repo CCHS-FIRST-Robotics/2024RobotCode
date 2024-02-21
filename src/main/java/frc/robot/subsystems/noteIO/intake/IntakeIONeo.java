@@ -8,8 +8,8 @@ public class IntakeIONeo implements IntakeIO {
     CANSparkMax motor;
     RelativeEncoder encoder;
 
-    public IntakeIONeo(int port) {
-        motor = new CANSparkMax(port, MotorType.kBrushless);
+    public IntakeIONeo(int id) {
+        motor = new CANSparkMax(id, MotorType.kBrushless);
         encoder = motor.getEncoder();
     }
 
