@@ -252,8 +252,8 @@ public class RobotContainer {
 
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
         String path = "SThreeNote";
-        new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
-        // controller.x().onTrue(
+        // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
+        controller.x().onTrue(
             drive.runOnce(
                 () -> {
                     
