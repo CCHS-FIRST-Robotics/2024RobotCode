@@ -99,9 +99,9 @@ public class Drive extends SubsystemBase {
     private double kPy = 0.35; // 0.33
     private double kPHeading = 2; // 0.25 // 0.5
 
-    private double kDx = 0.35; // 0.4
-    private double kDy = 0.35; // 0.33
-    private double kDHeading = 2; // 0.25 // 0.5
+    private double kDx = 0.0;
+    private double kDy = 0.0;
+    private double kDHeading = 0; 
 
     private double kIx = 0.12; // 0.12
     private double kIy = 0.12; // 0.15
