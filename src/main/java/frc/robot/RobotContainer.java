@@ -310,9 +310,9 @@ public class RobotContainer {
         // intake
         controller.a().onTrue(intake.getIntakeCommand(10));
         // outtake
-        controller.leftTrigger().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
+        controller.leftBumper().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
         // move towards shooter
-        controller.rightTrigger().whileTrue((new StartEndCommand(() -> intake.start(10), () -> intake.stop(), intake)));
+        controller.rightBumper().whileTrue((new StartEndCommand(() -> intake.start(10), () -> intake.stop(), intake)));
         // shoot
         controller.b().onTrue(new InstantCommand(() -> shooter.shoot(0), shooter));
     }
