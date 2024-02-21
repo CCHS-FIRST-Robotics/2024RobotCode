@@ -67,9 +67,10 @@ public class RobotContainer {
     private final Vision camera;
     private final PoseEstimator poseEstimator;
 
-    private final Arm arm;
-    private final Intake intake;
-    private final Shooter shooter;
+    Arm arm;
+    Intake intake;
+    Shooter shooter;
+    boolean shooterPrimed = false;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);

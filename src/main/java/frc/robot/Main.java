@@ -9,15 +9,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 /**
  * to do:
  * 
- * never look at colin's swerve code
- * make shooter actually work
- * uhh add arm angle controls
  * get david to do "sysid on shooter"
- * 
- * 
- * probably will use another controller for arm
- * 
- //! neos for intake
  */
 public final class Main {
     private Main() {
