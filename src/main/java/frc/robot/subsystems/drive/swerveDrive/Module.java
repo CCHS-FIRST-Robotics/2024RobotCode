@@ -50,20 +50,11 @@ public class Module {
         // double prevVel = getVelocityMetersPerSec();
         io.updateInputs(inputs);
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
-        // double acceleration = (getVelocityMetersPerSec() - prevVel) / 0.02;
-        // if (Math.abs(acceleration) > 50) System.out.println(acceleration);
-
-    // until we figure out how to use the logger
-        // SmartDashboard.putNumber("Drive Position", Units.radiansToDegrees(inputs.drivePositionRad));
-        // SmartDashboard.putNumber("Drive Velocity", Units.radiansToDegrees(inputs.driveVelocityRadPerSec));
-        // SmartDashboard.putNumber("Turn Absolute Position", Units.radiansToDegrees(inputs.turnAbsolutePositionRad));
-        // SmartDashboard.putNumber("Turn Relative Position", Units.radiansToDegrees(inputs.turnPositionRad));
-        // SmartDashboard.putNumber("Turn Velocity", Units.radiansToDegrees(inputs.turnVelocityRadPerSec));
     }
 
     /**
-     * Runs the module with the specified setpoint state. Must be called periodically. Returns the
-     * optimized state.
+     * Runs the module with the specified setpoint state. 
+     * Must be called periodically. Returns the optimized state.
      * 
      * @param targetState The desired state of the module
      * @return The optimized state of the module
@@ -85,6 +76,8 @@ public class Module {
         // draw out the current/desired vectors, and remember that cos is like the dot product, 
         // it projects one vector onto the other, idk I cant make sense of it rn im tired asf
         optimizedState.speedMetersPerSecond *= Math.cos(inputs.turnAbsolutePositionRad.in(Radians) - optimizedState.angle.getRadians());
+        
+        // constrian velocity based on voltage and previous velocity using motor dynamics
         optimizedState.speedMetersPerSecond = MathUtil.clamp(
             optimizedState.speedMetersPerSecond,
             getMaxVelocity(-inputs.driveAverageBusVoltage.in(Volts), prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, io.driveKv, io.driveKa) * wheelRadius.in(Meters),
@@ -134,8 +127,8 @@ public class Module {
     }
 
     /**
-     * Runs the module with the specified voltage while controlling to zero degrees. Must be called
-     * periodically.
+     * Runs the module with the specified voltage while controlling to zero degrees. 
+     * Must be called periodically.
      */
     public void runCharacterization(Measure<Voltage> volts) {
         // System.out.println(volts.in(Volts));

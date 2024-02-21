@@ -144,7 +144,9 @@ public class RobotContainer {
     public Translation2d getTargetTranslation(Pose3d targetPose) {
         Pose2d currentPose = drive.getPose();
 
-        Translation2d translationToTargetGround = targetPose.getTranslation().toTranslation2d().minus(currentPose.getTranslation());
+        Translation2d translationToTargetGround = targetPose.getTranslation()
+                                                    .toTranslation2d()
+                                                    .minus(currentPose.getTranslation());
         return translationToTargetGround;
     }
 

@@ -89,7 +89,13 @@ public class DriveTrajectory {
             for (int i = 0; i < this.positionTrajectory.size(); i++) {
                 Pose2d pose = this.positionTrajectory.get(i);
                 Twist2d twist = this.velocityTrajectory.get(i);
-                String[] data = {Double.toString(pose.getX()), Double.toString(pose.getY()), Double.toString(pose.getRotation().getRadians()), Double.toString(twist.dx), Double.toString(twist.dy), Double.toString(twist.dtheta)};
+                String[] data = {
+                    Double.toString(pose.getX()), 
+                    Double.toString(pose.getY()), 
+                    Double.toString(pose.getRotation().getRadians()), 
+                    Double.toString(twist.dx), Double.toString(twist.dy), 
+                    Double.toString(twist.dtheta)
+                };
                 writer.writeNext(data);
             }
             writer.close();

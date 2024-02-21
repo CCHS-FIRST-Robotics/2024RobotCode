@@ -76,7 +76,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         System.out.println("[Init] Creating ModuleIOSparkMax " + Integer.toString(index));
         this.index = index;
 
-        driveSparkMax = new CANSparkMax(2 + 2 *index, MotorType.kBrushless);
+        driveSparkMax = new CANSparkMax(2 + 2 * index, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(1 + 2 * index, MotorType.kBrushless);
 
         driveSparkMaxPIDF = driveSparkMax.getPIDController();
