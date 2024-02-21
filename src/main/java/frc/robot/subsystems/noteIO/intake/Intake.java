@@ -1,5 +1,7 @@
 package frc.robot.subsystems.noteIO.intake;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.littletonrobotics.junction.Logger;
@@ -38,5 +40,15 @@ public class Intake extends SubsystemBase {
         }
 
         io.setVoltage(volts);
+    }
+
+    public Command getIntakeCommand(double v) {
+        return new FunctionalCommand(
+                () -> start(v),
+                () -> {
+                },
+                (interrupted) -> stop(),
+                () -> checkNoteThere(),
+                this);
     }
 }

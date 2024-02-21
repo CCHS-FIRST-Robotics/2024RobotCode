@@ -65,9 +65,9 @@ public class RobotContainer {
     private final Vision camera;
     private final PoseEstimator poseEstimator;
 
-	private final Arm arm;
-	private final Intake intake;
-	private final Shooter shooter;
+    private final Arm arm;
+    private final Intake intake;
+    private final Shooter shooter;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -139,7 +139,6 @@ public class RobotContainer {
 		intake = new Intake(null);
 		shooter = new Shooter(new ShooterIOCIM(Constants.shooterPort));
 
-        // Configure the button bindings
         configureButtonBindings();
     }
 
