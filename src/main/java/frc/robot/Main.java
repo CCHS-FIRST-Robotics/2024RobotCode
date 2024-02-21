@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.RobotBase;
  * make shooter actually work
  * uhh add arm angle controls
  * get david to do "sysid on shooter"
+ * 
+ //! neos for intake
  */
 public final class Main {
     private Main() {

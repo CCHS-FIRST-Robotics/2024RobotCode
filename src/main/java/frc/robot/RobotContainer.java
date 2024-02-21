@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -305,6 +306,15 @@ public class RobotContainer {
                 }
             )
         );
+
+        // intake
+        controller.a().onTrue(intake.getIntakeCommand(10));
+        // outtake
+        controller.leftTrigger().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
+        // move towards shooter
+        controller.rightTrigger().whileTrue((new StartEndCommand(() -> intake.start(10), () -> intake.stop(), intake)));
+        // shoot
+        controller.b().onTrue(new InstantCommand(() -> shooter.shoot(0), shooter));
     }
 
     private double applyPreferences(double input, double exponent, double deadzone) {
