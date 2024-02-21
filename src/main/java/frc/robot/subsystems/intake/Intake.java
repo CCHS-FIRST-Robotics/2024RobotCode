@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.swerveDrive.ModuleIOInputsAutoLogged;
 
@@ -39,5 +40,9 @@ public class Intake extends SubsystemBase {
         Logger.recordOutput("Intaking", volts != 0);
 
         io.setVoltage(volts);
+    }
+
+    public Command startEndCommmand() {
+        return startEnd(() -> start(12), () -> stop());
     }
 }
