@@ -4,11 +4,11 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
-public class IntakeIONeo implements IntakeIO {
+public class IntakeIONEO implements IntakeIO {
     CANSparkMax motor;
     RelativeEncoder encoder;
 
-    public IntakeIONeo(int id) {
+    public IntakeIONEO(int id) {
         motor = new CANSparkMax(id, MotorType.kBrushless);
         encoder = motor.getEncoder();
     }
@@ -23,5 +23,6 @@ public class IntakeIONeo implements IntakeIO {
         inputs.motorVoltage = motor.getBusVoltage();
         inputs.motorCurrent = motor.getOutputCurrent();
         inputs.motorVelocity = encoder.getVelocity();
+        // donde le temperature signal
     }
 }

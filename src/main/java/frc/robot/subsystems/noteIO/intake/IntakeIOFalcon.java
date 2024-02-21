@@ -10,6 +10,7 @@ public class IntakeIOFalcon implements IntakeIO {
     StatusSignal<Double> voltageSignal = motor.getMotorVoltage();
     StatusSignal<Double> currentSignal = motor.getSupplyCurrent();
     StatusSignal<Double> velocitySignal = motor.getVelocity();
+    // donde le temperature signal
 
     public IntakeIOFalcon(int id) {
         motor = new TalonFX(id);

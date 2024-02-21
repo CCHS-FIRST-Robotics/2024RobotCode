@@ -5,6 +5,8 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 
 public class ShooterIOFalcon implements ShooterIO {
@@ -15,6 +17,8 @@ public class ShooterIOFalcon implements ShooterIO {
     PIDController pid = new PIDController(0, 0, 0);
 
     MotionMagicVoltage driveMotionMagic = new MotionMagicVoltage(0);
+    // keep in mind this is for a trapezoid profile, and usually for positional control only
+    // phoenix actually doesn't have the ability to do expo motion magic with velocity control yet, so dw about it
 
     StatusSignal<Double> voltageSignal = motor1.getMotorVoltage();
     StatusSignal<Double> currentSignal = motor1.getSupplyCurrent();
@@ -32,6 +36,7 @@ public class ShooterIOFalcon implements ShooterIO {
         double pidVolts = pid.calculate(velocitySignal.refresh().getValue(), velocity);
 
         // ! might be right????
+        // kinda but not really -- look at the arm code
         motor1.setControl(driveMotionMagic.withFeedForward(feedForwardVolts));
 
         setVoltage(feedForwardVolts + pidVolts);

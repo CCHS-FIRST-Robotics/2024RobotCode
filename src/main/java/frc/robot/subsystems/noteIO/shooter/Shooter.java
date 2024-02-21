@@ -28,5 +28,6 @@ public class Shooter extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("shooter", inputs);
         Logger.recordOutput("shooterCurrent", inputs.motorCurrent);
+        // why are you logging a subfield of inputs if youre logging inputs
     }
 }

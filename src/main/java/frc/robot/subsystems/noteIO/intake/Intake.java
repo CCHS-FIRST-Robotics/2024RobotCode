@@ -25,6 +25,7 @@ public class Intake extends SubsystemBase {
         volts = 0;
     }
 
+    // probably should be private
     public boolean checkNoteThere() {
         if (inputs.motorCurrent > 15 && inputs.motorVelocity > 5000 * (volts / 12)) {
             return true;
@@ -52,9 +53,10 @@ public class Intake extends SubsystemBase {
                 () -> checkNoteThere(),
                 this);
     }
-
+    
     public Command getShootCommand(double v) {
         // turns motor on until note not detected
+        // ^ This might not work in reality because the current might drop under even though we still have the note in the intake
         return new FunctionalCommand(
                 () -> start(v),
                 () -> {
