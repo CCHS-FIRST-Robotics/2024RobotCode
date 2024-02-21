@@ -251,46 +251,26 @@ public class RobotContainer {
         );
 
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
-        // String path = "SThreeNote";
-        // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
-        // // controller.x().onTrue(
-        //     drive.runOnce(
-        //         () -> {
-                    
-        //             var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
-        //             // adjust so that the start of the trajectory is where the robot is
-        //             // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
-        //             // traj.translateBy(drive.getPose().getTranslation());
-
-        //             System.out.println("recording pos traj");
-        //             Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
-
-        //             System.out.println("Writing trajectory to CSV");
-        //             traj.toCSV(path);
-        //             drive.runPosition(traj);
-        //         }
-        //     ).asProxy().andThen(new ThreeNoteAuto(drive, intake, new MechanismsPath(path)))
-        // );
-
+        String path = "SThreeNote";
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
-            // controller.x().onTrue(
-                drive.runOnce(
-                    () -> {
-                        String path = "ThirdFloorTest1";
-                        var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
-                        // adjust so that the start of the trajectory is where the robot is
-                        // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
-                        // traj.translateBy(drive.getPose().getTranslation());
-    
-                        System.out.println("recording pos traj");
-                        Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
-    
-                        System.out.println("Writing trajectory to CSV");
-                        traj.toCSV(path);
-                        drive.runPosition(traj);
-                    }
-                )
-            );
+        // controller.x().onTrue(
+            drive.runOnce(
+                () -> {
+                    
+                    var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
+                    // adjust so that the start of the trajectory is where the robot is
+                    // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
+                    // traj.translateBy(drive.getPose().getTranslation());
+
+                    System.out.println("recording pos traj");
+                    Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
+
+                    System.out.println("Writing trajectory to CSV");
+                    traj.toCSV(path);
+                    drive.runPosition(traj);
+                }
+            ).asProxy().andThen(new ThreeNoteAuto(drive, intake, new MechanismsPath(path)))
+        );
 
         // controller.b().onTrue(
         //     Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
