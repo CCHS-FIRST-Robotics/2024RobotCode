@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import org.littletonrobotics.junction.Logger;
@@ -18,7 +19,6 @@ public class Intake extends SubsystemBase {
     boolean noteThere;
     SlewRateLimiter voltLimiter = new SlewRateLimiter(6);
     IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged(); // class created by MotorIO interface
-    FollowPathHolonomic
 
     public Intake() {
         io = new IntakeIOCIM(12, 13);
@@ -45,5 +45,9 @@ public class Intake extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("motorVoltage", inputs);
         Logger.recordOutput("motorCurrent", io.motor.getSupplyCurrent());
+    }
+
+    public Command startEndCommmand() {
+        return startEnd(() -> start(12), () -> stop());
     }
 }

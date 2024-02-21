@@ -32,8 +32,9 @@ import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.DriveWithWiimote;
 import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
-import frc.robot.commands.ThreeNoteAuto;
+import frc.robot.commands.AutoRoutine;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.Constants.AutoPathConstants;
 
 // import frc.robot.subsystems.mecaDrive.Drive;
 // import frc.robot.subsystems.mecaDrive.DriveIO;
@@ -107,6 +108,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 false
             );
+            intake = new Intake();
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -120,6 +122,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 false
             );
+            intake = new Intake();
             camera = new Vision(new CameraIOZED());
             break;
         }
@@ -244,26 +247,27 @@ public class RobotContainer {
         );
 
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
-        String path = "SThreeNote";
+        String path = AutoPathConstants.THREE_NOTE_WING;
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
+            new AutoRoutine(drive, new MechanismsPath(path, intake))
         // controller.x().onTrue(
 
-            drive.runOnce(
-                () -> {
+            // drive.runOnce(
+            //     () -> {
                     
-                    var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
-                    // adjust so that the start of the trajectory is where the robot is
-                    // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
-                    // traj.translateBy(drive.getPose().getTranslation());
+            //         var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
+            //         // adjust so that the start of the trajectory is where the robot is
+            //         // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
+            //         // traj.translateBy(drive.getPose().getTranslation());
 
-                    System.out.println("recording pos traj");
-                    Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
+            //         System.out.println("recording pos traj");
+            //         Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
 
-                    System.out.println("Writing trajectory to CSV");
-                    traj.toCSV(path);
-                    drive.runPosition(traj);
-                }
-            ).asProxy().andThen(new ThreeNoteAuto(drive, intake, new MechanismsPath(path)))
+            //         System.out.println("Writing trajectory to CSV");
+            //         traj.toCSV(path);
+            //         drive.runPosition(traj);
+            //     }
+            // ).asProxy().andThen(new AutoRoutine(drive, new MechanismsPath(path, intake)))
         );
 
         // controller.b().onTrue(

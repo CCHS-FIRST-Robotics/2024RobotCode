@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
-public class ThreeNoteAuto extends Command {
+public class AutoRoutine extends Command {
 
   private final Timer timer = new Timer();
   // private final Supplier<Pose2d> poseSupplier;
@@ -43,20 +43,12 @@ public class ThreeNoteAuto extends Command {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ThreeNoteAuto(Drive drive, Intake intake, MechanismsPath path) {
+  public AutoRoutine(Drive drive, MechanismsPath path) {
     // m_subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     this.drive = drive;
-    this.intake = intake;
     addRequirements(drive);
-    addRequirements(intake);
     this.path = path;
-
-    /*
-     * Add event markers
-     */
-    path.addEventMarker(0.38, new IntakeNote(intake)); // intake 2nd note
-    path.addEventMarker(2.60, new IntakeNote(intake)); // intake 3rd note
 
     // add requirements
     for (Pair<Double, Command> marker : path.getEventMarkers()) {
@@ -68,7 +60,7 @@ public class ThreeNoteAuto extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    
+
     // Initialize marker stuff
     currentEventCommands.clear();
     untriggeredEvents.clear();
@@ -76,16 +68,25 @@ public class ThreeNoteAuto extends Command {
 
     timer.reset();
     timer.start();
+
+    // runs drive command with path
+    drive.runOnce(
+        () -> {
+          var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.getPath());
+          drive.runPosition(traj);
+        });
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
 
+    // checks if the time has reached when an event is supposed to happen
     if (!untriggeredEvents.isEmpty() && timer.hasElapsed(untriggeredEvents.get(0).getFirst())) {
       // Time to trigger this event command
       Pair<Double, Command> event = untriggeredEvents.remove(0);
 
+      // checks is not trying to run a command already running
       for (var runningCommand : currentEventCommands.entrySet()) {
         if (!runningCommand.getValue()) {
           continue;
