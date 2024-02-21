@@ -173,6 +173,8 @@ public class DriveWithJoysticks extends Command {
         prevSpeeds = speeds;
 
         // System.out.println(speeds.omegaRadiansPerSecond);
+
+        Logger.recordOutput("targetVelocityField", speeds);
         
         drive.runVelocity(speeds);
     }

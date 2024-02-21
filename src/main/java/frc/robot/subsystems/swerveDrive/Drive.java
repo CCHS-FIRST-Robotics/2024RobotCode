@@ -444,6 +444,7 @@ public class Drive extends SubsystemBase {
                 // System.out.println(adjustedSpeeds);
 
                 // Uses the IK to convert from chassis velocities to individual swerve module positions/velocities
+                Logger.recordOutput("Target Velocity", adjustedSpeeds);
                 SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(adjustedSpeeds);
 
                 // Ensure a module isnt trying to go faster than max
