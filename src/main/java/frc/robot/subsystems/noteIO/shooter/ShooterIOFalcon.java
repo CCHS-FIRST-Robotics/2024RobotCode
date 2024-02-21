@@ -25,7 +25,7 @@ public class ShooterIOFalcon implements ShooterIO {
     public void setVelocity(double velocity) {
         double feedForwardVolts = feedForward.calculate(velocity);
         double pidVolts = pid.calculate(velocitySignal.refresh().getValue(), velocity);
-        this.setVoltage(feedForwardVolts + pidVolts);
+        setVoltage(feedForwardVolts + pidVolts);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class ShooterIOFalcon implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputsAutoLogged inputs) {
-        BaseStatusSignal.refreshAll(voltageSignal, currentSignal, velocitySignal, tempSignal);
+        BaseStatusSignal.refreshAll(voltageSignal, currentSignal, velocitySignal);
         inputs.motorVoltage = voltageSignal.getValue();
         inputs.motorCurrent = currentSignal.getValue();
         inputs.motorVelocity = velocitySignal.getValue();

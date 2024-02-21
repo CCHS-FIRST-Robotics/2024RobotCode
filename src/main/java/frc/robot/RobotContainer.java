@@ -67,12 +67,11 @@ public class RobotContainer {
     private final Vision camera;
     private final PoseEstimator poseEstimator;
 
-    Arm arm;
-    Intake intake;
-    Shooter shooter;
+    private final Arm arm;
+    private final Intake intake;
+    private final Shooter shooter;
     boolean shooterPrimed = false;
 
-    // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
     private final CommandGenericHID wiiRemote1 = new CommandGenericHID(2);
     // private final CommandGenericHID wiiRemote2 = new CommandGenericHID(3);
@@ -311,20 +310,28 @@ public class RobotContainer {
 
         // lol filler arm code
         arm.setDefaultCommand(new ArmControlWithJoysticks(
-            arm, 
-            () -> controller.getLeftX(),
-            () -> controller.getLeftY(),
-            () -> controller.getRightX()
-        ));
+                arm,
+                () -> controller.getLeftX(),
+                () -> controller.getLeftY(),
+                () -> controller.getRightX()));
+
+        // outtake
+        controller.x().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
 
         // intake
         controller.a().onTrue(intake.getIntakeCommand(10));
-        // outtake
-        controller.leftBumper().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
-        // move towards shooter
-        controller.rightBumper().whileTrue((new StartEndCommand(() -> intake.start(10), () -> intake.stop(), intake)));
+
         // shoot
-        controller.b().onTrue(new InstantCommand(() -> shooter.shoot(0), shooter));
+        controller.b().onTrue(!shooterPrimed ?
+        // prime shooter
+                new InstantCommand(() -> shooter.start(10), shooter)
+                        .andThen(new InstantCommand(() -> shooterPrimed = true))
+                : // shoot
+                intake.getShootCommand(10)
+                        .andThen(new InstantCommand(() -> shooter.stop(), shooter))
+                        .andThen(new InstantCommand(() -> shooterPrimed = false))
+
+        );
     }
 
     private double applyPreferences(double input, double exponent, double deadzone) {

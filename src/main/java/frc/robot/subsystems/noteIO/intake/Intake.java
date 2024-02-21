@@ -43,12 +43,24 @@ public class Intake extends SubsystemBase {
     }
 
     public Command getIntakeCommand(double v) {
+        // turns motor on until note detected
         return new FunctionalCommand(
                 () -> start(v),
                 () -> {
                 },
                 (interrupted) -> stop(),
                 () -> checkNoteThere(),
+                this);
+    }
+
+    public Command getShootCommand(double v) {
+        // turns motor on until note not detected
+        return new FunctionalCommand(
+                () -> start(v),
+                () -> {
+                },
+                (interrupted) -> stop(),
+                () -> !checkNoteThere(),
                 this);
     }
 }
