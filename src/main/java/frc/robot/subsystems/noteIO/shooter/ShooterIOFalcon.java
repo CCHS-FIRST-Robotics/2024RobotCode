@@ -5,11 +5,16 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 
 public class ShooterIOFalcon implements ShooterIO {
     TalonFX motor1, motor2;
+
+    // I have no idea how to do a motion magic
     SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0, 0);
     PIDController pid = new PIDController(0, 0, 0);
+
+    MotionMagicVoltage driveMotionMagic = new MotionMagicVoltage(0);
 
     StatusSignal<Double> voltageSignal = motor1.getMotorVoltage();
     StatusSignal<Double> currentSignal = motor1.getSupplyCurrent();
@@ -25,6 +30,10 @@ public class ShooterIOFalcon implements ShooterIO {
     public void setVelocity(double velocity) {
         double feedForwardVolts = feedForward.calculate(velocity);
         double pidVolts = pid.calculate(velocitySignal.refresh().getValue(), velocity);
+
+        // ! might be right????
+        motor1.setControl(driveMotionMagic.withFeedForward(feedForwardVolts));
+
         setVoltage(feedForwardVolts + pidVolts);
     }
 

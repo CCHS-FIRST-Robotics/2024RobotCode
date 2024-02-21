@@ -9,15 +9,15 @@ import edu.wpi.first.wpilibj.RobotBase;
 /**
  * to do:
  * 
+ * AAAAAAARM stuff
+ * 
  * shooter:
  * Proper feedforward and feedback using the Phoenix API for velocity control,
  * using exponential motion magic (check the Phoenix docs for details)
- * 
  * A sysid routine and signal logger export for motor data (should be pretty
  * much identical to how the arm was done, David you might want to do this one)
  * 
- * ! ask colin if intake and shoot commands should move the arm to angle or if
- * should be done manually
+ * ! ask colin if intake and shoot commands should move the arm to angle
  */
 public final class Main {
     private Main() {
