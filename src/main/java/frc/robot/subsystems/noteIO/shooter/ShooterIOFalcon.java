@@ -38,6 +38,5 @@ public class ShooterIOFalcon implements ShooterIO {
         inputs.motorVoltage = voltageSignal.getValue();
         inputs.motorCurrent = currentSignal.getValue();
         inputs.motorVelocity = velocitySignal.getValue();
-        inputs.motorTemperature = tempSignal.getValue();
     }
 }

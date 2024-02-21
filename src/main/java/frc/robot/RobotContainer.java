@@ -34,6 +34,7 @@ import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.DriveWithWiimote;
 import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
+import frc.robot.commands.ArmControlWithJoysticks;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.DriveTrajectoryGenerator;
@@ -137,7 +138,7 @@ public class RobotContainer {
         // Set up auto routines
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
 		arm = new Arm();
-		intake = new Intake(null);
+		intake = new Intake(new IntakeIONeo(Constants.intakePort));
 		shooter = new Shooter(new ShooterIOCIM(Constants.shooterPort));
 
         configureButtonBindings();
@@ -306,6 +307,14 @@ public class RobotContainer {
                 }
             )
         );
+
+        // lol filler arm code
+        arm.setDefaultCommand(new ArmControlWithJoysticks(
+            arm, 
+            () -> controller.getLeftX(),
+            () -> controller.getLeftY(),
+            () -> controller.getRightX()
+        ));
 
         // intake
         controller.a().onTrue(intake.getIntakeCommand(10));

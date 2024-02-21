@@ -14,6 +14,9 @@ import edu.wpi.first.wpilibj.RobotBase;
  * uhh add arm angle controls
  * get david to do "sysid on shooter"
  * 
+ * 
+ * probably will use another controller for arm
+ * 
  //! neos for intake
  */
 public final class Main {

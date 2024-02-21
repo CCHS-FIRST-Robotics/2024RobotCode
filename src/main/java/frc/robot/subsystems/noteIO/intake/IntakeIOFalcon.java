@@ -13,10 +13,8 @@ public class IntakeIOFalcon implements IntakeIO {
     StatusSignal<Double> velocitySignal = motor.getVelocity();
     StatusSignal<Double> tempSignal = motor.getDeviceTemp();
 
-    public IntakeIOFalcon(int port1, int port2) {
-        motor = new TalonFX(port1);
-        follower = new TalonFX(port2);
-        follower.setControl(new Follower(motor.getDeviceID(), false));
+    public IntakeIOFalcon(int port) {
+        motor = new TalonFX(port);
     }
 
     @Override
