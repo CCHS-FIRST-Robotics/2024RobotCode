@@ -30,6 +30,8 @@ public class Intake extends SubsystemBase {
             return true;
         }
         return false;
+        // there's this crazy thing called a boolean idk if youve heard of it
+        return inputs.motorCurrent > 15 && inputs.motorVelocity > 5000 * (volts / 12);
     }
 
     @Override
