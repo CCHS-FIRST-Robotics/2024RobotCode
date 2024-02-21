@@ -9,11 +9,10 @@ import edu.wpi.first.wpilibj.RobotBase;
 /**
  * to do:
  * 
- * ask colin what kind of drivebase it'll be using (probably swerve)
- * make shooter actually work
- * make intake for one motor only
- * uhh add arm angle controls
  * never look at colin's swerve code
+ * make shooter actually work
+ * uhh add arm angle controls
+ * get david to do "sysid on shooter"
  */
 public final class Main {
     private Main() {
