@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swerveDrive;
+package frc.robot.subsystems.drive.swerveDrive;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -42,6 +42,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.swerveDrive.GyroIOInputsAutoLogged;
 import frc.robot.utils.DriveTrajectory;
 import frc.robot.utils.PoseEstimator;
 

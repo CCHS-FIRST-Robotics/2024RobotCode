@@ -12,7 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
 import frc.robot.*;
-import frc.robot.subsystems.mecaDrive.Drive;
+import frc.robot.subsystems.drive.mecaDrive.Drive;
 
 import com.choreo.lib.*;
 import com.ctre.phoenix6.controls.ControlRequest;

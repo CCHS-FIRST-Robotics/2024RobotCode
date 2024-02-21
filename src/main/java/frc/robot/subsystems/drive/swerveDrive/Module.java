@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swerveDrive;
+package frc.robot.subsystems.drive.swerveDrive;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -14,6 +14,7 @@ import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.subsystems.swerveDrive.ModuleIOInputsAutoLogged;
 import frc.robot.utils.SwerveKinematicUtils;
 
 import org.littletonrobotics.junction.Logger;

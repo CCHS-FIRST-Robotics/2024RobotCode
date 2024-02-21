@@ -32,13 +32,7 @@ import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.DriveWithWiimote;
 import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
-
-// import frc.robot.subsystems.mecaDrive.Drive;
-// import frc.robot.subsystems.mecaDrive.DriveIO;
-// import frc.robot.subsystems.mecaDrive.DriveIOSim;
-// import frc.robot.subsystems.mecaDrive.DriveIOSparkMax;
-
-import frc.robot.subsystems.swerveDrive.*;
+import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.PoseEstimator;
