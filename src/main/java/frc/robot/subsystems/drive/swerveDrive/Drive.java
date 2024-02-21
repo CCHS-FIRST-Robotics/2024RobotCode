@@ -42,7 +42,6 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.subsystems.swerveDrive.GyroIOInputsAutoLogged;
 import frc.robot.utils.DriveTrajectory;
 import frc.robot.utils.PoseEstimator;
 
