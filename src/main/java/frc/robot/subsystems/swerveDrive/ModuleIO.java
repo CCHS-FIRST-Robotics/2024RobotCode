@@ -7,8 +7,8 @@ import static edu.wpi.first.units.Units.*;
 
 public interface ModuleIO {
 
-    public double driveKa = 0.136898;
-    public double driveKv = 0.020864;
+    public double driveKv = 0.136898;
+    public double driveKa = 0.0148;
     
     @AutoLog
     public static class ModuleIOInputs {

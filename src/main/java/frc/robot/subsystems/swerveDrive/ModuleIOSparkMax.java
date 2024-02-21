@@ -37,7 +37,7 @@ public class ModuleIOSparkMax implements ModuleIO {
     public double driveKi = 0.000000; // 0.000008
     public double driveKs = 0.0; // 0.19
     public double driveKv = 0.136898; // From NEO datasheet (473kV): 0.136194 V/(rad/s) - https://www.wolframalpha.com/input?i=1%2F%28473+*+2pi%2F60%29+*+%2850.0+%2F+14.0%29+*+%2817.0+%2F+27.0%29+*+%2845.0+%2F+15.0%29
-    public double driveKa = 0.020864; // 0.0148
+    public double driveKa = 0.0148; // 0.0148
 
     public double turnKp = 8; 
     public double turnKd = 0.00;

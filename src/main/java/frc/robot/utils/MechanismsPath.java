@@ -24,7 +24,7 @@ import com.ctre.phoenix6.controls.ControlRequest;
 
 public final class MechanismsPath {
 
-    private List<Pair<Double, Command>> eventMarkers;
+    private List<Pair<Double, Command>> eventMarkers = new ArrayList<Pair<Double, Command>>();
     private String path;
     private AutoPathConstants constants;
 

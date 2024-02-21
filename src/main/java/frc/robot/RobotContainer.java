@@ -34,7 +34,6 @@ import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
 import frc.robot.commands.AutoRoutine;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.Constants.AutoPathConstants;
 
 // import frc.robot.subsystems.mecaDrive.Drive;
 // import frc.robot.subsystems.mecaDrive.DriveIO;
@@ -94,7 +93,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 useWiiRemotes
             );
-            intake = new Intake();
+            intake = new Intake(new IntakeIOFalcon(1, 1));
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -108,7 +107,6 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 false
             );
-            intake = new Intake();
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -122,7 +120,6 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 false
             );
-            intake = new Intake();
             camera = new Vision(new CameraIOZED());
             break;
         }
@@ -131,7 +128,11 @@ public class RobotContainer {
             drive.getKinematics(),
             new Rotation2d(),
             drive.getModulePositions(),
-            new Pose2d()
+            new Pose2d(
+                1.4318007230758516,
+                5.557066917419431,
+                new Rotation2d()
+            )
         );
 
         drive.setPoseEstimator(poseEstimator);
@@ -247,13 +248,12 @@ public class RobotContainer {
         );
 
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
-        String path = AutoPathConstants.THREE_NOTE_WING;
+        String path = "SThreeNote";
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
-            new AutoRoutine(drive, new MechanismsPath(path, intake))
         // controller.x().onTrue(
 
-            // drive.runOnce(
-            //     () -> {
+            drive.runOnce(
+                () -> {
                     
             //         var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
             //         // adjust so that the start of the trajectory is where the robot is
