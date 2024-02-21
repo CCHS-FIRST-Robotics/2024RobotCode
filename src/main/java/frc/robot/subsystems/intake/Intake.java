@@ -1,5 +1,7 @@
 package frc.robot.subsystems.intake;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.swerveDrive.ModuleIOInputsAutoLogged;
 
@@ -11,7 +13,6 @@ public class Intake extends SubsystemBase {
     boolean noteThere;
     SlewRateLimiter voltLimiter = new SlewRateLimiter(6);
     IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged(); // class created by MotorIO interface
-    FollowPathHolonomic
 
     public Intake(IntakeIO io) {
         this.io = io;

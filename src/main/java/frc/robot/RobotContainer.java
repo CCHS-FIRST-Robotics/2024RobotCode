@@ -34,6 +34,8 @@ import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
 import frc.robot.commands.AutoRoutine;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIOFalcon;
+import frc.robot.Constants.AutoPathConstants;
 
 // import frc.robot.subsystems.mecaDrive.Drive;
 // import frc.robot.subsystems.mecaDrive.DriveIO;
@@ -107,6 +109,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 false
             );
+            intake = new Intake(new IntakeIOFalcon(1, 1));
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -120,6 +123,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 false
             );
+            intake = new Intake(new IntakeIOFalcon(1, 1));
             camera = new Vision(new CameraIOZED());
             break;
         }
@@ -248,12 +252,14 @@ public class RobotContainer {
         );
 
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
-        String path = "SThreeNote";
+        String path = AutoPathConstants.THREE_NOTE_WING;
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
+            new AutoRoutine(drive, new MechanismsPath(path, intake))
+        // controller.x().onTrue(
         // controller.x().onTrue(
 
-            drive.runOnce(
-                () -> {
+            // drive.runOnce(
+            //     () -> {
                     
             //         var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
             //         // adjust so that the start of the trajectory is where the robot is
