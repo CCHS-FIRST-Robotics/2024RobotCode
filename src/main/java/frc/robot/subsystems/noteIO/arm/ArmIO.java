@@ -6,7 +6,7 @@ import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
 
 public interface ArmIO {
-    
+
     @AutoLog
     public static class ArmIOInputs {
         public Measure<Angle> drivePosition = Radians.of(0.0);
@@ -17,23 +17,31 @@ public interface ArmIO {
     }
 
     /** Updates the set of loggable inputs. */
-    public default void updateInputs(ArmIOInputs inputs) {}
+    public default void updateInputs(ArmIOInputs inputs) {
+    }
 
     /** Run the drive motor at the specified voltage. */
-    public default void setDriveVoltage(Measure<Voltage> volts) {}
+    public default void setDriveVoltage(Measure<Voltage> volts) {
+    }
 
     /** Run the turn motor to the specified position. */
-    public default void setDrivePosition(Measure<Angle> positionRad) {}
+    public default void setDrivePosition(Measure<Angle> positionRad) {
+    }
 
     /** Enable or disable brake mode on the drive motor. */
-    public default void setDriveBrakeMode(boolean enable) {}
+    public default void setDriveBrakeMode(boolean enable) {
+    }
 
-    public default void setMusicTrack(String path) {}
+    public default void setMusicTrack(String path) {
+    }
 
-    public default void playMusic() {}
+    public default void playMusic() {
+    }
 
-    public default void pauseMusic() {}
+    public default void pauseMusic() {
+    }
 
-    public default void stopMusic() {}
+    public default void stopMusic() {
+    }
 
 }

@@ -21,25 +21,23 @@ import edu.wpi.first.units.*;
 // rev sucks
 public class Arm extends SubsystemBase {
 
-
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
     private SysIdRoutine sysIdRoutine;
     private SignalLogger signalLogger;
     // length and position of the arm in relation to the robot's center
     private final double armLength = 0.0; // TODO: set this
-    private final Translation2d armOffset = new Translation2d(0.0, .425); // TODO: set this 
+    private final Translation2d armOffset = new Translation2d(0.0, .425); // TODO: set this
 
     public Arm(ArmIO io) {
         this.io = io;
         sysIdRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(), 
-            new SysIdRoutine.Mechanism(
-            (Measure<Voltage> volts) -> {
-                io.setDriveVoltage(volts);
-            },
-            null, this
-        ));
+                new SysIdRoutine.Config(),
+                new SysIdRoutine.Mechanism(
+                        (Measure<Voltage> volts) -> {
+                            io.setDriveVoltage(volts);
+                        },
+                        null, this));
         SignalLogger.start();
     }
 
@@ -77,18 +75,18 @@ public class Arm extends SubsystemBase {
     public Command alignWithTarget(Supplier<Translation2d> translationToTargetGround, Supplier<Pose3d> targetPose) {
         return run(() -> {
             Translation2d armOffset = getArmOffset();
-            Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.get().getNorm(), targetPose.get().getZ());
+            Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.get().getNorm(),
+                    targetPose.get().getZ());
             Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
-            setArmAngle(Radians.of(Math.PI/2.0 - targetArmAngle.getRadians())); // add 90 degrees since 0 is vertical
+            setArmAngle(Radians.of(Math.PI / 2.0 - targetArmAngle.getRadians())); // add 90 degrees since 0 is vertical
         });
     }
 
     public Command playMusic(String path) {
         return runOnce(
-                () -> io.setMusicTrack(path)
-            )
-            .andThen(() -> {
-                io.playMusic();
-            });
+                () -> io.setMusicTrack(path))
+                .andThen(() -> {
+                    io.playMusic();
+                });
     }
 }

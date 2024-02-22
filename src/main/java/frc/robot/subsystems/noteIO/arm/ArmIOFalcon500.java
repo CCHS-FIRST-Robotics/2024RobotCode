@@ -29,9 +29,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
-
-
-
 public class ArmIOFalcon500 implements ArmIO {
     /* MOTOR CONTROLLERS + PID */
     private final TalonFX driveFalcon;
@@ -45,8 +42,6 @@ public class ArmIOFalcon500 implements ArmIO {
 
     // I rise! FeedFwd momment!
 
-
-
     private final MotionMagicVoltage driveMotionMagic = new MotionMagicVoltage(0);
     private final MotionMagicConfigs driveMMConfig = driveFalconConfig.MotionMagic;
     private final Slot0Configs drivePID = driveFalconConfig.Slot0;
@@ -57,7 +52,6 @@ public class ArmIOFalcon500 implements ArmIO {
     StatusSignal<Double> driveAppliedVoltageSignal;
     StatusSignal<Double> driveCurrentSignal;
     StatusSignal<Double> driveTempSignal;
-
 
     // TODO: update constants in periodic once tunable is set up
     private static final double driveKp = 100;
@@ -85,12 +79,8 @@ public class ArmIOFalcon500 implements ArmIO {
         driveMMConfig.MotionMagicCruiseVelocity = 5; // 1 rotation every 1 seconds
         driveMMConfig.MotionMagicAcceleration = 10; // 1 second to reach max speed
         driveMMConfig.MotionMagicJerk = 30; // .1 seconds to reach max accel
-        
-        
-        
 
         // Feedforward momment!
-
 
         drivePID.kP = driveKp;
         drivePID.kI = driveKi;
@@ -112,30 +102,30 @@ public class ArmIOFalcon500 implements ArmIO {
         orchestra.addInstrument(driveFalcon);
 
         StatusCode status = StatusCode.StatusCodeNotInitialized;
-        for(int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 5; ++i) {
             status = driveFalcon.getConfigurator().apply(driveFalconConfig);
-        if (status.isOK()) break;
+            if (status.isOK())
+                break;
         }
         if (!status.isOK()) {
             System.out.println("Could not configure device. Error: " + status.toString());
         }
 
         // tatus!!!!
-        
+
     }
 
     @Override
     public void updateInputs(ArmIOInputs inputs) {
         BaseStatusSignal.refreshAll(
-            drivePositionSignal,
-            driveVelocitySignal,
-            driveAppliedVoltageSignal,
-            driveCurrentSignal,
-            driveTempSignal
-        );
+                drivePositionSignal,
+                driveVelocitySignal,
+                driveAppliedVoltageSignal,
+                driveCurrentSignal,
+                driveTempSignal);
 
         inputs.drivePosition = Rotations.of(drivePositionSignal.getValueAsDouble());
-        inputs.driveVelocity = RotationsPerSecond.of(driveVelocitySignal.getValueAsDouble()) ;
+        inputs.driveVelocity = RotationsPerSecond.of(driveVelocitySignal.getValueAsDouble());
         inputs.driveAppliedVolts = Volts.of(driveAppliedVoltageSignal.getValueAsDouble());
         inputs.driveCurrent = Amps.of(driveCurrentSignal.getValueAsDouble());
         inputs.driveTemp = Celsius.of(driveTempSignal.getValueAsDouble());
@@ -149,16 +139,15 @@ public class ArmIOFalcon500 implements ArmIO {
     @Override
     public void setDrivePosition(Measure<Angle> positionRad) {
         // for testing, dont let the arm go past 90 degrees in either direction
-        // positionRad = Radians.of(MathUtil.clamp(positionRad.in(Radians), -Math.PI/2.0, Math.PI/2.0));
-        positionRad = Radians.of(MathUtil.clamp(positionRad.in(Radians), Math.PI/6, Math.PI/3));  //uhh probably incorrect fix?
+        // positionRad = Radians.of(MathUtil.clamp(positionRad.in(Radians),
+        // -Math.PI/2.0, Math.PI/2.0));
+        positionRad = Radians.of(MathUtil.clamp(positionRad.in(Radians), Math.PI / 6, Math.PI / 3)); // uhh probably
+                                                                                                     // incorrect fix?
         // driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
 
         // lol this is NOT going to work
         driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
-    
 
-
-        
     }
 
     public void setMusicTrack(String path) {
@@ -166,7 +155,7 @@ public class ArmIOFalcon500 implements ArmIO {
         var status = orchestra.loadMusic(path);
 
         if (!status.isOK()) {
-        // log error
+            // log error
             System.out.println("MUSIC LOADING ERROR\n" + status.toString());
         }
     }
@@ -185,6 +174,6 @@ public class ArmIOFalcon500 implements ArmIO {
 
     // @Override
     // public void setDriveBrakeMode(boolean enable) {
-    //     driveFalcon.setBrakeMode(enable);
+    // driveFalcon.setBrakeMode(enable);
     // }
 }
