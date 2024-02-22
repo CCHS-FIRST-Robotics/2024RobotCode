@@ -27,5 +27,6 @@ public class IntakeIONEO implements IntakeIO {
         // donde le temperature signal *
         // *donde est*
         // I didn't think it was necessary????
+        // well if the motor goes up in smoke we're gonna wanna see the temp logs
     }
 }

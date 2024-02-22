@@ -49,6 +49,7 @@ public class Intake extends SubsystemBase {
         // turns motor on until note not detected
         // ! ^ This might not work in reality because the current might drop under even
         // ! though we still have the note in the intake
+        // how else could you do this?
         return new FunctionalCommand(
                 () -> start(v),
                 () -> {

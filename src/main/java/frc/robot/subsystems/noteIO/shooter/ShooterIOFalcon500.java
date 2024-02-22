@@ -15,6 +15,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
 
     MotionMagicExpoVoltage driveMotionMagic = new MotionMagicExpoVoltage(0);
 
+    // runtime error :)
     StatusSignal<Double> voltageSignal = motor1.getMotorVoltage();
     StatusSignal<Double> currentSignal = motor1.getSupplyCurrent();
     StatusSignal<Double> velocitySignal = motor1.getVelocity();
