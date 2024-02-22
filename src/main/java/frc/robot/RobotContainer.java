@@ -14,6 +14,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -33,20 +35,17 @@ import frc.robot.commands.DriveWithWiimote;
 import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
 import frc.robot.commands.AutoRoutine;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeIOFalcon;
 import frc.robot.Constants.AutoPathConstants;
-
-// import frc.robot.subsystems.mecaDrive.Drive;
-// import frc.robot.subsystems.mecaDrive.DriveIO;
-// import frc.robot.subsystems.mecaDrive.DriveIOSim;
-// import frc.robot.subsystems.mecaDrive.DriveIOSparkMax;
-
-import frc.robot.subsystems.swerveDrive.*;
+import frc.robot.commands.ArmControlWithJoysticks;
+import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.MechanismsPath;
 import frc.robot.utils.PoseEstimator;
+import frc.robot.subsystems.noteIO.arm.*;
+import frc.robot.subsystems.noteIO.intake.*;
+import frc.robot.subsystems.noteIO.shooter.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -64,14 +63,18 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
  * scheduler calls). Instead, the structure of the robot (including subsystems,
  * commands, and button mappings) should be declared here.
  */
+
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final Intake intake;
     private final Vision camera;
     private final PoseEstimator poseEstimator;
 
-    // Controller
+    private final Arm arm;
+    private final Intake intake;
+    private final Shooter shooter;
+    boolean shooterPrimed = false;
+
     private final CommandXboxController controller = new CommandXboxController(0);
     private final CommandGenericHID wiiRemote1 = new CommandGenericHID(2);
     // private final CommandGenericHID wiiRemote2 = new CommandGenericHID(3);
@@ -95,7 +98,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 useWiiRemotes
             );
-            intake = new Intake(new IntakeIOFalcon(1, 1));
+            intake = new Intake(new IntakeIOFalcon500(1));
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -109,7 +112,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 false
             );
-            intake = new Intake(new IntakeIOFalcon(1, 1));
+			intake = new Intake(new IntakeIOFalcon500(1)); // TODO: CHANGE TO SIM IMPL!
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -123,7 +126,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 false
             );
-            intake = new Intake(new IntakeIOFalcon(1, 1));
+			intake = new Intake(new IntakeIOFalcon500(1));
             camera = new Vision(new CameraIOZED());
             break;
         }
@@ -144,8 +147,9 @@ public class RobotContainer {
 
         // Set up auto routines
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
+		arm = new Arm(new ArmIOFalcon500(100));
+		shooter = new Shooter(new ShooterIOCIM(Constants.shooterID1, Constants.shooterID2));
 
-        // Configure the button bindings
         configureButtonBindings();
     }
 
@@ -163,7 +167,9 @@ public class RobotContainer {
     public Translation2d getTargetTranslation(Pose3d targetPose) {
         Pose2d currentPose = drive.getPose();
 
-        Translation2d translationToTargetGround = targetPose.getTranslation().toTranslation2d().minus(currentPose.getTranslation());
+        Translation2d translationToTargetGround = targetPose.getTranslation()
+                                                    .toTranslation2d()
+                                                    .minus(currentPose.getTranslation());
         return translationToTargetGround;
     }
 
@@ -254,9 +260,8 @@ public class RobotContainer {
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
         String path = AutoPathConstants.THREE_NOTE_WING;
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
+        // controller.x().onTrue(
             new AutoRoutine(drive, new MechanismsPath(path, intake))
-        // controller.x().onTrue(
-        // controller.x().onTrue(
 
             // drive.runOnce(
             //     () -> {
@@ -314,6 +319,27 @@ public class RobotContainer {
                 }
             )
         );
+
+        // lol filler arm code
+        arm.setDefaultCommand(new ArmControlWithJoysticks(
+                arm,
+                () -> controller.getLeftX(),
+                () -> controller.getLeftY(),
+                () -> controller.getRightX()));
+
+        // outtake
+        controller.x().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
+
+        // intake
+        controller.a().onTrue(intake.getIntakeCommand(10));
+
+        controller.b().onTrue(
+                // prime shooter
+                new InstantCommand(() -> shooter.start(10), shooter)
+                        // shoot
+                        .andThen(intake.getShootCommand(10)
+                                // stop shooter
+                                .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
     }
 
     private double applyPreferences(double input, double exponent, double deadzone) {

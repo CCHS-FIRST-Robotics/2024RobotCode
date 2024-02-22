@@ -16,8 +16,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.*;
 import frc.robot.Constants.AutoPathConstants;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.mecaDrive.Drive;
+import frc.robot.subsystems.noteIO.intake.Intake;
 
 import com.choreo.lib.*;
 import com.ctre.phoenix6.controls.ControlRequest;

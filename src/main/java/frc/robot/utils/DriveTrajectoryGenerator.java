@@ -12,7 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
 import frc.robot.*;
-import frc.robot.subsystems.mecaDrive.Drive;
+import frc.robot.subsystems.drive.mecaDrive.Drive;
 
 import com.choreo.lib.*;
 import com.ctre.phoenix6.controls.ControlRequest;
@@ -23,7 +23,10 @@ public final class DriveTrajectoryGenerator {
 
     }
 
-    public static DriveTrajectory generateTrapezoidTrajectory2(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints linearConstraints, Constraints angularConstraints) {
+    public static DriveTrajectory generateTrapezoidTrajectory2(
+        Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, 
+        Constraints linearConstraints, Constraints angularConstraints
+    ) {
 
         // System.out.println("TESTING");
         // System.out.println(targetPose);
@@ -80,7 +83,13 @@ public final class DriveTrajectoryGenerator {
 
         var profileHeading = new TrapezoidProfile(angularConstraints);
 
-        Translation2d[] translationTrajectory = new QuadraticProfile(Constants.PERIOD).getCombinedSetPoints(currentPose.getTranslation(), targetPose.getTranslation(), linearConstraints.maxVelocity, linearConstraints.maxAcceleration);
+        Translation2d[] translationTrajectory = new QuadraticProfile(Constants.PERIOD)
+                                                    .getCombinedSetPoints(
+                                                        currentPose.getTranslation(), 
+                                                        targetPose.getTranslation(), 
+                                                        linearConstraints.maxVelocity, 
+                                                        linearConstraints.maxAcceleration
+                                                    );
 
         // Find the max time it takes to reach setpoint
         double timeToEnd = Math.max(translationTrajectory.length * Constants.PERIOD, profileHeading.totalTime());
@@ -122,7 +131,10 @@ public final class DriveTrajectoryGenerator {
         return new DriveTrajectory(poseTrajectory, velocityTrajectory);
     }
 
-    public static DriveTrajectory generateGuidedTrapezoidTrajectory(Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, Constraints linearConstraints, Constraints angularConstraints, ArrayList<Pose2d> guidePoints) {
+    public static DriveTrajectory generateGuidedTrapezoidTrajectory(
+        Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity, 
+        Constraints linearConstraints, Constraints angularConstraints, ArrayList<Pose2d> guidePoints
+    ) {
         var trajectories = new ArrayList<DriveTrajectory>();
         for (int i = 0; i < guidePoints.size() + 1; i++) {
             Pose2d startPoint = (i == 0) ? currentPose : guidePoints.get(i - 1);
@@ -131,7 +143,9 @@ public final class DriveTrajectoryGenerator {
             Twist2d startVelocity = (i == 0) ? currentVelocity : new Twist2d();
             Twist2d endVelocity = (i == guidePoints.size()) ? targetVelocity : new Twist2d();
 
-            trajectories.add(generateTrapezoidTrajectory(endPoint, endVelocity, startPoint, startVelocity, linearConstraints, angularConstraints));
+            trajectories.add(generateTrapezoidTrajectory(
+                endPoint, endVelocity, startPoint, startVelocity, linearConstraints, angularConstraints
+            ));
         }
         
         DriveTrajectory finalTrajectory = new DriveTrajectory();

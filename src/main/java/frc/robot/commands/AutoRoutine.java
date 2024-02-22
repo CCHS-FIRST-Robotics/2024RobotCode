@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.swerveDrive.Drive;
+import frc.robot.subsystems.noteIO.intake.Intake;
+import frc.robot.subsystems.drive.swerveDrive.Drive;
 import frc.robot.utils.DriveTrajectory;
 import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.MechanismsPath;
@@ -47,7 +47,10 @@ public class AutoRoutine extends Command {
     // m_subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     this.drive = drive;
-    addRequirements(drive);
+    // this command isn't actully using the drive subsystem, but the command we call later will!
+    // so we don't want to add the requirement here or it'll override the requirement of the command we call
+    // that probably wasnt a good explanation so just text me if it makes no sense
+    // addRequirements(drive);
     this.path = path;
 
     // add requirements
@@ -70,11 +73,18 @@ public class AutoRoutine extends Command {
     timer.start();
 
     // runs drive command with path
-    drive.runOnce(
-        () -> {
-          var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.getPath());
-          drive.runPosition(traj);
-        });
+
+    // you weren't actually starting this command, just creating it (like for example you dont just do new RunCommand(...), you do Trigger.onTrue(new RunCommand()) - it needs to know when to start)
+    // drive.runOnce(
+    //     () -> {
+    //       var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.getPath());
+    //       drive.runPosition(traj);
+    //     });
+    // also, we already made this command using the command factory in Drive.java (which also logs the path to akit)
+    drive.followTrajectory(
+      DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.getPath())
+    ).schedule(); // now it creates the command (returned from the method) and schedules it :)
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.

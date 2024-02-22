@@ -1,4 +1,4 @@
-package frc.robot.subsystems.mecaDrive;
+package frc.robot.subsystems.drive.mecaDrive;
 import frc.robot.Constants.HardwareConstants;
 
 import org.littletonrobotics.junction.Logger;
@@ -9,7 +9,6 @@ import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.mecaDrive.DriveIOInputsAutoLogged;
 
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.drive.MecanumDrive.WheelSpeeds;
@@ -42,11 +41,11 @@ public class Drive extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.getInstance().processInputs("Drive", inputs);
+    Logger.processInputs("Drive", inputs);
 
     // Update odometry and log the new pose
     odometry.update(getHeading(), getWheelPositions());
-    Logger.getInstance().recordOutput("Odometry", getPose());
+    Logger.recordOutput("Odometry", getPose());
   }
 
   /**

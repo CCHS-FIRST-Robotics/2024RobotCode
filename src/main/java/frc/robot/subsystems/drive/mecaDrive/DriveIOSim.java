@@ -1,4 +1,4 @@
-package frc.robot.subsystems.mecaDrive;
+package frc.robot.subsystems.drive.mecaDrive;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
