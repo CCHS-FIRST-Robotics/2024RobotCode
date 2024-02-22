@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * 
  * ! ask colin if intake and shoot commands should move the arm to angle
  * ! ask colin about conflicting button mappings in robotcontainer
+ * ! ask colin why shooter even needs motionmagic
  * 
  * ! shooter motion magic stuff
  * ! intake shoot() command
