@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import frc.robot.subsystems.mecaDrive.Drive;
+import frc.robot.subsystems.drive.mecaDrive.Drive;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -89,7 +89,13 @@ public class DriveTrajectory {
             for (int i = 0; i < this.positionTrajectory.size(); i++) {
                 Pose2d pose = this.positionTrajectory.get(i);
                 Twist2d twist = this.velocityTrajectory.get(i);
-                String[] data = {Double.toString(pose.getX()), Double.toString(pose.getY()), Double.toString(pose.getRotation().getRadians()), Double.toString(twist.dx), Double.toString(twist.dy), Double.toString(twist.dtheta)};
+                String[] data = {
+                    Double.toString(pose.getX()), 
+                    Double.toString(pose.getY()), 
+                    Double.toString(pose.getRotation().getRadians()), 
+                    Double.toString(twist.dx), Double.toString(twist.dy), 
+                    Double.toString(twist.dtheta)
+                };
                 writer.writeNext(data);
             }
             writer.close();

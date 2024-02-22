@@ -41,6 +41,12 @@ public final class Constants {
         REPLAY
     }
 
+    public static final int intakeID = 5;
+    public static final int shooterID1 = 100;
+    public static final int shooterID2 = 100;
+
+    // colin shit (do not look)
+
     public static final double PERIOD = .02;
 
     // TODO: change to tunable numbers
@@ -76,15 +82,7 @@ public final class Constants {
         // center of the robot in meters
         public static final double WHEEL_ABSOLUTE_X_METERS = 0.2794;
         public static final double WHEEL_ABSOLUTE_Y_METERS = 0.31115;
-
-        // public static final Translation2d FL_WHEEL_POS = new
-        // Translation2d(WHEEL_ABSOLUTE_Y_METERS, WHEEL_ABSOLUTE_X_METERS);
-        // public static final Translation2d FR_WHEEL_POS = new
-        // Translation2d(-WHEEL_ABSOLUTE_Y_METERS, WHEEL_ABSOLUTE_X_METERS);
-        // public static final Translation2d RL_WHEEL_POS = new
-        // Translation2d(WHEEL_ABSOLUTE_Y_METERS, -WHEEL_ABSOLUTE_X_METERS);
-        // public static final Translation2d RR_WHEEL_POS = new
-        // Translation2d(-WHEEL_ABSOLUTE_Y_METERS, -WHEEL_ABSOLUTE_X_METERS);
+        
 
         public static final Translation2d FL_WHEEL_POS = new Translation2d(WHEEL_ABSOLUTE_X_METERS,
                 WHEEL_ABSOLUTE_Y_METERS);

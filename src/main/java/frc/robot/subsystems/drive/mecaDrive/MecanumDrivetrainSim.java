@@ -1,4 +1,4 @@
-package frc.robot.subsystems.mecaDrive;
+package frc.robot.subsystems.drive.mecaDrive;
 
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.math.system.plant.DCMotor;

@@ -1,8 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.Constants;
-
-import frc.robot.subsystems.swerveDrive.*;
+import frc.robot.subsystems.drive.swerveDrive.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -63,7 +62,9 @@ public class DriveWithJoysticks extends Command {
         
         headingAngleSupplier = headingSupplier;
 
-        angularProfile = new TrapezoidProfile(new Constraints(drive.getMaxAngularSpeed(), drive.getMaxAngularAcceleration()));
+        angularProfile = new TrapezoidProfile(
+            new Constraints(drive.getMaxAngularSpeed(), drive.getMaxAngularAcceleration())
+        );
     }
 
     @Override
@@ -94,7 +95,8 @@ public class DriveWithJoysticks extends Command {
 
         // APPLY ABSOLUTE HEADING CONTROL
         if (angularSpeed == 0) {
-            headingGoal = headingAngleSupplier.get().getDegrees() == -1 ? headingGoal : MathUtil.angleModulus(headingAngleSupplier.get().getRadians());
+            headingGoal = headingAngleSupplier.get().getDegrees() == -1 ? headingGoal 
+                            : MathUtil.angleModulus(headingAngleSupplier.get().getRadians());
             double currentHeadingRad = drive.getYaw().getRadians();
         
             State targetState = new State(headingGoal, 0);
@@ -108,7 +110,8 @@ public class DriveWithJoysticks extends Command {
                 targetState // goal state
             );
 
-            angularSpeed = nextState.velocity + headingController.calculate(drive.getYaw().getRadians(), nextState.position);
+            angularSpeed = nextState.velocity 
+                            + headingController.calculate(drive.getYaw().getRadians(), nextState.position);
             if (headingController.atSetpoint()) angularSpeed = 0;
             // divide by max speed to get as a percentage of max (for continuity with joystick control)
             angularSpeed = angularSpeed / drive.getMaxAngularSpeed().in(RadiansPerSecond);

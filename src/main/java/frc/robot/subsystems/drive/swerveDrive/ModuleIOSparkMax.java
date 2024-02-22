@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swerveDrive;
+package frc.robot.subsystems.drive.swerveDrive;
 
 // import com.ctre.phoenix6.configs.CANcoderConfiguration;
 // import com.ctre.phoenix6.hardware.CANcoder;
@@ -76,7 +76,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         System.out.println("[Init] Creating ModuleIOSparkMax " + Integer.toString(index));
         this.index = index;
 
-        driveSparkMax = new CANSparkMax(2 + 2 *index, MotorType.kBrushless);
+        driveSparkMax = new CANSparkMax(2 + 2 * index, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(1 + 2 * index, MotorType.kBrushless);
 
         driveSparkMaxPIDF = driveSparkMax.getPIDController();
