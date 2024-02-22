@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.AutoPathConstants;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -80,6 +81,12 @@ public class Arm extends SubsystemBase {
             Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.get().getNorm(), targetPose.get().getZ());
             Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
             setArmAngle(Radians.of(Math.PI/2.0 - targetArmAngle.getRadians())); // add 90 degrees since 0 is vertical
+        });
+    }
+
+    public Command alignForHandoff() {
+        return run(() -> {
+            setArmAngle(Radians.of(AutoPathConstants.ARM_HANDOFF_ANGLE));
         });
     }
 
