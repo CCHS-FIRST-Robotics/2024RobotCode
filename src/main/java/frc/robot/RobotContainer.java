@@ -261,7 +261,7 @@ public class RobotContainer {
         String path = AutoPathConstants.THREE_NOTE_WING;
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
         // controller.x().onTrue(
-            new AutoRoutine(drive, new MechanismsPath(path, intake))
+            new AutoRoutine(drive, new MechanismsPath(path, intake, shooter, arm))
 
             // drive.runOnce(
             //     () -> {

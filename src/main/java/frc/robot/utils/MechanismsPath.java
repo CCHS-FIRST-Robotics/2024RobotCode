@@ -16,7 +16,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.*;
 import frc.robot.Constants.AutoPathConstants;
+import frc.robot.subsystems.noteIO.arm.Arm;
 import frc.robot.subsystems.noteIO.intake.Intake;
+import frc.robot.subsystems.noteIO.shooter.Shooter;
 
 import com.choreo.lib.*;
 import com.ctre.phoenix6.controls.ControlRequest;
@@ -27,13 +29,24 @@ public final class MechanismsPath {
     private String path;
     private AutoPathConstants constants;
 
-    public MechanismsPath(String path, Intake intake) {
+    /* adds set markers */
+    public MechanismsPath(String path, Intake intake, Shooter shooter, Arm arm) {
         this.path = path;
-        constants = new AutoPathConstants(intake);
-        addEventMarkers();
+        constants = new AutoPathConstants(intake, shooter, arm);
+        addConstEventMarkers();
     }
 
-    public void addEventMarkers() {
+    /* won't add set markers intially */
+    public MechanismsPath(String path) {
+        this.path = path;
+    }
+
+    public void addEventMarker(double time, Command eventCommand) {
+        eventMarkers.add(Pair.of(time, eventCommand));
+        // time in seconds
+    }
+
+    public void addConstEventMarkers() {
         for (Map.Entry<Pair<Double,Command>, String> em : constants.eventMarkerMap.entrySet()) {
             if (em.getValue().equals(path)) {
                 eventMarkers.add(em.getKey());

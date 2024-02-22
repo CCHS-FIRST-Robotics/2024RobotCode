@@ -15,7 +15,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.noteIO.arm.Arm;
 import frc.robot.subsystems.noteIO.intake.Intake;
+import frc.robot.subsystems.noteIO.shooter.Shooter;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -110,7 +112,7 @@ public final class Constants {
         public static final String TWO_NOTE_RIGHT = "STwoNoteRight";
         public static final String FOUR_NOTE_LEFT= "SFourNoteLeft";
  
-        public AutoPathConstants(Intake intake) { //shooter, drive.], etc??
+        public AutoPathConstants(Intake intake, Shooter shooter, Arm arm) { 
             //probably a way to consolidate times here cause stuff happens at the same time for similar patterns ill do it later
             eventMarkerMap.put(Pair.of(0.38, intake.startEndCommmand()), THREE_NOTE_WING);
             eventMarkerMap.put(Pair.of(2.6, intake.startEndCommmand()), THREE_NOTE_WING);

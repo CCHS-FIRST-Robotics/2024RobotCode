@@ -38,11 +38,6 @@ public class AutoRoutine extends Command {
   private final Map<Command, Boolean> currentEventCommands = new HashMap<>();
   private final List<Pair<Double, Command>> untriggeredEvents = new ArrayList<>();
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
   public AutoRoutine(Drive drive, MechanismsPath path) {
     // m_subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
