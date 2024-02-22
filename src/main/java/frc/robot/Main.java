@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * much identical to how the arm was done, David you might want to do this one)
  * 
  * ! ask colin if intake and shoot commands should move the arm to angle
+ * ! ask colin about conflicting button mappings in robotcontainer
  * 
  * ! shooter motion magic stuff
  * ! intake shoot() command
