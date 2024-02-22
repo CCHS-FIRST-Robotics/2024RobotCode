@@ -31,6 +31,8 @@ public class Intake extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("intake", inputs);
 
+        // for sim
+        Logger.recordOutput("Intaking", volts != 0);
         io.setVoltage(volts);
     }
 
