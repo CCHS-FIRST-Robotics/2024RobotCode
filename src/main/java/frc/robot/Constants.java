@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.drive.swerveDrive.Drive;
 import frc.robot.subsystems.noteIO.arm.Arm;
 import frc.robot.subsystems.noteIO.intake.Intake;
 import frc.robot.subsystems.noteIO.shooter.Shooter;
@@ -110,12 +111,17 @@ public final class Constants {
         public static final String TWO_NOTE_LEFT = "STwoNoteLeft";
         public static final String TWO_NOTE_CENTER = "STwoNoteCenter";
         public static final String TWO_NOTE_RIGHT = "STwoNoteRight";
-        public static final String FOUR_NOTE_LEFT= "SFourNoteLeft";
+        public static final String FOUR_NOTE_LEFT = "SFourNoteLeft";
+
+        public static final double INTAKE_VOLTS = 12;
  
-        public AutoPathConstants(Intake intake, Shooter shooter, Arm arm) { 
+        public AutoPathConstants(Drive drive, Intake intake, Shooter shooter, Arm arm) { 
             //probably a way to consolidate times here cause stuff happens at the same time for similar patterns ill do it later
-            eventMarkerMap.put(Pair.of(0.38, intake.startEndCommmand()), THREE_NOTE_WING);
-            eventMarkerMap.put(Pair.of(2.6, intake.startEndCommmand()), THREE_NOTE_WING);
+            eventMarkerMap.put(Pair.of(0.38, intake.getIntakeCommand(INTAKE_VOLTS)), THREE_NOTE_WING);
+            eventMarkerMap.put(Pair.of(0.38, intake.getIntakeCommand(INTAKE_VOLTS)), THREE_NOTE_WING);
+            eventMarkerMap.put(Pair.of(0.38, intake.getIntakeCommand(INTAKE_VOLTS)), THREE_NOTE_WING);
+            eventMarkerMap.put(Pair.of(0.38, intake.getIntakeCommand(INTAKE_VOLTS)), THREE_NOTE_WING);
+            eventMarkerMap.put(Pair.of(2.6, intake.getIntakeCommand(INTAKE_VOLTS)), THREE_NOTE_WING);
 
             eventMarkerMap.put(Pair.of(1.0, intake.startEndCommmand()), FOUR_NOTE_WING);
             eventMarkerMap.put(Pair.of(2.68, intake.startEndCommmand()), FOUR_NOTE_WING);

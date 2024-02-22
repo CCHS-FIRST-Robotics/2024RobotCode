@@ -24,4 +24,6 @@ public class Shooter extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("shooter", inputs);
     }
+
+
 }

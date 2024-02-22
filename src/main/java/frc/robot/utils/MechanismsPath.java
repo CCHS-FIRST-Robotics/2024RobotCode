@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.*;
 import frc.robot.Constants.AutoPathConstants;
+import frc.robot.subsystems.drive.swerveDrive.Drive;
 import frc.robot.subsystems.noteIO.arm.Arm;
 import frc.robot.subsystems.noteIO.intake.Intake;
 import frc.robot.subsystems.noteIO.shooter.Shooter;
@@ -30,9 +31,9 @@ public final class MechanismsPath {
     private AutoPathConstants constants;
 
     /* adds set markers */
-    public MechanismsPath(String path, Intake intake, Shooter shooter, Arm arm) {
+    public MechanismsPath(String path, Drive drive, Intake intake, Shooter shooter, Arm arm) {
         this.path = path;
-        constants = new AutoPathConstants(intake, shooter, arm);
+        constants = new AutoPathConstants(drive, intake, shooter, arm);
         addConstEventMarkers();
     }
 
