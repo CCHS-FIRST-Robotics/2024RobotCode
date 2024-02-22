@@ -34,6 +34,10 @@ public class Intake extends SubsystemBase {
         io.setVoltage(volts);
     }
 
+    public Command startEndCommmand() {
+        return startEnd(() -> start(12), () -> stop());
+    }
+
     public Command getIntakeCommand(double v) {
         // turns motor on until note detected
         return new FunctionalCommand(

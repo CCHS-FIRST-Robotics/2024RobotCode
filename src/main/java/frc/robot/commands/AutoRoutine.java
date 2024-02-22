@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.swerveDrive.Drive;
+import frc.robot.subsystems.noteIO.intake.Intake;
+import frc.robot.subsystems.drive.swerveDrive.Drive;
 import frc.robot.utils.DriveTrajectory;
 import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.MechanismsPath;

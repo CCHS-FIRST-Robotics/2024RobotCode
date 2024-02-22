@@ -35,8 +35,6 @@ import frc.robot.commands.DriveWithWiimote;
 import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
 import frc.robot.commands.AutoRoutine;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeIOFalcon;
 import frc.robot.Constants.AutoPathConstants;
 import frc.robot.commands.ArmControlWithJoysticks;
 import frc.robot.subsystems.drive.swerveDrive.*;
@@ -69,7 +67,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final Intake intake;
     private final Vision camera;
     private final PoseEstimator poseEstimator;
 
@@ -101,7 +98,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 useWiiRemotes
             );
-            intake = new Intake(new IntakeIOFalcon(1, 1));
+            intake = new Intake(new IntakeIOFalcon500(1));
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -115,7 +112,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 false
             );
-			intake = new Intake(new IntakeIOFalcon(1, 1)); // TODO: CHANGE TO SIM IMPL!
+			intake = new Intake(new IntakeIOFalcon500(1)); // TODO: CHANGE TO SIM IMPL!
             camera = new Vision(new CameraIOZED());
             break;
 
@@ -129,7 +126,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(3),
                 false
             );
-			intake = new Intake(new IntakeIOFalcon(1, 1));
+			intake = new Intake(new IntakeIOFalcon500(1));
             camera = new Vision(new CameraIOZED());
             break;
         }
@@ -151,7 +148,6 @@ public class RobotContainer {
         // Set up auto routines
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
 		arm = new Arm();
-		intake = new Intake(new IntakeIONEO(Constants.intakeID));
 		shooter = new Shooter(new ShooterIOCIM(Constants.shooterID1, Constants.shooterID2));
 
         configureButtonBindings();
