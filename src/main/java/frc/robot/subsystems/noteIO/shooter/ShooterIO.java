@@ -8,6 +8,7 @@ public interface ShooterIO {
         public double motorCurrent;
         public double motorVoltage;
         public double motorVelocity;
+        public double motorTemperature;
     }
 
     public default void setVelocity(double velocity) {

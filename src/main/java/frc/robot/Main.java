@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 /**
  * to do:
  * 
- * AAAAAAARM stuff
+ * arm stuff
  * 
  * shooter:
  * Proper feedforward and feedback using the Phoenix API for velocity control,
@@ -18,6 +18,9 @@ import edu.wpi.first.wpilibj.RobotBase;
  * much identical to how the arm was done, David you might want to do this one)
  * 
  * ! ask colin if intake and shoot commands should move the arm to angle
+ * 
+ * ! shooter motion magic stuff
+ * ! intake shoot() command
  */
 public final class Main {
     private Main() {

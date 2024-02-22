@@ -43,39 +43,40 @@ public class Robot extends LoggedRobot {
         Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
         Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
         switch (BuildConstants.DIRTY) {
-        case 0:
-            Logger.recordMetadata("GitDirty", "All changes committed");
-            break;
-        case 1:
-            Logger.recordMetadata("GitDirty", "Uncomitted changes");
-            break;
-        default:
-            Logger.recordMetadata("GitDirty", "Unknown");
-            break;
+            case 0:
+                Logger.recordMetadata("GitDirty", "All changes committed");
+                break;
+            case 1:
+                Logger.recordMetadata("GitDirty", "Uncomitted changes");
+                break;
+            default:
+                Logger.recordMetadata("GitDirty", "Unknown");
+                break;
         }
-        
+
         // Set up data receivers & replay source
         switch (Constants.currentMode) {
-        // Running on a real robot, log to a USB stick
-        case REAL:
-            // Logger.addDataReceiver(new WPILOGWriter());
-            Logger.addDataReceiver(new NT4Publisher());
-            // new PowerDistribution(0, ModuleType.kCTRE); // Enables power distribution logging
-            break;
+            // Running on a real robot, log to a USB stick
+            case REAL:
+                // Logger.addDataReceiver(new WPILOGWriter());
+                Logger.addDataReceiver(new NT4Publisher());
+                // new PowerDistribution(0, ModuleType.kCTRE); // Enables power distribution
+                // logging
+                break;
 
-        // Running a physics simulator, log to local folder
-        case SIM:
-            Logger.addDataReceiver(new WPILOGWriter());
-            Logger.addDataReceiver(new NT4Publisher());
-            break;
+            // Running a physics simulator, log to local folder
+            case SIM:
+                Logger.addDataReceiver(new WPILOGWriter());
+                Logger.addDataReceiver(new NT4Publisher());
+                break;
 
-        // Replaying a log, set up replay source
-        case REPLAY:
-            setUseTiming(false); // Run as fast as possible
-            String logPath = LogFileUtil.findReplayLog();
-            Logger.setReplaySource(new WPILOGReader(logPath));
-            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-            break;
+            // Replaying a log, set up replay source
+            case REPLAY:
+                setUseTiming(false); // Run as fast as possible
+                String logPath = LogFileUtil.findReplayLog();
+                Logger.setReplaySource(new WPILOGReader(logPath));
+                Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+                break;
         }
 
         // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
@@ -84,7 +85,7 @@ public class Robot extends LoggedRobot {
         // Start AdvantageKit & URCL loggers
         Logger.registerURCL(URCL.startExternal());
         Logger.start();
-        
+
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.
         robotContainer = new RobotContainer();

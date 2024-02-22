@@ -23,6 +23,9 @@ public class IntakeIONEO implements IntakeIO {
         inputs.motorVoltage = motor.getBusVoltage();
         inputs.motorCurrent = motor.getOutputCurrent();
         inputs.motorVelocity = encoder.getVelocity();
-        // donde le temperature signal
+        inputs.motorTemperature = motor.getMotorTemperature();
+        // donde le temperature signal *
+        // *donde est*
+        // I didn't think it was necessary????
     }
 }

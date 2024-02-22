@@ -3,10 +3,7 @@ package frc.robot.subsystems.noteIO.intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import org.littletonrobotics.junction.Logger;
-
-// be able to intake (turns off automatically), shoot (moves towards shooter), and outtake
 
 public class Intake extends SubsystemBase {
     IntakeIO io;
@@ -25,13 +22,7 @@ public class Intake extends SubsystemBase {
         volts = 0;
     }
 
-    // probably should be private
-    public boolean checkNoteThere() {
-        if (inputs.motorCurrent > 15 && inputs.motorVelocity > 5000 * (volts / 12)) {
-            return true;
-        }
-        return false;
-        // there's this crazy thing called a boolean idk if youve heard of it
+    private boolean checkNoteThere() {
         return inputs.motorCurrent > 15 && inputs.motorVelocity > 5000 * (volts / 12);
     }
 
@@ -53,10 +44,11 @@ public class Intake extends SubsystemBase {
                 () -> checkNoteThere(),
                 this);
     }
-    
+
     public Command getShootCommand(double v) {
         // turns motor on until note not detected
-        // ^ This might not work in reality because the current might drop under even though we still have the note in the intake
+        // ! ^ This might not work in reality because the current might drop under even
+        // ! though we still have the note in the intake
         return new FunctionalCommand(
                 () -> start(v),
                 () -> {

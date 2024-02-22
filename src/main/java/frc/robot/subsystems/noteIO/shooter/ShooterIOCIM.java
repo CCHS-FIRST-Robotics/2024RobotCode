@@ -33,5 +33,6 @@ public class ShooterIOCIM implements ShooterIO {
         inputs.motorVoltage = motor1.getMotorOutputVoltage();
         inputs.motorCurrent = motor1.getSupplyCurrent();
         inputs.motorVelocity = motor1.getSelectedSensorVelocity();
+        inputs.motorTemperature = motor1.getTemperature();
     }
 }
