@@ -18,6 +18,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.*;
 import frc.robot.Constants.AutoPathConstants;
+import frc.robot.Constants.EventCommand;
 import frc.robot.subsystems.drive.swerveDrive.Drive;
 import frc.robot.subsystems.noteIO.arm.Arm;
 import frc.robot.subsystems.noteIO.intake.Intake;
@@ -64,9 +65,9 @@ public final class MechanismsPath {
     }
 
     public void addConstEventMarkers() {
-        for (Map.Entry<Pair<Double,Integer>, ArrayList<String>> em : constants.eventMarkerMap.entrySet()) {
+        for (Map.Entry<Pair<Double,Constants.EventCommand>, ArrayList<String>> em : constants.eventMarkerMap.entrySet()) {
             if (em.getValue().equals(path)) {
-                eventMarkers.add(Pair.of(em.getKey().getFirst(), getCommand(em.getKey().getSecond())));
+                eventMarkers.add(Pair.of(em.getKey().getFirst(), getCommand(em.getKey().getSecond(), em.getKey().getFirst())));
             }
         }
         // time in seconds
@@ -77,49 +78,29 @@ public final class MechanismsPath {
         currentPath = path.get(currentPathNum);
     }
 
-    public Command getCommand(int commandNum) {
+    public Command getCommand(Constants.EventCommand commandNum, double time) {
         switch (commandNum) {
-            case AutoPathConstants.INTAKE:
+            case INTAKE:
                 return intake.getIntakeCommand(AutoPathConstants.INTAKE_VOLTS);
-            case AutoPathConstants.SHOOT:
+            case SHOOT:
                 return shooter.getShootNoteCommand(AutoPathConstants.SHOOT_VOLTS);
-            case AutoPathConstants.INTAKE_HANDOFF:
+            case INTAKE_HANDOFF:
                 return intake.getHandNoteCommand(AutoPathConstants.INTAKE_HANDOFF_VOLTS);
-            case AutoPathConstants.SHOOTER_HANDOFF:
+            case SHOOTER_HANDOFF:
                 return shooter.getReceiveNoteCommand(AutoPathConstants.SHOOTER_HANDOFF_VOLTS);
-            case AutoPathConstants.DRIVE_PATH:
-                return drive.autoFollowTrajectory();
-            case AutoPathConstants.ARM_SHOOT:
-                return arm.autoAlignWithTarget();
-            case AutoPathConstants.ARM_HANDOFF:
-                return arm.alignForHandoff();
+            case DRIVE_PATH:
+                return drive.followTrajectory(path);
+            case ARM_SHOOT:
+                return arm.getPosFromPath(path.get(0), time);
+            case ARM_HANDOFF:
+                return arm.getMoveAngleCommand(AutoPathConstants.ARM_HANDOFF_ANGLE);
             default:
-                return intake.runOnce(() -> {}); //idk
+                return null;
         }
     }
 
     public List<Pair<Double, Command>> getEventMarkers(){
         // put them in time order here
         return eventMarkers;
-    }
-
-    // public String getPath() {
-    //     return path;
-    // }
-
-    public Drive getDrive() {
-        return drive;
-    }
-
-    public Intake getIntake() {
-        return intake;
-    }
-
-    public Shooter getShooter() {
-        return shooter;
-    }
-
-    public Arm getArm() {
-        return arm;
     }
 }
