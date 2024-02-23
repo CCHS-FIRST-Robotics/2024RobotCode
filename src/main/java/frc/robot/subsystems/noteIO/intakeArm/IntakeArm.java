@@ -54,6 +54,10 @@ public class IntakeArm extends SubsystemBase {
         //
         // alex: ugh maybe like get the current from the shooter and after it detects
         // that the note has been fired, it tells the intake to stop?
+
+        // colin: ^ yep sounds good. Use a supplier since the two subsystems cant interact explicitly
+        // or maybe a command class
+        // idk
         return new FunctionalCommand(
                 () -> start(v),
                 () -> {
