@@ -1,9 +1,5 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.noteIO.intake.Intake;
-import frc.robot.subsystems.drive.swerveDrive.Drive;
-import frc.robot.utils.DriveTrajectory;
-import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.MechanismsPath;
 
 import java.util.ArrayList;
@@ -32,21 +28,15 @@ public class AutoRoutine extends Command {
   // private final Supplier<ChassisSpeeds> speedsSupplier;
   // private final Consumer<ChassisSpeeds> speedsOutput;
   private final MechanismsPath path;
-  Drive drive;
-  Intake intake;
 
   // For event markers
   private final Map<Command, Boolean> currentEventCommands = new HashMap<>();
   private final List<Pair<Double, Command>> untriggeredEvents = new ArrayList<>();
 
-  public AutoRoutine(Drive drive, MechanismsPath path) {
+  public AutoRoutine(MechanismsPath path) {
     // m_subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
-    this.drive = drive;
-    // this command isn't actully using the drive subsystem, but the command we call later will!
-    // so we don't want to add the requirement here or it'll override the requirement of the command we call
-    // that probably wasnt a good explanation so just text me if it makes no sense
-    // addRequirements(drive);
+ 
     this.path = path;
 
     // add requirements
@@ -67,19 +57,6 @@ public class AutoRoutine extends Command {
 
     timer.reset();
     timer.start();
-
-    // runs drive command with path
-
-    // you weren't actually starting this command, just creating it (like for example you dont just do new RunCommand(...), you do Trigger.onTrue(new RunCommand()) - it needs to know when to start)
-    // drive.runOnce(
-    //     () -> {
-    //       var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.getPath());
-    //       drive.runPosition(traj);
-    //     });
-    // also, we already made this command using the command factory in Drive.java (which also logs the path to akit)
-    // drive.followTrajectory(
-    //   DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.getPath())
-    // ).schedule(); // now it creates the command (returned from the method) and schedules it :)
 
   }
 
@@ -114,9 +91,6 @@ public class AutoRoutine extends Command {
       if (!runningCommand.getValue()) {
         continue;
       }
-
-      if (runningCommand.getKey().hasRequirement(path.getArm())) {
-        path.getArm().setCurrentArmPos(   ); // getting translation and pose from drive? idk? 
 
       runningCommand.getKey().execute();
 
