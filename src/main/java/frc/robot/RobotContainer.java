@@ -258,10 +258,10 @@ public class RobotContainer {
         );
 
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
-        String path = AutoPathConstants.THREE_NOTE_WING;
+       // String path = AutoPathConstants.THREE_NOTE_WING;
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
         // controller.x().onTrue(
-            new AutoRoutine(drive, new MechanismsPath(path, drive, intake, shooter, arm))
+            new AutoRoutine(drive, new MechanismsPath(AutoPathConstants.threeNoteWing, drive, intake, shooter, arm))
 
             // drive.runOnce(
             //     () -> {
@@ -337,7 +337,7 @@ public class RobotContainer {
                 // prime shooter
                 new InstantCommand(() -> shooter.start(10), shooter)
                         // shoot
-                        .andThen(intake.getShootCommand(10)
+                        .andThen(intake.getHandNoteCommand(10)
                                 // stop shooter
                                 .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
     }
