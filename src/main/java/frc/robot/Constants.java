@@ -85,7 +85,6 @@ public final class Constants {
         // center of the robot in meters
         public static final double WHEEL_ABSOLUTE_X_METERS = 0.2794;
         public static final double WHEEL_ABSOLUTE_Y_METERS = 0.31115;
-        
 
         public static final Translation2d FL_WHEEL_POS = new Translation2d(WHEEL_ABSOLUTE_X_METERS,
                 WHEEL_ABSOLUTE_Y_METERS);
@@ -102,40 +101,73 @@ public final class Constants {
 
     public static class AutoPathConstants {
         // i feel like there has to be a better way to do this than how i did lol
-        
-        public final Map<Pair<Double, Command>, String> eventMarkerMap = new HashMap<>();
-        
+
+        public final Map<Pair<Double, Integer>, ArrayList<String>> eventMarkerMap = new HashMap<>();
+
         // file names for paths
-        public static final String THREE_NOTE_WING = "SThreeNote";
+        public static final String THREE_NOTE_WING1 = "SThreeNote.1";
+        public static final String THREE_NOTE_WING2 = "SThreeNote.2";
         public static final String FOUR_NOTE_WING = "SFourNote";
         public static final String TWO_NOTE_LEFT = "STwoNoteLeft";
         public static final String TWO_NOTE_CENTER = "STwoNoteCenter";
         public static final String TWO_NOTE_RIGHT = "STwoNoteRight";
         public static final String FOUR_NOTE_LEFT = "SFourNoteLeft";
 
+        public static final ArrayList<String> threeNoteWing = new ArrayList<String>();
+
+        public static final ArrayList<ArrayList<String>> pathLists = new ArrayList<ArrayList<String>>();
+
+        public static final int INTAKE = 0;
+        public static final int SHOOT = 1;
+        public static final int INTAKE_HANDOFF = 2;
+        public static final int SHOOTER_HANDOFF = 3;
+        public static final int DRIVE_PATH = 4;
+        public static final int ARM_SHOOT = 5;
+        public static final int ARM_HANDOFF = 6;
+
         public static final double INTAKE_VOLTS = 12;
- 
+        public static final double SHOOT_VOLTS = 12;
+        public static final double INTAKE_HANDOFF_VOLTS = 6;
+        public static final double SHOOTER_HANDOFF_VOLTS = 6;
+        public static final double ARM_HANDOFF_ANGLE = 80 * Math.PI / 180; // radians; double check this w/ final cad
+
         public AutoPathConstants(Drive drive, Intake intake, Shooter shooter, Arm arm) { 
+            threeNoteWing.add(THREE_NOTE_WING1);
+            threeNoteWing.add(THREE_NOTE_WING2);
+
+            pathLists.add(threeNoteWing);
+
             //probably a way to consolidate times here cause stuff happens at the same time for similar patterns ill do it later
-            eventMarkerMap.put(Pair.of(0.38, intake.getIntakeCommand(INTAKE_VOLTS)), THREE_NOTE_WING);
-            eventMarkerMap.put(Pair.of(0.38, intake.getIntakeCommand(INTAKE_VOLTS)), THREE_NOTE_WING);
-            eventMarkerMap.put(Pair.of(0.38, intake.getIntakeCommand(INTAKE_VOLTS)), THREE_NOTE_WING);
-            eventMarkerMap.put(Pair.of(0.38, intake.getIntakeCommand(INTAKE_VOLTS)), THREE_NOTE_WING);
-            eventMarkerMap.put(Pair.of(2.6, intake.getIntakeCommand(INTAKE_VOLTS)), THREE_NOTE_WING);
+            eventMarkerMap.put(Pair.of(0.0, ARM_SHOOT), threeNoteWing);
+            eventMarkerMap.put(Pair.of(0.0, SHOOT), threeNoteWing); //change
+            eventMarkerMap.put(Pair.of(0.0, DRIVE_PATH), threeNoteWing);
+            eventMarkerMap.put(Pair.of(0.3, ARM_HANDOFF), threeNoteWing);
+            eventMarkerMap.put(Pair.of(0.4, INTAKE), threeNoteWing);
+            eventMarkerMap.put(Pair.of(0.6, INTAKE_HANDOFF), threeNoteWing);
+            eventMarkerMap.put(Pair.of(0.6, SHOOTER_HANDOFF), threeNoteWing);
+            eventMarkerMap.put(Pair.of(0.67, ARM_SHOOT), threeNoteWing);
+            eventMarkerMap.put(Pair.of(0.77, SHOOT), threeNoteWing);
+            eventMarkerMap.put(Pair.of(0.77, DRIVE_PATH), threeNoteWing);
+            eventMarkerMap.put(Pair.of(0.8, ARM_HANDOFF), threeNoteWing);
+            eventMarkerMap.put(Pair.of(1.31, INTAKE), threeNoteWing);
+            eventMarkerMap.put(Pair.of(1.5, INTAKE_HANDOFF), threeNoteWing);
+            eventMarkerMap.put(Pair.of(1.5, SHOOTER_HANDOFF), threeNoteWing);
+            eventMarkerMap.put(Pair.of(1.6, ARM_SHOOT), threeNoteWing);
+            eventMarkerMap.put(Pair.of(1.67, SHOOT), threeNoteWing);
 
-            eventMarkerMap.put(Pair.of(1.0, intake.startEndCommmand()), FOUR_NOTE_WING);
-            eventMarkerMap.put(Pair.of(2.68, intake.startEndCommmand()), FOUR_NOTE_WING);
-            eventMarkerMap.put(Pair.of(4.8, intake.startEndCommmand()), FOUR_NOTE_WING);
+            // eventMarkerMap.put(Pair.of(1.0, intake.startEndCommmand()), FOUR_NOTE_WING);
+            // eventMarkerMap.put(Pair.of(2.68, intake.startEndCommmand()), FOUR_NOTE_WING);
+            // eventMarkerMap.put(Pair.of(4.8, intake.startEndCommmand()), FOUR_NOTE_WING);
 
-            eventMarkerMap.put(Pair.of(.91, intake.startEndCommmand()), TWO_NOTE_LEFT);
+            // eventMarkerMap.put(Pair.of(.91, intake.startEndCommmand()), TWO_NOTE_LEFT);
             
-            eventMarkerMap.put(Pair.of(.38, intake.startEndCommmand()), TWO_NOTE_CENTER);
+            // eventMarkerMap.put(Pair.of(.38, intake.startEndCommmand()), TWO_NOTE_CENTER);
            
-            eventMarkerMap.put(Pair.of(1.25, intake.startEndCommmand()), TWO_NOTE_RIGHT);
+            // eventMarkerMap.put(Pair.of(1.25, intake.startEndCommmand()), TWO_NOTE_RIGHT);
 
-            eventMarkerMap.put(Pair.of(.38, intake.startEndCommmand()), FOUR_NOTE_LEFT);
-            eventMarkerMap.put(Pair.of(2.31, intake.startEndCommmand()), FOUR_NOTE_LEFT);
-            eventMarkerMap.put(Pair.of(5.41, intake.startEndCommmand()), FOUR_NOTE_LEFT);
+            // eventMarkerMap.put(Pair.of(.38, intake.startEndCommmand()), FOUR_NOTE_LEFT);
+            // eventMarkerMap.put(Pair.of(2.31, intake.startEndCommmand()), FOUR_NOTE_LEFT);
+            // eventMarkerMap.put(Pair.of(5.41, intake.startEndCommmand()), FOUR_NOTE_LEFT);
         }
     }
 
