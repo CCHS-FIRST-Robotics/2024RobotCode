@@ -1,15 +1,14 @@
 package frc.robot.subsystems.noteIO.intakeGround;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
-public class Intake extends SubsystemBase {
-    IntakeIO io;
+public class IntakeGround extends SubsystemBase {
+    IntakeGroundIO io;
     double volts = 0;
     IntakeGroundIOInputsAutoLogged inputs = new IntakeGroundIOInputsAutoLogged();
 
-    public Intake(IntakeIO io) {
+    public IntakeGround(IntakeGroundIO io) {
         this.io = io;
     }
 
