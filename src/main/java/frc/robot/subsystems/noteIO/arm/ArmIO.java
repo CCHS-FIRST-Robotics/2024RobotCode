@@ -14,6 +14,16 @@ public interface ArmIO {
         public Measure<Voltage> driveAppliedVolts = Volts.of(0.0);
         public Measure<Current> driveCurrent = Amps.of(0);
         public Measure<Temperature> driveTemp = Celsius.of(0);
+
+        public Measure<Angle> absoluteArmPosition = Radians.of(0.0);
+        public Measure<Velocity<Angle>> absoluteArmVelocity = RadiansPerSecond.of(0.0);
+
+        public Measure<Angle> rotorPositionSignal = Radians.of(0.0);
+        // check withc ol.in if works
+        public boolean faultFusedSensorOutOfSync = false;
+        public boolean stickyFaultFusedSensorOutOfSync = false;
+        public boolean faultRemoteSensorOutOfSync = false;
+        public boolean stickyFaultRemoteSensorOutOfSync = false;
     }
 
     /** Updates the set of loggable inputs. */

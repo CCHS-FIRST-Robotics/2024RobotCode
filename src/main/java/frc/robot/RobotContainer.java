@@ -11,6 +11,8 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -28,6 +30,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.commands.ControlArm;
 import frc.robot.commands.DriveInCircle;
 import frc.robot.commands.DriveModules;
 import frc.robot.commands.DriveWithJoysticks;
@@ -82,6 +85,7 @@ public class RobotContainer {
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
+    private SignalLogger signalLogger;
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -141,6 +145,9 @@ public class RobotContainer {
         shooter = new Shooter(new ShooterIOCIM(Constants.shooterID1, Constants.shooterID2));
 
         configureButtonBindings();
+
+        SignalLogger.start();
+
     }
 
     private Rotation2d getWiiPOV() {
