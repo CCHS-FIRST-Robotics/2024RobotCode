@@ -19,6 +19,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -76,9 +77,9 @@ public class AutoRoutine extends Command {
     //       drive.runPosition(traj);
     //     });
     // also, we already made this command using the command factory in Drive.java (which also logs the path to akit)
-    drive.followTrajectory(
-      DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.getPath())
-    ).schedule(); // now it creates the command (returned from the method) and schedules it :)
+    // drive.followTrajectory(
+    //   DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.getPath())
+    // ).schedule(); // now it creates the command (returned from the method) and schedules it :)
 
   }
 
@@ -113,6 +114,9 @@ public class AutoRoutine extends Command {
       if (!runningCommand.getValue()) {
         continue;
       }
+
+      if (runningCommand.getKey().hasRequirement(path.getArm())) {
+        path.getArm().setCurrentArmPos(   ); // getting translation and pose from drive? idk? 
 
       runningCommand.getKey().execute();
 
