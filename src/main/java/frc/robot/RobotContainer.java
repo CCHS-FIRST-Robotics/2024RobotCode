@@ -11,6 +11,8 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -26,6 +28,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.commands.ControlArm;
 import frc.robot.commands.DriveInCircle;
 import frc.robot.commands.DriveModules;
 import frc.robot.commands.DriveWithJoysticks;
@@ -80,6 +83,7 @@ public class RobotContainer {
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
+    private SignalLogger signalLogger;
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -96,7 +100,7 @@ public class RobotContainer {
                 useWiiRemotes
             );
             camera = new Vision(new CameraIOZED());
-            arm = new Arm(new ArmIOFalcon500(9));
+            arm = new Arm(new ArmIOFalcon500(9, (int)(Math.random() * 10) - 1));
             break;
 
         // Sim robot, instantiate physics sim IO implementations
@@ -124,7 +128,7 @@ public class RobotContainer {
                 false
             );
             camera = new Vision(new CameraIOZED());
-            arm = new Arm(new ArmIOFalcon500(0));
+            arm = new Arm(new ArmIOFalcon500(0, 1 + (int)(Math.random() * 10)));
             break;
         }
 
@@ -144,6 +148,7 @@ public class RobotContainer {
         // Configure the button bindings
         configureButtonBindings();
 
+        SignalLogger.start();
 
     }
 
@@ -206,6 +211,13 @@ public class RobotContainer {
                     () -> 0.65 * controller.getRightX(), 
                     () -> {return 1.0;},
                     () -> Rotation2d.fromDegrees(controller.getHID().getPOV())
+                )
+            );
+
+            arm.setDefaultCommand(
+                new ControlArm(
+                    arm,
+                    controller::getRightY
                 )
             );
         }
