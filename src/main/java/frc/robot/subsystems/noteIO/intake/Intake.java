@@ -51,7 +51,7 @@ public class Intake extends SubsystemBase {
                 this);
     }
 
-    public Command getShootCommand(double v) {
+    public Command getHandNoteCommand(double v) {
         // turns motor on until note not detected
         // ! ^ This might not work in reality because the current might drop under even
         // ! though we still have the note in the intake
