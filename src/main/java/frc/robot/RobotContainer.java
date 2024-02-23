@@ -140,7 +140,7 @@ public class RobotContainer {
 
         // Set up auto routines
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
-        arm = new Arm(new ArmIOFalcon500(100));
+        arm = new Arm(new ArmIOFalcon500(100, 100));
         intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.intakeID));
         shooter = new Shooter(new ShooterIOCIM(Constants.shooterID1, Constants.shooterID2));
 

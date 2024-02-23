@@ -3,7 +3,7 @@ package frc.robot.commands;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.noteIO.arm.Arm;
 
 import edu.wpi.first.units.Angle;
 import static edu.wpi.first.units.Units.Radians;
