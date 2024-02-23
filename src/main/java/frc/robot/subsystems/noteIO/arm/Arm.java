@@ -31,6 +31,10 @@ public class Arm extends SubsystemBase {
     private final double armLength = 0.0; // TODO: set this
     private final Translation2d armOffset = new Translation2d(0.0, .425); // TODO: set this 
 
+    // added for auto stuff maybe
+    private Supplier<Translation2d> translationToTargetGround;
+    private Supplier<Pose3d> targetPose;
+
     public Arm(ArmIO io) {
         this.io = io;
         sysIdRoutine = new SysIdRoutine(
@@ -75,10 +79,26 @@ public class Arm extends SubsystemBase {
         return new Translation2d(armLength, new Rotation2d(getArmAngle().in(Radians))).plus(armOffset);
     }
 
+    // used to set stuff for suto events
+    public void setCurrentArmPos(Supplier<Translation2d> translationToTargetGround, Supplier<Pose3d> targetPose) {
+        this.translationToTargetGround = translationToTargetGround;
+        this.targetPose = targetPose;
+    }
+
     public Command alignWithTarget(Supplier<Translation2d> translationToTargetGround, Supplier<Pose3d> targetPose) {
         return run(() -> {
             Translation2d armOffset = getArmOffset();
             Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.get().getNorm(), targetPose.get().getZ());
+            Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
+            setArmAngle(Radians.of(Math.PI/2.0 - targetArmAngle.getRadians())); // add 90 degrees since 0 is vertical
+        });
+    }
+
+    // for auto events
+    public Command autoAlignWithTarget() {
+        return run(() -> {
+            Translation2d armOffset = getArmOffset();
+            Translation2d tranlationToTargetHigh = new Translation2d(this.translationToTargetGround.get().getNorm(), this.targetPose.get().getZ());
             Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
             setArmAngle(Radians.of(Math.PI/2.0 - targetArmAngle.getRadians())); // add 90 degrees since 0 is vertical
         });
