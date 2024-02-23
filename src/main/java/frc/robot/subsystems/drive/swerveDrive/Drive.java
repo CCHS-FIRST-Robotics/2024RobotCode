@@ -180,7 +180,7 @@ public class Drive extends SubsystemBase {
 
     // auto path
    private ArrayList<String> autoPaths;
-   private int currentPathNum = 0;
+   private int currentPathNum = 1; // 0 in the list is the first path
 
     // Control modes for the drive
     public enum CONTROL_MODE {
@@ -745,18 +745,17 @@ public class Drive extends SubsystemBase {
     }
 
 
-    /*added for auto stuff - not good */
-    public Command autoFollowTrajectory() {
-        return new FunctionalCommand(
-                () -> runPosition(DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(autoPaths.get(currentPathNum))), 
-                () -> {},
-                (interrupted) -> currentPathNum++,
-                () -> true, // this is wrong
-                this
+    /*added for auto stuff - not good but maybe better? */
+    public Command followTrajectory(ArrayList<String> path) {
+        return runOnce(
+                () -> {
+                    DriveTrajectory traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.get(currentPathNum));
+                    System.out.println("recording pos traj");
+                    Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
+                    currentPathNum++;
+                    runPosition(traj);
+                }
             );
-        /*
-         * this is not right but its supposed to follow the current path and when thats done increase currentPathNum
-         */
     }
 
     public void updateCurrentAutoPaths(ArrayList<String> paths) {
