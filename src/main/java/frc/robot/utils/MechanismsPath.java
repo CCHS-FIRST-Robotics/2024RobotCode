@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,18 +29,32 @@ import com.ctre.phoenix6.controls.ControlRequest;
 public final class MechanismsPath {
 
     private List<Pair<Double, Command>> eventMarkers = new ArrayList<Pair<Double, Command>>();
-    private String path;
+    private ArrayList<String> path;
+    private String currentPath;
     private AutoPathConstants constants;
+    private Drive drive;
+    private Intake intake;
+    private Shooter shooter;
+    private Arm arm;
+    private int currentPathNum = 0;
 
     /* adds set markers */
-    public MechanismsPath(String path, Drive drive, Intake intake, Shooter shooter, Arm arm) {
+    public MechanismsPath(ArrayList<String> path, Drive drive, Intake intake, Shooter shooter, Arm arm) {
         this.path = path;
+        this.drive = drive;
+        this.intake = intake;
+        this.shooter = shooter;
+        this.arm = arm;
+
+        currentPath = path.get(currentPathNum);
+        drive.updateCurrentAutoPaths(path);
         constants = new AutoPathConstants(drive, intake, shooter, arm);
+       
         addConstEventMarkers();
     }
 
-    /* won't add set markers intially */
-    public MechanismsPath(String path) {
+    /* won't add set markers initially */
+    public MechanismsPath(ArrayList<String> path) {
         this.path = path;
     }
 
@@ -48,12 +64,38 @@ public final class MechanismsPath {
     }
 
     public void addConstEventMarkers() {
-        for (Map.Entry<Pair<Double,Command>, String> em : constants.eventMarkerMap.entrySet()) {
+        for (Map.Entry<Pair<Double,Integer>, ArrayList<String>> em : constants.eventMarkerMap.entrySet()) {
             if (em.getValue().equals(path)) {
-                eventMarkers.add(em.getKey());
+                eventMarkers.add(Pair.of(em.getKey().getFirst(), getCommand(em.getKey().getSecond())));
             }
         }
         // time in seconds
+    }
+
+    public void updateCurrentPath() {
+        currentPathNum++;
+        currentPath = path.get(currentPathNum);
+    }
+
+    public Command getCommand(int commandNum) {
+        switch (commandNum) {
+            case AutoPathConstants.INTAKE:
+                return intake.getIntakeCommand(AutoPathConstants.INTAKE_VOLTS);
+            case AutoPathConstants.SHOOT:
+                return shooter.getShootNoteCommand(AutoPathConstants.SHOOT_VOLTS);
+            case AutoPathConstants.INTAKE_HANDOFF:
+                return intake.getHandNoteCommand(AutoPathConstants.INTAKE_HANDOFF_VOLTS);
+            case AutoPathConstants.SHOOTER_HANDOFF:
+                return shooter.getReceiveNoteCommand(AutoPathConstants.SHOOTER_HANDOFF_VOLTS);
+            case AutoPathConstants.DRIVE_PATH:
+                return drive.autoFollowTrajectory();
+            case AutoPathConstants.ARM_SHOOT:
+                return arm.autoAlignWithTarget();
+            case AutoPathConstants.ARM_HANDOFF:
+                return arm.alignForHandoff();
+            default:
+                return intake.runOnce(() -> {}); //idk
+        }
     }
 
     public List<Pair<Double, Command>> getEventMarkers(){
@@ -61,7 +103,23 @@ public final class MechanismsPath {
         return eventMarkers;
     }
 
-    public String getPath() {
-        return path;
+    // public String getPath() {
+    //     return path;
+    // }
+
+    public Drive getDrive() {
+        return drive;
+    }
+
+    public Intake getIntake() {
+        return intake;
+    }
+
+    public Shooter getShooter() {
+        return shooter;
+    }
+
+    public Arm getArm() {
+        return arm;
     }
 }
