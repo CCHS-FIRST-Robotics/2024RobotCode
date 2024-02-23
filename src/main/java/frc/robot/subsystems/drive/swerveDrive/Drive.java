@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
@@ -176,6 +177,10 @@ public class Drive extends SubsystemBase {
         );
 
     int i = 0;
+
+    // auto path
+   private ArrayList<String> autoPaths;
+   private int currentPathNum = 0;
 
     // Control modes for the drive
     public enum CONTROL_MODE {
@@ -737,5 +742,24 @@ public class Drive extends SubsystemBase {
                     runPosition(traj);
                 }
             );
+    }
+
+
+    /*added for auto stuff - not good */
+    public Command autoFollowTrajectory() {
+        return new FunctionalCommand(
+                () -> runPosition(DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(autoPaths.get(currentPathNum))), 
+                () -> {},
+                (interrupted) -> currentPathNum++,
+                () -> true, // this is wrong
+                this
+            );
+        /*
+         * this is not right but its supposed to follow the current path and when thats done increase currentPathNum
+         */
+    }
+
+    public void updateCurrentAutoPaths(ArrayList<String> paths) {
+        autoPaths = paths;
     }
 }
