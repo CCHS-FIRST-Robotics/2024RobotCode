@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 
 import org.ejml.data.CMatrixRMaj;
@@ -85,7 +86,7 @@ public class RobotContainer {
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
-    private SignalLogger signalLogger;
+    // private SignalLogger signalLogger;
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -334,6 +335,12 @@ public class RobotContainer {
                         .andThen(intake.getShootCommand(10, shooter::checkCompleteShot)
                                 // stop shooter
                                 .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
+
+        controller.y().onTrue(
+            arm.run(
+                () -> arm.setArmAngle(Degrees.of(5))
+            )
+        );
     }
 
     private double applyPreferences(double input, double exponent, double deadzone) {
