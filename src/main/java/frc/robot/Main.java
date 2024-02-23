@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * ! ask colin about conflicting button mappings in robotcontainer
  * ! ask colin why shooter even needs motionmagic
  * 
+ * ! ask colin if the neos for arm intake will have encoders
  * ! shooter motion magic stuff
  * ! intake shoot() command
  */

@@ -1,16 +1,16 @@
-package frc.robot.subsystems.noteIO.intake;
+package frc.robot.subsystems.noteIO.intakeArm;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
-public class Intake extends SubsystemBase {
-    IntakeIO io;
+public class IntakeArm extends SubsystemBase {
+    IntakeArmIO io;
     double volts = 0;
-    IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+    IntakeArmIOInputsAutoLogged inputs = new IntakeArmIOInputsAutoLogged();
 
-    public Intake(IntakeIO io) {
+    public IntakeArm(IntakeArmIO io) {
         this.io = io;
     }
 
