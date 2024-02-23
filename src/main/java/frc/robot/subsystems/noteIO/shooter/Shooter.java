@@ -29,7 +29,7 @@ public class Shooter extends SubsystemBase {
 
     public boolean checkCompleteShot() {
         // kinda placeholder thing idk if shooter should always run for 5s or something to detect if its gone 
-        return false;
+        return inputs.motorCurrent > 15 && inputs.motorVelocity > (4000 / 60d) * (inputs.motorVoltage / 12d);
     }
 
     public boolean checkInHandoff() {

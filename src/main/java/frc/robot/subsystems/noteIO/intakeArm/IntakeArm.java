@@ -3,7 +3,13 @@ package frc.robot.subsystems.noteIO.intakeArm;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
+
+import com.fasterxml.jackson.databind.ser.BeanPropertyFilter;
 
 public class IntakeArm extends SubsystemBase {
     IntakeArmIO io;
@@ -64,6 +70,28 @@ public class IntakeArm extends SubsystemBase {
                 },
                 (interrupted) -> stop(),
                 () -> !checkNoteThere(),
+                this);
+    }
+
+    public Command getShootCommand(double v, BooleanSupplier shooterDone) {
+        // turns motor on until note not detected
+
+        // colin: ^ This might not work in reality because the current might drop under
+        // even though we still have the note in the intake
+        // how else could you do this?
+        //
+        // alex: ugh maybe like get the current from the shooter and after it detects
+        // that the note has been fired, it tells the intake to stop?
+
+        // colin: ^ yep sounds good. Use a supplier since the two subsystems cant interact explicitly
+        // or maybe a command class
+        // idk
+        return new FunctionalCommand(
+                () -> start(v),
+                () -> {
+                },
+                (interrupted) -> stop(),
+                shooterDone,
                 this);
     }
 }
