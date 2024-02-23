@@ -47,11 +47,13 @@ public class IntakeArm extends SubsystemBase {
 
     public Command getShootCommand(double v) {
         // turns motor on until note not detected
-        // ! ^ This might not work in reality because the current might drop under even
-        // ! though we still have the note in the intake
+
+        // colin: ^ This might not work in reality because the current might drop under
+        // even though we still have the note in the intake
         // how else could you do this?
-        // ugh maybe like get the current from the shooter and after it detects that the
-        // note has been fired, it tells the intake to stop?
+        //
+        // alex: ugh maybe like get the current from the shooter and after it detects
+        // that the note has been fired, it tells the intake to stop?
         return new FunctionalCommand(
                 () -> start(v),
                 () -> {

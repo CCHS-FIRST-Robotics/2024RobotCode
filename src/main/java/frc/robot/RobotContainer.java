@@ -41,6 +41,7 @@ import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.noteIO.arm.*;
 import frc.robot.subsystems.noteIO.intakeArm.IntakeArm;
+import frc.robot.subsystems.noteIO.intakeArm.IntakeArmIOFalcon500;
 import frc.robot.subsystems.noteIO.intakeGround.*;
 import frc.robot.subsystems.noteIO.shooter.*;
 
@@ -136,7 +137,7 @@ public class RobotContainer {
         // Set up auto routines
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
         arm = new Arm(new ArmIOFalcon500(100));
-        intake = new IntakeArm(new IntakeGroundIONEO(Constants.intakeID));
+        intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.intakeID));
         shooter = new Shooter(new ShooterIOCIM(Constants.shooterID1, Constants.shooterID2));
 
         configureButtonBindings();

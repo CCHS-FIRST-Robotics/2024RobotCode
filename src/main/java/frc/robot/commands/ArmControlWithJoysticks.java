@@ -23,7 +23,7 @@ public class ArmControlWithJoysticks extends Command {
         double controllerX = linearXSupplier.get();
         double controllerY = linearYSupplier.get();
         double controllerAngle = angularSupplier.get();
-        
+
         // lol filler code
     }
 }

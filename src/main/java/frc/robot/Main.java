@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * to do:
  * 
  * arm stuff
+ * for example actually writing a controlwithJoysticks command
  * 
  * shooter:
  * Proper feedforward and feedback using the Phoenix API for velocity control,
