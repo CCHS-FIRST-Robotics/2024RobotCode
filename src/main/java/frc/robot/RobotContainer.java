@@ -6,57 +6,31 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Radians;
 
-import org.ejml.data.CMatrixRMaj;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
-
 import com.ctre.phoenix6.SignalLogger;
-
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.commands.ControlArm;
-import frc.robot.commands.DriveInCircle;
-import frc.robot.commands.DriveModules;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.DriveWithWiimote;
-import frc.robot.commands.FollowAprilTag;
-import frc.robot.commands.MoveToPose;
-import frc.robot.commands.ArmControlWithJoysticks;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
-import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.noteIO.arm.*;
 import frc.robot.subsystems.noteIO.intakeArm.IntakeArm;
 import frc.robot.subsystems.noteIO.intakeArm.IntakeArmIOFalcon500;
-import frc.robot.subsystems.noteIO.intakeGround.*;
 import frc.robot.subsystems.noteIO.shooter.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -85,7 +59,7 @@ public class RobotContainer {
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
-    private SignalLogger signalLogger;
+    // private SignalLogger signalLogger;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -226,7 +200,7 @@ public class RobotContainer {
         controller.leftTrigger().whileTrue(
                 new RunCommand(drive::stopWithX, drive));
 
-        Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
+        // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
         // controller.rightTrigger().whileTrue(
         // new DriveWithJoysticks(
         // drive,
@@ -337,29 +311,30 @@ public class RobotContainer {
                                 .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
     }
 
-    private double applyPreferences(double input, double exponent, double deadzone) {
-        if (Math.abs(input) < deadzone) {
-            return 0;
-        }
-        return Math.pow(Math.abs(input), exponent) * Math.signum(input);
-    }
+    // private double applyPreferences(double input, double exponent, double
+    // deadzone) {
+    // if (Math.abs(input) < deadzone) {
+    // return 0;
+    // }
+    // return Math.pow(Math.abs(input), exponent) * Math.signum(input);
+    // }
 
-    private Translation2d getRadius() {
-        double leftY = applyPreferences(controller.getLeftY(), 2.0, .1);
-        return new Translation2d(.5 + 1.5 * Math.abs(leftY), 0.0);
-    }
+    // private Translation2d getRadius() {
+    // double leftY = applyPreferences(controller.getLeftY(), 2.0, .1);
+    // return new Translation2d(.5 + 1.5 * Math.abs(leftY), 0.0);
+    // }
 
-    private double getVelocity() {
-        double leftX = applyPreferences(controller.getLeftX(), 2.0, .1);
-        return 2 * leftX;
-    }
+    // private double getVelocity() {
+    // double leftX = applyPreferences(controller.getLeftX(), 2.0, .1);
+    // return 2 * leftX;
+    // }
 
-    private double getAngularVelocity() {
-        if (getRadius().getNorm() == 0)
-            return 0;
-        double rightX = applyPreferences(controller.getRightX(), 2.0, .1);
-        return (1 + rightX) * getVelocity() / getRadius().getNorm();
-    }
+    // private double getAngularVelocity() {
+    // if (getRadius().getNorm() == 0)
+    // return 0;
+    // double rightX = applyPreferences(controller.getRightX(), 2.0, .1);
+    // return (1 + rightX) * getVelocity() / getRadius().getNorm();
+    // }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
