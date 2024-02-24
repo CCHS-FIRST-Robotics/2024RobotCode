@@ -9,13 +9,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 /**
  * to do:
  * 
- * 
- * shooter:
- * Proper feedforward and feedback using the Phoenix API for velocity control,
- * using exponential motion magic (check the Phoenix docs for details) <--- not
- * doing this anymore, just regular VelocityVoltage control
- * A sysid routine and signal logger export for motor data (should be pretty
- * much identical to how the arm was done, David you might want to do this one)
+ * sysID for shooter
  */
 public final class Main {
     private Main() {

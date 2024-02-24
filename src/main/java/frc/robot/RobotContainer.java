@@ -164,8 +164,20 @@ public class RobotContainer {
         // () -> 0.5 + 0.5 * controller.getRightTriggerAxis()
         // ));
 
-        // DRIVING WITH JOYSTICKS (NORMAL)
-        if (useWiiRemotes) {
+        if (!useWiiRemotes) {
+            // using joysticks
+            drive.setDefaultCommand(
+                    new DriveWithJoysticks(
+                            drive,
+                            controller::getLeftX,
+                            () -> -controller.getLeftY(),
+                            () -> -controller.getRightX(),
+                            () -> {
+                                return 1.0;
+                            },
+                            () -> Rotation2d.fromDegrees(controller.getHID().getPOV())));
+        } else {
+            // using wii remote
             drive.setDefaultCommand(
                     new DriveWithWiimote(
                             drive,
@@ -180,26 +192,9 @@ public class RobotContainer {
                             () -> {
                                 return 1.0;
                             }));
-        } else {
-            drive.setDefaultCommand(
-                    new DriveWithJoysticks(
-                            drive,
-                            controller::getLeftX,
-                            () -> -controller.getLeftY(),
-                            () -> -controller.getRightX(),
-                            () -> {
-                                return 1.0;
-                            },
-                            () -> Rotation2d.fromDegrees(controller.getHID().getPOV())));
         }
 
-        // Follow the nearest apriltag while the right trigger is held
-        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
-
-        // Brake when the left trigger is held
-        controller.leftTrigger().whileTrue(
-                new RunCommand(drive::stopWithX, drive));
-
+        // // drive to specific pose
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
         // controller.rightTrigger().whileTrue(
         // new DriveWithJoysticks(
@@ -215,16 +210,33 @@ public class RobotContainer {
         // return targetTranslation.getAngle();
         // }));
 
-        // controller.rightTrigger().whileTrue(
-        // new RunCommand(drive::runCharacterization, drive)
-        // );
+        // // drive in a circle
+        // controller.y().onTrue(
+        // new DriveInCircle(
+        // drive,
+        // () -> {
+        // return getRadius();
+        // },
+        // () -> {
+        // return getVelocity();
+        // },
+        // () -> {
+        // return getAngularVelocity();
+        // }));
+        // controller.y().whileTrue(
+        // new DriveInCircle(
+        // drive,
+        // () -> {
+        // return new Translation2d(.57 / 2.0, .57 / 2.0);
+        // },
+        // () -> {
+        // return 0.75;
+        // },
+        // () -> {
+        // return 0.75 / (new Translation2d(.57 / 2.0, .57 / 2.0).getNorm());
+        // }));
 
-        // controller.rightTrigger().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
-        // controller.rightTrigger().whileTrue(drive.sysIdDynamic(Direction.kForward));
-        // controller.rightTrigger().whileTrue(drive.sysIdFull());
-
-        // Generate a trajectory to a pose when the A button is pressed (and switch
-        // drive to position control)
+        // // create a trajectory to a specific pose
         // controller.a().onTrue(
         // new MoveToPose(
         // drive,
@@ -232,19 +244,15 @@ public class RobotContainer {
         // return new Pose2d(0, 0, new Rotation2d(Math.PI * 3 * .25));
         // }));
 
-        // Generate a trajectory to a pose when the X button is pressed (and switch
-        // drive to position control)
         // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
         // controller.x().onTrue(
         // drive.runOnce(
         // () -> {
         // String path = "ThirdFloorTest1";
         // var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
-        // // adjust so that the start of the trajectory is where the robot is
-        // //
         // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
-        // // traj.translateBy(drive.getPose().getTranslation());
 
+        // // record robot trajectory
         // System.out.println("recording pos traj");
         // Logger.recordOutput("Auto/GeneratedTrajectory",
         // traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
@@ -252,43 +260,17 @@ public class RobotContainer {
         // System.out.println("Writing trajectory to CSV");
         // traj.toCSV(path);
         // drive.runPosition(traj);
-        // }));
 
-        // controller.b().onTrue(
-        // Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
-        // );
+        // // sysID
+        // controller.rightTrigger().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
+        // controller.rightTrigger().whileTrue(drive.sysIdDynamic(Direction.kForward));
+        // controller.rightTrigger().whileTrue(drive.sysIdFull());
 
-        // controller.y().onTrue(
-        // new DriveInCircle(
-        // drive,
-        // () -> {
-        // return getRadius();
-        // // return new Translation2d(.57/2.0, .57/2.0);
-        // },
-        // () -> {
-        // return getVelocity();
-        // },
-        // () -> {
-        // return getAngularVelocity();
-        // }
-        // )
-        // );
+        // break when leftTrigger is held
+        controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
-        // controller.y().whileTrue(
-        // new DriveInCircle(
-        // drive,
-        // () -> {
-        // // return new Translation2d(2.0, 0.0);
-        // return new Translation2d(.57 / 2.0, .57 / 2.0);
-        // },
-        // () -> {
-        // // return 2.5;
-        // return 0.75;
-        // },
-        // () -> {
-        // // return 4 * 2.5 / 2.0;
-        // return 0.75 / (new Translation2d(.57 / 2.0, .57 / 2.0).getNorm());
-        // }));
+        // follow nearest aprilTag when rightTrigger is held
+        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
 
         // outtake
         controller.x().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
@@ -300,6 +282,7 @@ public class RobotContainer {
                         // run intake
                         .andThen(intake.getIntakeCommand(10)));
 
+        // shoot
         controller.b().onTrue(
                 // position the arm
                 new InstantCommand(() -> arm.setArmAngle(Radians.of(100)))
@@ -309,6 +292,7 @@ public class RobotContainer {
                         .andThen(intake.getShootCommand(10, shooter::checkNoteShot)
                                 // stop shooter
                                 .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
+
     }
 
     // private double applyPreferences(double input, double exponent, double
