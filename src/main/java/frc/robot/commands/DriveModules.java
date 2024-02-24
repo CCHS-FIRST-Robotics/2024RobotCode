@@ -21,13 +21,12 @@ public class DriveModules extends Command {
     Supplier<Double> linearSpeedMultiplierSupplier;
 
     double prevSpeed;
-    
+
     public DriveModules(
-        Drive drive, 
-        Supplier<Double> leftYSupplier, 
-        Supplier<Double> rightXSupplier,
-        Supplier<Double> linearSpeedMultiplierSupplier
-    ) {
+            Drive drive,
+            Supplier<Double> leftYSupplier,
+            Supplier<Double> rightXSupplier,
+            Supplier<Double> linearSpeedMultiplierSupplier) {
         addRequirements(drive);
         this.drive = drive;
         linearSpeedSupplier = leftYSupplier;
@@ -54,15 +53,13 @@ public class DriveModules extends Command {
         linearSpeed *= drive.getMaxLinearSpeed().in(MetersPerSecond);
 
         linearSpeed = MathUtil.clamp(
-            linearSpeed,
-            prevSpeed - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
-            prevSpeed + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD
-        );
-        
+                linearSpeed,
+                prevSpeed - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
+                prevSpeed + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD);
+
         drive.runModules(new SwerveModuleState(
-            linearSpeed,
-            new Rotation2d(Math.PI / 2.0 * angularPosition)
-        ));
+                linearSpeed,
+                new Rotation2d(Math.PI / 2.0 * angularPosition)));
     }
 
     @Override

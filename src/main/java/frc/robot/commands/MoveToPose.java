@@ -27,17 +27,17 @@ public class MoveToPose extends InstantCommand {
     TrapezoidProfile profileHeading;
     TrapezoidProfile.Constraints linearConstraints;
     TrapezoidProfile.Constraints angularConstraints;
-    
 
     public MoveToPose(
-        Drive drive,
-        Supplier<Pose2d> targetPoseSupplier
-    ) {
+            Drive drive,
+            Supplier<Pose2d> targetPoseSupplier) {
         addRequirements(drive);
         this.drive = drive;
         this.targetPoseSupplier = targetPoseSupplier;
-        linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeed().in(MetersPerSecond), drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond));
-        angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeed().in(RadiansPerSecond), drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)));
+        linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeed().in(MetersPerSecond),
+                drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond));
+        angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeed().in(RadiansPerSecond),
+                drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class MoveToPose extends InstantCommand {
         Twist2d targetVelocity = new Twist2d();
         Pose2d currentPose = drive.getPose();
         Twist2d currentVelocity = drive.getVelocity();
-        
+
         System.out.println("TESTING");
         System.out.println(targetPose);
         System.out.println(currentPose);
@@ -57,12 +57,17 @@ public class MoveToPose extends InstantCommand {
         // var guidePoints = new ArrayList<Pose2d>();
         // guidePoints.add(new Pose2d(.25, .1, new Rotation2d(Math.PI)));
         // guidePoints.add(new Pose2d(-.75, -.5, new Rotation2d(Math.PI * 3 * .25)));
-        // var driveTrajectory = DriveTrajectoryGenerator.generateGuidedTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, linearConstraints, angularConstraints, guidePoints);
+        // var driveTrajectory =
+        // DriveTrajectoryGenerator.generateGuidedTrapezoidTrajectory(targetPose,
+        // targetVelocity, currentPose, currentVelocity, linearConstraints,
+        // angularConstraints, guidePoints);
 
         // TESTING CHOREO TRAJ
-        // var driveTrajectory = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile("NewPath");
+        // var driveTrajectory =
+        // DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile("NewPath");
 
-        var driveTrajectory = DriveTrajectoryGenerator.generateTrapezoidTrajectory(targetPose, targetVelocity, currentPose, currentVelocity, linearConstraints, angularConstraints);
+        var driveTrajectory = DriveTrajectoryGenerator.generateTrapezoidTrajectory(targetPose, targetVelocity,
+                currentPose, currentVelocity, linearConstraints, angularConstraints);
         // System.out.println("Writing trajectory to CSV");
         // driveTrajectory.toCSV("choreoTrajectory");
         drive.runPosition(driveTrajectory.positionTrajectory, driveTrajectory.velocityTrajectory);

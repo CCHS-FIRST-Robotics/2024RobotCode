@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.function.Supplier;
 
 public class DriveWithWiimote extends Command {
-    
+
     Drive drive;
     Supplier<Double> linearXSpeedSupplier;
     Supplier<Double> linearYSpeedSupplier;
@@ -28,16 +28,15 @@ public class DriveWithWiimote extends Command {
     Supplier<Double> linearSpeedMultiplierSupplier;
 
     Rotation2d prevRotation;
-    
+
     public DriveWithWiimote(
-        Drive drive, 
-        Supplier<Double> rotateXSupplier, 
-        Supplier<Double> rotateYSupplier,
-        Trigger onePressedSupplier,
-        Trigger twoPressedSupplier,
-        Supplier<Rotation2d> POVSupplier,
-        Supplier<Double> linearSpeedMultiplierSupplier
-    ) {
+            Drive drive,
+            Supplier<Double> rotateXSupplier,
+            Supplier<Double> rotateYSupplier,
+            Trigger onePressedSupplier,
+            Trigger twoPressedSupplier,
+            Supplier<Rotation2d> POVSupplier,
+            Supplier<Double> linearSpeedMultiplierSupplier) {
         addRequirements(drive);
         this.drive = drive;
         linearYSpeedSupplier = rotateXSupplier;
@@ -70,26 +69,27 @@ public class DriveWithWiimote extends Command {
         // Calcaulate new linear components
         Translation2d linearVelocity = new Translation2d(linearSpeed, linearDirection);
 
-
-        // CONVERT INTO POSITION/VELOCITY FOR ROBOT TO FOLLOW 
+        // CONVERT INTO POSITION/VELOCITY FOR ROBOT TO FOLLOW
         // Pose2d currentPose = drive.getPose();
         // Pose2d targetPose = new Pose2d(currentPose.getTranslation(), rotation);
-
 
         // Twist2d currentVelocity = drive.getVelocity();
 
         // // constrain velocity to max speed
-        // double rotError = rotation.getRadians() - currentPose.getRotation().getRadians();
+        // double rotError = rotation.getRadians() -
+        // currentPose.getRotation().getRadians();
         // double rotVelocity = MathUtil.clamp(
-        //     rotError / Constants.PERIOD, 
-        //     -drive.getMaxAngularSpeedRadPerSec(),
-        //     drive.getMaxAngularSpeedRadPerSec()
+        // rotError / Constants.PERIOD,
+        // -drive.getMaxAngularSpeedRadPerSec(),
+        // drive.getMaxAngularSpeedRadPerSec()
         // );
         // // constrain velocity to max acceleration
         // rotVelocity = MathUtil.clamp(
-        //     rotVelocity,
-        //     currentVelocity.dtheta - drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD,
-        //     currentVelocity.dtheta + drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD
+        // rotVelocity,
+        // currentVelocity.dtheta - drive.getMaxAngularAccelerationRadPerSecPerSec() *
+        // Constants.PERIOD,
+        // currentVelocity.dtheta + drive.getMaxAngularAccelerationRadPerSecPerSec() *
+        // Constants.PERIOD
         // );
 
         drive.runWii(linearVelocity, rotation);
