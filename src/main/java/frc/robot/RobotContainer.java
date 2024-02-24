@@ -106,29 +106,6 @@ public class RobotContainer {
         configureButtonBindings();
     }
 
-    private Rotation2d getWiiPOV() {
-        double povX = wiiRemote1.getRawAxis(0); // should be binary (-1, 0, or 1)
-        double povY = wiiRemote1.getRawAxis(1);
-        if (Math.abs(povX) < .05)
-            povX = 0; // deadband since 0 isnt 0 for some reason
-        if (Math.abs(povY) < .05)
-            povY = 0;
-
-        if (povX == 0 && povY == 0)
-            return new Rotation2d(-1);
-        double povAngle = Math.atan2(povY, povX);
-        return new Rotation2d(povAngle);
-    }
-
-    public Translation2d getTargetTranslation(Pose3d targetPose) {
-        Pose2d currentPose = drive.getPose();
-
-        Translation2d translationToTargetGround = targetPose.getTranslation()
-                .toTranslation2d()
-                .minus(currentPose.getTranslation());
-        return translationToTargetGround;
-    }
-
     /**
      * Use this method to define your button->command mappings. Buttons can be
      * created by instantiating a {@link GenericHID} or one of its subclasses
@@ -165,6 +142,33 @@ public class RobotContainer {
                                 return 1.0;
                             }));
         }
+
+        // break when leftTrigger is held
+        controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
+
+        // follow nearest aprilTag when rightTrigger is held
+        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
+
+        // outtake
+        controller.x().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
+
+        // intake
+        controller.a().onTrue(
+                // position the arm
+                new InstantCommand(() -> arm.setArmAngle(Radians.of(10)))
+                        // run intake
+                        .andThen(intake.getIntakeCommand(10)));
+
+        // shoot
+        controller.b().onTrue(
+                // position the arm
+                new InstantCommand(() -> arm.setArmAngle(Radians.of(100)))
+                        // prime shooter
+                        .andThen(new InstantCommand(() -> shooter.start(10), shooter))
+                        // shoot
+                        .andThen(intake.getShootCommand(10, shooter::checkNoteShot)
+                                // stop shooter
+                                .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
 
         // // drive to specific pose
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
@@ -237,35 +241,29 @@ public class RobotContainer {
         // controller.rightTrigger().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
         // controller.rightTrigger().whileTrue(drive.sysIdDynamic(Direction.kForward));
         // controller.rightTrigger().whileTrue(drive.sysIdFull());
-
-        // break when leftTrigger is held
-        controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
-
-        // follow nearest aprilTag when rightTrigger is held
-        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
-
-        // outtake
-        controller.x().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
-
-        // intake
-        controller.a().onTrue(
-                // position the arm
-                new InstantCommand(() -> arm.setArmAngle(Radians.of(10)))
-                        // run intake
-                        .andThen(intake.getIntakeCommand(10)));
-
-        // shoot
-        controller.b().onTrue(
-                // position the arm
-                new InstantCommand(() -> arm.setArmAngle(Radians.of(100)))
-                        // prime shooter
-                        .andThen(new InstantCommand(() -> shooter.start(10), shooter))
-                        // shoot
-                        .andThen(intake.getShootCommand(10, shooter::checkNoteShot)
-                                // stop shooter
-                                .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
-
     }
+
+    private Rotation2d getWiiPOV() {
+        double povX = wiiRemote1.getRawAxis(0); // should be binary (-1, 0, or 1)
+        double povY = wiiRemote1.getRawAxis(1);
+        if (Math.abs(povX) < .05)
+            povX = 0; // deadband since 0 isnt 0 for some reason
+        if (Math.abs(povY) < .05)
+            povY = 0;
+
+        if (povX == 0 && povY == 0)
+            return new Rotation2d(-1);
+        double povAngle = Math.atan2(povY, povX);
+        return new Rotation2d(povAngle);
+    }
+
+    // public Translation2d getTargetTranslation(Pose3d targetPose) {
+    // Pose2d currentPose = drive.getPose();
+    // Translation2d translationToTargetGround = targetPose.getTranslation()
+    // .toTranslation2d()
+    // .minus(currentPose.getTranslation());
+    // return translationToTargetGround;
+    // }
 
     // private Translation2d getRadius() {
     // double leftY = applyPreferences(controller.getLeftY(), 2.0, .1);
