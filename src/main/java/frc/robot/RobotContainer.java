@@ -86,6 +86,7 @@ public class RobotContainer {
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
     private SignalLogger signalLogger;
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -227,18 +228,18 @@ public class RobotContainer {
 
         Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
         // controller.rightTrigger().whileTrue(
-        //         new DriveWithJoysticks(
-        //                 drive,
-        //                 controller::getLeftX,
-        //                 () -> -controller.getLeftY(),
-        //                 controller::getRightX,
-        //                 () -> {
-        //                     return 1.0;
-        //                 },
-        //                 () -> {
-        //                     Translation2d targetTranslation = getTargetTranslation(targetPose);
-        //                     return targetTranslation.getAngle();
-        //                 }));
+        // new DriveWithJoysticks(
+        // drive,
+        // controller::getLeftX,
+        // () -> -controller.getLeftY(),
+        // controller::getRightX,
+        // () -> {
+        // return 1.0;
+        // },
+        // () -> {
+        // Translation2d targetTranslation = getTargetTranslation(targetPose);
+        // return targetTranslation.getAngle();
+        // }));
 
         // controller.rightTrigger().whileTrue(
         // new RunCommand(drive::runCharacterization, drive)
@@ -251,32 +252,33 @@ public class RobotContainer {
         // Generate a trajectory to a pose when the A button is pressed (and switch
         // drive to position control)
         // controller.a().onTrue(
-        //         new MoveToPose(
-        //                 drive,
-        //                 () -> {
-        //                     return new Pose2d(0, 0, new Rotation2d(Math.PI * 3 * .25));
-        //                 }));
+        // new MoveToPose(
+        // drive,
+        // () -> {
+        // return new Pose2d(0, 0, new Rotation2d(Math.PI * 3 * .25));
+        // }));
 
         // Generate a trajectory to a pose when the X button is pressed (and switch
         // drive to position control)
         // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
         // controller.x().onTrue(
-        //         drive.runOnce(
-        //                 () -> {
-        //                     String path = "ThirdFloorTest1";
-        //                     var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
-        //                     // adjust so that the start of the trajectory is where the robot is
-        //                     // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
-        //                     // traj.translateBy(drive.getPose().getTranslation());
+        // drive.runOnce(
+        // () -> {
+        // String path = "ThirdFloorTest1";
+        // var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
+        // // adjust so that the start of the trajectory is where the robot is
+        // //
+        // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
+        // // traj.translateBy(drive.getPose().getTranslation());
 
-        //                     System.out.println("recording pos traj");
-        //                     Logger.recordOutput("Auto/GeneratedTrajectory",
-        //                             traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
+        // System.out.println("recording pos traj");
+        // Logger.recordOutput("Auto/GeneratedTrajectory",
+        // traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
 
-        //                     System.out.println("Writing trajectory to CSV");
-        //                     traj.toCSV(path);
-        //                     drive.runPosition(traj);
-        //                 }));
+        // System.out.println("Writing trajectory to CSV");
+        // traj.toCSV(path);
+        // drive.runPosition(traj);
+        // }));
 
         // controller.b().onTrue(
         // Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
@@ -299,27 +301,27 @@ public class RobotContainer {
         // );
 
         // controller.y().whileTrue(
-        //         new DriveInCircle(
-        //                 drive,
-        //                 () -> {
-        //                     // return new Translation2d(2.0, 0.0);
-        //                     return new Translation2d(.57 / 2.0, .57 / 2.0);
-        //                 },
-        //                 () -> {
-        //                     // return 2.5;
-        //                     return 0.75;
-        //                 },
-        //                 () -> {
-        //                     // return 4 * 2.5 / 2.0;
-        //                     return 0.75 / (new Translation2d(.57 / 2.0, .57 / 2.0).getNorm());
-        //                 }));
+        // new DriveInCircle(
+        // drive,
+        // () -> {
+        // // return new Translation2d(2.0, 0.0);
+        // return new Translation2d(.57 / 2.0, .57 / 2.0);
+        // },
+        // () -> {
+        // // return 2.5;
+        // return 0.75;
+        // },
+        // () -> {
+        // // return 4 * 2.5 / 2.0;
+        // return 0.75 / (new Translation2d(.57 / 2.0, .57 / 2.0).getNorm());
+        // }));
 
         // lol filler arm code
         // arm.setDefaultCommand(new ArmControlWithJoysticks(
-        //         arm,
-        //         () -> controller.getLeftX(),
-        //         () -> controller.getLeftY(),
-        //         () -> controller.getRightX()));
+        // arm,
+        // () -> controller.getLeftX(),
+        // () -> controller.getLeftY(),
+        // () -> controller.getRightX()));
 
         // outtake
         controller.x().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
