@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drive.mecaDrive;
-import frc.robot.Constants.HardwareConstants;
+
+import frc.robot.HardwareConstants;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -26,12 +27,10 @@ public class Drive extends SubsystemBase {
   private final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
 
   // Odometry class for tracking robot pose
-  MecanumDriveOdometry odometry =
-  new MecanumDriveOdometry(
-        HardwareConstants.MECANUM_KINEMATICS,
-        new Rotation2d(),
-        new MecanumDriveWheelPositions()
-);
+  MecanumDriveOdometry odometry = new MecanumDriveOdometry(
+      HardwareConstants.MECANUM_KINEMATICS,
+      new Rotation2d(),
+      new MecanumDriveWheelPositions());
 
   /** Creates a new Drive. */
   public Drive(DriveIO io) {
@@ -49,27 +48,30 @@ public class Drive extends SubsystemBase {
   }
 
   /**
-     * Drives the robot at given x, y and theta speeds. Speeds range from [-1, 1] and the linear
-     * speeds have no effect on the angular speed.
-     *
-     * @param xSpeed Speed of the robot in the x direction (forward/backwards).
-     * @param ySpeed Speed of the robot in the y direction (sideways).
-     * @param rot Angular rate of the robot.
-     * @param fieldRelative Whether the provided x and y speeds are relative to the field.
-     */
-    public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-      WheelSpeeds speeds;
-      if (fieldRelative) {
-        speeds = MecanumDrive.driveCartesianIK(xSpeed, ySpeed, rot, getHeading());
-      } else {
-        speeds = MecanumDrive.driveCartesianIK(xSpeed, ySpeed, rot);
-      }
-      io.setVoltage(speeds.frontRight * 12, speeds.frontLeft * 12, speeds.rearRight * 12, speeds.rearLeft * 12);
+   * Drives the robot at given x, y and theta speeds. Speeds range from [-1, 1]
+   * and the linear
+   * speeds have no effect on the angular speed.
+   *
+   * @param xSpeed        Speed of the robot in the x direction
+   *                      (forward/backwards).
+   * @param ySpeed        Speed of the robot in the y direction (sideways).
+   * @param rot           Angular rate of the robot.
+   * @param fieldRelative Whether the provided x and y speeds are relative to the
+   *                      field.
+   */
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    WheelSpeeds speeds;
+    if (fieldRelative) {
+      speeds = MecanumDrive.driveCartesianIK(xSpeed, ySpeed, rot, getHeading());
+    } else {
+      speeds = MecanumDrive.driveCartesianIK(xSpeed, ySpeed, rot);
+    }
+    io.setVoltage(speeds.frontRight * 12, speeds.frontLeft * 12, speeds.rearRight * 12, speeds.rearLeft * 12);
   }
 
   /** Stops the drive. */
   public void stop() {
-    io.setVoltage(0, 0, 0 ,0);
+    io.setVoltage(0, 0, 0, 0);
   }
 
   /** Returns the current odometry pose in meters. */
@@ -92,47 +94,49 @@ public class Drive extends SubsystemBase {
 
   public MecanumDriveWheelPositions getWheelPositions() {
     return new MecanumDriveWheelPositions(
-      convertPosition(inputs.flPositionRaw),
-      convertPosition(inputs.frPositionRaw),
-      convertPosition(inputs.blPositionRaw),
-      convertPosition(inputs.brPositionRaw)
-    );
+        convertPosition(inputs.flPositionRaw),
+        convertPosition(inputs.frPositionRaw),
+        convertPosition(inputs.blPositionRaw),
+        convertPosition(inputs.brPositionRaw));
   }
 
   public MecanumDriveWheelSpeeds getWheelSpeeds() {
     return new MecanumDriveWheelSpeeds(
-      convertVelocity(inputs.flVelocityRaw),
-      convertVelocity(inputs.frVelocityRaw),
-      convertVelocity(inputs.blVelocityRaw),
-      convertVelocity(inputs.brVelocityRaw)
-    );
+        convertVelocity(inputs.flVelocityRaw),
+        convertVelocity(inputs.frVelocityRaw),
+        convertVelocity(inputs.blVelocityRaw),
+        convertVelocity(inputs.brVelocityRaw));
   }
 
   /**
-	 * Converts raw position units to meters
-	 * @param rawPosition the position from an encoder in raw sensor units
-	 * @return the position in meters
-	 */
-	private double convertPosition(double rawPosition) {
-		// raw units are "clicks," so divide by "clicks" per rotation to get rotations
-		// also account for gear ratio because the encoders measure motor output, not actual wheel
-		double position = rawPosition / (HardwareConstants.TALON_FX_CPR * HardwareConstants.FALCON_GEARBOX_RATIO);
-		// multiply by circumference to get linear distance
-		position *= Math.PI * HardwareConstants.MECANUM_WHEEL_DIAMETER;
-		return position;
-	}
+   * Converts raw position units to meters
+   * 
+   * @param rawPosition the position from an encoder in raw sensor units
+   * @return the position in meters
+   */
+  private double convertPosition(double rawPosition) {
+    // raw units are "clicks," so divide by "clicks" per rotation to get rotations
+    // also account for gear ratio because the encoders measure motor output, not
+    // actual wheel
+    double position = rawPosition / (HardwareConstants.TALON_FX_CPR * HardwareConstants.FALCON_GEARBOX_RATIO);
+    // multiply by circumference to get linear distance
+    position *= Math.PI * HardwareConstants.MECANUM_WHEEL_DIAMETER;
+    return position;
+  }
 
-   /**
-	 * Converts raw sensor velocity to meters/second
-	 * @param rawVelocity the velocity from an encoder in raw sensor units
-	 * @return velocity in m/s
-	 */
-	private double convertVelocity(double rawVelocity) {
-		// convert to rotations per second because raw units are "clicks" per 100ms
-		// also account for gear ratio because the encoders measure motor output, not actual wheel
-		double velocity = rawVelocity / (HardwareConstants.TALON_FX_CPR * HardwareConstants.FALCON_GEARBOX_RATIO) * 10;
-		// multiply by circumference to get linear velocity
-		velocity *= Math.PI * HardwareConstants.MECANUM_WHEEL_DIAMETER;
-		return velocity;
-	}
+  /**
+   * Converts raw sensor velocity to meters/second
+   * 
+   * @param rawVelocity the velocity from an encoder in raw sensor units
+   * @return velocity in m/s
+   */
+  private double convertVelocity(double rawVelocity) {
+    // convert to rotations per second because raw units are "clicks" per 100ms
+    // also account for gear ratio because the encoders measure motor output, not
+    // actual wheel
+    double velocity = rawVelocity / (HardwareConstants.TALON_FX_CPR * HardwareConstants.FALCON_GEARBOX_RATIO) * 10;
+    // multiply by circumference to get linear velocity
+    velocity *= Math.PI * HardwareConstants.MECANUM_WHEEL_DIAMETER;
+    return velocity;
+  }
 }

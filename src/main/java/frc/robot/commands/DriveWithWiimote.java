@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.Constants;
+import frc.robot.HardwareConstants;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.drive.swerveDrive.Drive.CONTROL_MODE;
 import edu.wpi.first.math.MathUtil;
@@ -63,7 +64,7 @@ public class DriveWithWiimote extends Command {
         Rotation2d linearDirection = new Rotation2d(linearXSpeed, linearYSpeed);
 
         // TODO: switch constants to tunable numbers
-        linearSpeed = applyPreferences(linearSpeed, Constants.LIENAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
+        linearSpeed = applyPreferences(linearSpeed, HardwareConstants.LINEAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
         linearSpeed *= linearSpeedMultiplierSupplier.get();
 
         // Calcaulate new linear components

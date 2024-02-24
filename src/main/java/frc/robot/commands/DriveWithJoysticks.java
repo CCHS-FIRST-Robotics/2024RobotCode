@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.Constants;
+import frc.robot.HardwareConstants;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -82,8 +83,9 @@ public class DriveWithJoysticks extends Command {
         // System.out.println(angularSpeed);
 
         // TODO: switch constants to tunable numbers
-        linearSpeed = applyPreferences(linearSpeed, Constants.LIENAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
-        angularSpeed = applyPreferences(angularSpeed, Constants.ANGULAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
+        linearSpeed = applyPreferences(linearSpeed, HardwareConstants.LINEAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
+        angularSpeed = applyPreferences(angularSpeed, HardwareConstants.ANGULAR_SPEED_EXPONENT,
+                Constants.ANALOG_DEADZONE);
         // System.out.println(angularSpeed);
 
         linearSpeed *= linearSpeedMultiplierSupplier.get();
@@ -160,21 +162,32 @@ public class DriveWithJoysticks extends Command {
                 MathUtil.clamp(
                         speeds.vxMetersPerSecond,
                         prevSpeeds.vxMetersPerSecond
-                                - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
+                                - drive.getMaxLinearAcceleration()
+                                        .in(MetersPerSecondPerSecond)
+                                        * Constants.PERIOD,
                         prevSpeeds.vxMetersPerSecond
-                                + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD),
+                                + drive.getMaxLinearAcceleration()
+                                        .in(MetersPerSecondPerSecond)
+                                        * Constants.PERIOD),
                 MathUtil.clamp(
                         speeds.vyMetersPerSecond,
                         prevSpeeds.vyMetersPerSecond
-                                - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD,
+                                - drive.getMaxLinearAcceleration()
+                                        .in(MetersPerSecondPerSecond)
+                                        * Constants.PERIOD,
                         prevSpeeds.vyMetersPerSecond
-                                + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD),
+                                + drive.getMaxLinearAcceleration()
+                                        .in(MetersPerSecondPerSecond)
+                                        * Constants.PERIOD),
                 MathUtil.clamp(
                         speeds.omegaRadiansPerSecond,
                         prevSpeeds.omegaRadiansPerSecond
-                                - drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD,
+                                - drive.getMaxAngularAcceleration()
+                                        .in(RadiansPerSecond.per(Second))
+                                        * Constants.PERIOD,
                         prevSpeeds.omegaRadiansPerSecond
-                                + drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second))
+                                + drive.getMaxAngularAcceleration()
+                                        .in(RadiansPerSecond.per(Second))
                                         * Constants.PERIOD));
         prevSpeeds = speeds;
 

@@ -13,8 +13,6 @@ import edu.wpi.first.math.geometry.*;
  * not put anything functional in this class.
  */
 public final class Constants {
-    public static final Mode currentMode = Mode.REAL;
-
     public static enum Mode {
         /** Running on a real robot. */
         REAL,
@@ -26,22 +24,24 @@ public final class Constants {
         REPLAY
     }
 
+    public static final Mode currentMode = Mode.REAL;
+
+    // ports
+    public static final int XBOX_CONTROLLER_PORT = 0;
+    public static final int XBOX_CONTROLLER_ALTERNATE_PORT = 1;
+
+    // ids
+    public static final int FL_TALON_ID = 1;
+    public static final int FR_TALON_ID = 2;
+    public static final int BL_TALON_ID = 3;
+    public static final int BR_TALON_ID = 4;
+    public static final int INTAKE_ID = 5;
+    public static final int SHOOTER_ID_1 = 6;
+    public static final int SHOOTER_ID_2 = 7;
+
+    // miscellaneous
     public static final double PERIOD = .02;
     public static final double ANALOG_DEADZONE = .05;
-
-    // ports and ids
-    public static final int intakeID = 5;
-    public static final int shooterID1 = 100;
-    public static final int shooterID2 = 100;
-    public static final int falcon500MaxRPM = 7500;
-    public static final int CIMMaxRPM = 5330;
-    public static final int NEOMaxRPM = 5676;
-
-    // swerve constants
-    // TODO: change to tunable numbers
-    public static final double LIENAR_SPEED_EXPONENT = 2;
-    public static final double ANGULAR_SPEED_EXPONENT = 2.5;
-
     public static final Pose3d[] APRIL_TAG_LOCATIONS = {
             new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)),
             new Pose3d(0, 2, 0, new Rotation3d(0, 0, 0)),

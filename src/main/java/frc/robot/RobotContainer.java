@@ -98,8 +98,8 @@ public class RobotContainer {
         camera.setPoseEstimator(poseEstimator);
 
         arm = new Arm(new ArmIOFalcon500(100, 100));
-        intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.intakeID));
-        shooter = new Shooter(new ShooterIOCIM(Constants.shooterID1, Constants.shooterID2));
+        intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
+        shooter = new Shooter(new ShooterIOCIM(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
 
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
 
