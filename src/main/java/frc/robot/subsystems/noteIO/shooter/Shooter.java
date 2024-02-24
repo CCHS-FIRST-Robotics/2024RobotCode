@@ -3,7 +3,7 @@ package frc.robot.subsystems.noteIO.shooter;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
-import frc.robot.Constants;
+import frc.robot.HardwareConstants;
 
 public class Shooter extends SubsystemBase {
     ShooterIO io;
@@ -32,7 +32,7 @@ public class Shooter extends SubsystemBase {
     public boolean checkNoteShot() {
         // returns if no note friction detected and motor up to speed
         return inputs.motorCurrent < 15
-                && inputs.motorVelocity > (Constants.CIMMaxRPM / 60) * (inputs.motorVoltage / 12);
+                && inputs.motorVelocity > (HardwareConstants.CIMMaxRPM / 60) * (inputs.motorVoltage / 12);
 
         // returns if 4 seconds have gone by
         // return Timer.getFPGATimestamp() - startTime > 4000;
