@@ -306,7 +306,7 @@ public class RobotContainer {
                         // prime shooter
                         .andThen(new InstantCommand(() -> shooter.start(10), shooter))
                         // shoot
-                        .andThen(intake.getShootCommand(10, shooter::checkCompleteShot)
+                        .andThen(intake.getShootCommand(10, shooter::checkNoteShot)
                                 // stop shooter
                                 .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
     }

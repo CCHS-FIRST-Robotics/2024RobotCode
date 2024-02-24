@@ -29,7 +29,7 @@ public class Shooter extends SubsystemBase {
         Logger.processInputs("shooter", inputs);
     }
 
-    public boolean checkCompleteShot() {
+    public boolean checkNoteShot() {
         // returns if no note friction detected and motor up to speed
         return inputs.motorCurrent < 15
                 && inputs.motorVelocity > (Constants.CIMMaxRPM / 60) * (inputs.motorVoltage / 12);
