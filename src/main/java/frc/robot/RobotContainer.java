@@ -4,33 +4,26 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.*;
 
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.DriveWithWiimote;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.noteIO.arm.*;
-import frc.robot.subsystems.noteIO.intakeArm.IntakeArm;
-import frc.robot.subsystems.noteIO.intakeArm.IntakeArmIOFalcon500;
+import frc.robot.subsystems.noteIO.intakeArm.*;
 import frc.robot.subsystems.noteIO.shooter.*;
-
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -39,9 +32,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
  * scheduler calls). Instead, the structure of the robot (including subsystems,
  * commands, and button mappings) should be declared here.
  */
-
 public class RobotContainer {
-    // Subsystems
     private final Drive drive;
     private final Vision camera;
     private final PoseEstimator poseEstimator;
@@ -49,25 +40,21 @@ public class RobotContainer {
     private final Arm arm;
     private final IntakeArm intake;
     private final Shooter shooter;
-    boolean shooterPrimed = false;
 
     private final CommandXboxController controller = new CommandXboxController(0);
     private final CommandGenericHID wiiRemote1 = new CommandGenericHID(2);
-    // private final CommandGenericHID wiiRemote2 = new CommandGenericHID(3);
     private final boolean useWiiRemotes = false;
 
-    // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
-
-    // private SignalLogger signalLogger;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
+        // creating the drivebase
         switch (Constants.currentMode) {
-            // Real robot, instantiate hardware IO implementations
             case REAL:
+                // instantiate hardware IO implementations
                 drive = new Drive(
                         new GyroIONavX(),
                         new ModuleIOSparkMax(0),
@@ -77,9 +64,8 @@ public class RobotContainer {
                         useWiiRemotes);
                 camera = new Vision(new CameraIOZED());
                 break;
-
-            // Sim robot, instantiate physics sim IO implementations
             case SIM:
+                // instantiate physics sim IO implementations
                 drive = new Drive(
                         new GyroIO() {
                         },
@@ -90,9 +76,8 @@ public class RobotContainer {
                         false);
                 camera = new Vision(new CameraIOZED());
                 break;
-
-            // Replayed robot, disable IO implementations
-            default:
+            default: // replayed robot
+                // disable IO implementations
                 drive = new Drive(
                         new GyroIONavX(),
                         new ModuleIOSparkMax(0),
@@ -109,20 +94,16 @@ public class RobotContainer {
                 new Rotation2d(),
                 drive.getModulePositions(),
                 new Pose2d());
-
         drive.setPoseEstimator(poseEstimator);
         camera.setPoseEstimator(poseEstimator);
 
-        // Set up auto routines
-        autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
         arm = new Arm(new ArmIOFalcon500(100, 100));
         intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.intakeID));
         shooter = new Shooter(new ShooterIOCIM(Constants.shooterID1, Constants.shooterID2));
 
+        autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
+
         configureButtonBindings();
-
-        SignalLogger.start();
-
     }
 
     private Rotation2d getWiiPOV() {
@@ -155,15 +136,6 @@ public class RobotContainer {
      * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        // DRIVING MODULES -- FOR TESTING
-        // drive.setDefaultCommand(
-        // new DriveModules(
-        // drive,
-        // () -> -controller.getLeftY(),
-        // () -> controller.getRightX(),
-        // () -> 0.5 + 0.5 * controller.getRightTriggerAxis()
-        // ));
-
         if (!useWiiRemotes) {
             // using joysticks
             drive.setDefaultCommand(
@@ -295,14 +267,6 @@ public class RobotContainer {
 
     }
 
-    // private double applyPreferences(double input, double exponent, double
-    // deadzone) {
-    // if (Math.abs(input) < deadzone) {
-    // return 0;
-    // }
-    // return Math.pow(Math.abs(input), exponent) * Math.signum(input);
-    // }
-
     // private Translation2d getRadius() {
     // double leftY = applyPreferences(controller.getLeftY(), 2.0, .1);
     // return new Translation2d(.5 + 1.5 * Math.abs(leftY), 0.0);
@@ -320,9 +284,17 @@ public class RobotContainer {
     // return (1 + rightX) * getVelocity() / getRadius().getNorm();
     // }
 
+    // private double applyPreferences(double input, double exponent, double
+    // deadzone) {
+    // if (Math.abs(input) < deadzone) {
+    // return 0;
+    // }
+    // return Math.pow(Math.abs(input), exponent) * Math.signum(input);
+    // }
+
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
+     * 
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
