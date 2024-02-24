@@ -316,22 +316,21 @@ public class RobotContainer {
         // return 0.75 / (new Translation2d(.57 / 2.0, .57 / 2.0).getNorm());
         // }));
 
-        // lol filler arm code
-        // arm.setDefaultCommand(new ArmControlWithJoysticks(
-        // arm,
-        // () -> controller.getLeftX(),
-        // () -> controller.getLeftY(),
-        // () -> controller.getRightX()));
-
         // outtake
         controller.x().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
 
         // intake
-        controller.a().onTrue(intake.getIntakeCommand(10));
+        controller.a().onTrue(
+                // position the arm
+                new InstantCommand(() -> arm.setArmAngle(Radians.of(10)))
+                        // run intake
+                        .andThen(intake.getIntakeCommand(10)));
 
         controller.b().onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(10), shooter)
+                // position the arm
+                new InstantCommand(() -> arm.setArmAngle(Radians.of(100)))
+                        // prime shooter
+                        .andThen(new InstantCommand(() -> shooter.start(10), shooter))
                         // shoot
                         .andThen(intake.getShootCommand(10, shooter::checkCompleteShot)
                                 // stop shooter
