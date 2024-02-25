@@ -24,6 +24,7 @@ public class ArmIOFalcon500 implements ArmIO {
 
     private CANcoder driveCancoder;
 
+    // TODO - USE FOC (Field Oriented Control) - MotionMagicTorqueCurrentFOC
     private final MotionMagicVoltage driveMotionMagic = new MotionMagicVoltage(0);
     private final MotionMagicConfigs driveMMConfig = driveFalconConfig.MotionMagic;
     private final Slot0Configs drivePID = driveFalconConfig.Slot0;
@@ -46,7 +47,7 @@ public class ArmIOFalcon500 implements ArmIO {
     StatusSignal<Boolean> stickyFaultRemoteSensorOutOfSync;
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKp = 100;
+    private static final double driveKp = 0;
     private static final double driveKd = 0.0d;
     private static final double driveKi = 0.0d;
     private static final double driveKv = 0.113; // (from falcon500 spec sheet) UNITS: Volts / (Rotations / Second)
@@ -88,11 +89,11 @@ public class ArmIOFalcon500 implements ArmIO {
         // Ya-yoink! (from
         // https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/remote-sensors.html)
         // zeros the magnet!
-        CANcoderConfiguration canCodeConfig = new CANcoderConfiguration();
-        canCodeConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-        canCodeConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        canCodeConfig.MagnetSensor.MagnetOffset = 0.4; // CHANGGE
-        driveCancoder.getConfigurator().apply(canCodeConfig);
+        CANcoderConfiguration CANcoderConfig = new CANcoderConfiguration();
+        CANcoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+        CANcoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        CANcoderConfig.MagnetSensor.MagnetOffset = 0.4; // CHANGGE
+        driveCancoder.getConfigurator().apply(CANcoderConfig);
 
         // fuses (trust)
         TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
@@ -115,7 +116,7 @@ public class ArmIOFalcon500 implements ArmIO {
         // drivePID.kV = driveFeedforwardKv; // max rpm is 6,380 volts * seconds /
         // radians
         // Units needed are volts * seconds / radians
-        drivePID.kV = 18d / (Math.PI * 319d); // TRUST!!!!! I don't!!!
+        drivePID.kV = 18d / (Math.PI * 319d); // TRUST!!!!! I don't!!! 
         // 6380 rotaions per minute is 319/3 rotations per second
         // 2pi * 319/3 radians per second
         // 3/(2pi * 319) seconds per radian
@@ -164,7 +165,11 @@ public class ArmIOFalcon500 implements ArmIO {
         inputs.driveCurrent = Amps.of(driveCurrentSignal.getValueAsDouble());
         inputs.driveTemp = Celsius.of(driveTempSignal.getValueAsDouble());
         inputs.absoluteArmPosition = Rotations.of(absolutePositionSignal.getValueAsDouble());
-        inputs.absoluteArmVelocity = RotationsPerSecond.of(absolutePositionSignal.getValueAsDouble());
+
+        // BAD - RotationsPerSecond is for UNITS, it won't convert a position into a velocity 
+        // inputs.absoluteArmVelocity = RotationsPerSecond.of(absolutePositionSignal.getValueAsDouble()); 
+        inputs.absoluteArmVelocity = RotationsPerSecond.of(absoluteVelocitySignal.getValueAsDouble());
+
         inputs.rotorPositionSignal = Rotations.of(rotorPositionSignal.getValueAsDouble());
         // CHeck with colin if it works
         inputs.faultFusedSensorOutOfSync = faultFusedSensorOutOfSync.getValue();
@@ -179,20 +184,11 @@ public class ArmIOFalcon500 implements ArmIO {
     }
 
     @Override
-    public void setDrivePosition(Measure<Angle> positionRad) {
-        // for testing, dont let the arm go past 90 degrees in either direction
-        // positionRad = Radians.of(MathUtil.clamp(positionRad.in(Radians),
-        // -Math.PI/2.0, Math.PI/2.0));
-        positionRad = Radians.of(MathUtil.clamp(positionRad.in(Radians), -Math.PI / 6.0, 4 * Math.PI / 3.0)); // uhh
-                                                                                                              // probably
-                                                                                                              // incorrect
-                                                                                                              // fix?
-        // driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
+    public void setDrivePosition(Measure<Angle> position) {
+        // dont let the arm go out of the rage [-30, 270]
+        position = Radians.of(MathUtil.clamp(position.in(Radians), -Math.PI / 6.0, 4 * Math.PI / 3.0));
 
         // lol this is NOT going to work
-        driveFalcon.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
-
-        // use cancodee ~ JK DO NOT USE CANCODE
-        // driveEncoder.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
+        driveFalcon.setControl(driveMotionMagic.withPosition(position.in(Rotations)).withSlot(0));
     }
 }
