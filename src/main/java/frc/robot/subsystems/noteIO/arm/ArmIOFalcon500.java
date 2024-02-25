@@ -56,8 +56,6 @@ public class ArmIOFalcon500 implements ArmIO {
     // private final boolean motorInverted = false;
     private final Rotation2d absoluteEncoderOffset = new Rotation2d();
 
-    Orchestra orchestra = new Orchestra();
-
     int index;
 
     public ArmIOFalcon500(int motorID, int cancoderID) {
@@ -130,8 +128,6 @@ public class ArmIOFalcon500 implements ArmIO {
 
         driveFalcon.setPosition(absoluteEncoderOffset.getRotations());
 
-        orchestra.addInstrument(driveFalcon);
-
         StatusCode status = StatusCode.StatusCodeNotInitialized;
         for (int i = 0; i < 5; ++i) {
             status = driveFalcon.getConfigurator().apply(driveFalconConfig);
@@ -198,33 +194,5 @@ public class ArmIOFalcon500 implements ArmIO {
 
         // use cancodee ~ JK DO NOT USE CANCODE
         // driveEncoder.setControl(driveMotionMagic.withPosition(positionRad.in(Rotations)).withSlot(0));
-
     }
-
-    public void setMusicTrack(String path) {
-        // Attempt to load the chrp
-        var status = orchestra.loadMusic(path);
-
-        if (!status.isOK()) {
-            // log error
-            System.out.println("MUSIC LOADING ERROR\n" + status.toString());
-        }
-    }
-
-    public void playMusic() {
-        orchestra.play();
-    }
-
-    public void pauseMusic() {
-        orchestra.pause();
-    }
-
-    public void stopMusic() {
-        orchestra.stop();
-    }
-
-    // @Override
-    // public void setDriveBrakeMode(boolean enable) {
-    // driveFalcon.setBrakeMode(enable);
-    // }
 }
