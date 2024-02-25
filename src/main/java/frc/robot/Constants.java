@@ -35,9 +35,9 @@ public final class Constants {
     public static final int FR_TALON_ID = 2;
     public static final int BL_TALON_ID = 3;
     public static final int BR_TALON_ID = 4;
-    public static final int INTAKE_ID = 5;
-    public static final int SHOOTER_ID_1 = 6;
-    public static final int SHOOTER_ID_2 = 7;
+    public static final int INTAKE_ID = 21;
+    public static final int SHOOTER_ID_1 = 22;
+    public static final int SHOOTER_ID_2 = 23;
 
     // miscellaneous
     public static final double PERIOD = .02;

@@ -29,6 +29,6 @@ public class IntakeGround extends SubsystemBase {
             volts = 0;
         }
 
-        io.setVoltage(volts);
+        // io.setVoltage(volts);
     }
 }

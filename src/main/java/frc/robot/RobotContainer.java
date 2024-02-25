@@ -94,7 +94,7 @@ public class RobotContainer {
         drive.setPoseEstimator(poseEstimator);
         camera.setPoseEstimator(poseEstimator);
 
-        arm = new Arm(new ArmIOFalcon500(100, 100));
+        arm = new Arm(new ArmIOFalcon500(20, 19));
         intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
         shooter = new Shooter(new ShooterIOCIM(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
 
@@ -111,19 +111,19 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // using joysticks
-        drive.setDefaultCommand(
-                new DriveWithJoysticks(
-                        drive,
-                        controller::getLeftX,
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getRightX(),
-                        () -> {
-                            return 1.0;
-                        },
-                        () -> Rotation2d.fromDegrees(controller.getHID().getPOV())));
+        // drive.setDefaultCommand(
+        //         new DriveWithJoysticks(
+        //                 drive,
+        //                 controller::getLeftX,
+        //                 () -> -controller.getLeftY(),
+        //                 () -> -controller.getRightX(),
+        //                 () -> {
+        //                     return 1.0;
+        //                 },
+        //                 () -> Rotation2d.fromDegrees(controller.getHID().getPOV())));
 
         // break when leftTrigger is held
-        controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
+        // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
         // outtake
         controller.x().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
