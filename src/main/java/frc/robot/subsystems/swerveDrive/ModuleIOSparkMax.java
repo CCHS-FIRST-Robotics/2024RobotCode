@@ -98,7 +98,6 @@ public class ModuleIOSparkMax implements ModuleIO {
 
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
         turnAbsoluteEncoder.setInverted(isTurnMotorInverted);
-        // absoluteEncoderOffset = new Rotation2d(-3.03887450);
         turnSparkMaxPIDF.setFeedbackDevice(turnAbsoluteEncoder);
 
         driveSparkMax.setCANTimeout(500);
@@ -141,9 +140,9 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMax.setCANTimeout(0);
 
 
-        System.out.println("TESTING");
-        System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
-        System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
+        // System.out.println("TESTING");
+        // System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
+        // System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
     }
 
     /* (non-Javadoc)
@@ -207,20 +206,12 @@ public class ModuleIOSparkMax implements ModuleIO {
      * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVelocity(double)
      */
     public void setDriveVelocity(Measure<Velocity<Angle>> velocity) {
-        // velocity = velocity.times(driveAfterEncoderReduction);
-        // System.out.println(velocity.in(Rotations.per(Minute)));
-        // System.out.println(velocity.baseUnitMagnitude());
-        // velocity = velocity * driveAfterEncoderReduction;
-        // System.out.println(Rotations.per(Minute).convertFrom(velocity, RadiansPerSecond));
 
         driveSparkMaxPIDF.setReference(
             velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
-            // velocity * (60) / (2*Math.PI) * driveAfterEncoderReduction,
             CANSparkMax.ControlType.kVelocity,
             0,
-            // driveFeedforward.calculate(velocityRadPerSec)
             driveFeedforward.calculate(prevVelocity.in(RadiansPerSecond), velocity.in(RadiansPerSecond), Constants.PERIOD)
-            // driveFeedforward.calculate(prevVelocity, velocity, Constants.PERIOD)
         );
         prevVelocity = velocity;
     }

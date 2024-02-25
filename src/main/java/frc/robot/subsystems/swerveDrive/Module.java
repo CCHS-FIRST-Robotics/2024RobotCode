@@ -40,24 +40,12 @@ public class Module {
         System.out.println("[Init] Creating Module " + Integer.toString(index));
         this.io = io;
         this.index = index;
-    
-        // turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     /** Updates inputs and checks tunable numbers. */
     public void periodic() {
-        // double prevVel = getVelocityMetersPerSec();
         io.updateInputs(inputs);
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
-        // double acceleration = (getVelocityMetersPerSec() - prevVel) / 0.02;
-        // if (Math.abs(acceleration) > 50) System.out.println(acceleration);
-
-    // until we figure out how to use the logger
-        // SmartDashboard.putNumber("Drive Position", Units.radiansToDegrees(inputs.drivePositionRad));
-        // SmartDashboard.putNumber("Drive Velocity", Units.radiansToDegrees(inputs.driveVelocityRadPerSec));
-        // SmartDashboard.putNumber("Turn Absolute Position", Units.radiansToDegrees(inputs.turnAbsolutePositionRad));
-        // SmartDashboard.putNumber("Turn Relative Position", Units.radiansToDegrees(inputs.turnPositionRad));
-        // SmartDashboard.putNumber("Turn Velocity", Units.radiansToDegrees(inputs.turnVelocityRadPerSec));
     }
 
     /**
@@ -73,11 +61,7 @@ public class Module {
         // optimizedState = targetState; // for testing ONLY
 
         // Run turn controller
-        // io.setTurnVoltage(
-        //     turnFeedback.calculate(getAngle().getRadians(), optimizedState.angle.getRadians())
-        // );
         io.setTurnPosition(Radians.of(optimizedState.angle.getRadians()));
-        // io.setTurnVoltage(Volts.of(1));
 
         // Update velocity based on turn error
         // does some fancy things to move only in the direction you want while theres an error

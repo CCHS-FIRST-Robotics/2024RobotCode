@@ -47,7 +47,11 @@ import frc.robot.utils.PoseEstimator;
 
 
 public class Drive extends SubsystemBase {
-    
+
+    /*
+     * CONSTANTS
+     */
+
     private static final Measure<Velocity<Distance>> coastThresholdMetersPerSec =
         MetersPerSecond.of(0.05); // Need to be under this to switch to coast when disabling
     private static final Measure<Velocity<Distance>> coastThresholdSecs =
@@ -72,6 +76,10 @@ public class Drive extends SubsystemBase {
     // Define Kinematics object
     private SwerveDriveKinematics kinematics = getKinematics();
 
+    /*
+     * TRAJECTORIES & CONTROLS
+     */
+
     // Initialize setpoints
     private ChassisSpeeds chassisSetpoint = new ChassisSpeeds();
     private ChassisSpeeds lastSetpoint = new ChassisSpeeds();
@@ -89,6 +97,10 @@ public class Drive extends SubsystemBase {
     private ArrayList<Pose2d> positionTrajectory = new ArrayList<Pose2d>();
     private ArrayList<Twist2d> twistTrajectory = new ArrayList<Twist2d>();
     private int trajectoryCounter = -1;
+
+    /* 
+     * POSITIONAL CONTROL
+     */
     
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
     private double kPx = 0.35; // 0.4
@@ -101,37 +113,30 @@ public class Drive extends SubsystemBase {
 
     private double kIx = 0.12; // 0.12
     private double kIy = 0.12; // 0.15
-    // private double kPlinear = 
     private double kIHeading = 0.00; // 0.05
 
     private PIDController xController = new PIDController(kPx, kIx, kDx);
     private PIDController yController = new PIDController(kPy, kIy, kDy);
-    // private PIDController linearController = new PIDController(kPHeading, kIHeading, coastThresholdMetersPerSec);
     private PIDController headingController = new PIDController(kPHeading, kIHeading, kDHeading);
-    
-    private boolean isBrakeMode = true;
-    private Timer lastMovementTimer = new Timer();
+
+    /* 
+     * ODOMETRY
+     */
 
     // Initialize estimated positions
     private double[] lastModulePositionsMeters = new double[] {0.0, 0.0, 0.0, 0.0};
     private Rotation2d lastGyroYaw = new Rotation2d();
     private Twist2d fieldVelocity = new Twist2d();
     private Pose2d fieldPosition = new Pose2d(); // Use poseEstimator instead
-    private Pose2d rawFieldPosition = new Pose2d(); // doesnt account for coa
+    private Pose2d rawFieldPosition = new Pose2d(); // doesnt account for coa TODO: write lol
     private PoseEstimator poseEstimator;
 
+    /*
+     * SYSID STUFF
+     */
 
-    // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
     private final MutableMeasure<Voltage> characterizationVolts = mutable(Volts.of(0));
-
-    // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-    private final MutableMeasure<Distance> characterizationDistance = mutable(Meters.of(0));
-    // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-    private final MutableMeasure<Velocity<Distance>> characterizationVelocity = mutable(MetersPerSecond.of(0));
-    
-    // Mutable holder for unit-safe angular distance values, persisted to avoid reallocation.
     private final MutableMeasure<Angle> characterizationDistanceAngular = mutable(Radians.of(0));
-    // Mutable holder for unit-safe angular velocity values, persisted to avoid reallocation.
     private final MutableMeasure<Velocity<Angle>> characterizationVelocityAngular = mutable(RadiansPerSecond.of(0));
     
     // Tell SysId how to record a frame of data for each motor on the mechanism being
@@ -169,7 +174,15 @@ public class Drive extends SubsystemBase {
             )
         );
 
+
+    /* 
+     * OTHER
+     */
+
     int i = 0;
+
+    private boolean isBrakeMode = true;
+    private Timer lastMovementTimer = new Timer();
 
     // Control modes for the drive
     public enum CONTROL_MODE {
@@ -235,7 +248,6 @@ public class Drive extends SubsystemBase {
          */
 
         // Get the change in position of each module
-        //TODO: make sure there's no harm in turning this into a method (it was just written here before)
         SwerveModulePosition[] wheelDeltas = getModuleDeltas();
 
         // Use kinematics to convert the change in position of each module -> change in position of the robot
@@ -279,8 +291,6 @@ public class Drive extends SubsystemBase {
         Logger.recordOutput("Odometry/FieldVelocity", fieldVelocity);
         Logger.recordOutput("Odometry/WheelPosition", fieldPosition);
         Logger.recordOutput("Odometry/FieldPosition", getPose());
-
-        
 
         if (DriverStation.isDisabled()) {
             controlMode = CONTROL_MODE.DISABLED;
@@ -383,21 +393,6 @@ public class Drive extends SubsystemBase {
                         setpointTwist.dtheta / Constants.PERIOD
                     );
 
-                // desaturate speeds if above the max acceleration
-                // TODO: I think I already do this in the command... oml
-                // double[] accelVector = {
-                //     (adjustedSpeeds.vxMetersPerSecond - lastSetpoint.vxMetersPerSecond) / Constants.PERIOD,
-                //     (adjustedSpeeds.vyMetersPerSecond - lastSetpoint.vyMetersPerSecond) / Constants.PERIOD
-                // };
-                // double acceleration = Math.sqrt(
-                //     accelVector[0]*accelVector[0] + 
-                //     accelVector[1]*accelVector[1]
-                // );
-                // double accelDir = Math.atan2(accelVector[1], accelVector[0]);
-                // if (acceleration > maxLinearAcceleration) {
-                //     adjustedSpeeds.vxMetersPerSecond = lastSetpoint.vxMetersPerSecond + Math.cos(accelDir) * maxLinearAcceleration * Constants.PERIOD;
-                //     adjustedSpeeds.vyMetersPerSecond = lastSetpoint.vyMetersPerSecond + Math.sin(accelDir) * maxLinearAcceleration * Constants.PERIOD;
-                // }
                 lastSetpoint = adjustedSpeeds;
 
                 // System.out.println(adjustedSpeeds);
@@ -429,9 +424,6 @@ public class Drive extends SubsystemBase {
                     // FOR TESTING ONLY
                     // optimizedStates[i] = new SwerveModuleState();
                 }
-
-                // System.out.println("GOT HERE " + setpointStates[0].angle.getDegrees());
-                // Logger.recordOutput("SwerveStates/Test", setpointStates);
 
                 // Log setpoint states
                 Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
@@ -595,18 +587,6 @@ public class Drive extends SubsystemBase {
 
     /** Returns an array of module translations. */
     public static Translation2d[] getModuleTranslations() {
-        // return new Translation2d[] {
-        //     new Translation2d(-trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0),
-        //     new Translation2d(trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0),
-        //     new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
-        //     new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0)
-        // };
-        // return new Translation2d[] {
-        //     new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
-        //     new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
-        //     new Translation2d(-trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0),
-        //     new Translation2d(trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0)
-        // };
         return new Translation2d[] {
             new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
             new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
