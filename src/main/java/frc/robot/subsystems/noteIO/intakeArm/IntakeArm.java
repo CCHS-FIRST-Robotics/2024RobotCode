@@ -9,14 +9,12 @@ import org.littletonrobotics.junction.Logger;
 
 public class IntakeArm extends SubsystemBase {
     IntakeArmIO io;
-    int maxRPM;
     double volts = 0;
     Debouncer currentDebouncer = new Debouncer(0.1, Debouncer.DebounceType.kRising);
     IntakeArmIOInputsAutoLogged inputs = new IntakeArmIOInputsAutoLogged();
 
-    public IntakeArm(IntakeArmIO io, int maxRPM) {
+    public IntakeArm(IntakeArmIO io) {
         this.io = io;
-        this.maxRPM = maxRPM;
     }
 
     public void start(double v) {
@@ -33,7 +31,8 @@ public class IntakeArm extends SubsystemBase {
 
         // // returns whether note friction is detected and motor is up to speed
         // return inputs.motorCurrent > 15
-        // && inputs.motorVelocity > (maxRPM / 60) * (volts / 12);
+        // && inputs.motorVelocity > (maxRPM / 60) * (volts /
+        // 12);
     }
 
     @Override

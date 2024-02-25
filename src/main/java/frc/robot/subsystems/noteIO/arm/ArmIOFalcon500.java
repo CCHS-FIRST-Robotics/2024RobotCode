@@ -110,13 +110,13 @@ public class ArmIOFalcon500 implements ArmIO {
         drivePID.kV = driveKv;
         drivePID.GravityType = GravityTypeValue.Arm_Cosine;
         // drivePID.kA = driveFeedforwardKa; //dont use it (forn now)(trust) (use it
-        // ocne ssysid works)
+        // ocne sysid works)
         drivePID.kG = driveFeedforwardKg;
         // drivePID.kS = driveFeedforwardKs;
         // drivePID.kV = driveFeedforwardKv; // max rpm is 6,380 volts * seconds /
         // radians
         // Units needed are volts * seconds / radians
-        drivePID.kV = 18d / (Math.PI * 319d); // TRUST!!!!! I don't!!! 
+        drivePID.kV = 18d / (Math.PI * 319d); // TRUST!!!!! I don't!!!
         // 6380 rotaions per minute is 319/3 rotations per second
         // 2pi * 319/3 radians per second
         // 3/(2pi * 319) seconds per radian
@@ -166,8 +166,10 @@ public class ArmIOFalcon500 implements ArmIO {
         inputs.driveTemp = Celsius.of(driveTempSignal.getValueAsDouble());
         inputs.absoluteArmPosition = Rotations.of(absolutePositionSignal.getValueAsDouble());
 
-        // BAD - RotationsPerSecond is for UNITS, it won't convert a position into a velocity 
-        // inputs.absoluteArmVelocity = RotationsPerSecond.of(absolutePositionSignal.getValueAsDouble()); 
+        // BAD - RotationsPerSecond is for UNITS, it won't convert a position into a
+        // velocity
+        // inputs.absoluteArmVelocity =
+        // RotationsPerSecond.of(absolutePositionSignal.getValueAsDouble());
         inputs.absoluteArmVelocity = RotationsPerSecond.of(absoluteVelocitySignal.getValueAsDouble());
 
         inputs.rotorPositionSignal = Rotations.of(rotorPositionSignal.getValueAsDouble());

@@ -7,14 +7,12 @@ import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
     ShooterIO io;
-    int maxRPM;
     Debouncer currentDebouncer = new Debouncer(0.1, Debouncer.DebounceType.kRising);
     // double startTime;
     ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    public Shooter(ShooterIO io, int maxRPM) {
+    public Shooter(ShooterIO io) {
         this.io = io;
-        this.maxRPM = maxRPM;
     }
 
     public void start(double velocity) {
