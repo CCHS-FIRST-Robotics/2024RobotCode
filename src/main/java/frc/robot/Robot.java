@@ -66,8 +66,8 @@ public class Robot extends LoggedRobot {
                 Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
                 break;
         }
-        Logger.start();
         Logger.registerURCL(URCL.startExternal());
+        Logger.start();
 
         robotContainer = new RobotContainer();
     }
