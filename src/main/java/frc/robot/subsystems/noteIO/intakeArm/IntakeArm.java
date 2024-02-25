@@ -5,15 +5,16 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
-import frc.robot.HardwareConstants;
 
 public class IntakeArm extends SubsystemBase {
     IntakeArmIO io;
+    int maxRPM;
     double volts = 0;
     IntakeArmIOInputsAutoLogged inputs = new IntakeArmIOInputsAutoLogged();
 
-    public IntakeArm(IntakeArmIO io) {
+    public IntakeArm(IntakeArmIO io, int maxRPM) {
         this.io = io;
+        this.maxRPM = maxRPM;
     }
 
     public void start(double v) {
@@ -27,7 +28,7 @@ public class IntakeArm extends SubsystemBase {
     private boolean checkNoteThere() {
         // returns whether note friction is detected and motor is up to speed
         return inputs.motorCurrent > 15
-                && inputs.motorVelocity > (HardwareConstants.FALCON_MAX_RPM / 60) * (volts / 12);
+                && inputs.motorVelocity > (maxRPM / 60) * (volts / 12);
     }
 
     @Override

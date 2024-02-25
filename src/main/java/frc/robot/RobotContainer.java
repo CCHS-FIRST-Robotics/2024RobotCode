@@ -39,7 +39,7 @@ public class RobotContainer {
     private final Shooter shooter;
 
     private final CommandXboxController controller = new CommandXboxController(0);
-    private final CommandGenericHID wiiRemote1 = new CommandGenericHID(2);
+    private final CommandGenericHID wiiRemote = new CommandGenericHID(2);
     private final boolean useWiiRemotes = false;
 
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
@@ -95,8 +95,9 @@ public class RobotContainer {
         camera.setPoseEstimator(poseEstimator);
 
         arm = new Arm(new ArmIOFalcon500(100, 100));
-        intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
-        shooter = new Shooter(new ShooterIOCIM(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
+        intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID), HardwareConstants.FALCON_MAX_RPM);
+        shooter = new Shooter(new ShooterIOCIM(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2),
+                HardwareConstants.CIM_MAX_RPM);
 
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
 
@@ -162,7 +163,6 @@ public class RobotContainer {
         // return targetTranslation.getAngle();
         // }));
 
-
         // // create a trajectory to a specific pose
         // controller.a().onTrue(
         // new MoveToPose(
@@ -197,12 +197,11 @@ public class RobotContainer {
         // controller.rightTrigger().whileTrue(drive.sysIdFull());
     }
 
-
     public Translation2d getTargetTranslation(Pose3d targetPose) {
         Pose2d currentPose = drive.getPose();
         Translation2d translationToTargetGround = targetPose.getTranslation()
-        .toTranslation2d()
-        .minus(currentPose.getTranslation());
+                .toTranslation2d()
+                .minus(currentPose.getTranslation());
         return translationToTargetGround;
     }
 

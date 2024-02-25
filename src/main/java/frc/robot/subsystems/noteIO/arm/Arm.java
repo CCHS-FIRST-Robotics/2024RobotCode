@@ -12,7 +12,6 @@ import org.littletonrobotics.junction.Logger;
 
 // rev sucks
 public class Arm extends SubsystemBase {
-
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
     private SysIdRoutine sysIdRoutine;
@@ -23,16 +22,15 @@ public class Arm extends SubsystemBase {
 
     public Arm(ArmIO io) {
         this.io = io;
-        
+
         sysIdRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(),
-            new SysIdRoutine.Mechanism(
-            (Measure<Voltage> volts) -> {
-                io.setDriveVoltage(volts);
-            },
-            null,
-            this
-        ));
+                new SysIdRoutine.Config(),
+                new SysIdRoutine.Mechanism(
+                        (Measure<Voltage> volts) -> {
+                            io.setDriveVoltage(volts);
+                        },
+                        null,
+                        this));
     }
 
     /** Updates inputs and checks tunable numbers. */
