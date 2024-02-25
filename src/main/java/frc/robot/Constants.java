@@ -116,7 +116,7 @@ public final class Constants {
         public static class AutoPathConstants {
                 // i feel like there has to be a better way to do this than how i did lol
 
-                public final Map<Pair<Double, Constants.EventCommand>, ArrayList<String>> eventMarkerMap = new HashMap<>();
+                public static final Map<Pair<Double, Constants.EventCommand>, ArrayList<String>> eventMarkerMap = new HashMap<>();
 
                 // file names for paths
                 public static final String THREE_NOTE_WING1 = "SThreeNote.1";
@@ -128,7 +128,7 @@ public final class Constants {
                 public static final String TWO_NOTE_RIGHT = "STwoNoteRight";
                 public static final String FOUR_NOTE_LEFT = "SFourNoteLeft";
 
-                public final ArrayList<String> threeNoteWing = new ArrayList<String>();
+                public static final ArrayList<String> threeNoteWing = new ArrayList<String>();
 
                 public static final ArrayList<ArrayList<String>> pathLists = new ArrayList<ArrayList<String>>();
 
@@ -139,9 +139,8 @@ public final class Constants {
                 public static final Measure<Angle> ARM_HANDOFF_ANGLE = Radians.of(80 * Math.PI / 180); // radians;
                                                                                                        // double check
                                                                                                        // this w/ final
-                                                                                                       // cad
-
-                public AutoPathConstants() {
+                                                                                                       // ca
+                static {
                         threeNoteWing.add(THREE_NOTE_WING);
                         threeNoteWing.add(THREE_NOTE_WING1);
                         threeNoteWing.add(THREE_NOTE_WING2);
