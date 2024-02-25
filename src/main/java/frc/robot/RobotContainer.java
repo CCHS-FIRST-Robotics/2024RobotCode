@@ -110,35 +110,17 @@ public class RobotContainer {
      * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        if (!useWiiRemotes) {
-            // using joysticks
-            drive.setDefaultCommand(
-                    new DriveWithJoysticks(
-                            drive,
-                            controller::getLeftX,
-                            () -> -controller.getLeftY(),
-                            () -> -controller.getRightX(),
-                            () -> {
-                                return 1.0;
-                            },
-                            () -> Rotation2d.fromDegrees(controller.getHID().getPOV())));
-        } else {
-            // using wii remote
-            drive.setDefaultCommand(
-                    new DriveWithWiimote(
-                            drive,
-                            () -> wiiRemote1.getRawAxis(3),
-                            () -> {
-                                System.out.println(-MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1));
-                                return -MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1);
-                            },
-                            wiiRemote1.button(1),
-                            wiiRemote1.button(2),
-                            () -> getWiiPOV(),
-                            () -> {
-                                return 1.0;
-                            }));
-        }
+        // using joysticks
+        drive.setDefaultCommand(
+                new DriveWithJoysticks(
+                        drive,
+                        controller::getLeftX,
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getRightX(),
+                        () -> {
+                            return 1.0;
+                        },
+                        () -> Rotation2d.fromDegrees(controller.getHID().getPOV())));
 
         // break when leftTrigger is held
         controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
@@ -180,31 +162,6 @@ public class RobotContainer {
         // return targetTranslation.getAngle();
         // }));
 
-        // // drive in a circle
-        // controller.y().onTrue(
-        // new DriveInCircle(
-        // drive,
-        // () -> {
-        // return getRadius();
-        // },
-        // () -> {
-        // return getVelocity();
-        // },
-        // () -> {
-        // return getAngularVelocity();
-        // }));
-        // controller.y().whileTrue(
-        // new DriveInCircle(
-        // drive,
-        // () -> {
-        // return new Translation2d(.57 / 2.0, .57 / 2.0);
-        // },
-        // () -> {
-        // return 0.75;
-        // },
-        // () -> {
-        // return 0.75 / (new Translation2d(.57 / 2.0, .57 / 2.0).getNorm());
-        // }));
 
         // // create a trajectory to a specific pose
         // controller.a().onTrue(
@@ -240,52 +197,14 @@ public class RobotContainer {
         // controller.rightTrigger().whileTrue(drive.sysIdFull());
     }
 
-    private Rotation2d getWiiPOV() {
-        double povX = wiiRemote1.getRawAxis(0); // should be binary (-1, 0, or 1)
-        double povY = wiiRemote1.getRawAxis(1);
-        if (Math.abs(povX) < .05)
-            povX = 0; // deadband since 0 isnt 0 for some reason
-        if (Math.abs(povY) < .05)
-            povY = 0;
 
-        if (povX == 0 && povY == 0)
-            return new Rotation2d(-1);
-        double povAngle = Math.atan2(povY, povX);
-        return new Rotation2d(povAngle);
+    public Translation2d getTargetTranslation(Pose3d targetPose) {
+        Pose2d currentPose = drive.getPose();
+        Translation2d translationToTargetGround = targetPose.getTranslation()
+        .toTranslation2d()
+        .minus(currentPose.getTranslation());
+        return translationToTargetGround;
     }
-
-    // public Translation2d getTargetTranslation(Pose3d targetPose) {
-    // Pose2d currentPose = drive.getPose();
-    // Translation2d translationToTargetGround = targetPose.getTranslation()
-    // .toTranslation2d()
-    // .minus(currentPose.getTranslation());
-    // return translationToTargetGround;
-    // }
-
-    // private Translation2d getRadius() {
-    // double leftY = applyPreferences(controller.getLeftY(), 2.0, .1);
-    // return new Translation2d(.5 + 1.5 * Math.abs(leftY), 0.0);
-    // }
-
-    // private double getVelocity() {
-    // double leftX = applyPreferences(controller.getLeftX(), 2.0, .1);
-    // return 2 * leftX;
-    // }
-
-    // private double getAngularVelocity() {
-    // if (getRadius().getNorm() == 0)
-    // return 0;
-    // double rightX = applyPreferences(controller.getRightX(), 2.0, .1);
-    // return (1 + rightX) * getVelocity() / getRadius().getNorm();
-    // }
-
-    // private double applyPreferences(double input, double exponent, double
-    // deadzone) {
-    // if (Math.abs(input) < deadzone) {
-    // return 0;
-    // }
-    // return Math.pow(Math.abs(input), exponent) * Math.signum(input);
-    // }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
