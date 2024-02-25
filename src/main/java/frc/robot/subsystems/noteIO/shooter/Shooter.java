@@ -26,12 +26,6 @@ public class Shooter extends SubsystemBase {
         io.setVelocity(0);
     }
 
-    @Override
-    public void periodic() {
-        io.updateInputs(inputs);
-        Logger.processInputs("shooter", inputs);
-    }
-
     public boolean checkNoteShot() {
         // returns whether current has risen for more than 0.1 seconds
         return currentDebouncer.calculate(inputs.motorCurrent > 15);
@@ -42,5 +36,11 @@ public class Shooter extends SubsystemBase {
 
         // // returns if 4 seconds have gone by
         // return Timer.getFPGATimestamp() - startTime > 4000;
+    }
+
+    @Override
+    public void periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs("shooter", inputs);
     }
 }
