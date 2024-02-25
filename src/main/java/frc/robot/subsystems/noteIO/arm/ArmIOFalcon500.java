@@ -2,32 +2,14 @@ package frc.robot.subsystems.noteIO.arm;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.Orchestra;
-import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.*;
+import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.fasterxml.jackson.databind.JsonSerializable.Base;
-
+import com.ctre.phoenix6.hardware.*;
+import com.ctre.phoenix6.signals.*;
+import edu.wpi.first.units.*;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Voltage;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class ArmIOFalcon500 implements ArmIO {
     /* MOTOR CONTROLLERS + PID */
@@ -36,9 +18,9 @@ public class ArmIOFalcon500 implements ArmIO {
 
     // Uhh Feedforward momment!
     private static final double driveFeedforwardKg = 0;
-    private static final double driveFeedforwardKs = 0;
-    private static final double driveFeedforwardKv = 0;
-    private static final double driveFeedforwardKa = 0;
+    // private static final double driveFeedforwardKs = 0;
+    // private static final double driveFeedforwardKv = 0;
+    // private static final double driveFeedforwardKa = 0;
 
     private CANcoder driveCancoder;
 
@@ -71,7 +53,7 @@ public class ArmIOFalcon500 implements ArmIO {
 
     private final double gearRatio = 100.0;
 
-    private final boolean motorInverted = false;
+    // private final boolean motorInverted = false;
     private final Rotation2d absoluteEncoderOffset = new Rotation2d();
 
     Orchestra orchestra = new Orchestra();

@@ -1,29 +1,20 @@
 package frc.robot.subsystems.noteIO.arm;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
 import static edu.wpi.first.units.Units.*;
 
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
-import com.ctre.phoenix6.SignalLogger;
-
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.units.*;
+import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 // rev sucks
 public class Arm extends SubsystemBase {
 
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
-    private SysIdRoutine sysIdRoutine;
+    // private SysIdRoutine sysIdRoutine;
 
     // length and position of the arm in relation to the robot's center
     private final double armLength = 0.0; // TODO: set this
@@ -31,14 +22,14 @@ public class Arm extends SubsystemBase {
 
     public Arm(ArmIO io) {
         this.io = io;
-        sysIdRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(), 
-            new SysIdRoutine.Mechanism(
-            (Measure<Voltage> volts) -> {
-                io.setDriveVoltage(volts);
-            },
-            null, this
-        ));
+        // sysIdRoutine = new SysIdRoutine(
+        // new SysIdRoutine.Config(),
+        // new SysIdRoutine.Mechanism(
+        // (Measure<Voltage> volts) -> {
+        // io.setDriveVoltage(volts);
+        // },
+        // null, this
+        // ));
     }
 
     /** Updates inputs and checks tunable numbers. */
@@ -47,7 +38,8 @@ public class Arm extends SubsystemBase {
         Logger.processInputs("Arm", inputs);
         // not needed? I think? Colin said so!
         // SignalLogger.writeDouble("Position", this.getArmAngle().in(Radians));
-        // SignalLogger.writeDouble("Velocity", this.getArmVelocity().in(RadiansPerSecond));
+        // SignalLogger.writeDouble("Velocity",
+        // this.getArmVelocity().in(RadiansPerSecond));
         // trust!
         // io.setDriveVoltage(Volts.of(1));
         // setArmAngle(Degrees.of(90));
