@@ -51,7 +51,7 @@ public class IntakeArm extends SubsystemBase {
     }
 
     public Command getShootCommand(double v, BooleanSupplier shooterDone) {
-        // turns motor on until shooter says note has been shot
+        // turns motor on until shooter detects note
         return new FunctionalCommand(
                 () -> start(v),
                 () -> {
