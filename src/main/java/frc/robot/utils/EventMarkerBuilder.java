@@ -67,10 +67,14 @@ public final class EventMarkerBuilder {
         eventMarkers.add(Pair.of(totalTime - AutoPathConstants.INTAKE_TIME,
                 intake.getHandNoteCommand(AutoPathConstants.INTAKE_HANDOFF_VOLTS)));
 
-        command.andThen((new AutoCommand(eventMarkers)));
+        if (command == null) {
+            command = (new AutoCommand(eventMarkers));
+        } else {
+            command.andThen((new AutoCommand(eventMarkers)));
+        }
     }
 
-    public Command getCommands() {
+    public Command getCommandSequence() {
         return command;
     }
 }
