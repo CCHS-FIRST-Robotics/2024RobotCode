@@ -1,9 +1,9 @@
 package frc.robot.subsystems.drive.swerveDrive;
 
-import org.littletonrobotics.junction.AutoLog;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.*;
-import static edu.wpi.first.units.Units.*;
+import org.littletonrobotics.junction.AutoLog;
 
 // TODO: do we need any raw acc data? I don't think we have any use for it
 // TODO: dual imu??? https://arxiv.org/pdf/2107.02632.pdf

@@ -1,39 +1,32 @@
 package frc.robot.utils;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 
 public class AprilTag {
-    
+
     public int id;
     public Transform3d transform;
 
     /**
-     * Constructs a new AprilTag object from the x, y, and heading of the robot to the tag
+     * Constructs a new AprilTag object from the x, y, and heading of the robot to
+     * the tag
      * 
-     * @param id The ID of the tag
-     * @param x The x (forward) displacement from the robot to the tag
-     * @param y The y (left) displacement from the robot to the tag
+     * @param id      The ID of the tag
+     * @param x       The x (forward) displacement from the robot to the tag
+     * @param y       The y (left) displacement from the robot to the tag
      * @param heading The heading of the robot to the tag
      */
     public AprilTag(int id, double x, double y, double heading) {
         this.id = id;
         this.transform = new Transform3d(
-            new Translation3d(x, y, 0),
-            new Rotation3d(0, 0, heading)
-        ); 
+                new Translation3d(x, y, 0),
+                new Rotation3d(0, 0, heading));
     }
 
     /**
      * Constructs a new AprilTag object from a transform from the robot to the tag
      * 
-     * @param id The ID of the tag
+     * @param id        The ID of the tag
      * @param transform The transform from the robot to the tag
      */
     public AprilTag(int id, Transform3d transform) {
@@ -42,9 +35,10 @@ public class AprilTag {
     }
 
     /**
-     * Constructs a new AprilTag object from a pose (transform) from the robot to the tag
+     * Constructs a new AprilTag object from a pose (transform) from the robot to
+     * the tag
      * 
-     * @param id The ID of the tag
+     * @param id        The ID of the tag
      * @param transform The pose (transform) from the robot to the tag
      */
     public AprilTag(int id, Pose3d pose) {

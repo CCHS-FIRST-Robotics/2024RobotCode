@@ -1,25 +1,15 @@
 package frc.robot.commands;
 
-import frc.robot.Constants;
-import frc.robot.subsystems.drive.swerveDrive.*;
-import frc.robot.subsystems.drive.swerveDrive.Drive.CONTROL_MODE;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import java.util.ArrayList;
+import frc.robot.subsystems.drive.swerveDrive.*;
 import java.util.function.Supplier;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.math.geometry.*;
+import frc.robot.Constants;
+import frc.robot.HardwareConstants;
 
 public class DriveWithWiimote extends Command {
-    
+
     Drive drive;
     Supplier<Double> linearXSpeedSupplier;
     Supplier<Double> linearYSpeedSupplier;
@@ -28,16 +18,15 @@ public class DriveWithWiimote extends Command {
     Supplier<Double> linearSpeedMultiplierSupplier;
 
     Rotation2d prevRotation;
-    
+
     public DriveWithWiimote(
-        Drive drive, 
-        Supplier<Double> rotateXSupplier, 
-        Supplier<Double> rotateYSupplier,
-        Trigger onePressedSupplier,
-        Trigger twoPressedSupplier,
-        Supplier<Rotation2d> POVSupplier,
-        Supplier<Double> linearSpeedMultiplierSupplier
-    ) {
+            Drive drive,
+            Supplier<Double> rotateXSupplier,
+            Supplier<Double> rotateYSupplier,
+            Trigger onePressedSupplier,
+            Trigger twoPressedSupplier,
+            Supplier<Rotation2d> POVSupplier,
+            Supplier<Double> linearSpeedMultiplierSupplier) {
         addRequirements(drive);
         this.drive = drive;
         linearYSpeedSupplier = rotateXSupplier;
@@ -64,32 +53,33 @@ public class DriveWithWiimote extends Command {
         Rotation2d linearDirection = new Rotation2d(linearXSpeed, linearYSpeed);
 
         // TODO: switch constants to tunable numbers
-        linearSpeed = applyPreferences(linearSpeed, Constants.LIENAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
+        linearSpeed = applyPreferences(linearSpeed, HardwareConstants.LINEAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
         linearSpeed *= linearSpeedMultiplierSupplier.get();
 
         // Calcaulate new linear components
         Translation2d linearVelocity = new Translation2d(linearSpeed, linearDirection);
 
-
-        // CONVERT INTO POSITION/VELOCITY FOR ROBOT TO FOLLOW 
+        // CONVERT INTO POSITION/VELOCITY FOR ROBOT TO FOLLOW
         // Pose2d currentPose = drive.getPose();
         // Pose2d targetPose = new Pose2d(currentPose.getTranslation(), rotation);
-
 
         // Twist2d currentVelocity = drive.getVelocity();
 
         // // constrain velocity to max speed
-        // double rotError = rotation.getRadians() - currentPose.getRotation().getRadians();
+        // double rotError = rotation.getRadians() -
+        // currentPose.getRotation().getRadians();
         // double rotVelocity = MathUtil.clamp(
-        //     rotError / Constants.PERIOD, 
-        //     -drive.getMaxAngularSpeedRadPerSec(),
-        //     drive.getMaxAngularSpeedRadPerSec()
+        // rotError / Constants.PERIOD,
+        // -drive.getMaxAngularSpeedRadPerSec(),
+        // drive.getMaxAngularSpeedRadPerSec()
         // );
         // // constrain velocity to max acceleration
         // rotVelocity = MathUtil.clamp(
-        //     rotVelocity,
-        //     currentVelocity.dtheta - drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD,
-        //     currentVelocity.dtheta + drive.getMaxAngularAccelerationRadPerSecPerSec() * Constants.PERIOD
+        // rotVelocity,
+        // currentVelocity.dtheta - drive.getMaxAngularAccelerationRadPerSecPerSec() *
+        // Constants.PERIOD,
+        // currentVelocity.dtheta + drive.getMaxAngularAccelerationRadPerSecPerSec() *
+        // Constants.PERIOD
         // );
 
         drive.runWii(linearVelocity, rotation);

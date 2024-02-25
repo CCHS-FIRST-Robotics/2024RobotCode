@@ -1,32 +1,20 @@
 package frc.robot.utils;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.LinearQuadraticRegulator;
-import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.filter.MedianFilter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.geometry.Twist3d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.filter.*;
+import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.wpilibj.Timer;
-
+import org.littletonrobotics.junction.Logger;
 
 public class PoseEstimator extends SwerveDrivePoseEstimator {
-    
+
     double latestTimestamp = Timer.getFPGATimestamp();
     Pose2d poseEstimate = new Pose2d();
-    Pose3d poseEstimate3d = new Pose3d(); 
+    Pose3d poseEstimate3d = new Pose3d();
 
     // LinearFilter visionXFilter = LinearFilter.movingAverage(10);
     LinearFilter visionYFilter = LinearFilter.movingAverage(30);
@@ -36,8 +24,8 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
     // KalmanFilter
     // LinearQuadraticRegulator
 
-    
-    // static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(10, 10, 10); // for testing (only use vision, essentially)
+    // static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(10, 10,
+    // 10); // for testing (only use vision, essentially)
     static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.003, 0.003, 0.0002);
     SwerveModulePosition[] prevModulePositions = new SwerveModulePosition[4];
 
@@ -52,16 +40,15 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
      */
     static final Matrix<N3, N1> defaultVisionMeasurementStdDevs = VecBuilder.fill(.025, .15, 1);
 
-
     /**
      * Constructs a new PoseEstimator object
      */
     public PoseEstimator(SwerveDriveKinematics kinematics,
-        Rotation2d gyroAngle,
-        SwerveModulePosition[] modulePositions,
-        Pose2d initialPoseMeters
-    ){
-        super(kinematics, gyroAngle, modulePositions, initialPoseMeters, defaultStateStdDevs, defaultVisionMeasurementStdDevs);
+            Rotation2d gyroAngle,
+            SwerveModulePosition[] modulePositions,
+            Pose2d initialPoseMeters) {
+        super(kinematics, gyroAngle, modulePositions, initialPoseMeters, defaultStateStdDevs,
+                defaultVisionMeasurementStdDevs);
     }
 
     /**
@@ -107,30 +94,31 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
      * Adds odometry data to the pose estimator (pose exponential)
      * 
      * @param odometryTwist The twist of the robot since the last odometry update
-     * @param timestamp The timestamp of the odometry update
+     * @param timestamp     The timestamp of the odometry update
      */
     public void addOdometryData(Twist2d odometryTwist, double timestamp) {
         latestTimestamp = timestamp;
 
         poseEstimate = poseEstimate.exp(odometryTwist);
         poseEstimate3d = poseEstimate3d.exp(new Twist3d(
-            odometryTwist.dx, odometryTwist.dy, 0,
-            0, 0, odometryTwist.dtheta
-        ));
+                odometryTwist.dx, odometryTwist.dy, 0,
+                0, 0, odometryTwist.dtheta));
     }
 
     /**
      * Adds vision data to the pose estimator (overriding the pose estimate)
      * 
      * @param visionPoseEstimate The pose estimate from vision
-     * @param timestamp The timestamp of the vision update
+     * @param timestamp          The timestamp of the vision update
      */
     public void addVisionData(Pose3d visionPoseEstimate, double timestamp) {
         latestTimestamp = timestamp;
 
         // This assumes that the vision pose estimate is in the same frame as the gyro
-        // Also, kinda assumes that the pose estimate rotation is the same as the gyro rotation
-        // (which it should be when there are just these two sources of data and the other is overriding this one)
+        // Also, kinda assumes that the pose estimate rotation is the same as the gyro
+        // rotation
+        // (which it should be when there are just these two sources of data and the
+        // other is overriding this one)
         Rotation2d gyroAngle = poseEstimate.getRotation();
 
         // Filter x, y values
@@ -139,13 +127,11 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
 
         poseEstimate = new Pose2d(new Translation2d(x, y), gyroAngle);
         poseEstimate3d = new Pose3d(
-            visionPoseEstimate.getTranslation(), 
-            new Rotation3d(
-                visionPoseEstimate.getRotation().getX(), 
-                visionPoseEstimate.getRotation().getY(),
-                gyroAngle.getRadians()
-            )
-        );
+                visionPoseEstimate.getTranslation(),
+                new Rotation3d(
+                        visionPoseEstimate.getRotation().getX(),
+                        visionPoseEstimate.getRotation().getY(),
+                        gyroAngle.getRadians()));
     }
 
     @Override
@@ -167,5 +153,5 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
         Logger.recordOutput("odomTimestamp", timestamp);
         prevModulePositions = modulePositions;
         return super.updateWithTime(timestamp, gyroAngle, modulePositions);
-    }   
+    }
 }

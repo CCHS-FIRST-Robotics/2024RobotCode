@@ -1,9 +1,9 @@
 package frc.robot.subsystems.noteIO.arm;
 
-import org.littletonrobotics.junction.AutoLog;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.*;
-import static edu.wpi.first.units.Units.*;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
 

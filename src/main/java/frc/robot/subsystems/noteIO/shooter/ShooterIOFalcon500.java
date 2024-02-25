@@ -5,15 +5,11 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 
 public class ShooterIOFalcon500 implements ShooterIO {
     TalonFX motor1, motor2;
-
     SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0, 0);
     PIDController pid = new PIDController(0, 0, 0);
-
-    MotionMagicExpoVoltage driveMotionMagic = new MotionMagicExpoVoltage(0);
 
     // runtime error :)
     StatusSignal<Double> voltageSignal = motor1.getMotorVoltage();
@@ -30,12 +26,6 @@ public class ShooterIOFalcon500 implements ShooterIO {
     public void setVelocity(double velocity) {
         double feedForwardVolts = feedForward.calculate(velocity);
         double pidVolts = pid.calculate(velocitySignal.refresh().getValue(), velocity);
-
-        motor1.setControl(driveMotionMagic.withFeedForward(feedForwardVolts)); // ! bad (armcode has set position but
-                                                                               // that's because it's an arm—I thought I
-                                                                               // should use something with voltages
-                                                                               // instead)
-
         setVoltage(feedForwardVolts + pidVolts);
     }
 

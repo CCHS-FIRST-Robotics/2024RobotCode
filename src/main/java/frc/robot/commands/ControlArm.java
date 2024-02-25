@@ -1,17 +1,16 @@
 package frc.robot.commands;
 
-import java.util.function.Supplier;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.noteIO.arm.Arm;
+import java.util.function.Supplier;
 
-import edu.wpi.first.units.Angle;
-import static edu.wpi.first.units.Units.Radians;
-
-public class ControlArm extends Command{
+public class ControlArm extends Command {
     Arm arm;
     Supplier<Double> angleSupplier;
-    public ControlArm(Arm arm, Supplier<Double> angleSupplier){
+
+    public ControlArm(Arm arm, Supplier<Double> angleSupplier) {
         this.arm = arm;
         this.angleSupplier = angleSupplier;
     }
@@ -33,5 +32,5 @@ public class ControlArm extends Command{
         start += Math.PI / 4D;
         arm.setArmAngle(Radians.of(start));
     }
-    
+
 }
