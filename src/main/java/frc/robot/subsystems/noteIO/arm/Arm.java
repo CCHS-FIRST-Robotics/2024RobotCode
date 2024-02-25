@@ -74,12 +74,4 @@ public class Arm extends SubsystemBase {
             setArmAngle(Radians.of(Math.PI / 2.0 - targetArmAngle.getRadians())); // add 90 degrees since 0 is vertical
         });
     }
-
-    public Command playMusic(String path) {
-        return runOnce(
-                () -> io.setMusicTrack(path))
-                .andThen(() -> {
-                    io.playMusic();
-                });
-    }
 }

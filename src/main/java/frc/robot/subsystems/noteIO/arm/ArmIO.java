@@ -42,16 +42,4 @@ public interface ArmIO {
     public default void setDriveBrakeMode(boolean enable) {
     }
 
-    public default void setMusicTrack(String path) {
-    }
-
-    public default void playMusic() {
-    }
-
-    public default void pauseMusic() {
-    }
-
-    public default void stopMusic() {
-    }
-
 }
