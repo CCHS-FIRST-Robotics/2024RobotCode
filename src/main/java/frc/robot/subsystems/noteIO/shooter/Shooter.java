@@ -1,18 +1,31 @@
 package frc.robot.subsystems.noteIO.shooter;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.units.*;
 import edu.wpi.first.math.filter.Debouncer;
-// import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
     ShooterIO io;
+    SysIdRoutine sysIdRoutine;
     Debouncer currentDebouncer = new Debouncer(0.1, Debouncer.DebounceType.kRising);
     // double startTime;
     ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
     public Shooter(ShooterIO io) {
         this.io = io;
+
+        sysIdRoutine = new SysIdRoutine(
+                new SysIdRoutine.Config(),
+                new SysIdRoutine.Mechanism(
+                        (Measure<Voltage> volts) -> {
+                            io.setVoltage(volts.in(Volts));
+                        },
+                        null,
+                        this));
     }
 
     public void start(double velocity) {
