@@ -8,14 +8,18 @@ public class IntakeGroundIONEO implements IntakeGroundIO {
     CANSparkMax motor1, motor2;
     RelativeEncoder encoder1, encoder2;
 
-    public IntakeGroundIONEO(int id) {
-        motor1 = new CANSparkMax(id, MotorType.kBrushless);
+    public IntakeGroundIONEO(int id1, int id2) {
+        motor1 = new CANSparkMax(id1, MotorType.kBrushless);
         encoder1 = motor1.getEncoder();
+
+        motor2 = new CANSparkMax(id1, MotorType.kBrushless);
+        encoder2 = motor1.getEncoder();
     }
 
     @Override
     public void setVoltage(double volts) {
         motor1.setVoltage(volts);
+        motor2.setVoltage(volts);
     }
 
     @Override
