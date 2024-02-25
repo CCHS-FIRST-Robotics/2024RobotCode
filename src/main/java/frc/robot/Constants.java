@@ -128,7 +128,7 @@ public final class Constants {
                 public static final String TWO_NOTE_RIGHT = "STwoNoteRight";
                 public static final String FOUR_NOTE_LEFT = "SFourNoteLeft";
 
-                public static final ArrayList<String> threeNoteWing = new ArrayList<String>();
+                public final ArrayList<String> threeNoteWing = new ArrayList<String>();
 
                 public static final ArrayList<ArrayList<String>> pathLists = new ArrayList<ArrayList<String>>();
 
@@ -141,7 +141,7 @@ public final class Constants {
                                                                                                        // this w/ final
                                                                                                        // cad
 
-                public AutoPathConstants(Drive drive, Intake intake, Shooter shooter, Arm arm) {
+                public AutoPathConstants() {
                         threeNoteWing.add(THREE_NOTE_WING);
                         threeNoteWing.add(THREE_NOTE_WING1);
                         threeNoteWing.add(THREE_NOTE_WING2);

@@ -49,7 +49,7 @@ public final class MechanismsPath {
 
         currentPath = path.get(currentPathNum);
         drive.updateCurrentAutoPaths(path);
-        constants = new AutoPathConstants(drive, intake, shooter, arm);
+        
        
         addConstEventMarkers();
     }
