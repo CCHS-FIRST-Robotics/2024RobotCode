@@ -1,10 +1,9 @@
 package frc.robot.subsystems.drive.swerveDrive;
 
-import com.kauailabs.navx.frc.*;
-import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
 
-/** IO implementation for NavX */
+import com.kauailabs.navx.frc.*;
+
 public class GyroIONavX implements GyroIO {
     private final AHRS navx;
 
@@ -19,10 +18,9 @@ public class GyroIONavX implements GyroIO {
         inputs.rollPosition = Degrees.of(navx.getRoll());
         inputs.pitchPosition = Degrees.of(navx.getPitch());
         inputs.yawPosition = Degrees.of(-navx.getYaw()); // negative cuz its switched for some reason
-        
+
         inputs.rollVelocity = DegreesPerSecond.of(navx.getRawGyroY());
         inputs.pitchVelocity = DegreesPerSecond.of(navx.getRawGyroX());
-        inputs.yawVelocity = DegreesPerSecond.of(navx.getRawGyroZ()); 
+        inputs.yawVelocity = DegreesPerSecond.of(navx.getRawGyroZ());
     }
 }
-
