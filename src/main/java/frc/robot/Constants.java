@@ -149,6 +149,7 @@ public final class Constants {
                         /*
                          * three note w/ quokka; 1 drive traj
                          */
+                        eventMarkerMap.put(Pair.of(0.0, EventCommand.DRIVE_PATH), threeNoteWing);
                         eventMarkerMap.put(Pair.of(0.0, EventCommand.ARM_SHOOT), threeNoteWing);
                         eventMarkerMap.put(Pair.of(0.15, EventCommand.SHOOT), threeNoteWing);
                         eventMarkerMap.put(Pair.of(0.25, EventCommand.ARM_HANDOFF), threeNoteWing);

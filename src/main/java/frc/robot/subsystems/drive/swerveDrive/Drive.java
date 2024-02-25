@@ -745,7 +745,7 @@ public class Drive extends SubsystemBase {
     }
 
 
-    /*added for auto stuff - not good but maybe better? */
+    /* added for auto stuff - not good but maybe better? */
     public Command followTrajectory(ArrayList<String> path) {
         return runOnce(
                 () -> {
