@@ -31,13 +31,12 @@ public final class MechanismsPath {
 
     private List<Pair<Double, Command>> eventMarkers = new ArrayList<Pair<Double, Command>>();
     private ArrayList<String> path;
-    private String currentPath;
     private AutoPathConstants constants;
     private Drive drive;
     private Intake intake;
     private Shooter shooter;
     private Arm arm;
-    private int currentPathNum = 0;
+   
 
     /* adds set markers */
     public MechanismsPath(ArrayList<String> path, Drive drive, Intake intake, Shooter shooter, Arm arm) {
@@ -47,7 +46,7 @@ public final class MechanismsPath {
         this.shooter = shooter;
         this.arm = arm;
 
-        currentPath = path.get(currentPathNum);
+  
         drive.updateCurrentAutoPaths(path);
         
        
@@ -71,11 +70,6 @@ public final class MechanismsPath {
             }
         }
         // time in seconds
-    }
-
-    public void updateCurrentPath() {
-        currentPathNum++;
-        currentPath = path.get(currentPathNum);
     }
 
     public Command getCommand(Constants.EventCommand commandNum, double time) {
