@@ -26,12 +26,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.commands.DriveInCircle;
-import frc.robot.commands.DriveModules;
-import frc.robot.commands.DriveWithJoysticks;
-import frc.robot.commands.DriveWithWiimote;
-import frc.robot.commands.FollowAprilTag;
-import frc.robot.commands.MoveToPose;
+import frc.robot.commands.*;
 
 // import frc.robot.subsystems.mecaDrive.Drive;
 // import frc.robot.subsystems.mecaDrive.DriveIO;
@@ -263,63 +258,6 @@ public class RobotContainer {
         //     Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
         // );
 
-
-        // controller.y().onTrue(
-        //     new DriveInCircle(
-        //         drive,
-        //         () -> {
-        //             return getRadius();
-        //             // return new Translation2d(.57/2.0, .57/2.0);
-        //         },
-        //         () -> {
-        //             return getVelocity();
-        //         },
-        //         () -> {
-        //             return getAngularVelocity();
-        //         }
-        //     )
-        // );
-
-        controller.y().whileTrue(
-            new DriveInCircle(
-                drive,
-                () -> {
-                    // return new Translation2d(2.0, 0.0);
-                    return new Translation2d(.57/2.0, .57/2.0);
-                },
-                () -> {
-                    // return 2.5;
-                    return 0.75;
-                },
-                () -> {
-                    // return 4 * 2.5 / 2.0;
-                    return 0.75 / (new Translation2d(.57/2.0, .57/2.0).getNorm());
-                }
-            )
-        );
-    }
-
-    private double applyPreferences(double input, double exponent, double deadzone) {
-        if (Math.abs(input) < deadzone) {
-            return 0;
-        }
-        return Math.pow(Math.abs(input), exponent) * Math.signum(input);
-    }
-
-    private Translation2d getRadius() {
-        double leftY = applyPreferences(controller.getLeftY(), 2.0, .1);
-        return new Translation2d(.5 + 1.5 * Math.abs(leftY), 0.0);
-    }
-
-    private double getVelocity() {
-        double leftX = applyPreferences(controller.getLeftX(), 2.0, .1);
-        return 2 * leftX;
-    }
-
-    private double getAngularVelocity() {
-        if (getRadius().getNorm() == 0) return 0;
-        double rightX = applyPreferences(controller.getRightX(), 2.0, .1);
-        return (1 + rightX) * getVelocity() / getRadius().getNorm();
     }
 
     /**
