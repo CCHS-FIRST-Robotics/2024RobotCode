@@ -110,19 +110,19 @@ public class RobotContainer {
      * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        // using joysticks
+        // // using joysticks
         // drive.setDefaultCommand(
-        //         new DriveWithJoysticks(
-        //                 drive,
-        //                 controller::getLeftX,
-        //                 () -> -controller.getLeftY(),
-        //                 () -> -controller.getRightX(),
-        //                 () -> {
-        //                     return 1.0;
-        //                 },
-        //                 () -> Rotation2d.fromDegrees(controller.getHID().getPOV())));
+        // new DriveWithJoysticks(
+        // drive,
+        // controller::getLeftX,
+        // () -> -controller.getLeftY(),
+        // () -> -controller.getRightX(),
+        // () -> {
+        // return 1.0;
+        // },
+        // () -> Rotation2d.fromDegrees(controller.getHID().getPOV())));
 
-        // break when leftTrigger is held
+        // // break when leftTrigger is held
         // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
         // outtake
