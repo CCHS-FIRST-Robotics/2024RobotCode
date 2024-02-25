@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * 
  * sysID for shooter
  * 
- * ! ask colin why autochooser exists
+ * ! ask colin why autochooser in robotcontainer exists
  */
 public final class Main {
     private Main() {
