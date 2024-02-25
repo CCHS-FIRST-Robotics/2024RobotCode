@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
-import java.util.function.Supplier;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.noteIO.arm.Arm;
-import static edu.wpi.first.units.Units.Radians;
+import java.util.function.Supplier;
 
 public class ControlArm extends Command {
     Arm arm;
