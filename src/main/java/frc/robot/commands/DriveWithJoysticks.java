@@ -1,13 +1,13 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.*;
+
 import frc.robot.Constants;
 import frc.robot.HardwareConstants;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -16,14 +16,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-
-import edu.wpi.first.units.*;
-import static edu.wpi.first.units.Units.*;
-
-import java.util.Optional;
 import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveWithJoysticks extends Command {

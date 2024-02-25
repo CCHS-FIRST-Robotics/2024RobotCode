@@ -1,27 +1,18 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.*;
+
 import java.util.ArrayList;
 import java.util.function.Supplier;
-
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
 import frc.robot.subsystems.drive.swerveDrive.Drive;
 import frc.robot.subsystems.drive.swerveDrive.Drive.CONTROL_MODE;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.utils.DriveTrajectoryGenerator;
-
-import edu.wpi.first.units.*;
-import static edu.wpi.first.units.Units.*;
+import frc.robot.Constants;
 
 public class FollowAprilTag extends Command {
 
@@ -71,7 +62,7 @@ public class FollowAprilTag extends Command {
         // tranform of the robot to the closest tag - ROBOT RELATIVE DISPLACEMENT
         Transform2d transformToTag = tagTransformSuppier.get();
         Pose2d currentPose = drive.getPose();
-        Twist2d currentVelocity = drive.getVelocity();
+        // Twist2d currentVelocity = drive.getVelocity();
         if (transformToTag.getX() < 0) {
             end(false);
             return;

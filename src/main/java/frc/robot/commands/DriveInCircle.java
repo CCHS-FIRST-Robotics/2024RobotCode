@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
-import java.lang.annotation.Target;
+import static edu.wpi.first.units.Units.*;
+
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
@@ -10,17 +11,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.drive.swerveDrive.Drive;
 import frc.robot.subsystems.drive.swerveDrive.Drive.CONTROL_MODE;
-import frc.robot.utils.DriveTrajectoryGenerator;
-import frc.robot.utils.DriveTrajectory;
-
-import edu.wpi.first.units.*;
-import static edu.wpi.first.units.Units.*;
 
 public class DriveInCircle extends Command {
 
@@ -52,7 +46,8 @@ public class DriveInCircle extends Command {
     @Override
     public void initialize() {
         previousPose = drive.getPose(); // GETS UPDATED
-        centerTranslation = previousPose.plus(new Transform2d(centerSupplier.get(), new Rotation2d())).getTranslation(); // CONSTANT
+        centerTranslation = previousPose.plus(new Transform2d(centerSupplier.get(), new Rotation2d()))
+                .getTranslation(); // CONSTANT
 
         prevLinearSpeed = 0;
         prevRotationalSpeed = 0;
@@ -68,9 +63,11 @@ public class DriveInCircle extends Command {
         rotationalSpeed = MathUtil.clamp(
                 rotationalSpeed,
                 prevRotationalSpeed
-                        - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) / 2 * Constants.PERIOD,
+                        - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) / 2
+                                * Constants.PERIOD,
                 prevRotationalSpeed
-                        + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) / 2 * Constants.PERIOD);
+                        + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) / 2
+                                * Constants.PERIOD);
         prevRotationalSpeed = rotationalSpeed;
 
         // Adjust rotational speed to match (kidna) change in linear speed
@@ -80,7 +77,8 @@ public class DriveInCircle extends Command {
         double rotationalSpeedMultiplier = rotationalSpeed / (linearSpeed / radius);
 
         // Centripetal acceleration constraint
-        if (linearSpeed * linearSpeed / radius > drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond)) {
+        if (linearSpeed * linearSpeed / radius > drive.getMaxLinearAcceleration()
+                .in(MetersPerSecondPerSecond)) {
             // Adjust linear speed to limit centripetal acceleation
             linearSpeed = Math.sqrt(drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * radius);
         }
@@ -89,8 +87,10 @@ public class DriveInCircle extends Command {
         // careful not to lose traction)
         linearSpeed = MathUtil.clamp(
                 linearSpeed,
-                prevLinearSpeed - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) / 2 * Constants.PERIOD,
-                prevLinearSpeed + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) / 2 * Constants.PERIOD);
+                prevLinearSpeed - drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) / 2
+                        * Constants.PERIOD,
+                prevLinearSpeed + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) / 2
+                        * Constants.PERIOD);
         prevLinearSpeed = linearSpeed;
 
         // scale rot speed back after adjusting the linear speed
@@ -104,7 +104,8 @@ public class DriveInCircle extends Command {
         // speed
         Translation2d displacementFromCenter = previousPose.getTranslation().minus(centerTranslation);
         Translation2d targetTranslation = centerTranslation
-                .plus(displacementFromCenter.rotateBy(new Rotation2d(linearSpeed / radius * Constants.PERIOD)));
+                .plus(displacementFromCenter
+                        .rotateBy(new Rotation2d(linearSpeed / radius * Constants.PERIOD)));
 
         // Move the robot's rotation based on the desired rotational speed
         Rotation2d targetRotation = previousPose.getRotation()
