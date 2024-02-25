@@ -62,9 +62,6 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
-    private final CommandGenericHID wiiRemote1 = new CommandGenericHID(2);
-    // private final CommandGenericHID wiiRemote2 = new CommandGenericHID(3);
-    private final boolean useWiiRemotes = false;
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
@@ -81,8 +78,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(0), 
                 new ModuleIOSparkMax(1), 
                 new ModuleIOSparkMax(2), 
-                new ModuleIOSparkMax(3),
-                useWiiRemotes
+                new ModuleIOSparkMax(3)
             );
             camera = new Vision(new CameraIOZED());
             break;
@@ -94,8 +90,7 @@ public class RobotContainer {
                 new ModuleIOSim(), 
                 new ModuleIOSim(),
                 new ModuleIOSim(),
-                new ModuleIOSim(),
-                false
+                new ModuleIOSim()
             );
             camera = new Vision(new CameraIOZED());
             break;
@@ -107,8 +102,7 @@ public class RobotContainer {
                 new ModuleIOSparkMax(0), 
                 new ModuleIOSparkMax(1),
                 new ModuleIOSparkMax(2), 
-                new ModuleIOSparkMax(3),
-                false
+                new ModuleIOSparkMax(3)
             );
             camera = new Vision(new CameraIOZED());
             break;
@@ -129,17 +123,6 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
-    }
-
-    private Rotation2d getWiiPOV() {
-        double povX = wiiRemote1.getRawAxis(0); // should be binary (-1, 0, or 1)
-        double povY = wiiRemote1.getRawAxis(1);
-        if (Math.abs(povX) < .05) povX = 0; // deadband since 0 isnt 0 for some reason
-        if (Math.abs(povY) < .05) povY = 0;
-
-        if (povX == 0 && povY == 0) return new Rotation2d(-1);
-        double povAngle = Math.atan2(povY, povX);
-        return new Rotation2d(povAngle);
     }
 
     public Translation2d getTargetTranslation(Pose3d targetPose) {
@@ -165,43 +148,34 @@ public class RobotContainer {
         //     () -> 0.5 + 0.5 * controller.getRightTriggerAxis()
         // ));
 
-        // DRIVING WITH JOYSTICKS (NORMAL)
-        if (useWiiRemotes) {
-            drive.setDefaultCommand(
-                new DriveWithWiimote(
-                    drive,
-                    () -> wiiRemote1.getRawAxis(3),
-                    () -> {
-                        System.out.println(-MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1));
-                        return -MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1);
-                    },
-                    wiiRemote1.button(1),
-                    wiiRemote1.button(2),
-                    () -> getWiiPOV(),
-                    () -> {return 1.0;}
-                )
-            );
-        } else {
-            drive.setDefaultCommand(
-                new DriveWithJoysticks(
-                    drive, 
-                    controller::getLeftX, 
-                    () -> -controller.getLeftY(), 
-                    () -> -controller.getRightX(), 
-                    () -> {return 1.0;},
-                    () -> Rotation2d.fromDegrees(controller.getHID().getPOV())
-                )
-            );
-        }
+        // DRIVING WITH JOYSTICKS (NORMAL) 
+        drive.setDefaultCommand(
+            new DriveWithJoysticks(
+                drive, 
+                controller::getLeftX, 
+                () -> -controller.getLeftY(), 
+                () -> -controller.getRightX(), 
+                () -> {return 1.0;},
+                () -> Rotation2d.fromDegrees(controller.getHID().getPOV())
+            )
+        );
 
         // Follow the nearest apriltag while the right trigger is held
         // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
 
-        // Brake when the left trigger is held
+        // Stop when the left trigger is held (safety stop)
         controller.leftTrigger().whileTrue(
             new RunCommand(drive::stopWithX, drive)
         );
 
+        // Turn on brake vs coast mode
+        // controller.b().onTrue(
+        //     Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
+        // );
+
+        /* 
+         * Move drive (future: other subsystems) to track a target
+         */
         Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
         controller.rightTrigger().whileTrue(
             new DriveWithJoysticks(
@@ -216,15 +190,21 @@ public class RobotContainer {
                 }
             )
         );
+        
+        /*
+         * Drive Characterization Code
+         */ 
 
         // controller.rightTrigger().whileTrue(
         //     new RunCommand(drive::runCharacterization, drive)
         // );
-        
         // controller.rightTrigger().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
         // controller.rightTrigger().whileTrue(drive.sysIdDynamic(Direction.kForward));
         controller.rightTrigger().whileTrue(drive.sysIdFull());
         
+        /* 
+         * Drive Auto Code
+         */
         // Generate a trajectory to a pose when the A button is pressed (and switch drive to position control)
         controller.a().onTrue(
             new MoveToPose(
@@ -253,11 +233,6 @@ public class RobotContainer {
                 }
             )
         );
-
-        // controller.b().onTrue(
-        //     Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
-        // );
-
     }
 
     /**

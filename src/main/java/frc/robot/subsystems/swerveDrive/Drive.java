@@ -89,9 +89,6 @@ public class Drive extends SubsystemBase {
     private ArrayList<Pose2d> positionTrajectory = new ArrayList<Pose2d>();
     private ArrayList<Twist2d> twistTrajectory = new ArrayList<Twist2d>();
     private int trajectoryCounter = -1;
-
-    private Rotation2d wiiRotation = new Rotation2d();
-    private Translation2d wiiLinearVelocity = new Translation2d();
     
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
     private double kPx = 0.35; // 0.4
@@ -122,8 +119,6 @@ public class Drive extends SubsystemBase {
     private Pose2d fieldPosition = new Pose2d(); // Use poseEstimator instead
     private Pose2d rawFieldPosition = new Pose2d(); // doesnt account for coa
     private PoseEstimator poseEstimator;
-
-    private boolean isWiiMode = false; 
 
 
     // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
@@ -182,7 +177,6 @@ public class Drive extends SubsystemBase {
         MODULE_SETPOINT,
         CHASSIS_SETPOINT,
         POSITION_SETPOINT,
-        WII_SETPOINT,
         CHARACTERIZING
     };
 
@@ -193,8 +187,7 @@ public class Drive extends SubsystemBase {
         ModuleIO flModuleIO,
         ModuleIO frModuleIO,
         ModuleIO blModuleIO,
-        ModuleIO brModuleIO,
-        boolean isWiiMode
+        ModuleIO brModuleIO
     ) {
         System.out.println("[Init] Creating Drive");
         Logger.recordOutput("SysIdTestState", "none");
@@ -219,13 +212,6 @@ public class Drive extends SubsystemBase {
         xController.setTolerance(.01);
         yController.setTolerance(.01);
         headingController.setTolerance(.005);
-
-        if (isWiiMode) {
-            this.isWiiMode = true;
-
-            // reset max speeds
-            maxLinearSpeed = MetersPerSecond.of(0.5);
-        }
     }
 
     public void periodic() {
@@ -325,33 +311,6 @@ public class Drive extends SubsystemBase {
                 Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
                 break;
             
-            // TODO: THIS IS CURRENTLY VERY HACKY SO LIKE PROBABLY SHOULD REWRITE THIS
-            case WII_SETPOINT:
-                // constrain velocity to max speed
-                double rotError = wiiRotation.getRadians() - getPose().getRotation().getRadians();
-                double rotVelocity = MathUtil.clamp(
-                    rotError / Constants.PERIOD, 
-                    -getMaxAngularSpeed().in(RadiansPerSecond),
-                    getMaxAngularSpeed().in(RadiansPerSecond)
-                );
-                // constrain velocity to max acceleration
-                rotVelocity = MathUtil.clamp(
-                    rotVelocity,
-                    getVelocity().dtheta - getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD,
-                    getVelocity().dtheta + getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD
-                );
-
-                trajectoryCounter = 0;
-                positionTrajectory = new ArrayList<>();
-                twistTrajectory = new ArrayList<>();
-                positionTrajectory.add(new Pose2d(getPose().getTranslation(), wiiRotation));
-                twistTrajectory.add(new Twist2d(wiiLinearVelocity.getX(), wiiLinearVelocity.getY(), rotVelocity));
-                /*
-                 * WARNING:
-                 * NO BREAK HERE
-                 * IT CONTINUES TO POSITION_SETPOINT CASE
-                 */
-                // fallthrough
             case POSITION_SETPOINT:
                 // If we've reached the end of the trajectory, hold at the last setpoint
                 if (trajectoryCounter > positionTrajectory.size() - 1) {
@@ -539,12 +498,6 @@ public class Drive extends SubsystemBase {
         this.positionTrajectory = driveTrajectory.positionTrajectory;
         this.twistTrajectory = driveTrajectory.velocityTrajectory;
         trajectoryCounter = 0;
-    }
-
-    public void runWii(Translation2d linearVelocity, Rotation2d rotation) {
-        controlMode = CONTROL_MODE.WII_SETPOINT;
-        wiiLinearVelocity = linearVelocity;
-        wiiRotation = rotation;
     }
 
     public void runCharacterization(Measure<Voltage> volts) {
