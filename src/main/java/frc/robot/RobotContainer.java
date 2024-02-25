@@ -37,9 +37,11 @@ import frc.robot.commands.MoveToPose;
 import frc.robot.commands.AutoRoutine;
 import frc.robot.Constants.AutoPathConstants;
 import frc.robot.commands.ArmControlWithJoysticks;
+import frc.robot.commands.AutoCommandBuilder;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.DriveTrajectoryGenerator;
+import frc.robot.utils.EventMarkerBuilder;
 import frc.robot.utils.MechanismsPath;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.noteIO.arm.*;
@@ -261,7 +263,8 @@ public class RobotContainer {
         // String path = AutoPathConstants.THREE_NOTE_WING;
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 20);}).onTrue(
         // controller.x().onTrue(
-            new AutoRoutine(new MechanismsPath(AutoPathConstants.threeNoteWing, drive, intake, shooter, arm))
+            // new AutoRoutine(new MechanismsPath(AutoPathConstants.threeNoteWing, drive, intake, shooter, arm))
+                new AutoCommandBuilder(new EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake, shooter, arm).getCommands())
 
             // drive.runOnce(
             //     () -> {

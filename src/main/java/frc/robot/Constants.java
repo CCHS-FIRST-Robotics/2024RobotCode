@@ -129,6 +129,7 @@ public final class Constants {
                 public static final String FOUR_NOTE_LEFT = "SFourNoteLeft";
 
                 public static final ArrayList<String> threeNoteWing = new ArrayList<String>();
+                public static final ArrayList<String> threeNoteWingSplits = new ArrayList<String>();
 
                 public static final ArrayList<ArrayList<String>> pathLists = new ArrayList<ArrayList<String>>();
 
@@ -139,10 +140,24 @@ public final class Constants {
                 public static final Measure<Angle> ARM_HANDOFF_ANGLE = Radians.of(80 * Math.PI / 180); // double check for final
                 public static final Measure<Angle> QUOKKA_ARM_INTAKE_ANGLE = Radians.of(80 * Math.PI / 180); // double check
 
+                public static final double INIT_MOVEMENTS_TIME = 0.0;
+                public static final double MAX_ARM_MOVE_TIME = 0.5;
+                public static final double INTAKE_TIME = 0.3;
+
+                public static final int DRIVE_POS = 0;
+                public static final int ARM_SHOOT = 1;
+                public static final int SHOOT = 2;
+                public static final int ARM_INTAKE = 3;
+                public static final int INTAKE = 4;
+
+
                 static {
                         threeNoteWing.add(THREE_NOTE_WING);
                         threeNoteWing.add(THREE_NOTE_WING1);
                         threeNoteWing.add(THREE_NOTE_WING2);
+
+                        threeNoteWingSplits.add(THREE_NOTE_WING1);
+                        threeNoteWingSplits.add(THREE_NOTE_WING2);
 
                         pathLists.add(threeNoteWing);
 
