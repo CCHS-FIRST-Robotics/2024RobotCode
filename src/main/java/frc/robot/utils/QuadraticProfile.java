@@ -3,15 +3,14 @@ package frc.robot.utils;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class QuadraticProfile {
-
     double period;
-
-    public QuadraticProfile(double period) {
-        this.period = period;
-    }
 
     public QuadraticProfile() {
         this(.02);
+    }
+
+    public QuadraticProfile(double period) {
+        this.period = period;
     }
 
     // public ArrayList<double[]> getSetPoints(Translation2d initialPosition,
@@ -71,7 +70,6 @@ public class QuadraticProfile {
             constantSpeedSetpoints = getConstantSpeedSetpoints(timeConstantSpeed, angleDisplacement, speed);
         }
 
-        // System.out.println("ASUHDUHSUH" + accelSetpoints[45].x);
         System.out.println("#Accel: " + accelSetpoints.length);
         System.out.println("#Speed: " + constantSpeedSetpoints.length);
         System.out.println("#Stop: " + stoppingSetpoints.length);
