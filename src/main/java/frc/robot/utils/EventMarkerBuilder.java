@@ -68,9 +68,9 @@ public final class EventMarkerBuilder {
                 intake.getHandNoteCommand(AutoPathConstants.INTAKE_HANDOFF_VOLTS)));
 
         if (command == null) {
-            command = (new AutoCommand(eventMarkers));
+            command = (new AutoCommand(eventMarkers, totalTime));
         } else {
-            command.andThen((new AutoCommand(eventMarkers)));
+            command = command.andThen((new AutoCommand(eventMarkers, totalTime)));
         }
     }
 

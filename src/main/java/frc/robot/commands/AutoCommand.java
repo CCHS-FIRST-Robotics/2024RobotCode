@@ -19,16 +19,19 @@ public class AutoCommand extends Command {
   // private final Supplier<ChassisSpeeds> speedsSupplier;
   // private final Consumer<ChassisSpeeds> speedsOutput;
 
+  private double totalTime;
+
   // For event markers
   private final Map<Command, Boolean> currentEventCommands = new HashMap<>();
   private final List<Pair<Double, Command>> untriggeredEvents = new ArrayList<>();
   private List<Pair<Double, Command>> eventMarkers = new ArrayList<>();
 
-  public AutoCommand(List<Pair<Double, Command>> eventMarkers) {
+  public AutoCommand(List<Pair<Double, Command>> eventMarkers, double totalTime) {
     // m_subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
  
     this.eventMarkers = eventMarkers;
+    this.totalTime = totalTime;
 
     // add requirements
     for (Pair<Double, Command> marker : eventMarkers) {
@@ -96,12 +99,13 @@ public class AutoCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     timer.stop();
-    // isFinished(); will switch to this when using intake indication
+    // will switch to this when using intake indication
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    if (timer.hasElapsed(totalTime)) return true;
     return false;
     // return when intake is done
   }
