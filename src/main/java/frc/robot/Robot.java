@@ -84,14 +84,14 @@ public class Robot extends LoggedRobot {
     }
 
     /** This function is called once when the robot is disabled. */
-    // @Override
-    // public void disabledInit() {
-    // }
+    @Override
+    public void disabledInit() {
+    }
 
     /** This function is called periodically when disabled. */
-    // @Override
-    // public void disabledPeriodic() {
-    // }
+    @Override
+    public void disabledPeriodic() {
+    }
 
     /**
      * This autonomous runs the autonomous command selected by your

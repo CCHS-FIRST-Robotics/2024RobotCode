@@ -61,6 +61,9 @@ public class ArmIOFalcon500 implements ArmIO {
 
     public ArmIOFalcon500(int motorID, int cancoderID) {
         driveFalcon = new TalonFX(motorID);
+        /// I encode???? Turst Different ids needed NO IDEA WHAT IDS
+        driveCancoder = new CANcoder(cancoderID);
+
         drivePositionSignal = driveFalcon.getPosition();
         driveVelocitySignal = driveFalcon.getVelocity();
         driveAppliedVoltageSignal = driveFalcon.getMotorVoltage();
@@ -75,14 +78,11 @@ public class ArmIOFalcon500 implements ArmIO {
         faultFusedSensorOutOfSync = driveFalcon.getFault_FusedSensorOutOfSync();
         stickyFaultFusedSensorOutOfSync = driveFalcon.getStickyFault_FusedSensorOutOfSync();
         faultRemoteSensorOutOfSync = driveFalcon.getFault_RemoteSensorDataInvalid();
-        stickyFaultFusedSensorOutOfSync = driveFalcon.getStickyFault_RemoteSensorDataInvalid();
+        stickyFaultRemoteSensorOutOfSync = driveFalcon.getStickyFault_RemoteSensorDataInvalid();
 
         driveMMConfig.MotionMagicCruiseVelocity = 5; // 1 rotation every 1 seconds
         driveMMConfig.MotionMagicAcceleration = 10; // 1 second to reach max speed
         driveMMConfig.MotionMagicJerk = 30; // .1 seconds to reach max accel
-
-        /// I encode???? Turst Different ids needed NO IDEA WHAT IDS
-        driveCancoder = new CANcoder(cancoderID);
 
         // Feedforward momment!
 

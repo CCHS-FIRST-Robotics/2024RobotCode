@@ -7,13 +7,18 @@ import com.ctre.phoenix6.StatusSignal;
 public class IntakeArmIOFalcon500 implements IntakeArmIO {
     TalonFX motor;
 
-    StatusSignal<Double> voltageSignal = motor.getMotorVoltage();
-    StatusSignal<Double> currentSignal = motor.getSupplyCurrent();
-    StatusSignal<Double> velocitySignal = motor.getVelocity();
-    StatusSignal<Double> temperatureSignal = motor.getDeviceTemp();
+    StatusSignal<Double> voltageSignal;
+    StatusSignal<Double> currentSignal;
+    StatusSignal<Double> velocitySignal;
+    StatusSignal<Double> temperatureSignal;
 
     public IntakeArmIOFalcon500(int id) {
         motor = new TalonFX(id);
+
+        voltageSignal = motor.getMotorVoltage();
+        currentSignal = motor.getSupplyCurrent();
+        velocitySignal = motor.getVelocity();
+        temperatureSignal = motor.getDeviceTemp();
     }
 
     @Override
