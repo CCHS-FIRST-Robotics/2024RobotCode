@@ -70,7 +70,7 @@ public final class EventMarkerBuilder {
         if (command == null) {
             command = (new AutoCommand(eventMarkers));
         } else {
-            command.andThen((new AutoCommand(eventMarkers)));
+            command = command.andThen((new AutoCommand(eventMarkers)));
         }
     }
 
