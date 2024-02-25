@@ -180,6 +180,18 @@ public final class Constants {
                         // eventMarkerMap.put(Pair.of(.38, intake.startEndCommmand()), FOUR_NOTE_LEFT);
                         // eventMarkerMap.put(Pair.of(2.31, intake.startEndCommmand()), FOUR_NOTE_LEFT);
                         // eventMarkerMap.put(Pair.of(5.41, intake.startEndCommmand()), FOUR_NOTE_LEFT);
+
+
+
+                        /*
+                         * start against speaker (1.4, 5.55, 0)
+                         * WM (2.75, 5.55, 0)
+                         * WM-WL angle .71
+                         * WR
+                         * 
+                         * 
+                         */
+
                 }
         }
 
