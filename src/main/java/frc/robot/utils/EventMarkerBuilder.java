@@ -38,7 +38,7 @@ public final class EventMarkerBuilder {
     private Shooter shooter;
     private Arm arm;
 
-    private ArrayList<Command> commands = new ArrayList<Command>();
+    private Command command;
 
     public EventMarkerBuilder(ArrayList<String> pathList, Drive drive, Intake intake, Shooter shooter, Arm arm) {
         this.drive = drive;
@@ -67,10 +67,10 @@ public final class EventMarkerBuilder {
         eventMarkers.add(Pair.of(totalTime - AutoPathConstants.INTAKE_TIME,
                 intake.getHandNoteCommand(AutoPathConstants.INTAKE_HANDOFF_VOLTS)));
 
-        commands.add(new AutoCommand(eventMarkers));
+        command.andThen((new AutoCommand(eventMarkers)));
     }
 
-    public ArrayList<Command> getCommands() {
-        return commands;
+    public Command getCommands() {
+        return command;
     }
 }
