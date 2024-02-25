@@ -24,7 +24,7 @@ public final class Constants {
         REPLAY
     }
 
-    public static final Mode currentMode = Mode.REAL;
+    public static final Mode CURRENT_MODE = Mode.REAL;
 
     // ports
     public static final int XBOX_CONTROLLER_PORT = 0;

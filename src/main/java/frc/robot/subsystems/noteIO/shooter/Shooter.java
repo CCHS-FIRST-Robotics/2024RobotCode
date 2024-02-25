@@ -32,7 +32,7 @@ public class Shooter extends SubsystemBase {
     public boolean checkNoteShot() {
         // returns if no note friction detected and motor up to speed
         return inputs.motorCurrent < 15
-                && inputs.motorVelocity > (HardwareConstants.CIMMaxRPM / 60) * (inputs.motorVoltage / 12);
+                && inputs.motorVelocity > (HardwareConstants.CIM_MAX_RPM / 60) * (inputs.motorVoltage / 12);
 
         // returns if 4 seconds have gone by
         // return Timer.getFPGATimestamp() - startTime > 4000;

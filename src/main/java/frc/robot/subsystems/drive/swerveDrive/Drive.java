@@ -127,7 +127,7 @@ public class Drive extends SubsystemBase {
     // Tell SysId how to record a frame of data for each motor on the mechanism
     // being
     // characterized (real uses URCL, sim uses manual logging)
-    Consumer<SysIdRoutineLog> log = (Constants.currentMode == Mode.REAL) ? null : log -> {
+    Consumer<SysIdRoutineLog> log = (Constants.CURRENT_MODE == Mode.REAL) ? null : log -> {
         // Record a frame for the left motors. Since these share an encoder, we consider
         // the entire group to be one motor.
         log.motor("drive-0")

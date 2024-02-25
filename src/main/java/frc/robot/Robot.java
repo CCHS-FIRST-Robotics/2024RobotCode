@@ -49,7 +49,7 @@ public class Robot extends LoggedRobot {
         }
 
         // set up data recievers
-        switch (Constants.currentMode) {
+        switch (Constants.CURRENT_MODE) {
             case REAL: // log to a USB stick
                 // Logger.addDataReceiver(new WPILOGWriter());
                 Logger.addDataReceiver(new NT4Publisher());

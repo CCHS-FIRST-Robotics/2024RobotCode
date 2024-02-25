@@ -13,10 +13,7 @@ import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.commands.DriveWithWiimote;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.PoseEstimator;
@@ -52,7 +49,7 @@ public class RobotContainer {
      */
     public RobotContainer() {
         // creating the drivebase
-        switch (Constants.currentMode) {
+        switch (Constants.CURRENT_MODE) {
             case REAL:
                 // instantiate hardware IO implementations
                 drive = new Drive(
@@ -146,9 +143,6 @@ public class RobotContainer {
         // break when leftTrigger is held
         controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
-        // follow nearest aprilTag when rightTrigger is held
-        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
-
         // outtake
         controller.x().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
 
@@ -227,6 +221,9 @@ public class RobotContainer {
         // String path = "ThirdFloorTest1";
         // var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
         // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
+
+        // // follow nearest aprilTag when rightTrigger is held
+        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
 
         // // record robot trajectory
         // System.out.println("recording pos traj");

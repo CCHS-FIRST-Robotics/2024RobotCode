@@ -27,7 +27,7 @@ public class IntakeArm extends SubsystemBase {
     private boolean checkNoteThere() {
         // returns whether note friction is detected and motor is up to speed
         return inputs.motorCurrent > 15
-                && inputs.motorVelocity > (HardwareConstants.falcon500MaxRPM / 60) * (volts / 12);
+                && inputs.motorVelocity > (HardwareConstants.FALCON_MAX_RPM / 60) * (volts / 12);
     }
 
     @Override
