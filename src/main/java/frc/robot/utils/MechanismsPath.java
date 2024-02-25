@@ -31,7 +31,6 @@ public final class MechanismsPath {
 
     private List<Pair<Double, Command>> eventMarkers = new ArrayList<Pair<Double, Command>>();
     private ArrayList<String> path;
-    private AutoPathConstants constants;
     private Drive drive;
     private Intake intake;
     private Shooter shooter;
@@ -44,11 +43,7 @@ public final class MechanismsPath {
         this.drive = drive;
         this.intake = intake;
         this.shooter = shooter;
-        this.arm = arm;
-
-  
-        drive.updateCurrentAutoPaths(path);
-        
+        this.arm = arm; 
        
         addConstEventMarkers();
     }
@@ -64,7 +59,7 @@ public final class MechanismsPath {
     }
 
     public void addConstEventMarkers() {
-        for (Map.Entry<Pair<Double,Constants.EventCommand>, ArrayList<String>> em : constants.eventMarkerMap.entrySet()) {
+        for (Map.Entry<Pair<Double,Constants.EventCommand>, ArrayList<String>> em : AutoPathConstants.eventMarkerMap.entrySet()) {
             if (em.getValue().equals(path)) {
                 eventMarkers.add(Pair.of(em.getKey().getFirst(), getCommand(em.getKey().getSecond(), em.getKey().getFirst())));
             }
@@ -83,11 +78,13 @@ public final class MechanismsPath {
             case SHOOTER_HANDOFF:
                 return shooter.getReceiveNoteCommand(AutoPathConstants.SHOOTER_HANDOFF_VOLTS);
             case DRIVE_PATH:
-                return drive.followTrajectory(path);
+                // return drive.followTrajectory(path); for split
+                return drive.followTrajectory(DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.get(0)));
             case ARM_SHOOT:
                 return arm.getPosFromPath(path.get(0), time);
             case ARM_HANDOFF:
-                return arm.getMoveAngleCommand(AutoPathConstants.ARM_HANDOFF_ANGLE);
+                // return arm.getMoveAngleCommand(AutoPathConstants.ARM_HANDOFF_ANGLE);
+                return arm.getMoveAngleCommand(AutoPathConstants.QUOKKA_ARM_INTAKE_ANGLE);
             default:
                 return null;
         }

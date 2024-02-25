@@ -136,10 +136,9 @@ public final class Constants {
                 public static final double SHOOT_VOLTS = 12;
                 public static final double INTAKE_HANDOFF_VOLTS = 6;
                 public static final double SHOOTER_HANDOFF_VOLTS = 6;
-                public static final Measure<Angle> ARM_HANDOFF_ANGLE = Radians.of(80 * Math.PI / 180); // radians;
-                                                                                                       // double check
-                                                                                                       // this w/ final
-                                                                                                       // ca
+                public static final Measure<Angle> ARM_HANDOFF_ANGLE = Radians.of(80 * Math.PI / 180); // double check for final
+                public static final Measure<Angle> QUOKKA_ARM_INTAKE_ANGLE = Radians.of(80 * Math.PI / 180); // double check
+
                 static {
                         threeNoteWing.add(THREE_NOTE_WING);
                         threeNoteWing.add(THREE_NOTE_WING1);
@@ -147,24 +146,44 @@ public final class Constants {
 
                         pathLists.add(threeNoteWing);
 
+                        /*
+                         * three note w/ quokka; 1 drive traj
+                         */
+                        eventMarkerMap.put(Pair.of(0.0, EventCommand.ARM_SHOOT), threeNoteWing);
+                        eventMarkerMap.put(Pair.of(0.15, EventCommand.SHOOT), threeNoteWing);
+                        eventMarkerMap.put(Pair.of(0.25, EventCommand.ARM_HANDOFF), threeNoteWing);
+                        eventMarkerMap.put(Pair.of(0.36, EventCommand.INTAKE), threeNoteWing);
+                        eventMarkerMap.put(Pair.of(0.74, EventCommand.ARM_SHOOT), threeNoteWing);
+                        eventMarkerMap.put(Pair.of(0.9, EventCommand.SHOOT), threeNoteWing);
+                        eventMarkerMap.put(Pair.of(1.1, EventCommand.ARM_HANDOFF), threeNoteWing);
+                        eventMarkerMap.put(Pair.of(1.2, EventCommand.INTAKE), threeNoteWing);
+                        eventMarkerMap.put(Pair.of(1.5, EventCommand.ARM_SHOOT), threeNoteWing);
+                        eventMarkerMap.put(Pair.of(1.58, EventCommand.SHOOT), threeNoteWing);
+
+
                         // probably a way to consolidate times here cause stuff happens at the same time
                         // for similar patterns ill do it later
-                        eventMarkerMap.put(Pair.of(0.0, EventCommand.ARM_SHOOT), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(0.0, EventCommand.SHOOT), threeNoteWing); // change
-                        eventMarkerMap.put(Pair.of(0.0, EventCommand.DRIVE_PATH), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(0.3, EventCommand.ARM_HANDOFF), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(0.4, EventCommand.INTAKE), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(0.6, EventCommand.INTAKE_HANDOFF), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(0.6, EventCommand.SHOOTER_HANDOFF), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(0.67, EventCommand.ARM_SHOOT), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(0.77, EventCommand.SHOOT), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(0.77, EventCommand.DRIVE_PATH), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(0.8, EventCommand.ARM_HANDOFF), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(1.31, EventCommand.INTAKE), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(1.5, EventCommand.INTAKE_HANDOFF), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(1.5, EventCommand.SHOOTER_HANDOFF), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(1.6, EventCommand.ARM_SHOOT), threeNoteWing);
-                        eventMarkerMap.put(Pair.of(1.67, EventCommand.SHOOT), threeNoteWing);
+                        /*
+                         * commands that work for a final robot intake
+                         */
+                        // eventMarkerMap.put(Pair.of(0.0, EventCommand.ARM_SHOOT), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(0.0, EventCommand.SHOOT), threeNoteWing); // change
+                        // eventMarkerMap.put(Pair.of(0.0, EventCommand.DRIVE_PATH), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(0.3, EventCommand.ARM_HANDOFF), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(0.4, EventCommand.INTAKE), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(0.6, EventCommand.INTAKE_HANDOFF), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(0.6, EventCommand.SHOOTER_HANDOFF), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(0.67, EventCommand.ARM_SHOOT), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(0.77, EventCommand.SHOOT), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(0.77, EventCommand.DRIVE_PATH), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(0.8, EventCommand.ARM_HANDOFF), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(1.31, EventCommand.INTAKE), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(1.5, EventCommand.INTAKE_HANDOFF), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(1.5, EventCommand.SHOOTER_HANDOFF), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(1.6, EventCommand.ARM_SHOOT), threeNoteWing);
+                        // eventMarkerMap.put(Pair.of(1.67, EventCommand.SHOOT), threeNoteWing);
+
+
 
                         // eventMarkerMap.put(Pair.of(1.0, intake.startEndCommmand()), FOUR_NOTE_WING);
                         // eventMarkerMap.put(Pair.of(2.68, intake.startEndCommmand()), FOUR_NOTE_WING);

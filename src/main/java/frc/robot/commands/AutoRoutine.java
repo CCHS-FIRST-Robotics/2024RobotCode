@@ -49,7 +49,7 @@ public class AutoRoutine extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
+   
     // Initialize marker stuff
     currentEventCommands.clear();
     untriggeredEvents.clear();

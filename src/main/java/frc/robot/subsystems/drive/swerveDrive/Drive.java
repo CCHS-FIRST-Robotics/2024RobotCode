@@ -757,8 +757,4 @@ public class Drive extends SubsystemBase {
                 }
             );
     }
-
-    public void updateCurrentAutoPaths(ArrayList<String> paths) {
-        autoPaths = paths;
-    }
 }
