@@ -118,7 +118,7 @@ public class ArmIOFalcon500 implements ArmIO {
         // Units needed are volts * seconds / radians
         drivePID.kV = 18d / (Math.PI * 319d); // TRUST!!!!! I don't!!!
         // 6380 rotaions per minute is 319/3 rotations per second
-        // 2pi * 319/3 radians per second
+        // 2pi * 319/3 radians per second <--- you don't need to convert to radians
         // 3/(2pi * 319) seconds per radian
         // 12 * 3/(2pi * 319)
 
