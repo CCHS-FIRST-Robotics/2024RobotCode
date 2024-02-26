@@ -138,8 +138,8 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMax.setCANTimeout(0);
 
         System.out.println("TESTING");
-        System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
-        System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
+        // System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
+        // System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
     }
 
     /*
