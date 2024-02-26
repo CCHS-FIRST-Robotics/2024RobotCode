@@ -17,6 +17,10 @@ public interface ShooterIO {
     public default void setVoltage(double volts) {
     }
 
+    public default boolean checkNoteShot() {
+        return false;
+    }
+
     public default void updateInputs(ShooterIOInputsAutoLogged inputs) {
     }
 }
