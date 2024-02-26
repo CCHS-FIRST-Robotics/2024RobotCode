@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
     ShooterIO io;
+    double volts = 0;
     ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
     public Shooter(ShooterIO io) {
@@ -15,16 +16,20 @@ public class Shooter extends SubsystemBase {
 
     public void start(double velocity) {
         io.setVelocity(velocity);
+        volts = velocity;
     }
 
     public void stop() {
         io.setVelocity(0);
+        volts = 0;
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("shooter", inputs);
+
+        Logger.recordOutput("Shooter", volts != 0);
     }
 
     public boolean checkCompleteShot() {

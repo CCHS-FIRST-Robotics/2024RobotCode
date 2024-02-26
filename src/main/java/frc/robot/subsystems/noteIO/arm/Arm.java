@@ -64,6 +64,8 @@ public class Arm extends SubsystemBase {
         // trust!
         // io.setDriveVoltage(Volts.of(1));
         // setArmAngle(Degrees.of(90));
+
+        Logger.recordOutput("Arm Angle", getArmAngle());
     }
 
     public void setArmAngle(Measure<Angle> angle) {

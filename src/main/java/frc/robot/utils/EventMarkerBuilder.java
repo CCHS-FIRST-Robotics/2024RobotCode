@@ -62,9 +62,9 @@ public final class EventMarkerBuilder {
                 arm.getPosFromPath(path, AutoPathConstants.INIT_MOVEMENTS_TIME)));
         eventMarkers.add(Pair.of(AutoPathConstants.MAX_ARM_MOVE_TIME,
                 shooter.getShootNoteCommand(AutoPathConstants.SHOOT_VOLTS)));
-        eventMarkers.add(Pair.of(totalTime - AutoPathConstants.MAX_ARM_MOVE_TIME - AutoPathConstants.INTAKE_TIME,
+        eventMarkers.add(Pair.of((totalTime - AutoPathConstants.MAX_ARM_MOVE_TIME - AutoPathConstants.INTAKE_TIME),
                 arm.getMoveAngleCommand(AutoPathConstants.ARM_HANDOFF_ANGLE)));
-        eventMarkers.add(Pair.of(totalTime - AutoPathConstants.INTAKE_TIME,
+        eventMarkers.add(Pair.of((totalTime - AutoPathConstants.INTAKE_TIME),
                 intake.getHandNoteCommand(AutoPathConstants.INTAKE_HANDOFF_VOLTS)));
 
         if (command == null) {
