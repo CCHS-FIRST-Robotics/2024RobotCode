@@ -3,6 +3,7 @@ package frc.robot.subsystems.swerveDrive;
 // import com.ctre.phoenix6.configs.CANcoderConfiguration;
 // import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
 import com.revrobotics.CANSparkBase.ControlType;
@@ -140,9 +141,9 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMax.setCANTimeout(0);
 
 
-        // System.out.println("TESTING");
-        // System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
-        // System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
+        System.out.println("TESTING");
+        System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
+        System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
     }
 
     /* (non-Javadoc)
@@ -206,14 +207,17 @@ public class ModuleIOSparkMax implements ModuleIO {
      * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVelocity(double)
      */
     public void setDriveVelocity(Measure<Velocity<Angle>> velocity) {
+        driveSparkMaxPIDF.setReference(1000, CANSparkMax.ControlType.kVelocity, 0, 1);
+        // driveSparkMaxPIDF.setReference(6, CANSparkMax.ControlType.kVoltage);
+        
 
-        driveSparkMaxPIDF.setReference(
-            velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
-            CANSparkMax.ControlType.kVelocity,
-            0,
-            driveFeedforward.calculate(prevVelocity.in(RadiansPerSecond), velocity.in(RadiansPerSecond), Constants.PERIOD)
-        );
-        prevVelocity = velocity;
+        // driveSparkMaxPIDF.setReference(
+        //     velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
+        //     CANSparkMax.ControlType.kVelocity,
+        //     0,
+        //     driveFeedforward.calculate(prevVelocity.in(RadiansPerSecond), velocity.in(RadiansPerSecond), Constants.PERIOD)
+        // );
+        // prevVelocity = velocity;
     }
 
     /* (non-Javadoc)
