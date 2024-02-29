@@ -128,11 +128,11 @@ public class RobotContainer {
         // outtake
         controller.x().whileTrue(new StartEndCommand(() -> intake.start(-2.9), () -> intake.stop(), intake));
 
-        // intake (stops automatically)
-        controller.a().onTrue(intake.getIntakeCommand(2.9));
-
         // manual intake
         controller.y().whileTrue(new StartEndCommand(() -> intake.start(4), () -> intake.stop(), intake));
+
+        // intake (stops automatically)
+        controller.a().onTrue(intake.getIntakeCommand(2.9));
 
         controller.b().onTrue(
                 // prime shooter
