@@ -19,11 +19,18 @@ public interface ArmIO {
         public Measure<Velocity<Angle>> absoluteArmVelocity = RadiansPerSecond.of(0.0);
 
         public Measure<Angle> rotorPositionSignal = Radians.of(0.0);
+
+
+        public String name = "";
+
         // check withc ol.in if works
         public boolean faultFusedSensorOutOfSync = false;
         public boolean stickyFaultFusedSensorOutOfSync = false;
         public boolean faultRemoteSensorOutOfSync = false;
         public boolean stickyFaultRemoteSensorOutOfSync = false;
+
+
+
 
 
 
@@ -43,6 +50,10 @@ public interface ArmIO {
 
     /** Enable or disable brake mode on the drive motor. */
     public default void setDriveBrakeMode(boolean enable) {
+    }
+
+    public default void setCharacterizationVoltage(Measure<Voltage> volts){
+
     }
 
 }
