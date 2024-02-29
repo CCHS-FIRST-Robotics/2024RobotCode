@@ -20,6 +20,10 @@ public interface ArmIO {
 
         public Measure<Angle> rotorPositionSignal = Radians.of(0.0);
 
+        public Measure<Current> torqueCurrent = Amps.of(0);
+
+        
+
 
         public String name = "";
 
@@ -28,10 +32,6 @@ public interface ArmIO {
         public boolean stickyFaultFusedSensorOutOfSync = false;
         public boolean faultRemoteSensorOutOfSync = false;
         public boolean stickyFaultRemoteSensorOutOfSync = false;
-
-
-
-
 
 
     }

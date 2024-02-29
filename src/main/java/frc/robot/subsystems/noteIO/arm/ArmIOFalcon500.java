@@ -48,9 +48,10 @@ public class ArmIOFalcon500 implements ArmIO {
     StatusSignal<Boolean> faultRemoteSensorOutOfSync;
     StatusSignal<Boolean> stickyFaultRemoteSensorOutOfSync;
 
+    StatusSignal<Double> torqueCurrentSignal;
     StatusSignal<String> name;
 
-
+// recalc: https://www.reca.lc/arm
 
 
     
@@ -88,6 +89,8 @@ public class ArmIOFalcon500 implements ArmIO {
         driveCurrentSignal = driveFalcon.getSupplyCurrent();
         driveTempSignal = driveFalcon.getDeviceTemp();
 
+
+
         absolutePositionSignal = driveCancoder.getPosition(); // check what this does!!!!!!! absolute variations! other
                                                               // methord!!!!
         absoluteVelocitySignal = driveCancoder.getVelocity();
@@ -97,6 +100,8 @@ public class ArmIOFalcon500 implements ArmIO {
         stickyFaultFusedSensorOutOfSync = driveFalcon.getStickyFault_FusedSensorOutOfSync();
         faultRemoteSensorOutOfSync = driveFalcon.getFault_RemoteSensorDataInvalid();
         stickyFaultRemoteSensorOutOfSync = driveFalcon.getStickyFault_RemoteSensorDataInvalid();
+
+        torqueCurrentSignal = driveFalcon.getTorqueCurrent();
 
         driveMMConfig.MotionMagicCruiseVelocity = 5; // 1 rotation every 1 seconds
         driveMMConfig.MotionMagicAcceleration = 10; // 1 second to reach max speed
@@ -186,7 +191,8 @@ public class ArmIOFalcon500 implements ArmIO {
                 stickyFaultFusedSensorOutOfSync,
                 faultRemoteSensorOutOfSync,
                 stickyFaultRemoteSensorOutOfSync,
-                name
+                name,
+                torqueCurrentSignal
                 
         );
 
@@ -211,6 +217,8 @@ public class ArmIOFalcon500 implements ArmIO {
         inputs.stickyFaultRemoteSensorOutOfSync = stickyFaultRemoteSensorOutOfSync.getValue();
 
         inputs.name = driveMotionMagic.getName();
+
+        inputs.torqueCurrent = Amps.of(torqueCurrentSignal.getValueAsDouble());
     }
 
     @Override
