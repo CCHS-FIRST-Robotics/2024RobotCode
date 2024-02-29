@@ -108,10 +108,14 @@ public class ArmIOFalcon500 implements ArmIO {
 
         // fuses (trust)
         TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
+
         talonFXConfig.Feedback.FeedbackRemoteSensorID = driveCancoder.getDeviceID();
         talonFXConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         talonFXConfig.Feedback.SensorToMechanismRatio = 1.0; // fuck maybe? CHANGE????
         talonFXConfig.Feedback.RotorToSensorRatio = 100.0; // CHNAGE
+
+        talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        talonFXConfig.CurrentLimits.StatorCurrentLimit = 60;
 
         driveFalcon.getConfigurator().apply(talonFXConfig);
 

@@ -32,10 +32,9 @@ public class ShooterIOCIM implements ShooterIO {
     }
 
     @Override
-    public boolean checkNoteShot() {
+    public boolean upToSpeed() {
         // returns whether current has risen for more than 0.1 seconds
-        return currentDebouncer.calculate(motor1.getSupplyCurrent() < 15)
-                && motor1.getSelectedSensorVelocity() * 10 * 60 > (HardwareConstants.CIM_MAX_RPM / 60)
+        return motor1.getSelectedSensorVelocity() * 10 * 60 > (HardwareConstants.CIM_MAX_RPM / 60)
                         * (motor1.getMotorOutputVoltage() / 12);
     }
 
