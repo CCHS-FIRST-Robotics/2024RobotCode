@@ -25,11 +25,10 @@ public class Arm extends SubsystemBase {
 
         sysIdRoutine = new SysIdRoutine(
                 new SysIdRoutine.Config(
-                    Volts.per(Second).of(.8),
-                    Volts.of(3),
-                    Seconds.of(5),
-                    (state) -> Logger.recordOutput("SysIdTestState", state.toString())
-                ),
+                        Volts.per(Second).of(.8),
+                        Volts.of(3),
+                        Seconds.of(5),
+                        (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
                 new SysIdRoutine.Mechanism(
                         (Measure<Voltage> volts) -> {
                             io.setDriveVoltage(volts);

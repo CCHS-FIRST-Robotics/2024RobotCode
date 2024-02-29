@@ -217,13 +217,14 @@ public class ModuleIOSparkMax implements ModuleIO {
         // RadiansPerSecond));
 
         // driveSparkMaxPIDF.setReference(
-        //         velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
-        //         // velocity * (60) / (2*Math.PI) * driveAfterEncoderReduction,
-        //         CANSparkMax.ControlType.kVelocity,
-        //         0,
-        //         // driveFeedforward.calculate(velocityRadPerSec)
-        //         driveFeedforward.calculate(prevVelocity.in(RadiansPerSecond), velocity.in(RadiansPerSecond),
-        //                 Constants.PERIOD)
+        // velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
+        // // velocity * (60) / (2*Math.PI) * driveAfterEncoderReduction,
+        // CANSparkMax.ControlType.kVelocity,
+        // 0,
+        // // driveFeedforward.calculate(velocityRadPerSec)
+        // driveFeedforward.calculate(prevVelocity.in(RadiansPerSecond),
+        // velocity.in(RadiansPerSecond),
+        // Constants.PERIOD)
         // driveFeedforward.calculate(prevVelocity, velocity, Constants.PERIOD)
         // );
         prevVelocity = velocity;
@@ -237,11 +238,11 @@ public class ModuleIOSparkMax implements ModuleIO {
     public void setTurnPosition(Measure<Angle> position) {
         // Adjust from [-PI, PI] (wrapped angle, so initially -pi was 2pi) -> [0, 2PI]
         // position = Radians.of(
-        //         MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
+        // MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
         // turnSparkMaxPIDF.setReference(
-        //         position.in(Rotations),
-        //         CANSparkMax.ControlType.kPosition,
-        //         0);
+        // position.in(Rotations),
+        // CANSparkMax.ControlType.kPosition,
+        // 0);
     }
 
     /*

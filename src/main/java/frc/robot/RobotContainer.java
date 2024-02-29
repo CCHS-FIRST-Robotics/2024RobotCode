@@ -4,20 +4,20 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+// import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.MathUtil;
+// import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.DriveWithJoysticks;
-import frc.robot.commands.DriveWithWiimote;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+// import frc.robot.commands.DriveWithJoysticks;
+// import frc.robot.commands.DriveWithWiimote;
+// import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.PoseEstimator;
-import frc.robot.subsystems.noteIO.arm.*;
+// import frc.robot.subsystems.noteIO.arm.*;
 import frc.robot.subsystems.noteIO.intakeArm.*;
 import frc.robot.subsystems.noteIO.shooter.*;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -34,12 +34,12 @@ public class RobotContainer {
     private final Vision camera;
     private final PoseEstimator poseEstimator;
 
-    private final Arm arm;
+    // private final Arm arm;
     private final IntakeArm intake;
     private final Shooter shooter;
 
     private final CommandXboxController controller = new CommandXboxController(0);
-    private final CommandGenericHID wiiRemote = new CommandGenericHID(2);
+    // private final CommandGenericHID wiiRemote = new CommandGenericHID(2);
     private final boolean useWiiRemotes = false;
 
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
@@ -94,7 +94,7 @@ public class RobotContainer {
         drive.setPoseEstimator(poseEstimator);
         camera.setPoseEstimator(poseEstimator);
 
-        arm = new Arm(new ArmIOFalcon500(20, 19));
+        // arm = new Arm(new ArmIOFalcon500(20, 19));
         intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
         shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
 
@@ -131,42 +131,22 @@ public class RobotContainer {
         // intake (auto stop)
         controller.a().onTrue(intake.getIntakeCommand(2.9));
 
-        // intake 
+        // intake
         controller.y().whileTrue(new StartEndCommand(() -> intake.start(4), () -> intake.stop(), intake));
 
         // prime shooter
-        // controller.b().whileTrue(new StartEndCommand(() -> shooter.start(10), () -> shooter.stop(), shooter));
+        // controller.b().whileTrue(new StartEndCommand(() -> shooter.start(10), () ->
+        // shooter.stop(), shooter));
 
         controller.b().onTrue(
-                        // prime shooter
-                        new InstantCommand(() -> shooter.start(10), shooter)
+                // prime shooter
+                new InstantCommand(() -> shooter.start(10), shooter)
                         // wait until shooter is up to speed
                         .alongWith(Commands.waitUntil(shooter::upToSpeed))
                         // shoot
                         .andThen(intake.getShootCommand(10, shooter::checkNoteShot))
                         // stop shooter
-                        .andThen(new InstantCommand(shooter::stop, shooter))
-        );
-
-
-        // // intake & arm
-        // controller.a().onTrue(
-        //         // position the arm
-        //         new InstantCommand(() -> arm.setArmAngle(Radians.of(10)))
-        //                 // run intake
-        //                 .andThen(intake.getIntakeCommand(10))
-        //     );
-
-        // // shoot & arm
-        // controller.b().onTrue(
-        //         // position the arm
-        //         new InstantCommand(() -> arm.setArmAngle(Radians.of(100)))
-        //                 // prime shooter
-        //                 .andThen(new InstantCommand(() -> shooter.start(10), shooter))
-        //                 // shoot
-        //                 .andThen(intake.getShootCommand(10, shooter::checkNoteShot)
-        //                         // stop shooter
-        //                         .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
+                        .andThen(new InstantCommand(shooter::stop, shooter)));
 
         // // drive to specific pose
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());

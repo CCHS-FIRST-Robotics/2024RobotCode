@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.*;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
+// import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.*;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.*;
@@ -26,7 +26,8 @@ public class ArmIOFalcon500 implements ArmIO {
     private CANcoder driveCancoder;
 
     // TODO - USE FOC (Field Oriented Control) - MotionMagicTorqueCurrentFOC
-    // private final MotionMagicVoltage driveMotionMagic = new MotionMagicVoltage(0);
+    // private final MotionMagicVoltage driveMotionMagic = new
+    // MotionMagicVoltage(0);
     private final MotionMagicTorqueCurrentFOC driveMotionMagic = new MotionMagicTorqueCurrentFOC(0);
     private final MotionMagicConfigs driveMMConfig = driveFalconConfig.MotionMagic;
     private final Slot0Configs drivePID = driveFalconConfig.Slot0;
@@ -61,15 +62,13 @@ public class ArmIOFalcon500 implements ArmIO {
 
     int index;
 
-
-
     public ArmIOFalcon500(int motorID, int cancoderID) {
         /*
-        
-
-            comment
-
-
+         * 
+         * 
+         * comment
+         * 
+         * 
          */
         driveFalcon = new TalonFX(motorID);
         /// I encode???? Turst Different ids needed NO IDEA WHAT IDS
