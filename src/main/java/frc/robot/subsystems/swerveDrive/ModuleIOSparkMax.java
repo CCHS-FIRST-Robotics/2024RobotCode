@@ -18,6 +18,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.ExponentialProfile;
+import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
+import edu.wpi.first.math.trajectory.ExponentialProfile.State;
 import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
 // import edu.wpi.first.math.Units;
@@ -36,6 +39,7 @@ public class ModuleIOSparkMax implements ModuleIO {
     public double driveKp = 0.00001; // 00015
     public double driveKd = 0.0;
     public double driveKi = 0.000000; // 0.000008
+
     public double driveKs = 0.0; // 0.19
     public double driveKv = 0.136898; // From NEO datasheet (473kV): 0.136194 V/(rad/s) - https://www.wolframalpha.com/input?i=1%2F%28473+*+2pi%2F60%29+*+%2850.0+%2F+14.0%29+*+%2817.0+%2F+27.0%29+*+%2845.0+%2F+15.0%29
     public double driveKa = 0.020864; // 0.0148
@@ -43,7 +47,15 @@ public class ModuleIOSparkMax implements ModuleIO {
     public double turnKp = 8; 
     public double turnKd = 0.00;
 
-    private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa); // kV UNITS: VOLTS / (RAD PER SECOND)
+    public double turnKs = 0.0;
+    public double turnKv = 0.0;
+    public double turnKa = 0.0;
+
+    private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa); // kV UNITS: VOLTS / (RAD PER SECOND)
+    private final ExponentialProfile turnExponentialProfile = new ExponentialProfile(
+        Constraints.fromCharacteristics(12.5, turnKv, turnKa)
+    );
+    private final SimpleMotorFeedforward turnFeedforward = new SimpleMotorFeedforward(turnKs, turnKv, turnKa);
 
     /* ENCODERS */
     private final RelativeEncoder driveEncoder; // NEO Encoder
@@ -63,6 +75,8 @@ public class ModuleIOSparkMax implements ModuleIO {
     // private final Rotation2d absoluteEncoderOffset;
 
     private Measure<Velocity<Angle>> prevVelocity = RadiansPerSecond.of(0.0);
+    private Measure<Angle> prevTurnPosition = Radians.of(0.0);
+    private Measure<Velocity<Angle>> prevTurnVelocity = RadiansPerSecond.of(0.0);
     // private double prevVelocity = 0;
 
     public int index;
@@ -144,6 +158,8 @@ public class ModuleIOSparkMax implements ModuleIO {
         System.out.println("TESTING");
         System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
         System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
+
+        prevTurnPosition = Radians.of(turnAbsoluteEncoder.getPosition());
     }
 
     /* (non-Javadoc)
@@ -207,17 +223,13 @@ public class ModuleIOSparkMax implements ModuleIO {
      * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVelocity(double)
      */
     public void setDriveVelocity(Measure<Velocity<Angle>> velocity) {
-        driveSparkMaxPIDF.setReference(1000, CANSparkMax.ControlType.kVelocity, 0, 1);
-        // driveSparkMaxPIDF.setReference(6, CANSparkMax.ControlType.kVoltage);
-        
-
-        // driveSparkMaxPIDF.setReference(
-        //     velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
-        //     CANSparkMax.ControlType.kVelocity,
-        //     0,
-        //     driveFeedforward.calculate(prevVelocity.in(RadiansPerSecond), velocity.in(RadiansPerSecond), Constants.PERIOD)
-        // );
-        // prevVelocity = velocity;
+        driveSparkMaxPIDF.setReference(
+            velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
+            CANSparkMax.ControlType.kVelocity,
+            0,
+            driveFeedforward.calculate(prevVelocity.in(RadiansPerSecond), velocity.in(RadiansPerSecond), Constants.PERIOD)
+        );
+        prevVelocity = velocity;
     }
 
     /* (non-Javadoc)
@@ -228,11 +240,25 @@ public class ModuleIOSparkMax implements ModuleIO {
         position = Radians.of(
             MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI)
         );
+
+        // verify that wrapping won't be an issue (I think it wont because of angle setpoint optimization by the SMS class)
+        var setpoint = turnExponentialProfile.calculate(
+            Constants.PERIOD, 
+            new State(prevTurnPosition.in(Radians), prevTurnVelocity.in(RadiansPerSecond)), 
+            new State(position.in(Radians), 0)
+        );
+
         turnSparkMaxPIDF.setReference(
             position.in(Rotations),
             CANSparkMax.ControlType.kPosition,
-            0
+            0,
+            // should this be setpoint.velocity for "current" and generate a new setpoint at 2 * PERIOD for "next"?
+            // I remember tyler saying something about using the prev value causing latency but idk
+            turnFeedforward.calculate(prevTurnVelocity.in(RadiansPerSecond), setpoint.velocity, Constants.PERIOD)
         );
+
+        prevTurnPosition = Radians.of(setpoint.position);
+        prevTurnVelocity = RadiansPerSecond.of(setpoint.velocity);
     }
 
     /* (non-Javadoc)
