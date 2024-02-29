@@ -26,6 +26,7 @@ public class Robot extends TimedRobot {
   Shooter shoot = new Shooter(talon);
   double targetVelocity =0;
   boolean on = false;
+  
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
