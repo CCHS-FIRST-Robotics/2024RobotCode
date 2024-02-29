@@ -126,10 +126,10 @@ public class RobotContainer {
         // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
         // outtake
-        controller.x().whileTrue(new StartEndCommand(() -> intake.start(-1.4), () -> intake.stop(), intake));
+        controller.x().whileTrue(new StartEndCommand(() -> intake.start(-1.45), () -> intake.stop(), intake));
 
         // intake (stops automatically)
-        controller.a().onTrue(intake.getIntakeCommand(2.8));
+        controller.a().onTrue(intake.getIntakeCommand(2.9));
 
         // manual intake
         controller.y().whileTrue(new StartEndCommand(() -> intake.start(4), () -> intake.stop(), intake));
