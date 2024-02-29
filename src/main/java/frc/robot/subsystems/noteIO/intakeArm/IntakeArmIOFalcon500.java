@@ -22,10 +22,10 @@ public class IntakeArmIOFalcon500 implements IntakeArmIO {
         velocitySignal = motor.getVelocity();
         temperatureSignal = motor.getDeviceTemp();
 
+        // current limiting
         TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
         talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         talonFXConfig.CurrentLimits.StatorCurrentLimit = 60;
-
         motor.getConfigurator().apply(talonFXConfig);
     }
 

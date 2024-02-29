@@ -2,7 +2,6 @@ package frc.robot.subsystems.noteIO.shooter;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.controller.PIDController;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -12,7 +11,6 @@ public class ShooterIOFalcon500 implements ShooterIO {
     TalonFX motor1, motor2;
     SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0, 0);
     PIDController pid = new PIDController(0, 0, 0);
-    Debouncer currentDebouncer = new Debouncer(0.1, Debouncer.DebounceType.kRising);
 
     StatusSignal<Double> voltageSignal;
     StatusSignal<Double> currentSignal;
@@ -29,10 +27,10 @@ public class ShooterIOFalcon500 implements ShooterIO {
         velocitySignal = motor1.getVelocity();
         temperatureSignal = motor1.getDeviceTemp();
 
+        // current limiting
         TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
         talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         talonFXConfig.CurrentLimits.StatorCurrentLimit = 60;
-
         motor1.getConfigurator().apply(talonFXConfig);
         motor2.getConfigurator().apply(talonFXConfig);
     }
@@ -53,6 +51,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
     @Override
     public void updateInputs(ShooterIOInputsAutoLogged inputs) {
         BaseStatusSignal.refreshAll(voltageSignal, currentSignal, velocitySignal, temperatureSignal);
+
         inputs.motorVoltage = voltageSignal.getValue();
         inputs.motorCurrent = currentSignal.getValue();
         inputs.motorVelocity = velocitySignal.getValue();

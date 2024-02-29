@@ -3,8 +3,7 @@ package frc.robot.subsystems.noteIO.intakeArm;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -29,14 +28,14 @@ public class IntakeArm extends SubsystemBase {
     }
 
     private boolean checkNoteThere() {
-        // returns whether current has risen for more than 0.3 seconds
-        // return currentDebouncer.calculate(inputs.motorCurrent > 20);
-        return inputs.motorCurrent > 30 && (Timer.getFPGATimestamp() - time > .5);
+        // returns whether current has risen after up to speed
+        return inputs.motorCurrent > 30 && (Timer.getFPGATimestamp() - time > 0.5);
 
-        // // returns whether note friction is detected and motor is up to speed
-        // return inputs.motorCurrent > 35
-        // && inputs.motorVelocity > (98) * (volts /
-        // 12d);
+        // returns whether current has risen for more than 0.3 seconds
+        // return currentDebouncer.calculate(inputs.motorCurrent > 30);
+
+        // returns whether note friction is detected and motor is up to speed
+        // return inputs.motorCurrent > 30 && inputs.motorVelocity > 98 * (volts / 12);
     }
 
     @Override
