@@ -97,9 +97,9 @@ public class ArmIOFalcon500 implements ArmIO {
         faultRemoteSensorOutOfSync = driveFalcon.getFault_RemoteSensorDataInvalid();
         stickyFaultRemoteSensorOutOfSync = driveFalcon.getStickyFault_RemoteSensorDataInvalid();
 
-        driveMMConfig.MotionMagicCruiseVelocity = 5; // 1 rotation every 1 seconds
-        driveMMConfig.MotionMagicAcceleration = 10; // 1 second to reach max speed
-        driveMMConfig.MotionMagicJerk = 30; // .1 seconds to reach max accel
+        driveMMConfig.MotionMagicCruiseVelocity = 1; // 5 rotations every 1 seconds
+        driveMMConfig.MotionMagicAcceleration = 2; // .5 second to reach max speed
+        driveMMConfig.MotionMagicJerk = 5; // .33 seconds to reach max accel
 
         // Feedforward momment!
 
