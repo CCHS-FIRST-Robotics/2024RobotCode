@@ -14,6 +14,7 @@ import org.littletonrobotics.junction.Logger;
 public class Arm extends SubsystemBase {
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
+    @SuppressWarnings({ "unused" })
     private SysIdRoutine sysIdRoutine;
 
     // length and position of the arm in relation to the robot's center
