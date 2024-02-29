@@ -24,11 +24,11 @@ public class Arm extends SubsystemBase {
         this.io = io;
 
         sysIdRoutine = new SysIdRoutine(
-                new SysIdRoutine.Config(
+                new SysIdRoutine.Config( // Calculate ~ how far it's going to go (less than 90 deg)
                     Volts.per(Second).of(.8),
                     Volts.of(3),
                     Seconds.of(5),
-                    (state) -> Logger.recordOutput("SysIdTestState", state.toString())
+                    (state) -> Logger.recordOutput("SysIdArmTestState", state.toString())
                 ),
                 new SysIdRoutine.Mechanism(
                         (Measure<Voltage> volts) -> {

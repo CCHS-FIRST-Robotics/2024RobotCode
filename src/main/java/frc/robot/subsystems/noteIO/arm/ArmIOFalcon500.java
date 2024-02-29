@@ -48,6 +48,13 @@ public class ArmIOFalcon500 implements ArmIO {
     StatusSignal<Boolean> faultRemoteSensorOutOfSync;
     StatusSignal<Boolean> stickyFaultRemoteSensorOutOfSync;
 
+    StatusSignal<String> name;
+
+
+
+
+    
+
     // TODO: update constants in periodic once tunable is set up
     private static final double driveKp = 0;
     private static final double driveKd = 0.0d;
@@ -114,8 +121,12 @@ public class ArmIOFalcon500 implements ArmIO {
         talonFXConfig.Feedback.SensorToMechanismRatio = 1.0; // fuck maybe? CHANGE????
         talonFXConfig.Feedback.RotorToSensorRatio = 100.0; // CHNAGE
 
-        talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        talonFXConfig.CurrentLimits.StatorCurrentLimit = 60;
+        // talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        // talonFXConfig.CurrentLimits.StatorCurrentLimit = 60;
+
+        talonFXConfig.TorqueCurrent.PeakForwardTorqueCurrent = 130;
+        talonFXConfig.TorqueCurrent.PeakReverseTorqueCurrent = -130;
+        
 
         driveFalcon.getConfigurator().apply(talonFXConfig);
 
@@ -174,7 +185,10 @@ public class ArmIOFalcon500 implements ArmIO {
                 faultFusedSensorOutOfSync,
                 stickyFaultFusedSensorOutOfSync,
                 faultRemoteSensorOutOfSync,
-                stickyFaultRemoteSensorOutOfSync);
+                stickyFaultRemoteSensorOutOfSync,
+                name
+                
+        );
 
         inputs.drivePosition = Rotations.of(drivePositionSignal.getValueAsDouble());
         inputs.driveVelocity = RotationsPerSecond.of(driveVelocitySignal.getValueAsDouble());
@@ -195,11 +209,19 @@ public class ArmIOFalcon500 implements ArmIO {
         inputs.stickyFaultFusedSensorOutOfSync = stickyFaultFusedSensorOutOfSync.getValue();
         inputs.faultRemoteSensorOutOfSync = faultRemoteSensorOutOfSync.getValue();
         inputs.stickyFaultRemoteSensorOutOfSync = stickyFaultRemoteSensorOutOfSync.getValue();
+
+        inputs.name = driveMotionMagic.getName();
     }
 
     @Override
     public void setDriveVoltage(Measure<Voltage> volts) {
         driveFalcon.setVoltage(volts.in(Volts));
+    }
+
+
+    @Override
+    public void setCharacterizationVoltage(Measure<Voltage> volts) {
+        driveFalcon.setVoltage(volts.in(Volts)); // needs to counteract gravity
     }
 
     @Override
