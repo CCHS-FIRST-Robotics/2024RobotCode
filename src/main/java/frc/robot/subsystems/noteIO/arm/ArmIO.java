@@ -24,6 +24,9 @@ public interface ArmIO {
         public boolean stickyFaultFusedSensorOutOfSync = false;
         public boolean faultRemoteSensorOutOfSync = false;
         public boolean stickyFaultRemoteSensorOutOfSync = false;
+
+
+
     }
 
     /** Updates the set of loggable inputs. */

@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.*;
 import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.*;
 import com.ctre.phoenix6.signals.*;
@@ -25,7 +26,8 @@ public class ArmIOFalcon500 implements ArmIO {
     private CANcoder driveCancoder;
 
     // TODO - USE FOC (Field Oriented Control) - MotionMagicTorqueCurrentFOC
-    private final MotionMagicVoltage driveMotionMagic = new MotionMagicVoltage(0);
+    // private final MotionMagicVoltage driveMotionMagic = new MotionMagicVoltage(0);
+    private final MotionMagicTorqueCurrentFOC driveMotionMagic = new MotionMagicTorqueCurrentFOC(0);
     private final MotionMagicConfigs driveMMConfig = driveFalconConfig.MotionMagic;
     private final Slot0Configs drivePID = driveFalconConfig.Slot0;
     private final FeedbackConfigs driveFeedbackConfig = driveFalconConfig.Feedback;
@@ -59,7 +61,16 @@ public class ArmIOFalcon500 implements ArmIO {
 
     int index;
 
+
+
     public ArmIOFalcon500(int motorID, int cancoderID) {
+        /*
+        
+
+            comment
+
+
+         */
         driveFalcon = new TalonFX(motorID);
         /// I encode???? Turst Different ids needed NO IDEA WHAT IDS
         driveCancoder = new CANcoder(cancoderID);
@@ -116,8 +127,10 @@ public class ArmIOFalcon500 implements ArmIO {
         // drivePID.kV = driveFeedforwardKv; // max rpm is 6,380 volts * seconds /
         // radians
         // Units needed are volts * seconds / radians
-        drivePID.kV = 18d / (Math.PI * 319d); // TRUST!!!!! I don't!!!
+        // drivePID.kV = 18d / (Math.PI * 319d); // TRUST!!!!! I don't!!! IN RADIANS
+        // drivePID.kV = 36 / 319;
         // 6380 rotaions per minute is 319/3 rotations per second
+        //
         // 2pi * 319/3 radians per second <--- you don't need to convert to radians
         // 3/(2pi * 319) seconds per radian
         // 12 * 3/(2pi * 319)
