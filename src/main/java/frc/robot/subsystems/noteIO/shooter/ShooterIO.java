@@ -17,7 +17,7 @@ public interface ShooterIO {
     public default void setVoltage(double volts) {
     }
 
-    public default boolean checkNoteShot() {
+    public default boolean upToSpeed() {
         return false;
     }
 

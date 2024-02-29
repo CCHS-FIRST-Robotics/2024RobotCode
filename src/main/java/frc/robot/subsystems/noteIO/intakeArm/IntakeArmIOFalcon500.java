@@ -3,6 +3,7 @@ package frc.robot.subsystems.noteIO.intakeArm;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 public class IntakeArmIOFalcon500 implements IntakeArmIO {
     TalonFX motor;
@@ -16,9 +17,16 @@ public class IntakeArmIOFalcon500 implements IntakeArmIO {
         motor = new TalonFX(id);
 
         voltageSignal = motor.getMotorVoltage();
-        currentSignal = motor.getSupplyCurrent();
+        currentSignal = motor.getStatorCurrent();
+        currentSignal.setUpdateFrequency(100);
         velocitySignal = motor.getVelocity();
         temperatureSignal = motor.getDeviceTemp();
+
+        TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
+        talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        talonFXConfig.CurrentLimits.StatorCurrentLimit = 60;
+
+        motor.getConfigurator().apply(talonFXConfig);
     }
 
     @Override

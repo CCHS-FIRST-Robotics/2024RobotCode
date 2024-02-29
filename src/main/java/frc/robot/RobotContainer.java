@@ -126,25 +126,47 @@ public class RobotContainer {
         // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
         // outtake
-        controller.x().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
+        controller.x().whileTrue(new StartEndCommand(() -> intake.start(-2), () -> intake.stop(), intake));
 
-        // intake
-        controller.a().onTrue(
-                // position the arm
-                new InstantCommand(() -> arm.setArmAngle(Radians.of(10)))
-                        // run intake
-                        .andThen(intake.getIntakeCommand(10)));
+        // intake (auto stop)
+        controller.a().onTrue(intake.getIntakeCommand(2.9));
 
-        // shoot
+        // intake 
+        controller.y().whileTrue(new StartEndCommand(() -> intake.start(4), () -> intake.stop(), intake));
+
+        // prime shooter
+        // controller.b().whileTrue(new StartEndCommand(() -> shooter.start(10), () -> shooter.stop(), shooter));
+
         controller.b().onTrue(
-                // position the arm
-                new InstantCommand(() -> arm.setArmAngle(Radians.of(100)))
                         // prime shooter
-                        .andThen(new InstantCommand(() -> shooter.start(10), shooter))
+                        new InstantCommand(() -> shooter.start(10), shooter)
+                        // wait until shooter is up to speed
+                        .alongWith(Commands.waitUntil(shooter::upToSpeed))
                         // shoot
-                        .andThen(intake.getShootCommand(10, shooter::checkNoteShot)
-                                // stop shooter
-                                .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
+                        .andThen(intake.getShootCommand(10, shooter::checkNoteShot))
+                        // stop shooter
+                        .andThen(new InstantCommand(shooter::stop, shooter))
+        );
+
+
+        // // intake & arm
+        // controller.a().onTrue(
+        //         // position the arm
+        //         new InstantCommand(() -> arm.setArmAngle(Radians.of(10)))
+        //                 // run intake
+        //                 .andThen(intake.getIntakeCommand(10))
+        //     );
+
+        // // shoot & arm
+        // controller.b().onTrue(
+        //         // position the arm
+        //         new InstantCommand(() -> arm.setArmAngle(Radians.of(100)))
+        //                 // prime shooter
+        //                 .andThen(new InstantCommand(() -> shooter.start(10), shooter))
+        //                 // shoot
+        //                 .andThen(intake.getShootCommand(10, shooter::checkNoteShot)
+        //                         // stop shooter
+        //                         .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
 
         // // drive to specific pose
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());

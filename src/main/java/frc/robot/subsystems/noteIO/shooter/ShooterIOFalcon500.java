@@ -7,6 +7,7 @@ import frc.robot.HardwareConstants;
 import edu.wpi.first.math.controller.PIDController;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 public class ShooterIOFalcon500 implements ShooterIO {
     TalonFX motor1, motor2;
@@ -24,9 +25,17 @@ public class ShooterIOFalcon500 implements ShooterIO {
         motor2 = new TalonFX(id2);
 
         voltageSignal = motor1.getMotorVoltage();
-        currentSignal = motor1.getSupplyCurrent();
+        currentSignal = motor1.getStatorCurrent();
+        currentSignal.setUpdateFrequency(100);
         velocitySignal = motor1.getVelocity();
         temperatureSignal = motor1.getDeviceTemp();
+
+        TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
+        talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        talonFXConfig.CurrentLimits.StatorCurrentLimit = 60;
+
+        motor1.getConfigurator().apply(talonFXConfig);
+        motor2.getConfigurator().apply(talonFXConfig);
     }
 
     @Override
@@ -40,14 +49,6 @@ public class ShooterIOFalcon500 implements ShooterIO {
     public void setVoltage(double volts) {
         motor1.setVoltage(volts);
         motor2.setVoltage(volts);
-    }
-
-    @Override
-    public boolean checkNoteShot() {
-        // returns whether current has risen for more than 0.1 seconds
-        return currentDebouncer.calculate(currentSignal.getValue() < 15)
-                && velocitySignal.getValue() * 10 * 60 > (HardwareConstants.CIM_MAX_RPM / 60)
-                        * (voltageSignal.getValue() / 12);
     }
 
     @Override
