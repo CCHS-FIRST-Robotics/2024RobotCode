@@ -42,10 +42,11 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
+        // System.out.println("testingggg");
 
         // trust!
-        // io.setDriveVoltage(Volts.of(1));
-        // setArmAngle(Degrees.of(90));
+        // io.setDriveVoltage(Volts.of(0));
+        setArmAngle(Degrees.of(30));
     }
 
     public void setArmAngle(Measure<Angle> angle) {

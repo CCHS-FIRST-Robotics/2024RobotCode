@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.*;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 // import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.*;
 import com.ctre.phoenix6.signals.*;
@@ -16,19 +17,13 @@ public class ArmIOFalcon500 implements ArmIO {
     /* MOTOR CONTROLLERS + PID */
     private final TalonFX driveFalcon;
     private final TalonFXConfiguration driveFalconConfig = new TalonFXConfiguration();
-
-    // Uhh Feedforward momment!
-    private static final double driveFeedforwardKg = 0;
-    // private static final double driveFeedforwardKs = 0;
-    // private static final double driveFeedforwardKv = 0;
-    // private static final double driveFeedforwardKa = 0;
+    CANcoderConfiguration CANcoderConfig = new CANcoderConfiguration();
 
     private CANcoder driveCancoder;
 
     // TODO - USE FOC (Field Oriented Control) - MotionMagicTorqueCurrentFOC
-    // private final MotionMagicVoltage driveMotionMagic = new
-    // MotionMagicVoltage(0);
-    private final MotionMagicTorqueCurrentFOC driveMotionMagic = new MotionMagicTorqueCurrentFOC(0);
+    private final MotionMagicVoltage driveMotionMagic = new MotionMagicVoltage(0);
+    // private final MotionMagicTorqueCurrentFOC driveMotionMagic = new MotionMagicTorqueCurrentFOC(0);
     private final MotionMagicConfigs driveMMConfig = driveFalconConfig.MotionMagic;
     private final Slot0Configs drivePID = driveFalconConfig.Slot0;
     private final FeedbackConfigs driveFeedbackConfig = driveFalconConfig.Feedback;
@@ -44,28 +39,30 @@ public class ArmIOFalcon500 implements ArmIO {
 
     StatusSignal<Double> rotorPositionSignal;
 
+    StatusSignal<Double> closedLoopReferenceSignal;
+
     StatusSignal<Boolean> faultFusedSensorOutOfSync;
     StatusSignal<Boolean> stickyFaultFusedSensorOutOfSync;
     StatusSignal<Boolean> faultRemoteSensorOutOfSync;
     StatusSignal<Boolean> stickyFaultRemoteSensorOutOfSync;
 
-    StatusSignal<String> name;
-
-
-
-
-    
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKp = 0;
+    private static final double driveKp = 20;
     private static final double driveKd = 0.0d;
     private static final double driveKi = 0.0d;
-    private static final double driveKv = 0.113; // (from falcon500 spec sheet) UNITS: Volts / (Rotations / Second)
+    private static final double driveKv = 0.0d; // 0.113 (from falcon500 spec sheet) UNITS: Volts / (Rotations / Second)
 
-    private final double gearRatio = 100.0;
+    // Uhh Feedforward momment!
+    private static final double driveFeedforwardKg = 0.435; // .435V
+    // private static final double driveFeedforwardKs = 0;
+    // private static final double driveFeedforwardKv = 0;
+    // private static final double driveFeedforwardKa = 0;
+
+    private final double gearRatio = 218;
 
     // private final boolean motorInverted = false;
-    private final Rotation2d absoluteEncoderOffset = new Rotation2d();
+    private final Measure<Angle> absoluteEncoderOffset = Radians.of(-2.72);
 
     int index;
 
@@ -90,44 +87,46 @@ public class ArmIOFalcon500 implements ArmIO {
         absolutePositionSignal = driveCancoder.getPosition(); // check what this does!!!!!!! absolute variations! other
                                                               // methord!!!!
         absoluteVelocitySignal = driveCancoder.getVelocity();
-
         rotorPositionSignal = driveFalcon.getRotorPosition();
+
+        closedLoopReferenceSignal = driveFalcon.getClosedLoopReference();
+        closedLoopReferenceSignal.setUpdateFrequency(100);
+
         faultFusedSensorOutOfSync = driveFalcon.getFault_FusedSensorOutOfSync();
         stickyFaultFusedSensorOutOfSync = driveFalcon.getStickyFault_FusedSensorOutOfSync();
         faultRemoteSensorOutOfSync = driveFalcon.getFault_RemoteSensorDataInvalid();
         stickyFaultRemoteSensorOutOfSync = driveFalcon.getStickyFault_RemoteSensorDataInvalid();
 
-        driveMMConfig.MotionMagicCruiseVelocity = 1; // 5 rotations every 1 seconds
-        driveMMConfig.MotionMagicAcceleration = 2; // .5 second to reach max speed
-        driveMMConfig.MotionMagicJerk = 5; // .33 seconds to reach max accel
+        driveMMConfig.MotionMagicCruiseVelocity = 5; // 5 rotations every 1 seconds
+        driveMMConfig.MotionMagicAcceleration = 30; // .5 second to reach max speed
+        driveMMConfig.MotionMagicJerk = 100; // .33 seconds to reach max accel
 
         // Feedforward momment!
 
         // Ya-yoink! (from
         // https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/remote-sensors.html)
         // zeros the magnet!
-        CANcoderConfiguration CANcoderConfig = new CANcoderConfiguration();
         CANcoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-        CANcoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        CANcoderConfig.MagnetSensor.MagnetOffset = 0.4; // CHANGGE
+        CANcoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+        CANcoderConfig.MagnetSensor.MagnetOffset = absoluteEncoderOffset.in(Rotations); // CHANGGE
         driveCancoder.getConfigurator().apply(CANcoderConfig);
 
         // fuses (trust)
-        TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
+        driveFalconConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        talonFXConfig.Feedback.FeedbackRemoteSensorID = driveCancoder.getDeviceID();
-        talonFXConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-        talonFXConfig.Feedback.SensorToMechanismRatio = 1.0; // fuck maybe? CHANGE????
-        talonFXConfig.Feedback.RotorToSensorRatio = 100.0; // CHNAGE
+        driveFeedbackConfig.FeedbackRemoteSensorID = driveCancoder.getDeviceID();
+        driveFeedbackConfig.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        driveFeedbackConfig.SensorToMechanismRatio = 1.0; // fuck maybe? CHANGE????
+        driveFeedbackConfig.RotorToSensorRatio = gearRatio; // CHNAGE
 
-        // talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        // talonFXConfig.CurrentLimits.StatorCurrentLimit = 60;
+        driveFalconConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        driveFalconConfig.CurrentLimits.StatorCurrentLimit = 60;
 
-        talonFXConfig.TorqueCurrent.PeakForwardTorqueCurrent = 130;
-        talonFXConfig.TorqueCurrent.PeakReverseTorqueCurrent = -130;
-        
+        // driveFalconConfig.TorqueCurrent.PeakForwardTorqueCurrent = 130;
+        // driveFalconConfig.TorqueCurrent.PeakReverseTorqueCurrent = -130;
 
-        driveFalcon.getConfigurator().apply(talonFXConfig);
+        driveFalconConfig.Voltage.PeakForwardVoltage = 12;
+        driveFalconConfig.Voltage.PeakReverseVoltage = -12;
 
         drivePID.kP = driveKp;
         drivePID.kI = driveKi;
@@ -149,12 +148,7 @@ public class ArmIOFalcon500 implements ArmIO {
         // 3/(2pi * 319) seconds per radian
         // 12 * 3/(2pi * 319)
 
-        driveFeedbackConfig.SensorToMechanismRatio = gearRatio;
-
-        driveFalconConfig.Voltage.PeakForwardVoltage = 12;
-        driveFalconConfig.Voltage.PeakReverseVoltage = -12;
-
-        driveFalcon.setPosition(absoluteEncoderOffset.getRotations());
+        // driveFalcon.setPosition(absoluteEncoderOffset.getRotations());
 
         StatusCode status = StatusCode.StatusCodeNotInitialized;
         for (int i = 0; i < 5; ++i) {
@@ -167,7 +161,6 @@ public class ArmIOFalcon500 implements ArmIO {
         }
 
         // tatus!!!!
-
     }
 
     @Override
@@ -184,9 +177,7 @@ public class ArmIOFalcon500 implements ArmIO {
                 faultFusedSensorOutOfSync,
                 stickyFaultFusedSensorOutOfSync,
                 faultRemoteSensorOutOfSync,
-                stickyFaultRemoteSensorOutOfSync,
-                name
-                
+                stickyFaultRemoteSensorOutOfSync
         );
 
         inputs.drivePosition = Rotations.of(drivePositionSignal.getValueAsDouble());
@@ -203,13 +194,13 @@ public class ArmIOFalcon500 implements ArmIO {
         inputs.absoluteArmVelocity = RotationsPerSecond.of(absoluteVelocitySignal.getValueAsDouble());
 
         inputs.rotorPositionSignal = Rotations.of(rotorPositionSignal.getValueAsDouble());
+        inputs.closedLoopReference = Rotations.of(closedLoopReferenceSignal.getValueAsDouble());
+
         // CHeck with colin if it works
         inputs.faultFusedSensorOutOfSync = faultFusedSensorOutOfSync.getValue();
         inputs.stickyFaultFusedSensorOutOfSync = stickyFaultFusedSensorOutOfSync.getValue();
         inputs.faultRemoteSensorOutOfSync = faultRemoteSensorOutOfSync.getValue();
         inputs.stickyFaultRemoteSensorOutOfSync = stickyFaultRemoteSensorOutOfSync.getValue();
-
-        inputs.name = driveMotionMagic.getName();
     }
 
     @Override
@@ -229,6 +220,7 @@ public class ArmIOFalcon500 implements ArmIO {
         position = Radians.of(MathUtil.clamp(position.in(Radians), -Math.PI / 6.0, 4 * Math.PI / 3.0));
 
         // lol this is NOT going to work
+        
         driveFalcon.setControl(driveMotionMagic.withPosition(position.in(Rotations)).withSlot(0));
     }
 }

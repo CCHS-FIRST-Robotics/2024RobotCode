@@ -20,20 +20,12 @@ public interface ArmIO {
 
         public Measure<Angle> rotorPositionSignal = Radians.of(0.0);
 
+        public Measure<Angle> closedLoopReference = Radians.of(0.0);
 
-        public String name = "";
-
-        // check withc ol.in if works
         public boolean faultFusedSensorOutOfSync = false;
         public boolean stickyFaultFusedSensorOutOfSync = false;
         public boolean faultRemoteSensorOutOfSync = false;
         public boolean stickyFaultRemoteSensorOutOfSync = false;
-
-
-
-
-
-
     }
 
     /** Updates the set of loggable inputs. */

@@ -43,7 +43,7 @@ public class IntakeArm extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("intake", inputs);
 
-        io.setVoltage(volts);
+        // io.setVoltage(volts);
     }
 
     public Command getIntakeCommand(double v) {

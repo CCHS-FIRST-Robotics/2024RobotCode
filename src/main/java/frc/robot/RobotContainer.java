@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.PoseEstimator;
+import frc.robot.subsystems.noteIO.arm.Arm;
+import frc.robot.subsystems.noteIO.arm.ArmIOFalcon500;
 // import frc.robot.subsystems.noteIO.arm.*;
 import frc.robot.subsystems.noteIO.intakeArm.*;
 import frc.robot.subsystems.noteIO.shooter.*;
@@ -34,7 +36,7 @@ public class RobotContainer {
     private final Vision camera;
     private final PoseEstimator poseEstimator;
 
-    // private final Arm arm;
+    private final Arm arm;
     private final IntakeArm intake;
     private final Shooter shooter;
 
@@ -94,7 +96,7 @@ public class RobotContainer {
         drive.setPoseEstimator(poseEstimator);
         camera.setPoseEstimator(poseEstimator);
 
-        // arm = new Arm(new ArmIOFalcon500(20, 19));
+        arm = new Arm(new ArmIOFalcon500(20, 19));
         intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
         shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
 
