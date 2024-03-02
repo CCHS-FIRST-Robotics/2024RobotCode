@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.RobotBase;
  * 
  * better simulation code
  * sysID for shooter (same as arm)
- * use proper units
  * 
  * We also need to fix the velocity control currently, it uses WPILib's
  * PID and FF classes, but it should be using the Phoenix API to control

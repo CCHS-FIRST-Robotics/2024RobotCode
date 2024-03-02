@@ -2,8 +2,8 @@ package frc.robot.subsystems.noteIO.shooter;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.*;

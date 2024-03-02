@@ -4,16 +4,14 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.units.*;
 
 public class ShooterIOFalcon500 implements ShooterIO {
     TalonFX motor1, motor2;
-    SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0, 0);
-    PIDController pid = new PIDController(0, 0, 0);
+    VelocityVoltage velocityControl;
 
     StatusSignal<Double> voltageSignal1;
     StatusSignal<Double> currentSignal1;
@@ -54,10 +52,9 @@ public class ShooterIOFalcon500 implements ShooterIO {
     }
 
     @Override
-    public void setVelocity(Measure<Velocity<Angle>> velocity) {
-        double feedForwardVolts = feedForward.calculate(velocity.in(RotationsPerSecond));
-        double pidVolts = pid.calculate(velocitySignal1.refresh().getValue(), velocity.in(RotationsPerSecond));
-        setVoltage(Volts.of(feedForwardVolts + pidVolts));
+    public void setVelocity(Measure<Velocity<Angle>> v) {
+        motor1.setControl(velocityControl.withVelocity(v.in(RotationsPerSecond)));
+        motor2.setControl(velocityControl.withVelocity(v.in(RotationsPerSecond)));
     }
 
     @Override
