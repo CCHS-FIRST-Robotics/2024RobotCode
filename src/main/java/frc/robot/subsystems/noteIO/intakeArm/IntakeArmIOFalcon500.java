@@ -1,15 +1,16 @@
 package frc.robot.subsystems.noteIO.intakeArm;
 
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 public class IntakeArmIOFalcon500 implements IntakeArmIO {
     TalonFX motor;
 
     StatusSignal<Double> voltageSignal;
     StatusSignal<Double> currentSignal;
+    StatusSignal<Double> positionSignal;
     StatusSignal<Double> velocitySignal;
     StatusSignal<Double> temperatureSignal;
 
@@ -19,6 +20,7 @@ public class IntakeArmIOFalcon500 implements IntakeArmIO {
         voltageSignal = motor.getMotorVoltage();
         currentSignal = motor.getStatorCurrent();
         currentSignal.setUpdateFrequency(100);
+        positionSignal = motor.getPosition();
         velocitySignal = motor.getVelocity();
         temperatureSignal = motor.getDeviceTemp();
 
@@ -36,10 +38,11 @@ public class IntakeArmIOFalcon500 implements IntakeArmIO {
 
     @Override
     public void updateInputs(IntakeArmIOInputs inputs) {
-        BaseStatusSignal.refreshAll(voltageSignal, currentSignal, velocitySignal, temperatureSignal);
+        BaseStatusSignal.refreshAll(voltageSignal, currentSignal, positionSignal, velocitySignal, temperatureSignal);
 
         inputs.motorVoltage = voltageSignal.getValue();
         inputs.motorCurrent = currentSignal.getValue();
+        inputs.motorPosition = positionSignal.getValue();
         inputs.motorVelocity = velocitySignal.getValue();
         inputs.motorTemperature = temperatureSignal.getValue();
     }

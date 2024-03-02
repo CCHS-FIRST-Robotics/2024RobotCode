@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
 import frc.robot.subsystems.noteIO.intakeArm.IntakeArmIO.IntakeArmIOInputs;
 
-
 public class ShooterIOSim implements ShooterIO {
     Measure<Voltage> appliedVoltage = Volts.of(0);
     DCMotorSim motor = new DCMotorSim(DCMotor.getFalcon500(1), 1, .0025);
@@ -21,7 +20,7 @@ public class ShooterIOSim implements ShooterIO {
     double prevSetpoint;
 
     public ShooterIOSim() {
-        
+
     }
 
     public void updateInputs(IntakeArmIOInputs inputs) {
@@ -39,13 +38,12 @@ public class ShooterIOSim implements ShooterIO {
 
     public void setVelocity(double velocity) {
         double volts = feedforward.calculate(
-            prevSetpoint,
-            velocity, 
-            Constants.PERIOD
-        ) + feedback.calculate(
-            motor.getAngularVelocityRPM() * 60,
-            velocity
-        );
+                prevSetpoint,
+                velocity,
+                Constants.PERIOD)
+                + feedback.calculate(
+                        motor.getAngularVelocityRPM() * 60,
+                        velocity);
         setVoltage(volts);
 
         prevSetpoint = velocity;

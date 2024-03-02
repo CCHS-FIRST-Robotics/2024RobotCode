@@ -41,12 +41,12 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean upToSpeed() {
-        return inputs.motorVelocity > 98 * (0.5);
+        return inputs.motor1Velocity > 98 * (0.5);
     }
 
     public boolean checkNoteShot() {
         // returns whether note detected and it's been 2 seconds
-        return inputs.motorCurrent > 30 && Timer.getFPGATimestamp() - time > 2;
+        return inputs.motor1Current > 30 && Timer.getFPGATimestamp() - time > 2;
     }
 
     @Override

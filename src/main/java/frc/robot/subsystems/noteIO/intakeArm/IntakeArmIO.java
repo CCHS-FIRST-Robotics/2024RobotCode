@@ -7,6 +7,7 @@ public interface IntakeArmIO {
     public static class IntakeArmIOInputs {
         public double motorCurrent;
         public double motorVoltage;
+        public double motorPosition;
         public double motorVelocity;
         public double motorTemperature;
     }

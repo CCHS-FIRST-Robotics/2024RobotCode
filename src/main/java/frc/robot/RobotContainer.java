@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-// import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.*;
 
 // import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
@@ -142,6 +142,12 @@ public class RobotContainer {
         // intake (stops automatically)
         controller.a().onTrue(intake.getIntakeCommand(2.9));
 
+        // // intake and move arm (stops automatically)
+        // controller.a().onTrue(
+        // new InstantCommand(() -> arm.setArmAngle(Degrees.of(90)))
+        // .andThen(intake.getIntakeCommand(2.9)));
+
+        // shoot
         controller.b().onTrue(
                 // prime shooter
                 new InstantCommand(() -> shooter.start(4), shooter)
@@ -151,6 +157,15 @@ public class RobotContainer {
                         .andThen(intake.getShootCommand(8, shooter::checkNoteShot))
                         // stop shooter
                         .andThen(new InstantCommand(shooter::stop, shooter)));
+
+        // // shoot with arm
+        // controller.b().onTrue(
+        // // move arm
+        // new InstantCommand(() -> arm.setArmAngle(Degrees.of(10))).andThen(
+        // // prime shooter
+        // new InstantCommand(() -> shooter.start(4), shooter)
+        // // wait until shooter is up to speed
+        // .alongWith(Commands.waitUntil(shooter::upToSpeed)))
 
         // // drive to specific pose
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
