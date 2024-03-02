@@ -1,7 +1,7 @@
 package frc.robot.subsystems.noteIO.intakeArm;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.filter.Debouncer;
+// import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.*;
 import java.util.function.BooleanSupplier;
@@ -11,7 +11,8 @@ public class IntakeArm extends SubsystemBase {
     IntakeArmIO io;
     double volts = 0;
     double startTime;
-    Debouncer currentDebouncer = new Debouncer(0.3, Debouncer.DebounceType.kRising);
+    // Debouncer currentDebouncer = new Debouncer(0.3,
+    // Debouncer.DebounceType.kRising);
     IntakeArmIOInputsAutoLogged inputs = new IntakeArmIOInputsAutoLogged();
 
     public IntakeArm(IntakeArmIO io) {
