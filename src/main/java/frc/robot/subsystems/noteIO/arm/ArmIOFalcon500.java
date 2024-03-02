@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.*;
 import com.ctre.phoenix6.configs.*;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+// import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 // import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.*;
@@ -22,7 +22,8 @@ public class ArmIOFalcon500 implements ArmIO {
 
     // TODO - USE FOC (Field Oriented Control) - MotionMagicTorqueCurrentFOC
     private final MotionMagicVoltage driveMotionMagic = new MotionMagicVoltage(0);
-    // private final MotionMagicTorqueCurrentFOC driveMotionMagic = new MotionMagicTorqueCurrentFOC(0);
+    // private final MotionMagicTorqueCurrentFOC driveMotionMagic = new
+    // MotionMagicTorqueCurrentFOC(0);
     private final MotionMagicConfigs driveMMConfig = driveFalconConfig.MotionMagic;
     private final Slot0Configs drivePID = driveFalconConfig.Slot0;
     private final FeedbackConfigs driveFeedbackConfig = driveFalconConfig.Feedback;
@@ -56,7 +57,8 @@ public class ArmIOFalcon500 implements ArmIO {
     private static final double driveFeedforwardKg = 0.435; // .435V
     private static final double driveFeedforwardKs = 0;
     // Units needed are volts * seconds / rotations, max rpm is 6,380
-    private static final double driveFeedforwardKv = 12 * (3 / 319d) / gearRatio; // 6380 rotaions per minute is 319/3 rotations per second
+    private static final double driveFeedforwardKv = 12 * (3 / 319d) / gearRatio; // 6380 rotaions per minute is 319/3
+                                                                                  // rotations per second
     private static final double driveFeedforwardKa = 0;
 
     // private final boolean motorInverted = false;
@@ -129,10 +131,10 @@ public class ArmIOFalcon500 implements ArmIO {
         drivePID.kI = driveKi;
         drivePID.kD = driveKd;
         drivePID.GravityType = GravityTypeValue.Arm_Cosine;
-        drivePID.kA = driveFeedforwardKa; //dont use it (forn now)(trust) (use it ocne sysid works)
+        drivePID.kA = driveFeedforwardKa; // dont use it (forn now)(trust) (use it ocne sysid works)
         drivePID.kG = driveFeedforwardKg;
         drivePID.kS = driveFeedforwardKs;
-        drivePID.kV = driveFeedforwardKv; 
+        drivePID.kV = driveFeedforwardKv;
 
         // driveFalcon.setPosition(absoluteEncoderOffset.getRotations());
 
@@ -172,8 +174,7 @@ public class ArmIOFalcon500 implements ArmIO {
                 faultFusedSensorOutOfSync,
                 stickyFaultFusedSensorOutOfSync,
                 faultRemoteSensorOutOfSync,
-                stickyFaultRemoteSensorOutOfSync
-        );
+                stickyFaultRemoteSensorOutOfSync);
 
         inputs.drivePosition = Rotations.of(drivePositionSignal.getValueAsDouble());
         inputs.driveVelocity = RotationsPerSecond.of(driveVelocitySignal.getValueAsDouble());
@@ -203,7 +204,6 @@ public class ArmIOFalcon500 implements ArmIO {
         driveFalcon.setVoltage(volts.in(Volts));
     }
 
-
     @Override
     public void setCharacterizationVoltage(Measure<Voltage> volts) {
         driveFalcon.setVoltage(volts.in(Volts)); // needs to counteract gravity
@@ -215,7 +215,7 @@ public class ArmIOFalcon500 implements ArmIO {
         position = Radians.of(MathUtil.clamp(position.in(Radians), -Math.PI / 6.0, 4 * Math.PI / 3.0));
 
         // lol this is NOT going to work
-        
+
         driveFalcon.setControl(driveMotionMagic.withPosition(position.in(Rotations)).withSlot(0));
     }
 }
