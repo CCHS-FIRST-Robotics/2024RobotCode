@@ -1,5 +1,6 @@
 package frc.robot.subsystems.noteIO.shooter;
 
+import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ShooterIO {
@@ -18,13 +19,13 @@ public interface ShooterIO {
         public double motor2Temperature;
     }
 
-    public default void setVelocity(double velocity) {
+    public default void setVelocity(Measure<Velocity<Angle>> velocity) {
     }
 
-    public default void setVoltage(double volts) {
+    public default void setVoltage(Measure<Voltage> volts) {
     }
 
-    public default boolean upToSpeed(double targetVelocity) {
+    public default boolean upToSpeed(Measure<Velocity<Angle>> targetVelocity) {
         return false;
     }
 

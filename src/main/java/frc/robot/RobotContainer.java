@@ -134,13 +134,13 @@ public class RobotContainer {
         // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
         // outtake
-        controller.x().whileTrue(new StartEndCommand(() -> intake.start(-2.9), () -> intake.stop(), intake));
+        controller.x().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
 
         // manual intake
-        controller.y().whileTrue(new StartEndCommand(() -> intake.start(4), () -> intake.stop(), intake));
+        controller.y().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(4)), () -> intake.stop(), intake));
 
         // intake (stops automatically)
-        controller.a().onTrue(intake.getIntakeCommand(2.9));
+        controller.a().onTrue(intake.getIntakeCommand(Volts.of(2.9)));
 
         // // intake and move arm (stops automatically)
         // controller.a().onTrue(
@@ -150,11 +150,11 @@ public class RobotContainer {
         // shoot
         controller.b().onTrue(
                 // prime shooter
-                new InstantCommand(() -> shooter.start(4), shooter)
+                new InstantCommand(() -> shooter.start(Volts.of(4)), shooter)
                         // wait until shooter is up to speed
                         .alongWith(Commands.waitUntil(shooter::upToSpeed))
                         // shoot
-                        .andThen(intake.getShootCommand(8, shooter::checkNoteShot))
+                        .andThen(intake.getShootCommand(Volts.of(8), shooter::checkNoteShot))
                         // stop shooter
                         .andThen(new InstantCommand(shooter::stop, shooter)));
 

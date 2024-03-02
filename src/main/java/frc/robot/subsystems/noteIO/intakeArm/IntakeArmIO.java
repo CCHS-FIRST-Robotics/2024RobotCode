@@ -1,5 +1,6 @@
 package frc.robot.subsystems.noteIO.intakeArm;
 
+import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeArmIO {
@@ -12,7 +13,7 @@ public interface IntakeArmIO {
         public double motorTemperature;
     }
 
-    public default void setVoltage(double volts) {
+    public default void setVoltage(Measure<Voltage> volts) {
     }
 
     public default void updateInputs(IntakeArmIOInputs inputs) {

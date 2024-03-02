@@ -1,10 +1,12 @@
 package frc.robot.subsystems.noteIO.shooter;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import frc.robot.HardwareConstants;
+import edu.wpi.first.units.*;
 
 public class ShooterIOCIM implements ShooterIO {
     TalonSRX motor1, motor2;
@@ -17,24 +19,21 @@ public class ShooterIOCIM implements ShooterIO {
     }
 
     @Override
-    public void setVelocity(double velocity) {
-        double feedForwardVolts = feedForward.calculate(velocity);
-        double pidVolts = pid.calculate(motor1.getSelectedSensorVelocity(), velocity);
-        setVoltage(feedForwardVolts + pidVolts);
+    public void setVelocity(Measure<Velocity<Angle>> velocity) {
+        double feedForwardVolts = feedForward.calculate(velocity.in(RotationsPerSecond));
+        double pidVolts = pid.calculate(motor1.getSelectedSensorVelocity(), velocity.in(RotationsPerSecond));
+        setVoltage(Volts.of(feedForwardVolts + pidVolts));
     }
 
     @Override
-    public void setVoltage(double volts) {
-        motor1.set(TalonSRXControlMode.PercentOutput, volts / 12);
-        motor2.set(TalonSRXControlMode.PercentOutput, volts / 12);
+    public void setVoltage(Measure<Voltage> volts) {
+        motor1.set(TalonSRXControlMode.PercentOutput, volts.in(Volts) / 12);
+        motor2.set(TalonSRXControlMode.PercentOutput, volts.in(Volts) / 12);
     }
 
     @Override
-    public boolean upToSpeed(double targetVelocity) {
-        // // for when shooter actually has velocity control
-        // return motor1.getSelectedSensorVelocity() * 10 > targetVelocity;
-
-        return motor1.getSelectedSensorVelocity() * 10 > HardwareConstants.CIM_MAX_RPS * (targetVelocity / 12);
+    public boolean upToSpeed(Measure<Velocity<Angle>> targetVelocity) {
+        return motor1.getSelectedSensorVelocity() * 10 > targetVelocity.in(RotationsPerSecond) * 0.95;
     }
 
     @Override

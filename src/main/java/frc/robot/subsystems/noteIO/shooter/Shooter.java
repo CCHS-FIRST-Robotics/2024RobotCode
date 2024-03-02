@@ -1,40 +1,29 @@
 package frc.robot.subsystems.noteIO.shooter;
 
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
     ShooterIO io;
-    double velocity = 0;
+    Measure<Velocity<Angle>> velocity = RotationsPerSecond.of(0);
     double startTime;
-    SysIdRoutine sysIdRoutine;
     ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
     public Shooter(ShooterIO io) {
         this.io = io;
-
-        sysIdRoutine = new SysIdRoutine(
-                new SysIdRoutine.Config(),
-                new SysIdRoutine.Mechanism(
-                        (Measure<Voltage> volts) -> {
-                            io.setVoltage(volts.in(Volts));
-                        },
-                        null,
-                        this));
     }
 
-    public void start(double v) {
+    public void start(Measure<Velocity<Angle>> v) {
         velocity = v;
         startTime = Timer.getFPGATimestamp();
     }
 
     public void stop() {
-        velocity = 0;
+        velocity = RotationsPerSecond.of(0);
     }
 
     public boolean upToSpeed() {
@@ -50,7 +39,6 @@ public class Shooter extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("shooter", inputs);
 
-        // io.setVelocity(velocity);
-        io.setVoltage(velocity);
+        io.setVelocity(velocity);
     }
 }

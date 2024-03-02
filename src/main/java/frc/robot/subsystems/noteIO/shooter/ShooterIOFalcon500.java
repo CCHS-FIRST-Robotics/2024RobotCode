@@ -1,12 +1,14 @@
 package frc.robot.subsystems.noteIO.shooter;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import frc.robot.HardwareConstants;
+import edu.wpi.first.units.*;
 
 public class ShooterIOFalcon500 implements ShooterIO {
     TalonFX motor1, motor2;
@@ -52,24 +54,21 @@ public class ShooterIOFalcon500 implements ShooterIO {
     }
 
     @Override
-    public void setVelocity(double velocity) {
-        double feedForwardVolts = feedForward.calculate(velocity);
-        double pidVolts = pid.calculate(velocitySignal1.refresh().getValue(), velocity);
-        setVoltage(feedForwardVolts + pidVolts);
+    public void setVelocity(Measure<Velocity<Angle>> velocity) {
+        double feedForwardVolts = feedForward.calculate(velocity.in(RotationsPerSecond));
+        double pidVolts = pid.calculate(velocitySignal1.refresh().getValue(), velocity.in(RotationsPerSecond));
+        setVoltage(Volts.of(feedForwardVolts + pidVolts));
     }
 
     @Override
-    public void setVoltage(double volts) {
-        motor1.setVoltage(volts);
-        motor2.setVoltage(volts);
+    public void setVoltage(Measure<Voltage> volts) {
+        motor1.setVoltage(volts.in(Volts));
+        motor2.setVoltage(volts.in(Volts));
     }
 
     @Override
-    public boolean upToSpeed(double targetVelocity) {
-        // // for when shooter actually has velocity control
-        // return velocitySignal1.refresh().getValue() > targetVelocity
-
-        return velocitySignal1.refresh().getValue() > HardwareConstants.FALCON_MAX_RPS * (targetVelocity / 12);
+    public boolean upToSpeed(Measure<Velocity<Angle>> targetVelocity) {
+        return velocitySignal1.refresh().getValue() > targetVelocity.in(RotationsPerSecond) * 0.95;
     }
 
     @Override

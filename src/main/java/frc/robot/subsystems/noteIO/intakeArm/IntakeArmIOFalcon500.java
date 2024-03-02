@@ -1,9 +1,12 @@
 package frc.robot.subsystems.noteIO.intakeArm;
 
+import static edu.wpi.first.units.Units.*;
+
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import edu.wpi.first.units.*;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.TalonFX;
 
 public class IntakeArmIOFalcon500 implements IntakeArmIO {
     TalonFX motor;
@@ -32,8 +35,8 @@ public class IntakeArmIOFalcon500 implements IntakeArmIO {
     }
 
     @Override
-    public void setVoltage(double volts) {
-        motor.setVoltage(volts);
+    public void setVoltage(Measure<Voltage> volts) {
+        motor.setVoltage(volts.in(Volts));
     }
 
     @Override
