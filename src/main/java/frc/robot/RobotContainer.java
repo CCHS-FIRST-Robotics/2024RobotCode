@@ -150,7 +150,7 @@ public class RobotContainer {
         // shoot
         controller.b().onTrue(
                 // prime shooter
-                new InstantCommand(() -> shooter.start(Volts.of(4)), shooter)
+                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter)
                         // wait until shooter is up to speed
                         .alongWith(Commands.waitUntil(shooter::upToSpeed))
                         // shoot
