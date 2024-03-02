@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
     ShooterIO io;
+    double velocity;
     double time;
     SysIdRoutine sysIdRoutine;
     ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
@@ -27,17 +28,13 @@ public class Shooter extends SubsystemBase {
                         this));
     }
 
-    public void start(double velocity) {
-        // io.setVelocity(velocity);
-
-        io.setVoltage(velocity);
+    public void start(double v) {
+        this.velocity = v;
         time = Timer.getFPGATimestamp();
     }
 
     public void stop() {
-        // io.setVelocity(0);
-
-        io.setVoltage(0);
+        this.velocity = 0;
     }
 
     public boolean upToSpeed() {
@@ -53,5 +50,8 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("shooter", inputs);
+
+        // io.setVelocity(velocity);
+        io.setVoltage(velocity);
     }
 }
