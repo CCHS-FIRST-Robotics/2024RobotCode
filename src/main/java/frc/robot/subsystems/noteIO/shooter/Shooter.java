@@ -38,7 +38,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean upToSpeed() {
-        return inputs.motor1Velocity > 98 * (0.5);
+        return io.upToSpeed();
     }
 
     public boolean checkNoteShot() {

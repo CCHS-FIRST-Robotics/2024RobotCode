@@ -64,6 +64,11 @@ public class ShooterIOFalcon500 implements ShooterIO {
     }
 
     @Override
+    public boolean upToSpeed() {
+        return velocitySignal1.refresh().getValue() > 98 * (0.5);
+    }
+
+    @Override
     public void updateInputs(ShooterIOInputs inputs) {
         BaseStatusSignal.refreshAll(
                 voltageSignal1,

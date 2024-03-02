@@ -29,6 +29,11 @@ public class ShooterIOCIM implements ShooterIO {
     }
 
     @Override
+    public boolean upToSpeed() {
+        return motor1.getSelectedSensorVelocity() * 10 * 60 > 98 * (0.5);
+    }
+
+    @Override
     public void updateInputs(ShooterIOInputs inputs) {
         inputs.motor1Voltage = motor1.getMotorOutputVoltage();
         inputs.motor1Current = motor1.getSupplyCurrent();
