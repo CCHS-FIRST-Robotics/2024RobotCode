@@ -29,6 +29,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * scheduler calls). Instead, the structure of the robot (including subsystems,
  * commands, and button mappings) should be declared here.
  */
+
+@SuppressWarnings("unused")
 public class RobotContainer {
     private final Drive drive;
     private final Vision camera;
@@ -48,7 +50,6 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-        // creating the drivebase
         switch (Constants.CURRENT_MODE) {
             case REAL:
                 // instantiate hardware IO implementations

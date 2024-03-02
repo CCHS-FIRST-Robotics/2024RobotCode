@@ -11,8 +11,8 @@ import edu.wpi.first.units.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.filter.MedianFilter;
-import frc.robot.Constants;
 
+@SuppressWarnings("unused")
 public class ModuleIOSparkMax implements ModuleIO {
     /* MOTOR CONTROLLERS + PID */
     private final CANSparkMax driveSparkMax;
