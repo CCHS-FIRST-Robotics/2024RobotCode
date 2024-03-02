@@ -144,17 +144,6 @@ public class RobotContainer {
         // new InstantCommand(() -> arm.setArmAngle(Degrees.of(90)))
         // .andThen(intake.getIntakeCommand(2.9)));
 
-        // shoot
-        controller.b().onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter)
-                        // wait until shooter is up to speed
-                        .alongWith(Commands.waitUntil(shooter::upToSpeed))
-                        // shoot
-                        .andThen(intake.getShootCommand(Volts.of(8), shooter::checkNoteShot))
-                        // stop shooter
-                        .andThen(new InstantCommand(shooter::stop, shooter)));
-
         // // shoot with arm
         // controller.b().onTrue(
         // // move arm
@@ -163,6 +152,17 @@ public class RobotContainer {
         // new InstantCommand(() -> shooter.start(4), shooter)
         // // wait until shooter is up to speed
         // .alongWith(Commands.waitUntil(shooter::upToSpeed)))
+
+        // shoot
+        controller.b().onTrue(
+                // prime shooter
+                new InstantCommand(() -> shooter.start(Volts.of(10)), shooter)
+                        // wait until shooter is up to speed
+                        .alongWith(Commands.waitUntil(shooter::upToSpeed))
+                        // shoot
+                        .andThen(intake.getShootCommand(Volts.of(8), shooter::checkNoteShot))
+                        // stop shooter
+                        .andThen(new InstantCommand(shooter::stop, shooter)));
 
         // // drive to specific pose
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());

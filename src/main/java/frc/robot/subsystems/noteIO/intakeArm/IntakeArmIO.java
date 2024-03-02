@@ -13,7 +13,7 @@ public interface IntakeArmIO {
         public double motorTemperature;
     }
 
-    public default void setVoltage(Measure<Voltage> volts) {
+    public default void setVoltage(Measure<Voltage> v) {
     }
 
     public default void updateInputs(IntakeArmIOInputs inputs) {

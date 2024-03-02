@@ -35,8 +35,8 @@ public class IntakeArmIOFalcon500 implements IntakeArmIO {
     }
 
     @Override
-    public void setVoltage(Measure<Voltage> volts) {
-        motor.setVoltage(volts.in(Volts));
+    public void setVoltage(Measure<Voltage> v) {
+        motor.setVoltage(v.in(Volts));
     }
 
     @Override

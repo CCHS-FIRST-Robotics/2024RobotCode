@@ -58,9 +58,9 @@ public class ShooterIOFalcon500 implements ShooterIO {
     }
 
     @Override
-    public void setVoltage(Measure<Voltage> volts) {
-        motor1.setVoltage(volts.in(Volts));
-        motor2.setVoltage(volts.in(Volts));
+    public void setVoltage(Measure<Voltage> v) {
+        motor1.setVoltage(v.in(Volts));
+        motor2.setVoltage(v.in(Volts));
     }
 
     @Override

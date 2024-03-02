@@ -19,16 +19,16 @@ public class ShooterIOCIM implements ShooterIO {
     }
 
     @Override
-    public void setVelocity(Measure<Velocity<Angle>> velocity) {
-        double feedForwardVolts = feedForward.calculate(velocity.in(RotationsPerSecond));
-        double pidVolts = pid.calculate(motor1.getSelectedSensorVelocity(), velocity.in(RotationsPerSecond));
+    public void setVelocity(Measure<Velocity<Angle>> v) {
+        double feedForwardVolts = feedForward.calculate(v.in(RotationsPerSecond));
+        double pidVolts = pid.calculate(motor1.getSelectedSensorVelocity(), v.in(RotationsPerSecond));
         setVoltage(Volts.of(feedForwardVolts + pidVolts));
     }
 
     @Override
-    public void setVoltage(Measure<Voltage> volts) {
-        motor1.set(TalonSRXControlMode.PercentOutput, volts.in(Volts) / 12);
-        motor2.set(TalonSRXControlMode.PercentOutput, volts.in(Volts) / 12);
+    public void setVoltage(Measure<Voltage> v) {
+        motor1.set(TalonSRXControlMode.PercentOutput, v.in(Volts) / 12);
+        motor2.set(TalonSRXControlMode.PercentOutput, v.in(Volts) / 12);
     }
 
     @Override
