@@ -9,9 +9,9 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.*;
 
 public class ShooterIOCIM implements ShooterIO {
-    TalonSRX motor1, motor2;
-    SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0, 0);
-    PIDController pid = new PIDController(0, 0, 0);
+    private TalonSRX motor1, motor2;
+    private SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0, 0);
+    private PIDController pid = new PIDController(0, 0, 0);
 
     public ShooterIOCIM(int id1, int id2) {
         motor1 = new TalonSRX(id1);

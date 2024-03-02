@@ -10,20 +10,20 @@ import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.units.*;
 
 public class ShooterIOFalcon500 implements ShooterIO {
-    TalonFX motor1, motor2;
-    VelocityVoltage velocityControl;
+    private TalonFX motor1, motor2;
+    private VelocityVoltage velocityControl;
 
-    StatusSignal<Double> voltageSignal1;
-    StatusSignal<Double> currentSignal1;
-    StatusSignal<Double> positionSignal1;
-    StatusSignal<Double> velocitySignal1;
-    StatusSignal<Double> temperatureSignal1;
+    private StatusSignal<Double> voltageSignal1;
+    private StatusSignal<Double> currentSignal1;
+    private StatusSignal<Double> positionSignal1;
+    private StatusSignal<Double> velocitySignal1;
+    private StatusSignal<Double> temperatureSignal1;
 
-    StatusSignal<Double> voltageSignal2;
-    StatusSignal<Double> currentSignal2;
-    StatusSignal<Double> positionSignal2;
-    StatusSignal<Double> velocitySignal2;
-    StatusSignal<Double> temperatureSignal2;
+    private StatusSignal<Double> voltageSignal2;
+    private StatusSignal<Double> currentSignal2;
+    private StatusSignal<Double> positionSignal2;
+    private StatusSignal<Double> velocitySignal2;
+    private StatusSignal<Double> temperatureSignal2;
 
     public ShooterIOFalcon500(int id1, int id2) {
         motor1 = new TalonFX(id1);

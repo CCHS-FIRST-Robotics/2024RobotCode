@@ -8,10 +8,10 @@ import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
-    ShooterIO io;
-    Measure<Velocity<Angle>> velocity = RotationsPerSecond.of(0);
-    double startTime;
-    ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+    private ShooterIO io;
+    private Measure<Velocity<Angle>> velocity = RotationsPerSecond.of(0);
+    private double startTime;
+    private ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
     public Shooter(ShooterIO io) {
         this.io = io;

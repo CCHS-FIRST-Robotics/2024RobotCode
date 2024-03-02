@@ -11,12 +11,12 @@ import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class IntakeArm extends SubsystemBase {
-    IntakeArmIO io;
-    Measure<Voltage> volts = Volts.of(0);
-    double startTime;
+    private IntakeArmIO io;
+    private Measure<Voltage> volts = Volts.of(0);
+    private double startTime;
     // Debouncer currentDebouncer = new Debouncer(0.3,
     // Debouncer.DebounceType.kRising);
-    IntakeArmIOInputsAutoLogged inputs = new IntakeArmIOInputsAutoLogged();
+    private IntakeArmIOInputsAutoLogged inputs = new IntakeArmIOInputsAutoLogged();
 
     public IntakeArm(IntakeArmIO io) {
         this.io = io;
