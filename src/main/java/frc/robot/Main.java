@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.RobotBase;
  * 
  * better simulation code
  * sysID for shooter (same as arm)
- * make variables private
  */
 public final class Main {
     private Main() {
