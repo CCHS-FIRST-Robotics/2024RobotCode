@@ -10,8 +10,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
     ShooterIO io;
-    double velocity;
-    double time;
+    double velocity = 0;
+    double startTime;
     SysIdRoutine sysIdRoutine;
     ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
@@ -29,21 +29,20 @@ public class Shooter extends SubsystemBase {
     }
 
     public void start(double v) {
-        this.velocity = v;
-        time = Timer.getFPGATimestamp();
+        velocity = v;
+        startTime = Timer.getFPGATimestamp();
     }
 
     public void stop() {
-        this.velocity = 0;
+        velocity = 0;
     }
 
     public boolean upToSpeed() {
-        return io.upToSpeed();
+        return io.upToSpeed(velocity);
     }
 
     public boolean checkNoteShot() {
-        // returns whether note detected and it's been 2 seconds
-        return inputs.motor1Current > 30 && Timer.getFPGATimestamp() - time > 2;
+        return inputs.motor1Current > 30 && Timer.getFPGATimestamp() - startTime > 0.5;
     }
 
     @Override

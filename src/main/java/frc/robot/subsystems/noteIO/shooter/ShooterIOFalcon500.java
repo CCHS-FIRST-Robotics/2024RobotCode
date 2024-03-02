@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.PIDController;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import frc.robot.HardwareConstants;
 
 public class ShooterIOFalcon500 implements ShooterIO {
     TalonFX motor1, motor2;
@@ -64,8 +65,11 @@ public class ShooterIOFalcon500 implements ShooterIO {
     }
 
     @Override
-    public boolean upToSpeed() {
-        return velocitySignal1.refresh().getValue() > 98 * (0.5);
+    public boolean upToSpeed(double targetVelocity) {
+        // // for when shooter actually has velocity control
+        // return velocitySignal1.refresh().getValue() > targetVelocity
+
+        return velocitySignal1.refresh().getValue() > HardwareConstants.FALCON_MAX_RPS * (targetVelocity / 12);
     }
 
     @Override

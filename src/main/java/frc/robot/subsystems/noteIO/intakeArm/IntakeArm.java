@@ -10,9 +10,9 @@ import org.littletonrobotics.junction.Logger;
 public class IntakeArm extends SubsystemBase {
     IntakeArmIO io;
     double volts = 0;
+    double startTime;
     Debouncer currentDebouncer = new Debouncer(0.3, Debouncer.DebounceType.kRising);
     IntakeArmIOInputsAutoLogged inputs = new IntakeArmIOInputsAutoLogged();
-    double time;
 
     public IntakeArm(IntakeArmIO io) {
         this.io = io;
@@ -20,7 +20,7 @@ public class IntakeArm extends SubsystemBase {
 
     public void start(double v) {
         volts = v;
-        time = Timer.getFPGATimestamp();
+        startTime = Timer.getFPGATimestamp();
     }
 
     public void stop() {
@@ -28,13 +28,8 @@ public class IntakeArm extends SubsystemBase {
     }
 
     private boolean checkNoteThere() {
-        // returns whether current has risen after up to speed
-        return inputs.motorCurrent > 30 && (Timer.getFPGATimestamp() - time > 0.5);
-
-        // returns whether current has risen for more than 0.3 seconds
+        return inputs.motorCurrent > 30 && (Timer.getFPGATimestamp() - startTime > 0.5);
         // return currentDebouncer.calculate(inputs.motorCurrent > 30);
-
-        // returns whether note friction is detected and motor is up to speed
         // return inputs.motorCurrent > 30 && inputs.motorVelocity > 98 * (volts / 12);
     }
 
@@ -43,7 +38,7 @@ public class IntakeArm extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("intake", inputs);
 
-        // io.setVoltage(volts);
+        io.setVoltage(volts);
     }
 
     public Command getIntakeCommand(double v) {

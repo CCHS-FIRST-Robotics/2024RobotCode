@@ -24,7 +24,7 @@ public interface ShooterIO {
     public default void setVoltage(double volts) {
     }
 
-    public default boolean upToSpeed() {
+    public default boolean upToSpeed(double targetVelocity) {
         return false;
     }
 
