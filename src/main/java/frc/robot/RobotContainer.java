@@ -19,6 +19,7 @@ import frc.robot.subsystems.vision.*;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.noteIO.arm.Arm;
 import frc.robot.subsystems.noteIO.arm.ArmIOFalcon500;
+import frc.robot.subsystems.noteIO.arm.ArmIOSim;
 // import frc.robot.subsystems.noteIO.arm.*;
 import frc.robot.subsystems.noteIO.intakeArm.*;
 import frc.robot.subsystems.noteIO.shooter.*;
@@ -62,6 +63,9 @@ public class RobotContainer {
                         new ModuleIOSparkMax(3),
                         useWiiRemotes);
                 camera = new Vision(new CameraIOZED());
+                arm = new Arm(new ArmIOFalcon500(20, 19));
+                intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
+                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
             case SIM:
                 // instantiate physics sim IO implementations
@@ -74,6 +78,9 @@ public class RobotContainer {
                         new ModuleIOSim(),
                         false);
                 camera = new Vision(new CameraIOZED());
+                arm = new Arm(new ArmIOSim());
+                intake = new IntakeArm(new IntakeIOSim());
+                shooter = new Shooter(new ShooterIOSim());
                 break;
             default: // replayed robot
                 // disable IO implementations
@@ -85,6 +92,9 @@ public class RobotContainer {
                         new ModuleIOSparkMax(3),
                         false);
                 camera = new Vision(new CameraIOZED());
+                arm = new Arm(new ArmIOFalcon500(20, 19));
+                intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
+                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
         }
 
@@ -95,10 +105,6 @@ public class RobotContainer {
                 new Pose2d());
         drive.setPoseEstimator(poseEstimator);
         camera.setPoseEstimator(poseEstimator);
-
-        arm = new Arm(new ArmIOFalcon500(20, 19));
-        intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
-        shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
 
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
 

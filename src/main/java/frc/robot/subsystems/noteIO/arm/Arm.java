@@ -18,7 +18,7 @@ public class Arm extends SubsystemBase {
     private SysIdRoutine sysIdRoutine;
 
     // length and position of the arm in relation to the robot's center
-    private final double armLength = 0.0; // TODO: set this
+    private final Measure<Distance> armLength = Inches.of(16); // TODO: set this
     private final Translation2d armOffset = new Translation2d(0.0, .425); // TODO: set this
 
     public Arm(ArmIO io) {
@@ -45,7 +45,7 @@ public class Arm extends SubsystemBase {
         // System.out.println("testingggg");
 
         // trust!
-        // io.setDriveVoltage(Volts.of(0));
+        // io.setDriveVoltage(Volts.of(1));
         setArmAngle(Degrees.of(30));
     }
 
@@ -66,7 +66,7 @@ public class Arm extends SubsystemBase {
     }
 
     public Translation2d getEndEffectorPosition() {
-        return new Translation2d(armLength, new Rotation2d(getArmAngle().in(Radians))).plus(armOffset);
+        return new Translation2d(armLength.in(Meters), new Rotation2d(getArmAngle().in(Radians))).plus(armOffset);
     }
 
     public Command alignWithTarget(Supplier<Translation2d> translationToTargetGround, Supplier<Pose3d> targetPose) {

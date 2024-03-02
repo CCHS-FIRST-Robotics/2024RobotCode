@@ -35,7 +35,7 @@ public class IntakeArmIOFalcon500 implements IntakeArmIO {
     }
 
     @Override
-    public void updateInputs(IntakeArmIOInputsAutoLogged inputs) {
+    public void updateInputs(IntakeArmIOInputs inputs) {
         BaseStatusSignal.refreshAll(voltageSignal, currentSignal, velocitySignal, temperatureSignal);
 
         inputs.motorVoltage = voltageSignal.getValue();

@@ -21,6 +21,6 @@ public interface ShooterIO {
         return false;
     }
 
-    public default void updateInputs(ShooterIOInputsAutoLogged inputs) {
+    public default void updateInputs(ShooterIOInputs inputs) {
     }
 }

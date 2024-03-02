@@ -14,6 +14,6 @@ public interface IntakeArmIO {
     public default void setVoltage(double volts) {
     }
 
-    public default void updateInputs(IntakeArmIOInputsAutoLogged inputs) {
+    public default void updateInputs(IntakeArmIOInputs inputs) {
     }
 }

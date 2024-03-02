@@ -49,7 +49,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
     }
 
     @Override
-    public void updateInputs(ShooterIOInputsAutoLogged inputs) {
+    public void updateInputs(ShooterIOInputs inputs) {
         BaseStatusSignal.refreshAll(voltageSignal, currentSignal, velocitySignal, temperatureSignal);
 
         inputs.motorVoltage = voltageSignal.getValue();

@@ -11,7 +11,6 @@ import com.ctre.phoenix6.hardware.*;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 
 public class ArmIOFalcon500 implements ArmIO {
     /* MOTOR CONTROLLERS + PID */
@@ -46,20 +45,19 @@ public class ArmIOFalcon500 implements ArmIO {
     StatusSignal<Boolean> faultRemoteSensorOutOfSync;
     StatusSignal<Boolean> stickyFaultRemoteSensorOutOfSync;
 
+    private static final double gearRatio = 100 * 48 / 22d;
 
     // TODO: update constants in periodic once tunable is set up
     private static final double driveKp = 20;
     private static final double driveKd = 0.0d;
     private static final double driveKi = 0.0d;
-    private static final double driveKv = 0.0d; // 0.113 (from falcon500 spec sheet) UNITS: Volts / (Rotations / Second)
 
     // Uhh Feedforward momment!
     private static final double driveFeedforwardKg = 0.435; // .435V
-    // private static final double driveFeedforwardKs = 0;
-    // private static final double driveFeedforwardKv = 0;
-    // private static final double driveFeedforwardKa = 0;
-
-    private final double gearRatio = 218;
+    private static final double driveFeedforwardKs = 0;
+    // Units needed are volts * seconds / rotations, max rpm is 6,380
+    private static final double driveFeedforwardKv = 12 * (3 / 319d) / gearRatio; // 6380 rotaions per minute is 319/3 rotations per second
+    private static final double driveFeedforwardKa = 0;
 
     // private final boolean motorInverted = false;
     private final Measure<Angle> absoluteEncoderOffset = Radians.of(-2.72);
@@ -109,11 +107,10 @@ public class ArmIOFalcon500 implements ArmIO {
         CANcoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
         CANcoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         CANcoderConfig.MagnetSensor.MagnetOffset = absoluteEncoderOffset.in(Rotations); // CHANGGE
-        driveCancoder.getConfigurator().apply(CANcoderConfig);
 
-        // fuses (trust)
         driveFalconConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
+        // fuses (trust)
         driveFeedbackConfig.FeedbackRemoteSensorID = driveCancoder.getDeviceID();
         driveFeedbackConfig.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         driveFeedbackConfig.SensorToMechanismRatio = 1.0; // fuck maybe? CHANGE????
@@ -122,8 +119,8 @@ public class ArmIOFalcon500 implements ArmIO {
         driveFalconConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         driveFalconConfig.CurrentLimits.StatorCurrentLimit = 60;
 
-        // driveFalconConfig.TorqueCurrent.PeakForwardTorqueCurrent = 130;
-        // driveFalconConfig.TorqueCurrent.PeakReverseTorqueCurrent = -130;
+        driveFalconConfig.TorqueCurrent.PeakForwardTorqueCurrent = 130;
+        driveFalconConfig.TorqueCurrent.PeakReverseTorqueCurrent = -130;
 
         driveFalconConfig.Voltage.PeakForwardVoltage = 12;
         driveFalconConfig.Voltage.PeakReverseVoltage = -12;
@@ -131,28 +128,26 @@ public class ArmIOFalcon500 implements ArmIO {
         drivePID.kP = driveKp;
         drivePID.kI = driveKi;
         drivePID.kD = driveKd;
-        drivePID.kV = driveKv;
         drivePID.GravityType = GravityTypeValue.Arm_Cosine;
-        // drivePID.kA = driveFeedforwardKa; //dont use it (forn now)(trust) (use it
-        // ocne sysid works)
+        drivePID.kA = driveFeedforwardKa; //dont use it (forn now)(trust) (use it ocne sysid works)
         drivePID.kG = driveFeedforwardKg;
-        // drivePID.kS = driveFeedforwardKs;
-        // drivePID.kV = driveFeedforwardKv; // max rpm is 6,380 volts * seconds /
-        // radians
-        // Units needed are volts * seconds / radians
-        // drivePID.kV = 18d / (Math.PI * 319d); // TRUST!!!!! I don't!!! IN RADIANS
-        // drivePID.kV = 36 / 319;
-        // 6380 rotaions per minute is 319/3 rotations per second
-        //
-        // 2pi * 319/3 radians per second <--- you don't need to convert to radians
-        // 3/(2pi * 319) seconds per radian
-        // 12 * 3/(2pi * 319)
+        drivePID.kS = driveFeedforwardKs;
+        drivePID.kV = driveFeedforwardKv; 
 
         // driveFalcon.setPosition(absoluteEncoderOffset.getRotations());
 
         StatusCode status = StatusCode.StatusCodeNotInitialized;
         for (int i = 0; i < 5; ++i) {
             status = driveFalcon.getConfigurator().apply(driveFalconConfig);
+            if (status.isOK())
+                break;
+        }
+        if (!status.isOK()) {
+            System.out.println("Could not configure device. Error: " + status.toString());
+        }
+
+        for (int i = 0; i < 5; ++i) {
+            status = driveCancoder.getConfigurator().apply(CANcoderConfig);
             if (status.isOK())
                 break;
         }

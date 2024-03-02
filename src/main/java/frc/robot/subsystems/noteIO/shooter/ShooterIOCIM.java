@@ -29,7 +29,7 @@ public class ShooterIOCIM implements ShooterIO {
     }
 
     @Override
-    public void updateInputs(ShooterIOInputsAutoLogged inputs) {
+    public void updateInputs(ShooterIOInputs inputs) {
         inputs.motorVoltage = motor1.getMotorOutputVoltage();
         inputs.motorCurrent = motor1.getSupplyCurrent();
         inputs.motorVelocity = motor1.getSelectedSensorVelocity() * 10 * 60; // function records rotations per 100ms
