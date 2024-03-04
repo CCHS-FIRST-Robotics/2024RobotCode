@@ -4,18 +4,14 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.*;
 
-import org.ejml.data.CMatrixRMaj;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
-
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
+// import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+// import frc.robot.commands.DriveWithJoysticks;
+// import frc.robot.commands.DriveWithWiimote;
+// import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -36,26 +32,16 @@ import frc.robot.commands.FollowAprilTag;
 import frc.robot.commands.MoveToPose;
 import frc.robot.commands.AutoRoutine;
 import frc.robot.Constants.AutoPathConstants;
-import frc.robot.commands.ArmControlWithJoysticks;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
-import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.EventMarkerBuilder;
 import frc.robot.utils.MechanismsPath;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.noteIO.arm.*;
-import frc.robot.subsystems.noteIO.intake.*;
+import frc.robot.subsystems.noteIO.intakeArm.*;
 import frc.robot.subsystems.noteIO.shooter.*;
-
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -65,71 +51,70 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
  * commands, and button mappings) should be declared here.
  */
 
+@SuppressWarnings("unused")
 public class RobotContainer {
-    // Subsystems
     private final Drive drive;
     private final Vision camera;
     private final PoseEstimator poseEstimator;
 
     private final Arm arm;
-    private final Intake intake;
+    private final IntakeArm intake;
     private final Shooter shooter;
-    boolean shooterPrimed = false;
 
     private final CommandXboxController controller = new CommandXboxController(0);
-    private final CommandGenericHID wiiRemote1 = new CommandGenericHID(2);
-    // private final CommandGenericHID wiiRemote2 = new CommandGenericHID(3);
+    // private final CommandGenericHID wiiRemote = new CommandGenericHID(2);
     private final boolean useWiiRemotes = false;
 
-    // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-        switch (Constants.currentMode) {
-        // Real robot, instantiate hardware IO implementations
-        case REAL:
-            drive = new Drive(
-                new GyroIONavX(),
-                new ModuleIOSparkMax(0), 
-                new ModuleIOSparkMax(1), 
-                new ModuleIOSparkMax(2), 
-                new ModuleIOSparkMax(3),
-                useWiiRemotes
-            );
-            intake = new Intake(new IntakeIOFalcon500(1));
-            camera = new Vision(new CameraIOZED());
-            break;
-
-        // Sim robot, instantiate physics sim IO implementations
-        case SIM:
-            drive = new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(), 
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                false
-            );
-			intake = new Intake(new IntakeIOFalcon500(1)); // TODO: CHANGE TO SIM IMPL!
-            camera = new Vision(new CameraIOZED());
-            break;
-
-        // Replayed robot, disable IO implementations
-        default:
-            drive = new Drive(
-                new GyroIONavX(),
-                new ModuleIOSparkMax(0), 
-                new ModuleIOSparkMax(1),
-                new ModuleIOSparkMax(2), 
-                new ModuleIOSparkMax(3),
-                false
-            );
-			intake = new Intake(new IntakeIOFalcon500(1));
-            camera = new Vision(new CameraIOZED());
-            break;
+        switch (Constants.CURRENT_MODE) {
+            case REAL:
+                // instantiate hardware IO implementations
+                drive = new Drive(
+                        new GyroIONavX(),
+                        new ModuleIOSparkMax(0),
+                        new ModuleIOSparkMax(1),
+                        new ModuleIOSparkMax(2),
+                        new ModuleIOSparkMax(3),
+                        useWiiRemotes);
+                camera = new Vision(new CameraIOZED());
+                arm = new Arm(new ArmIOFalcon500(20, 19));
+                intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
+                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
+                break;
+            case SIM:
+                // instantiate physics sim IO implementations
+                drive = new Drive(
+                        new GyroIO() {
+                        },
+                        new ModuleIOSim(),
+                        new ModuleIOSim(),
+                        new ModuleIOSim(),
+                        new ModuleIOSim(),
+                        false);
+                camera = new Vision(new CameraIOZED());
+                arm = new Arm(new ArmIOSim());
+                intake = new IntakeArm(new IntakeIOSim());
+                shooter = new Shooter(new ShooterIOSim());
+                break;
+            default: // replayed robot
+                // disable IO implementations
+                drive = new Drive(
+                        new GyroIONavX(),
+                        new ModuleIOSparkMax(0),
+                        new ModuleIOSparkMax(1),
+                        new ModuleIOSparkMax(2),
+                        new ModuleIOSparkMax(3),
+                        false);
+                camera = new Vision(new CameraIOZED());
+                arm = new Arm(new ArmIOFalcon500(20, 19));
+                intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
+                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
+                break;
         }
 
         poseEstimator = new PoseEstimator(
@@ -146,32 +131,9 @@ public class RobotContainer {
         drive.setPoseEstimator(poseEstimator);
         camera.setPoseEstimator(poseEstimator);
 
-        // Set up auto routines
-        autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
-		arm = new Arm(new ArmIOFalcon500(100));
-		shooter = new Shooter(new ShooterIOCIM(Constants.shooterID1, Constants.shooterID2));
+        autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
 
         configureButtonBindings();
-    }
-
-    private Rotation2d getWiiPOV() {
-        double povX = wiiRemote1.getRawAxis(0); // should be binary (-1, 0, or 1)
-        double povY = wiiRemote1.getRawAxis(1);
-        if (Math.abs(povX) < .05) povX = 0; // deadband since 0 isnt 0 for some reason
-        if (Math.abs(povY) < .05) povY = 0;
-
-        if (povX == 0 && povY == 0) return new Rotation2d(-1);
-        double povAngle = Math.atan2(povY, povX);
-        return new Rotation2d(povAngle);
-    }
-
-    public Translation2d getTargetTranslation(Pose3d targetPose) {
-        Pose2d currentPose = drive.getPose();
-
-        Translation2d translationToTargetGround = targetPose.getTranslation()
-                                                    .toTranslation2d()
-                                                    .minus(currentPose.getTranslation());
-        return translationToTargetGround;
     }
 
     /**
@@ -181,83 +143,36 @@ public class RobotContainer {
      * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        // DRIVING MODULES -- FOR TESTING
+        // // using joysticks
         // drive.setDefaultCommand(
-        //   new DriveModules(
-        //     drive, 
-        //     () -> -controller.getLeftY(), 
-        //     () -> controller.getRightX(), 
-        //     () -> 0.5 + 0.5 * controller.getRightTriggerAxis()
-        // ));
+        // new DriveWithJoysticks(
+        // drive,
+        // controller::getLeftX,
+        // () -> -controller.getLeftY(),
+        // () -> -controller.getRightX(),
+        // () -> {
+        // return 1.0;
+        // },
+        // () -> Rotation2d.fromDegrees(controller.getHID().getPOV())));
 
-        // // DRIVING WITH JOYSTICKS (NORMAL)
-        // if (useWiiRemotes) {
-        //     drive.setDefaultCommand(
-        //         new DriveWithWiimote(
-        //             drive,
-        //             () -> wiiRemote1.getRawAxis(3),
-        //             () -> {
-        //                 System.out.println(-MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1));
-        //                 return -MathUtil.inputModulus((wiiRemote1.getRawAxis(4) - 1), -1, 1);
-        //             },
-        //             wiiRemote1.button(1),
-        //             wiiRemote1.button(2),
-        //             () -> getWiiPOV(),
-        //             () -> {return 1.0;}
-        //         )
-        //     );
-        // } else {
-        //     drive.setDefaultCommand(
-        //         new DriveWithJoysticks(
-        //             drive, 
-        //             controller::getLeftX, 
-        //             () -> -controller.getLeftY(), 
-        //             () -> -controller.getRightX(), 
-        //             () -> {return 1.0;},
-        //             () -> Rotation2d.fromDegrees(controller.getHID().getPOV())
-        //         )
-        //     );
-        // }
+        // // break when leftTrigger is held
+        // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
-        // Follow the nearest apriltag while the right trigger is held
-        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
+        // outtake
+        controller.x().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
 
-        // Brake when the left trigger is held
-        controller.leftTrigger().whileTrue(
-            new RunCommand(drive::stopWithX, drive)
-        );
+        // manual intake
+        controller.y().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(4)), () -> intake.stop(), intake));
 
-        Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
-        controller.rightTrigger().whileTrue(
-            new DriveWithJoysticks(
-                drive, 
-                controller::getLeftX, 
-                () -> -controller.getLeftY(), 
-                controller::getRightX, 
-                () -> {return 1.0;},
-                () -> {
-                    Translation2d targetTranslation = getTargetTranslation(targetPose);
-                    return targetTranslation.getAngle();
-                }
-            )
-        );
+        // intake (stops automatically)
+        controller.a().onTrue(intake.getIntakeCommand(Volts.of(2.9)));
 
-        // controller.rightTrigger().whileTrue(
-        //     new RunCommand(drive::runCharacterization, drive)
-        // );
-        
-        // controller.rightTrigger().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
-        // controller.rightTrigger().whileTrue(drive.sysIdDynamic(Direction.kForward));
-        controller.rightTrigger().whileTrue(drive.sysIdFull());
-        
-        // Generate a trajectory to a pose when the A button is pressed (and switch drive to position control)
-        controller.a().onTrue(
-            new MoveToPose(
-                drive, 
-                () -> {return new Pose2d(0, 0, new Rotation2d(Math.PI * 3 * .25));}
-            )
-        );
+        // // intake and move arm (stops automatically)
+        // controller.a().onTrue(
+        // new InstantCommand(() -> arm.setArmAngle(Degrees.of(90)))
+        // .andThen(intake.getIntakeCommand(2.9)));
 
+        // // shoot with arm
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
         // String path = AutoPathConstants.THREE_NOTE_WING;
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 45);}).onTrue(
@@ -284,92 +199,85 @@ public class RobotContainer {
         );
 
         // controller.b().onTrue(
-        //     Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
-        // );
+        // // move arm
+        // new InstantCommand(() -> arm.setArmAngle(Degrees.of(10))).andThen(
+        // // prime shooter
+        // new InstantCommand(() -> shooter.start(4), shooter)
+        // // wait until shooter is up to speed
+        // .alongWith(Commands.waitUntil(shooter::upToSpeed)))
 
-
-        // controller.y().onTrue(
-        //     new DriveInCircle(
-        //         drive,
-        //         () -> {
-        //             return getRadius();
-        //             // return new Translation2d(.57/2.0, .57/2.0);
-        //         },
-        //         () -> {
-        //             return getVelocity();
-        //         },
-        //         () -> {
-        //             return getAngularVelocity();
-        //         }
-        //     )
-        // );
-
-        controller.y().whileTrue(
-            new DriveInCircle(
-                drive,
-                () -> {
-                    // return new Translation2d(2.0, 0.0);
-                    return new Translation2d(.57/2.0, .57/2.0);
-                },
-                () -> {
-                    // return 2.5;
-                    return 0.75;
-                },
-                () -> {
-                    // return 4 * 2.5 / 2.0;
-                    return 0.75 / (new Translation2d(.57/2.0, .57/2.0).getNorm());
-                }
-            )
-        );
-
-        // lol filler arm code
-        arm.setDefaultCommand(new ArmControlWithJoysticks(
-                arm,
-                () -> controller.getLeftX(),
-                () -> controller.getLeftY(),
-                () -> controller.getRightX()));
-
-        // outtake
-        controller.x().whileTrue(new StartEndCommand(() -> intake.start(-6), () -> intake.stop(), intake));
-
-        // intake
-        controller.a().onTrue(intake.getIntakeCommand(10));
-
+        // shoot
         controller.b().onTrue(
                 // prime shooter
-                new InstantCommand(() -> shooter.start(10), shooter)
+                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter)
+                        // wait until shooter is up to speed
+                        .alongWith(Commands.waitUntil(shooter::upToSpeed))
                         // shoot
-                        .andThen(intake.getHandNoteCommand(10)
-                                // stop shooter
-                                .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
+                        .andThen(intake.getShootCommand(Volts.of(8), shooter::checkNoteShot))
+                        // stop shooter
+                        .andThen(new InstantCommand(shooter::stop, shooter)));
+
+        // // drive to specific pose
+        // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
+        // controller.rightTrigger().whileTrue(
+        // new DriveWithJoysticks(
+        // drive,
+        // controller::getLeftX,
+        // () -> -controller.getLeftY(),
+        // controller::getRightX,
+        // () -> {
+        // return 1.0;
+        // },
+        // () -> {
+        // Translation2d targetTranslation = getTargetTranslation(targetPose);
+        // return targetTranslation.getAngle();
+        // }));
+
+        // // create a trajectory to a specific pose
+        // controller.a().onTrue(
+        // new MoveToPose(
+        // drive,
+        // () -> {
+        // return new Pose2d(0, 0, new Rotation2d(Math.PI * 3 * .25));
+        // }));
+
+        // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
+        // controller.x().onTrue(
+        // drive.runOnce(
+        // () -> {
+        // String path = "ThirdFloorTest1";
+        // var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
+        // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
+
+        // // follow nearest aprilTag when rightTrigger is held
+        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
+
+        // // record robot trajectory
+        // System.out.println("recording pos traj");
+        // Logger.recordOutput("Auto/GeneratedTrajectory",
+        // traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
+
+        // System.out.println("Writing trajectory to CSV");
+        // traj.toCSV(path);
+        // drive.runPosition(traj);
+
+        // // sysID
+        // controller.rightTrigger().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
+        // controller.rightTrigger().whileTrue(drive.sysIdDynamic(Direction.kForward));
+        // controller.rightTrigger().whileTrue(drive.sysIdFull());
     }
 
-    private double applyPreferences(double input, double exponent, double deadzone) {
-        if (Math.abs(input) < deadzone) {
-            return 0;
-        }
-        return Math.pow(Math.abs(input), exponent) * Math.signum(input);
-    }
-
-    private Translation2d getRadius() {
-        double leftY = applyPreferences(controller.getLeftY(), 2.0, .1);
-        return new Translation2d(.5 + 1.5 * Math.abs(leftY), 0.0);
-    }
-
-    private double getVelocity() {
-        double leftX = applyPreferences(controller.getLeftX(), 2.0, .1);
-        return 2 * leftX;
-    }
-
-    private double getAngularVelocity() {
-        if (getRadius().getNorm() == 0) return 0;
-        double rightX = applyPreferences(controller.getRightX(), 2.0, .1);
-        return (1 + rightX) * getVelocity() / getRadius().getNorm();
+    public Translation2d getTargetTranslation(Pose3d targetPose) {
+        Pose2d currentPose = drive.getPose();
+        Translation2d translationToTargetGround = targetPose.getTranslation()
+                .toTranslation2d()
+                .minus(currentPose.getTranslation());
+        return translationToTargetGround;
     }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
+     * 
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {

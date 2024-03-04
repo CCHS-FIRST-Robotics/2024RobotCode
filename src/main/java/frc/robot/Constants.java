@@ -23,16 +23,13 @@ import frc.robot.subsystems.drive.swerveDrive.Drive;
 import frc.robot.subsystems.noteIO.arm.Arm;
 import frc.robot.subsystems.noteIO.intake.Intake;
 import frc.robot.subsystems.noteIO.shooter.Shooter;
+import edu.wpi.first.math.geometry.*;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean constants. This class should not be used for any other
  * purpose. All constants should be declared globally (i.e. public static). Do
  * not put anything functional in this class.
- *
- * <p>
- * It is advised to statically import this class (or one of its inner classes)
- * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
         public static final Mode currentMode = Mode.SIM;
@@ -48,60 +45,35 @@ public final class Constants {
                 REPLAY
         }
 
-        public static final int intakeID = 5;
-        public static final int shooterID1 = 100;
-        public static final int shooterID2 = 100;
+    public static final Mode CURRENT_MODE = Mode.SIM;
 
-        // colin shit (do not look)
+    // ports
+    public static final int XBOX_CONTROLLER_PORT = 0;
+    public static final int XBOX_CONTROLLER_ALTERNATE_PORT = 1;
 
-        public static final double PERIOD = .02;
+    // ids
+    public static final int FL_TALON_ID = 1;
+    public static final int FR_TALON_ID = 2;
+    public static final int BL_TALON_ID = 3;
+    public static final int BR_TALON_ID = 4;
+    public static final int INTAKE_ID = 21;
+    public static final int SHOOTER_ID_1 = 22;
+    public static final int SHOOTER_ID_2 = 23;
+
+    // miscellaneous
+    public static final double PERIOD = .02;
+    public static final double ANALOG_DEADZONE = .05;
+    public static final Pose3d[] APRIL_TAG_LOCATIONS = {
+            new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)),
+            new Pose3d(0, 2, 0, new Rotation3d(0, 0, 0)),
+            new Pose3d(0, 1, 0, new Rotation3d(0, 0, 0)),
+            new Pose3d(0, 3, 0, new Rotation3d(0, 0, 0)),
+    };
 
         // TODO: change to tunable numbers
         public static final double LIENAR_SPEED_EXPONENT = 2;
         public static final double ANGULAR_SPEED_EXPONENT = 2.5;
 
-        public static final double ANALOG_DEADZONE = .05;
-
-        // TODO: Should this be its own file?
-        public static class HardwareConstants {
-                // the port for the xbox controller
-                public static final int XBOX_CONTROLLER_PORT = 0;
-                public static final int XBOX_CONTROLLER_ALTERNATE_PORT = 1;
-
-                // for mecanum drive FR = front right, FL = front left, RR = rear right, RL =
-                // rear left
-                public static final int FR_TALON_ID = 1;
-                public static final int FL_TALON_ID = 2;
-                public static final int RR_TALON_ID = 3;
-                public static final int RL_TALON_ID = 4;
-
-                public static final int TALON_FX_CPR = 2048;
-                // gear ratio of the motor gearbox
-                public static final double FALCON_GEARBOX_RATIO = 10.71;
-
-                public static final double MECANUM_WHEEL_DIAMETER = 0.1524; // meters
-
-                public static final SPI.Port NAVX_PORT = SPI.Port.kMXP;
-                public static final SPI.Port ANALOG_GYRO_PORT = SPI.Port.kOnboardCS0;
-                // public static final int ANALOG_GYRO_PORT = 0;
-
-                // Robot's kinematics --> cartesian location of each wheel to the physical
-                // center of the robot in meters
-                public static final double WHEEL_ABSOLUTE_X_METERS = 0.2794;
-                public static final double WHEEL_ABSOLUTE_Y_METERS = 0.31115;
-
-                public static final Translation2d FL_WHEEL_POS = new Translation2d(WHEEL_ABSOLUTE_X_METERS,
-                                WHEEL_ABSOLUTE_Y_METERS);
-                public static final Translation2d FR_WHEEL_POS = new Translation2d(WHEEL_ABSOLUTE_X_METERS,
-                                -WHEEL_ABSOLUTE_Y_METERS);
-                public static final Translation2d RL_WHEEL_POS = new Translation2d(-WHEEL_ABSOLUTE_X_METERS,
-                                WHEEL_ABSOLUTE_Y_METERS);
-                public static final Translation2d RR_WHEEL_POS = new Translation2d(-WHEEL_ABSOLUTE_X_METERS,
-                                -WHEEL_ABSOLUTE_Y_METERS);
-
-                public static final MecanumDriveKinematics MECANUM_KINEMATICS = new MecanumDriveKinematics(FL_WHEEL_POS,
-                                FR_WHEEL_POS, RL_WHEEL_POS, RR_WHEEL_POS);
-        }
 
         public static enum EventCommand {
                 INTAKE,
@@ -228,11 +200,4 @@ public final class Constants {
 
                 }
         }
-
-        public static final Pose3d[] APRIL_TAG_LOCATIONS = {
-                        new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)),
-                        new Pose3d(0, 2, 0, new Rotation3d(0, 0, 0)),
-                        new Pose3d(0, 1, 0, new Rotation3d(0, 0, 0)),
-                        new Pose3d(0, 3, 0, new Rotation3d(0, 0, 0)),
-        };
 }
