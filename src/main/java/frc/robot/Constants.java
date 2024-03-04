@@ -4,6 +4,12 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
+import java.util.Map;
+
+import static edu.wpi.first.units.Units.*;
+
 import static edu.wpi.first.units.Units.Radians;
 
 import java.util.ArrayList;
@@ -20,6 +26,8 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -42,6 +50,20 @@ public final class Constants {
         }
 
     public static final Mode CURRENT_MODE = Mode.SIM;
+
+
+    public static enum ArmPosition {
+        INTAKE,
+        SHOOT,
+        AMP,
+        MAIN
+    }
+
+    public static Map<ArmPosition, Measure<Angle>> ARM_POSITIONS = Map.of(
+        ArmPosition.INTAKE, Degrees.of(0),
+        ArmPosition.AMP, Degrees.of(90),
+        ArmPosition.MAIN, Degrees.of(15)
+    );
 
     // ports
     public static final int XBOX_CONTROLLER_PORT = 0;

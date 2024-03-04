@@ -1,11 +1,17 @@
 package frc.robot.subsystems.noteIO.arm;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.ARM_POSITIONS;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.ArmPosition;
 import edu.wpi.first.units.*;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -20,6 +26,35 @@ public class Arm extends SubsystemBase {
     // length and position of the arm in relation to the robot's center
     private final Measure<Distance> armLength = Inches.of(16); // TODO: set this
     private final Translation2d armOffset = new Translation2d(0.0, .425); // TODO: set this
+
+    /** Arm angle look up table key: meters, values: degrees */
+    private static final InterpolatingDoubleTreeMap armAngleMap = new InterpolatingDoubleTreeMap();
+
+    // thiefed from littleton lmao
+    static {
+        armAngleMap.put(1.026639, 52.0);
+        armAngleMap.put(1.156125, 50.0);
+        armAngleMap.put(1.174623, 50.0);
+        armAngleMap.put(1.38735, 49.0);
+        armAngleMap.put(1.618575, 44.0);
+        armAngleMap.put(1.8498, 40.5);
+        armAngleMap.put(2.081025, 37.5);
+        armAngleMap.put(2.31225, 36.0);
+        armAngleMap.put(2.543475, 34.0);
+        armAngleMap.put(2.7747, 33.0);
+        armAngleMap.put(3.005925, 31.0);
+        armAngleMap.put(3.23715, 30.0);
+        armAngleMap.put(3.468375, 28.5);
+        armAngleMap.put(3.468375, 28.0);
+        armAngleMap.put(3.6996, 27.5);
+        armAngleMap.put(3.912327, 26.5);
+        armAngleMap.put(4.16205, 26.25);
+        armAngleMap.put(4.393275, 25.25);
+        armAngleMap.put(4.6245, 25.0);
+        armAngleMap.put(4.855725, 24.75);
+        armAngleMap.put(5.170191, 24.6);
+        armAngleMap.put(5.373669, 24.25);
+      }
 
     public Arm(ArmIO io) {
         this.io = io;
@@ -77,5 +112,21 @@ public class Arm extends SubsystemBase {
             Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
             setArmAngle(Radians.of(Math.PI / 2.0 - targetArmAngle.getRadians())); // add 90 degrees since 0 is vertical
         });
+    }
+
+    private Command moveToShoot(Supplier<Pose2d> robotPose) {
+        return run(() -> {
+            double angle = armAngleMap.get(robotPose.get().getTranslation().getNorm());
+            setArmAngle(Degrees.of(angle));
+        });
+    }
+
+    public Command moveArm(ArmPosition position, Supplier<Pose2d> robotPose) {
+        if (position == ArmPosition.SHOOT) {
+            return moveToShoot(robotPose);
+        }
+
+        Measure<Angle> angle = ARM_POSITIONS.get(position);
+        return run(() -> setArmAngle(angle));
     }
 }

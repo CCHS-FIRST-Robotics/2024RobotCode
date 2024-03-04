@@ -166,7 +166,10 @@ public class RobotContainer {
         controller.y().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(4)), () -> intake.stop(), intake));
 
         // intake (stops automatically)
-        controller.a().onTrue(intake.getIntakeCommand(Volts.of(2.9)));
+        controller.a().onTrue(
+            intake.getIntakeCommand(Volts.of(2.9))
+            .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
+        );
 
         // // intake and move arm (stops automatically)
         // controller.a().onTrue(
@@ -207,16 +210,32 @@ public class RobotContainer {
         // // wait until shooter is up to speed
         // .alongWith(Commands.waitUntil(shooter::upToSpeed)))
 
+        // shoot (one command - probably used for amp)
+        // controller.b().onTrue(
+        //         // prime shooter
+        //         new InstantCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter)
+        //                 // wait until shooter is up to speed
+        //                 .alongWith(Commands.waitUntil(shooter::upToSpeed))
+        //                 // shoot
+        //                 .andThen(intake.getShootCommand(Volts.of(8), shooter::checkNoteShot))
+        //                 // stop shooter
+        //                 .andThen(new InstantCommand(shooter::stop, shooter))
+        // );
+
+
+        // prime shooter
+        controller.b().onTrue(
+            new InstantCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter)
+            .alongWith(arm.moveArm(Constants.ArmPosition.SHOOT, drive::getPose))
+            .unless(shooter::upToSpeed)
+        );
+        
         // shoot
         controller.b().onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter)
-                        // wait until shooter is up to speed
-                        .alongWith(Commands.waitUntil(shooter::upToSpeed))
-                        // shoot
-                        .andThen(intake.getShootCommand(Volts.of(8), shooter::checkNoteShot))
-                        // stop shooter
-                        .andThen(new InstantCommand(shooter::stop, shooter)));
+            intake.getShootCommand(Volts.of(8), shooter::checkNoteShot)
+            .andThen(new InstantCommand(shooter::stop, shooter))
+            .unless(() -> !shooter.upToSpeed())
+        );
 
         // // drive to specific pose
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
