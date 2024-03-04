@@ -171,17 +171,15 @@ public class RobotContainer {
 
 
         // prime shooter
-        controller.b().onTrue(
+        controller.b().and(shooter::upToSpeed).onTrue(
             new InstantCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter)
             .alongWith(arm.moveArm(Constants.ArmPosition.SHOOT, drive::getPose))
-            .unless(shooter::upToSpeed)
         );
         
         // shoot
-        controller.b().onTrue(
+        controller.b().and(() -> !shooter.upToSpeed()).onTrue(
             intake.getShootCommand(Volts.of(8), shooter::checkNoteShot)
             .andThen(new InstantCommand(shooter::stop, shooter))
-            .unless(() -> !shooter.upToSpeed())
         );
 
         // // drive to specific pose
