@@ -114,7 +114,7 @@ public class Arm extends SubsystemBase {
         });
     }
 
-    public Command moveToShoot(Supplier<Pose2d> robotPose) {
+    private Command moveToShoot(Supplier<Pose2d> robotPose) {
         return run(() -> {
             double angle = armAngleMap.get(robotPose.get().getTranslation().getNorm());
             setArmAngle(Degrees.of(angle));
