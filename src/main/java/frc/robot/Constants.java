@@ -19,10 +19,6 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.drive.swerveDrive.Drive;
-import frc.robot.subsystems.noteIO.arm.Arm;
-import frc.robot.subsystems.noteIO.intake.Intake;
-import frc.robot.subsystems.noteIO.shooter.Shooter;
 import edu.wpi.first.math.geometry.*;
 
 /**
