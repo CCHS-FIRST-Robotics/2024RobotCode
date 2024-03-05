@@ -5,6 +5,7 @@ import static frc.robot.Constants.ARM_POSITIONS;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
 import frc.robot.Constants.ArmPosition;
 import edu.wpi.first.units.*;
 import edu.wpi.first.math.MathUtil;
@@ -15,6 +16,10 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
+
+import com.choreo.lib.Choreo;
+import com.choreo.lib.ChoreoTrajectory;
+import com.choreo.lib.ChoreoTrajectoryState;
 
 // rev sucks
 public class Arm extends SubsystemBase {
@@ -128,5 +133,29 @@ public class Arm extends SubsystemBase {
 
         Measure<Angle> angle = ARM_POSITIONS.get(position);
         return run(() -> setArmAngle(angle));
+    }
+
+    public Supplier<Pose2d> getPosFromPath(String path, double eventTime) {
+        ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
+
+        double timeToEnd = choreoTrajectory.getTotalTime();
+
+        for (int i = 0; i < (int) (timeToEnd / Constants.PERIOD) + 2; i++) {
+            double time = i * Constants.PERIOD;
+            ChoreoTrajectoryState state = choreoTrajectory.sample(time);
+
+            if (time >= eventTime) {
+                Translation2d translationToTargetGround = new Translation2d(state.x, state.y);
+                Pose3d targetPose = new Pose3d(new Pose2d(state.x, state.y, new Rotation2d(state.heading)));
+                
+                Translation2d armOffset = getArmOffset();
+                Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.getNorm(), targetPose.getZ());
+                Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
+                
+                return () -> new Pose2d(translationToTargetGround, targetArmAngle);
+            }
+        }
+
+        return null;
     }
 }
