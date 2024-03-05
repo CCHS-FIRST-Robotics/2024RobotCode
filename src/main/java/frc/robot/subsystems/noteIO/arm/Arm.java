@@ -2,6 +2,7 @@ package frc.robot.subsystems.noteIO.arm;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.ARM_POSITIONS;
+import static frc.robot.Constants.SPEAKER_POSE;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -81,7 +82,7 @@ public class Arm extends SubsystemBase {
 
         // trust!
         // io.setDriveVoltage(Volts.of(1));
-        setArmAngle(Degrees.of(30));
+        // setArmAngle(Degrees.of(30));
     }
 
     public void setArmAngle(Measure<Angle> angle) {
@@ -116,7 +117,10 @@ public class Arm extends SubsystemBase {
 
     private Command moveToShoot(Supplier<Pose2d> robotPose) {
         return run(() -> {
-            double angle = armAngleMap.get(robotPose.get().getTranslation().getNorm());
+            double angle = armAngleMap.get(
+                robotPose.get().getTranslation().minus(
+                    SPEAKER_POSE.getTranslation()
+                ).getNorm());
             setArmAngle(Degrees.of(angle));
         });
     }

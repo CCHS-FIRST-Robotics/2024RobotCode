@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 // import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.Constants.ArmPosition;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.PoseEstimator;
@@ -132,21 +133,19 @@ public class RobotContainer {
         // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
         // outtake
-        controller.x().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
+        // controller.x().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
 
         // manual intake
-        controller.y().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(4)), () -> intake.stop(), intake));
+        // controller.y().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(4)), () -> intake.stop(), intake));
+
+        // controller.x().onTrue(arm.moveArm(ArmPosition.INTAKE, drive::getPose));
+        controller.y().onTrue(arm.moveArm(ArmPosition.MAIN, drive::getPose));
 
         // intake (stops automatically)
         controller.a().onTrue(
-            intake.getIntakeCommand(Volts.of(2.9))
+            intake.getIntakeCommand(Volts.of(4))
             .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
         );
-
-        // // intake and move arm (stops automatically)
-        // controller.a().onTrue(
-        // new InstantCommand(() -> arm.setArmAngle(Degrees.of(90)))
-        // .andThen(intake.getIntakeCommand(2.9)));
 
         // // shoot with arm
         // controller.b().onTrue(
@@ -171,16 +170,16 @@ public class RobotContainer {
 
 
         // prime shooter
-        controller.b().and(shooter::upToSpeed).onTrue(
-            new InstantCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter)
-            .alongWith(arm.moveArm(Constants.ArmPosition.SHOOT, drive::getPose))
-        );
+        // controller.b().and(() -> !shooter.upToSpeed()).onTrue(
+        //     new InstantCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter)
+        //     .alongWith(arm.moveArm(Constants.ArmPosition.SHOOT, drive::getPose))
+        // );
         
         // shoot
-        controller.b().and(() -> !shooter.upToSpeed()).onTrue(
-            intake.getShootCommand(Volts.of(8), shooter::checkNoteShot)
-            .andThen(new InstantCommand(shooter::stop, shooter))
-        );
+        // controller.b().and(shooter::upToSpeed).onTrue(
+        //     intake.getShootCommand(Volts.of(8), shooter::checkNoteShot)
+        //     .andThen(new InstantCommand(shooter::stop, shooter))
+        // );
 
         // // drive to specific pose
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());

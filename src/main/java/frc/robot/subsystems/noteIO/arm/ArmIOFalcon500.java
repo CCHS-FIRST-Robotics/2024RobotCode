@@ -2,6 +2,7 @@ package frc.robot.subsystems.noteIO.arm;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.*;
 import com.ctre.phoenix6.configs.*;
 // import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
@@ -49,7 +50,7 @@ public class ArmIOFalcon500 implements ArmIO {
     private static final double gearRatio = 100 * 48 / 22d;
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKp = 20;
+    private static final double driveKp = 22;
     private static final double driveKd = 0.0d;
     private static final double driveKi = 0.0d;
 
@@ -62,7 +63,7 @@ public class ArmIOFalcon500 implements ArmIO {
     private static final double driveFeedforwardKa = 0;
 
     // private final boolean motorInverted = false;
-    private final Measure<Angle> absoluteEncoderOffset = Radians.of(-2.72);
+    private final Measure<Angle> absoluteEncoderOffset = Radians.of(-3.72);
 
     int index;
 
@@ -111,6 +112,8 @@ public class ArmIOFalcon500 implements ArmIO {
         CANcoderConfig.MagnetSensor.MagnetOffset = absoluteEncoderOffset.in(Rotations); // CHANGGE
 
         driveFalconConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        driveFalconConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        
 
         // fuses (trust)
         driveFeedbackConfig.FeedbackRemoteSensorID = driveCancoder.getDeviceID();
@@ -171,6 +174,7 @@ public class ArmIOFalcon500 implements ArmIO {
                 absolutePositionSignal,
                 absoluteVelocitySignal,
                 rotorPositionSignal,
+                closedLoopReferenceSignal,
                 faultFusedSensorOutOfSync,
                 stickyFaultFusedSensorOutOfSync,
                 faultRemoteSensorOutOfSync,
@@ -190,7 +194,7 @@ public class ArmIOFalcon500 implements ArmIO {
         inputs.absoluteArmVelocity = RotationsPerSecond.of(absoluteVelocitySignal.getValueAsDouble());
 
         inputs.rotorPositionSignal = Rotations.of(rotorPositionSignal.getValueAsDouble());
-        inputs.closedLoopReference = Rotations.of(closedLoopReferenceSignal.getValueAsDouble());
+        inputs.closedLoopReference = Rotations.of(closedLoopReferenceSignal.getValueAsDouble() / gearRatio);
 
         // CHeck with colin if it works
         inputs.faultFusedSensorOutOfSync = faultFusedSensorOutOfSync.getValue();

@@ -11,7 +11,7 @@ import edu.wpi.first.units.*;
 
 public class ShooterIOFalcon500 implements ShooterIO {
     private TalonFX motor1, motor2;
-    private VelocityVoltage velocityControl;
+    private VelocityVoltage velocityControl = new VelocityVoltage(0);
 
     private StatusSignal<Double> voltageSignal1;
     private StatusSignal<Double> currentSignal1;

@@ -30,7 +30,7 @@ public final class Constants {
         REPLAY
     }
 
-    public static final Mode CURRENT_MODE = Mode.SIM;
+    public static final Mode CURRENT_MODE = Mode.REAL;
 
 
     public static enum ArmPosition {
@@ -41,10 +41,12 @@ public final class Constants {
     }
 
     public static Map<ArmPosition, Measure<Angle>> ARM_POSITIONS = Map.of(
-        ArmPosition.INTAKE, Degrees.of(0),
-        ArmPosition.AMP, Degrees.of(90),
-        ArmPosition.MAIN, Degrees.of(15)
+        ArmPosition.INTAKE, Degrees.of(-8.5),
+        ArmPosition.AMP, Degrees.of(75),
+        ArmPosition.MAIN, Degrees.of(30)    
     );
+
+    public static final Pose2d SPEAKER_POSE = new Pose2d(0, 0, new Rotation2d(0));
 
     // ports
     public static final int XBOX_CONTROLLER_PORT = 0;
