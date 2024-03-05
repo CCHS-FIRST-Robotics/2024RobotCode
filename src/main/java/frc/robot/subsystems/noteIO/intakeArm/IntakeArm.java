@@ -45,7 +45,7 @@ public class IntakeArm extends SubsystemBase {
         io.setVoltage(volts);
     }
 
-    public Command getIntakeCommand(Measure<Voltage> v) {
+    public Command getHandoffCommand(Measure<Voltage> v) {
         // turns motor on until note detected
         return new FunctionalCommand(
                 () -> start(v),

@@ -13,7 +13,7 @@ public class IntakeGroundIONEO implements IntakeGroundIO {
         encoder1 = motor1.getEncoder();
 
         motor2 = new CANSparkMax(id1, MotorType.kBrushless);
-        encoder2 = motor1.getEncoder();
+        encoder2 = motor2.getEncoder(); //should this be motor 2?
 
         // get rotations per second
         encoder1.setVelocityConversionFactor(1 / 60);
