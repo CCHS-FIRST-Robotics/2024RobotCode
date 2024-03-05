@@ -1,5 +1,8 @@
 package frc.robot.utils;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +20,14 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.*;
+import frc.robot.Constants.ArmPosition;
 import frc.robot.Constants.AutoPathConstants;
 import frc.robot.Constants.EventCommand;
 import frc.robot.subsystems.drive.swerveDrive.Drive;
 import frc.robot.subsystems.noteIO.arm.Arm;
-import frc.robot.subsystems.noteIO.intake.Intake;
+import frc.robot.subsystems.noteIO.intakeGround.IntakeGround;
 import frc.robot.subsystems.noteIO.shooter.Shooter;
+import edu.wpi.first.units.Units.*;
 
 import com.choreo.lib.*;
 import com.ctre.phoenix6.controls.ControlRequest;
@@ -32,13 +37,13 @@ public final class MechanismsPath {
     private List<Pair<Double, Command>> eventMarkers = new ArrayList<Pair<Double, Command>>();
     private ArrayList<String> path;
     private Drive drive;
-    private Intake intake;
+    private IntakeGround intake;
     private Shooter shooter;
     private Arm arm;
    
 
     /* adds set markers */
-    public MechanismsPath(ArrayList<String> path, Drive drive, Intake intake, Shooter shooter, Arm arm) {
+    public MechanismsPath(ArrayList<String> path, Drive drive, IntakeGround intake, Shooter shooter, Arm arm) {
         this.path = path;
         this.drive = drive;
         this.intake = intake;
@@ -72,19 +77,20 @@ public final class MechanismsPath {
             case INTAKE:
                 return intake.getIntakeCommand(AutoPathConstants.INTAKE_VOLTS);
             case SHOOT:
-                return shooter.getShootNoteCommand(AutoPathConstants.SHOOT_VOLTS);
+                return shooter.getShootNoteCommand(RadiansPerSecond.of(AutoPathConstants.SHOOT_VOLTS));
             case INTAKE_HANDOFF:
                 return intake.getHandNoteCommand(AutoPathConstants.INTAKE_HANDOFF_VOLTS);
             case SHOOTER_HANDOFF:
-                return shooter.getReceiveNoteCommand(AutoPathConstants.SHOOTER_HANDOFF_VOLTS);
+                return shooter.getReceiveNoteCommand(RadiansPerSecond.of(AutoPathConstants.SHOOTER_HANDOFF_VOLTS));
             case DRIVE_PATH:
                 // return drive.followTrajectory(path); for split
                 return drive.followTrajectory(DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.get(0)));
             case ARM_SHOOT:
-                return arm.getPosFromPath(path.get(0), time);
+                return arm.moveArm(ArmPosition.SHOOT, arm.getPosFromPath(path.get(0), time));
             case ARM_HANDOFF:
                 // return arm.getMoveAngleCommand(AutoPathConstants.ARM_HANDOFF_ANGLE);
-                return arm.getMoveAngleCommand(AutoPathConstants.QUOKKA_ARM_INTAKE_ANGLE);
+                // return arm.getMoveAngleCommand(AutoPathConstants.QUOKKA_ARM_INTAKE_ANGLE);
+                return arm.moveArm(ArmPosition.INTAKE, arm.getPosFromPath(path.get(0), time));
             default:
                 return null;
         }

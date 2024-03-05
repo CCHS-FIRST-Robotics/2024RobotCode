@@ -2,6 +2,8 @@ package frc.robot.subsystems.noteIO.shooter;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.Timer;
@@ -40,5 +42,32 @@ public class Shooter extends SubsystemBase {
         Logger.processInputs("shooter", inputs);
 
         io.setVelocity(velocity);
+    }
+
+    public boolean checkInHandoff() {
+        // also placeholder, i think could use current limits with the handoff motor idk
+        return false;
+    }
+
+    public Command getShootNoteCommand(Measure<Velocity<Angle>> v) {
+        // turns on motor to shoot note
+        return new FunctionalCommand(
+                () -> start(v),
+                () -> {
+                },
+                (interrupted) -> stop(),
+                () -> checkNoteShot(),
+                this);
+    }
+
+    public Command getReceiveNoteCommand(Measure<Velocity<Angle>> v) {
+        // turns on motor until note is fully detected inside handoff
+        return new FunctionalCommand(
+                () -> start(v),
+                () -> {
+                },
+                (interrupted) -> stop(),
+                () -> checkInHandoff(),
+                this);
     }
 }

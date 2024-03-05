@@ -1,5 +1,8 @@
 package frc.robot.utils;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volt;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,13 +20,16 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.*;
+import frc.robot.Constants.ArmPosition;
 import frc.robot.Constants.AutoPathConstants;
 import frc.robot.Constants.EventCommand;
 import frc.robot.commands.AutoCommand;
 import frc.robot.subsystems.drive.swerveDrive.Drive;
 import frc.robot.subsystems.noteIO.arm.Arm;
-import frc.robot.subsystems.noteIO.intake.Intake;
+import frc.robot.subsystems.noteIO.intakeArm.IntakeArm;
+import frc.robot.subsystems.noteIO.intakeGround.IntakeGround;
 import frc.robot.subsystems.noteIO.shooter.Shooter;
+import edu.wpi.first.units.Units.*;
 
 import com.choreo.lib.*;
 import com.ctre.phoenix6.controls.ControlRequest;
@@ -34,13 +40,15 @@ public final class EventMarkerBuilder {
 
     private ArrayList<String> pathList;
     private Drive drive;
-    private Intake intake;
+    private IntakeGround intake;
+    private IntakeArm handoff;
     private Shooter shooter;
     private Arm arm;
 
     private Command command;
 
-    public EventMarkerBuilder(ArrayList<String> pathList, Drive drive, Intake intake, Shooter shooter, Arm arm) {
+    public EventMarkerBuilder(ArrayList<String> pathList, Drive drive, IntakeGround intake, IntakeArm handoff,
+            Shooter shooter, Arm arm) {
         this.drive = drive;
         this.intake = intake;
         this.shooter = shooter;
@@ -54,18 +62,27 @@ public final class EventMarkerBuilder {
     public void addCommand(String path) {
         DriveTrajectory traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
         ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
-        double totalTime = choreoTrajectory.getTotalTime();
+        double totalTime = choreoTrajectory.getTotalTime(); // + time to shoot
         List<Pair<Double, Command>> eventMarkers = new ArrayList<Pair<Double, Command>>();
 
+        // drive
         eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME, drive.followTrajectory(traj)));
-        eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME,
-                arm.getPosFromPath(path, AutoPathConstants.INIT_MOVEMENTS_TIME)));
-        eventMarkers.add(Pair.of(AutoPathConstants.MAX_ARM_MOVE_TIME,
-                shooter.getShootNoteCommand(AutoPathConstants.SHOOT_VOLTS)));
+        // arm hand
         eventMarkers.add(Pair.of((totalTime - AutoPathConstants.MAX_ARM_MOVE_TIME - AutoPathConstants.INTAKE_TIME),
-                arm.getMoveAngleCommand(AutoPathConstants.ARM_HANDOFF_ANGLE)));
+                arm.moveArm(ArmPosition.INTAKE, arm.getPosFromPath(path,
+                        totalTime - AutoPathConstants.MAX_ARM_MOVE_TIME - AutoPathConstants.INTAKE_TIME))));
+        // intake
         eventMarkers.add(Pair.of((totalTime - AutoPathConstants.INTAKE_TIME),
-                intake.getHandNoteCommand(AutoPathConstants.INTAKE_HANDOFF_VOLTS)));
+                intake.getIntakeCommand(AutoPathConstants.INTAKE_HANDOFF_VOLTS)));
+        // handoff
+        eventMarkers.add(Pair.of((totalTime - AutoPathConstants.INTAKE_TIME),
+                handoff.getHandoffCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS))));
+        // arm shoot
+        eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME,
+                arm.moveArm(ArmPosition.SHOOT, arm.getPosFromPath(path, AutoPathConstants.INIT_MOVEMENTS_TIME))));
+        // shoot
+        eventMarkers.add(Pair.of(AutoPathConstants.MAX_ARM_MOVE_TIME,
+                shooter.getReceiveNoteCommand(RadiansPerSecond.of(AutoPathConstants.SHOOTER_HANDOFF_VOLTS))));
 
         if (command == null) {
             command = (new AutoCommand(eventMarkers, totalTime));
