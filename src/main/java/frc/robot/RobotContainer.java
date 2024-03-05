@@ -41,6 +41,9 @@ import frc.robot.utils.MechanismsPath;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.noteIO.arm.*;
 import frc.robot.subsystems.noteIO.intakeArm.*;
+import frc.robot.subsystems.noteIO.intakeGround.IntakeGround;
+import frc.robot.subsystems.noteIO.intakeGround.IntakeGroundIONEO;
+import frc.robot.subsystems.noteIO.intakeGround.IntakeGroundIOSim;
 import frc.robot.subsystems.noteIO.shooter.*;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -59,7 +62,8 @@ public class RobotContainer {
     private final PoseEstimator poseEstimator;
 
     private final Arm arm;
-    private final IntakeArm intake;
+    private final IntakeArm handoff;
+    private final IntakeGround intake;
     private final Shooter shooter;
 
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -84,7 +88,8 @@ public class RobotContainer {
                         useWiiRemotes);
                 camera = new Vision(new CameraIOZED());
                 arm = new Arm(new ArmIOFalcon500(20, 19));
-                intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
+                intake = new IntakeGround(new IntakeGroundIONEO(5, 6)); ////////change
+                handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
                 shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
             case SIM:
@@ -99,7 +104,8 @@ public class RobotContainer {
                         false);
                 camera = new Vision(new CameraIOZED());
                 arm = new Arm(new ArmIOSim());
-                intake = new IntakeArm(new IntakeIOSim());
+                handoff = new IntakeArm(new IntakeIOSim());
+                intake = new IntakeGround(new IntakeGroundIOSim()); ////////change
                 shooter = new Shooter(new ShooterIOSim());
                 break;
             default: // replayed robot
@@ -113,7 +119,8 @@ public class RobotContainer {
                         false);
                 camera = new Vision(new CameraIOZED());
                 arm = new Arm(new ArmIOFalcon500(20, 19));
-                intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
+                handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
+                intake = new IntakeGround(new IntakeGroundIONEO(5, 6)); ////////change
                 shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
         }
@@ -160,16 +167,16 @@ public class RobotContainer {
         // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
         // outtake
-        controller.x().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
+        controller.x().whileTrue(new StartEndCommand(() -> handoff.start(Volts.of(-2.9)), () -> handoff.stop(), handoff));
 
         // manual intake
-        controller.y().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(4)), () -> intake.stop(), intake));
+        controller.y().whileTrue(new StartEndCommand(() -> handoff.start(Volts.of(4)), () -> handoff.stop(), handoff));
 
         // intake (stops automatically)
-        controller.a().onTrue(
-            intake.getIntakeCommand(Volts.of(2.9))
-            .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
-        );
+        // controller.a().onTrue(
+        //     intake.getIntakeCommand(Volts.of(2.9))
+        //     .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
+        // );
 
         // // intake and move arm (stops automatically)
         // controller.a().onTrue(
@@ -182,7 +189,7 @@ public class RobotContainer {
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 45);}).onTrue(
         // controller.x().onTrue(
             // new AutoRoutine(new MechanismsPath(AutoPathConstants.threeNoteWing, drive, intake, shooter, arm))
-            new EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake, shooter, arm).getCommandSequence()
+            new EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake, handoff, shooter, arm).getCommandSequence()
 
             // drive.runOnce(
             //     () -> {
@@ -232,7 +239,7 @@ public class RobotContainer {
         
         // shoot
         controller.b().onTrue(
-            intake.getShootCommand(Volts.of(8), shooter::checkNoteShot)
+            handoff.getShootCommand(Volts.of(8), shooter::checkNoteShot)
             .andThen(new InstantCommand(shooter::stop, shooter))
             .unless(() -> !shooter.upToSpeed())
         );
