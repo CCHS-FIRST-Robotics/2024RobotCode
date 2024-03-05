@@ -755,8 +755,7 @@
                     "scope": [
                         "last"
                     ],
-                    "type": "StopPoint",
-                    "direction": 0
+                    "type": "StopPoint"
                 }
             ],
             "usesControlIntervalGuessing": true,
