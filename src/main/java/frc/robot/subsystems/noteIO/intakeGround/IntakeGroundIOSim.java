@@ -11,29 +11,31 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
 
 public class IntakeGroundIOSim implements IntakeGroundIO {
-    // CANSparkMax motor1 = new CANSparkMax();
-    // CANSparkMax motor2 = new CANSparkMax();
-    // RelativeEncoder encoder1 = motor1.getEncoder();
-    // RelativeEncoder encoder2 = motor1.getEncoder();
+    Measure<Voltage> appliedVoltage = Volts.of(0);
+    DCMotorSim motor1 = new DCMotorSim(DCMotor.getFalcon500(1), 1, .001);
+    DCMotorSim motor2 = new DCMotorSim(DCMotor.getFalcon500(1), 1, .001);
 
     public IntakeGroundIOSim() {
 
     }
 
     public void updateInputs(IntakeGroundIOInputs inputs) {
-        // inputs.motor1Voltage = motor1.getBusVoltage();
-        // inputs.motor1Current = motor1.getOutputCurrent();
-        // inputs.motor1Velocity = encoder1.getVelocity();
-        // inputs.motor1Temperature = motor1.getMotorTemperature();
+        motor1.update(Constants.PERIOD);
 
-        // inputs.motor2Voltage = motor2.getBusVoltage();
-        // inputs.motor2Current = motor2.getOutputCurrent();
-        // inputs.motor2Velocity = encoder2.getVelocity();
-        // inputs.motor2Temperature = motor2.getMotorTemperature();
+        inputs.motor1Voltage = appliedVoltage.in(Volts);
+        inputs.motor1Current = motor1.getCurrentDrawAmps();
+        inputs.motor1Velocity = motor1.getAngularVelocityRPM();
+
+        motor2.update(Constants.PERIOD);
+
+        inputs.motor2Voltage = appliedVoltage.in(Volts);
+        inputs.motor2Current = motor2.getCurrentDrawAmps();
+        inputs.motor2Velocity = motor2.getAngularVelocityRPM();
     }
 
     public void setVoltage(double volts) {
-        // motor1.setVoltage(volts);
-        // motor2.setVoltage(volts);
+        appliedVoltage = Volts.of(volts);
+        motor1.setInputVoltage(volts);
+        motor2.setInputVoltage(volts);
     }
 }

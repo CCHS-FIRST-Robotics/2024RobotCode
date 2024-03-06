@@ -26,6 +26,7 @@ public class IntakeGround extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("intake", inputs);
+        Logger.recordOutput("Ground On", volts != 0);
 
         if (checkNoteThere()) {
             volts = 0;

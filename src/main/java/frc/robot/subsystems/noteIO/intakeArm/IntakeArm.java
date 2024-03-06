@@ -2,7 +2,6 @@ package frc.robot.subsystems.noteIO.intakeArm;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.Timer;
@@ -40,7 +39,8 @@ public class IntakeArm extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs("intake", inputs);
+        Logger.processInputs("handoff", inputs);
+        Logger.recordOutput("Handoff On", volts.magnitude() != 0);
 
         io.setVoltage(volts);
     }

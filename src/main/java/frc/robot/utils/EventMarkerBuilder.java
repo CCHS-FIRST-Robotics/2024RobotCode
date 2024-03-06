@@ -53,20 +53,27 @@ public final class EventMarkerBuilder {
         this.intake = intake;
         this.shooter = shooter;
         this.arm = arm;
+        this.handoff = handoff;
 
         for (String path : pathList) {
             addCommand(path);
         }
-    }
+    } 
 
     public void addCommand(String path) {
         DriveTrajectory traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
         ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
-        double totalTime = choreoTrajectory.getTotalTime(); // + time to shoot
+        double totalTime = choreoTrajectory.getTotalTime() + AutoPathConstants.SHOOT_TIME + AutoPathConstants.SHOOT_TIME; // + time to shoot
         List<Pair<Double, Command>> eventMarkers = new ArrayList<Pair<Double, Command>>();
 
+        // arm shoot
+        eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME,
+        arm.moveArm(ArmPosition.SHOOT, arm.getPosFromPath(path, AutoPathConstants.INIT_MOVEMENTS_TIME))));
+        // shoot
+        eventMarkers.add(Pair.of(AutoPathConstants.MAX_ARM_MOVE_TIME,
+        shooter.getReceiveNoteCommand(RadiansPerSecond.of(AutoPathConstants.SHOOTER_HANDOFF_VOLTS))));
         // drive
-        eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME, drive.followTrajectory(traj)));
+        eventMarkers.add(Pair.of(AutoPathConstants.MAX_ARM_MOVE_TIME + AutoPathConstants.SHOOT_TIME, drive.followTrajectory(traj)));
         // arm hand
         eventMarkers.add(Pair.of((totalTime - AutoPathConstants.MAX_ARM_MOVE_TIME - AutoPathConstants.INTAKE_TIME),
                 arm.moveArm(ArmPosition.INTAKE, arm.getPosFromPath(path,
@@ -77,12 +84,6 @@ public final class EventMarkerBuilder {
         // handoff
         eventMarkers.add(Pair.of((totalTime - AutoPathConstants.INTAKE_TIME),
                 handoff.getHandoffCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS))));
-        // arm shoot
-        eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME,
-                arm.moveArm(ArmPosition.SHOOT, arm.getPosFromPath(path, AutoPathConstants.INIT_MOVEMENTS_TIME))));
-        // shoot
-        eventMarkers.add(Pair.of(AutoPathConstants.MAX_ARM_MOVE_TIME,
-                shooter.getReceiveNoteCommand(RadiansPerSecond.of(AutoPathConstants.SHOOTER_HANDOFF_VOLTS))));
 
         if (command == null) {
             command = (new AutoCommand(eventMarkers, totalTime));

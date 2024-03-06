@@ -133,6 +133,7 @@ public final class Constants {
                 public static final double INIT_MOVEMENTS_TIME = 0.0;
                 public static final double MAX_ARM_MOVE_TIME = 0.5;
                 public static final double INTAKE_TIME = 0.3;
+                public static final double SHOOT_TIME = 0.5;// idk
 
                 public static final int DRIVE_POS = 0;
                 public static final int ARM_SHOOT = 1;

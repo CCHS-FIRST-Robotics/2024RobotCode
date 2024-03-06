@@ -40,6 +40,7 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("shooter", inputs);
+        Logger.recordOutput("Shooting", velocity.magnitude() != 0);
 
         io.setVelocity(velocity);
     }
