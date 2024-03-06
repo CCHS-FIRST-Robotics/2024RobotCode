@@ -88,7 +88,7 @@ public class DriveWithJoysticks extends Command {
                 Translation2d linearVelocity = new Translation2d(linearSpeed, linearDirection);
 
                 // APPLY ABSOLUTE HEADING CONTROL
-                if (angularSpeed == 0) {
+                if (angularSpeed == 0 && false) {
                         headingGoal = headingAngleSupplier.get().getDegrees() == -1 ? headingGoal
                                         : MathUtil.angleModulus(headingAngleSupplier.get().getRadians());
                         // double currentHeadingRad = drive.getYaw().getRadians();

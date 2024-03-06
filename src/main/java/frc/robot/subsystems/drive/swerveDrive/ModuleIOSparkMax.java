@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.*;
+import frc.robot.Constants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.filter.MedianFilter;
@@ -209,25 +210,22 @@ public class ModuleIOSparkMax implements ModuleIO {
      * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVelocity(double)
      */
     public void setDriveVelocity(Measure<Velocity<Angle>> velocity) {
+        // driveSparkMaxPIDF.setReference(0, CANSparkMax.ControlType.kVelocity, 0, 2);
+
         // velocity = velocity.times(driveAfterEncoderReduction);
-        // System.out.println(velocity.in(Rotations.per(Minute)));
-        // System.out.println(velocity.baseUnitMagnitude());
-        // velocity = velocity * driveAfterEncoderReduction;
-        // System.out.println(Rotations.per(Minute).convertFrom(velocity,
-        // RadiansPerSecond));
 
         // driveSparkMaxPIDF.setReference(
-        // velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
-        // // velocity * (60) / (2*Math.PI) * driveAfterEncoderReduction,
-        // CANSparkMax.ControlType.kVelocity,
-        // 0,
-        // // driveFeedforward.calculate(velocityRadPerSec)
-        // driveFeedforward.calculate(prevVelocity.in(RadiansPerSecond),
-        // velocity.in(RadiansPerSecond),
-        // Constants.PERIOD)
-        // driveFeedforward.calculate(prevVelocity, velocity, Constants.PERIOD)
+        //     velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
+        //     // velocity * (60) / (2*Math.PI) * driveAfterEncoderReduction,
+        //     CANSparkMax.ControlType.kVelocity,
+        //     0,
+        //     // driveFeedforward.calculate(velocityRadPerSec)
+        //     driveFeedforward.calculate(prevVelocity.in(RadiansPerSecond),
+        //     velocity.in(RadiansPerSecond),
+        //     Constants.PERIOD)
+        //     // driveFeedforward.calculate(prevVelocity, velocity, Constants.PERIOD)
         // );
-        prevVelocity = velocity;
+        // prevVelocity = velocity;
     }
 
     /*
@@ -239,6 +237,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         // Adjust from [-PI, PI] (wrapped angle, so initially -pi was 2pi) -> [0, 2PI]
         // position = Radians.of(
         // MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
+
         // turnSparkMaxPIDF.setReference(
         // position.in(Rotations),
         // CANSparkMax.ControlType.kPosition,

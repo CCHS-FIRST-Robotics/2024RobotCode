@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import edu.wpi.first.math.geometry.*;
@@ -37,14 +38,24 @@ public final class Constants {
         INTAKE,
         SHOOT,
         AMP,
-        MAIN
+        MAIN,
+        WILANG,
+        ALLAN,
+        RANDOM,
+        LEGAL_DRINKING_AGE,
+        RANDY,
     }
 
-    public static Map<ArmPosition, Measure<Angle>> ARM_POSITIONS = Map.of(
-        ArmPosition.INTAKE, Degrees.of(-8.5),
+    public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(Map.of(
+        ArmPosition.INTAKE, Degrees.of(-5),
         ArmPosition.AMP, Degrees.of(75),
-        ArmPosition.MAIN, Degrees.of(30)    
-    );
+        ArmPosition.MAIN, Degrees.of(40),
+        ArmPosition.WILANG, Degrees.of(60),
+        ArmPosition.ALLAN, Degrees.of(30),
+        ArmPosition.RANDOM, Degrees.of(Math.random() * 75),
+        ArmPosition.LEGAL_DRINKING_AGE, Degrees.of(21),
+        ArmPosition.RANDY, Degrees.of(30)
+    ));
 
     public static final Pose2d SPEAKER_POSE = new Pose2d(0, 0, new Rotation2d(0));
 

@@ -32,7 +32,7 @@ public class IntakeArm extends SubsystemBase {
     }
 
     private boolean checkNoteThere() {
-        return inputs.motorCurrent > 50 && (Timer.getFPGATimestamp() - startTime > 0.5);
+        return inputs.motorCurrent > 30 && (Timer.getFPGATimestamp() - startTime > 0.5);
         // return currentDebouncer.calculate(inputs.motorCurrent > 30);
         // return inputs.motorCurrent > 30 && inputs.motorVelocity > 98 * (volts / 12);
     }

@@ -58,8 +58,8 @@ public class Module {
         // turnFeedback.calculate(getAngle().getRadians(),
         // optimizedState.angle.getRadians())
         // );
-        // io.setTurnPosition(Radians.of(optimizedState.angle.getRadians()));
-        io.setTurnVoltage(Volts.of(1));
+        io.setTurnPosition(Radians.of(optimizedState.angle.getRadians()));
+        // io.setTurnVoltage(Volts.of(1));
 
         // Update velocity based on turn error
         // does some fancy things to move only in the direction you want while theres an

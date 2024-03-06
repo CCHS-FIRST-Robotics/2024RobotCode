@@ -31,7 +31,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean checkNoteShot() {
-        return inputs.motor1Current > 30 && Timer.getFPGATimestamp() - startTime > 0.5;
+        return inputs.motor1Current > 16 && Timer.getFPGATimestamp() - startTime > 0.5;
     }
 
     @Override
