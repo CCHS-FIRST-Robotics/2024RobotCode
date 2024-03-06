@@ -31,13 +31,12 @@ public class Arm extends SubsystemBase {
     /** Arm angle look up table key: meters, values: degrees */
     private static final InterpolatingDoubleTreeMap armAngleMap = new InterpolatingDoubleTreeMap();
 
-    // thiefed from littleton lmao
+    // meters, degrees
     static {
-        armAngleMap.put(6d, 30d);
-        armAngleMap.put(6.5, 30d);
-        armAngleMap.put(8d, 35d);
-        armAngleMap.put(10d, 38d);
-        armAngleMap.put(15d, 42d);
+        armAngleMap.put(2.3, 30d);
+        armAngleMap.put(2.7, 35d);
+        armAngleMap.put(3.4, 38d);
+        armAngleMap.put(4.9, 42d);
       }
 
     public Arm(ArmIO io) {
