@@ -142,7 +142,7 @@ public final class Constants {
 
                 public static final double INTAKE_VOLTS = 12;
                 public static final double SHOOT_VOLTS = 12;
-                public static final double INTAKE_HANDOFF_VOLTS = 6;
+                public static final double INTAKE_HANDOFF_VOLTS = 3;
                 public static final double SHOOTER_HANDOFF_VOLTS = 6;
                 public static final Measure<Angle> ARM_HANDOFF_ANGLE = Radians.of(80 * Math.PI / 180); // double check for final
                 public static final Measure<Angle> QUOKKA_ARM_INTAKE_ANGLE = Radians.of(80 * Math.PI / 180); // double check
@@ -159,7 +159,7 @@ public final class Constants {
                 public static final double Q_INIT_SHOOT_SET_TIME = 2;
                 public static final double Q_SHOOT_SET_TIME = 1;
                 public static final double Q_SHOOT_TIME = 0.5;
-                public static final Measure<Velocity<Angle>> SHOOT_SPEED = RadiansPerSecond.of(5); // idk
+                public static final Measure<Velocity<Angle>> SHOOT_SPEED = RotationsPerSecond.of(95); // idk
 
 
                 static {

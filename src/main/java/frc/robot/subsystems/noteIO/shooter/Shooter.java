@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoPathConstants;
 import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.Timer;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
@@ -29,6 +31,7 @@ public class Shooter extends SubsystemBase {
         velocity = RotationsPerSecond.of(0);
     }
 
+    @AutoLogOutput
     public boolean upToSpeed() {
         return io.upToSpeed(velocity);
     }
