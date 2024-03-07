@@ -92,7 +92,7 @@ public class RobotContainer {
                         useWiiRemotes);
                 camera = new Vision(new CameraIOZED());
                 arm = new Arm(new ArmIOFalcon500(20, 19));
-                intake = new IntakeGround(new IntakeGroundIONEO(5, 6)); ////////change
+                intake = new IntakeGround(new IntakeGroundIONEO(100, 101)); ////////change
                 handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
                 shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
@@ -124,7 +124,7 @@ public class RobotContainer {
                 camera = new Vision(new CameraIOZED());
                 arm = new Arm(new ArmIOFalcon500(20, 19));
                 handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
-                intake = new IntakeGround(new IntakeGroundIONEO(5, 6)); ////////change
+                intake = new IntakeGround(new IntakeGroundIONEO(100, 101)); ////////change
                 shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
         }

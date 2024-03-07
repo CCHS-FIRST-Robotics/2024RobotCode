@@ -38,20 +38,19 @@ import edu.wpi.first.units.Measure;
  * not put anything functional in this class.
  */
 public final class Constants {
-        public static final Mode currentMode = Mode.SIM;
 
-        public static enum Mode {
-                /** Running on a real robot. */
-                REAL,
+    public static enum Mode {
+            /** Running on a real robot. */
+            REAL,
 
-                /** Running a physics simulator. */
-                SIM,
+            /** Running a physics simulator. */
+            SIM,
 
-                /** Replaying from a log file. */
-                REPLAY
-        }
+            /** Replaying from a log file. */
+            REPLAY
+    }
 
-    public static final Mode CURRENT_MODE = Mode.REAL;
+    public static final Mode CURRENT_MODE = Mode.SIM;
 
 
     public static enum ArmPosition {
