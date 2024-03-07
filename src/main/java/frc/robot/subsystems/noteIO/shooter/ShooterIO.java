@@ -11,6 +11,7 @@ public interface ShooterIO {
         public double motor1Position;
         public double motor1Velocity;
         public double motor1Temperature;
+        public double closedLoopReference;
 
         public double motor2Current;
         public double motor2Voltage;

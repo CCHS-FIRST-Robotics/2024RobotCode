@@ -5,6 +5,8 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.ARM_POSITIONS;
+import static frc.robot.Constants.SPEAKER_POSE;
 
 // import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
@@ -34,6 +36,8 @@ import frc.robot.commands.MoveToPose;
 import frc.robot.commands.AutoRoutine;
 import frc.robot.Constants.AutoPathConstants;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.Constants.ArmPosition;
+import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.EventMarkerBuilder;
@@ -151,37 +155,38 @@ public class RobotContainer {
      * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        // // using joysticks
-        // drive.setDefaultCommand(
-        // new DriveWithJoysticks(
-        // drive,
-        // controller::getLeftX,
-        // () -> -controller.getLeftY(),
-        // () -> -controller.getRightX(),
-        // () -> {
-        // return 1.0;
-        // },
-        // () -> Rotation2d.fromDegrees(controller.getHID().getPOV())));
+        // using joysticks
+        drive.setDefaultCommand(
+            new DriveWithJoysticks(
+                drive,
+                () -> -controller.getLeftX(),
+                () -> -controller.getLeftY(),
+                () -> .75 * controller.getRightX(),
+                () -> {
+                return 1.0;
+                },
+                () -> Rotation2d.fromDegrees(controller.getHID().getPOV()),
+                false
+            )
+        );
 
         // // break when leftTrigger is held
         // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
         // outtake
-        controller.x().whileTrue(new StartEndCommand(() -> handoff.start(Volts.of(-2.9)), () -> handoff.stop(), handoff));
+        // controller.a().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
 
         // manual intake
-        controller.y().whileTrue(new StartEndCommand(() -> handoff.start(Volts.of(4)), () -> handoff.stop(), handoff));
+        // controller.b().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(12)), () -> intake.stop(), intake));
+
+        // controller.x().onTrue(arm.moveArm(ArmPosition.INTAKE, drive::getPose));
+        // controller.y().onTrue(arm.moveArm(ArmPosition.RANDY, drive::getPose));
 
         // intake (stops automatically)
-        // controller.a().onTrue(
-        //     intake.getIntakeCommand(Volts.of(2.9))
+        // controller.x().onTrue(
+        //     intake.getIntakeCommand(Volts.of(2.7))
         //     .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
         // );
-
-        // // intake and move arm (stops automatically)
-        // controller.a().onTrue(
-        // new InstantCommand(() -> arm.setArmAngle(Degrees.of(90)))
-        // .andThen(intake.getIntakeCommand(2.9)));
 
         // // shoot with arm
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
@@ -189,7 +194,7 @@ public class RobotContainer {
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 45);}).onTrue(
         // controller.x().onTrue(
             // new AutoRoutine(new MechanismsPath(AutoPathConstants.threeNoteWing, drive, intake, shooter, arm))
-            new EventMarkerBuilder(AutoPathConstants.fourNoteWingSplits, drive, intake, handoff, shooter, arm).getCommandSequence()
+            new EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake, handoff, shooter, arm).getCommandSequence()
 
             // drive.runOnce(
             //     () -> {
@@ -224,25 +229,61 @@ public class RobotContainer {
         //                 // wait until shooter is up to speed
         //                 .alongWith(Commands.waitUntil(shooter::upToSpeed))
         //                 // shoot
-        //                 .andThen(intake.getShootCommand(Volts.of(8), shooter::checkNoteShot))
+        //                 .andThen(intake.getShootCommand(Volts.of(4), shooter::checkNoteShot))
         //                 // stop shooter
         //                 .andThen(new InstantCommand(shooter::stop, shooter))
         // );
 
 
         // prime shooter
-        controller.b().onTrue(
-            new InstantCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter)
-            .alongWith(arm.moveArm(Constants.ArmPosition.SHOOT, drive::getPose))
-            .unless(shooter::upToSpeed)
+        controller.b().and(() -> !shooter.upToSpeed()).onTrue(
+            new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95)), shooter)
+            // new InstantCommand()
+            .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
+            .alongWith(
+                new DriveWithJoysticks(
+                    drive,
+                    () -> -controller.getLeftX(),
+                    () -> -controller.getLeftY(),
+                    () -> controller.getRightX(),
+                    () -> {
+                        return 1.0;
+                    },
+                    () -> drive.getPose().getTranslation().minus(
+                        SPEAKER_POSE.getTranslation()
+                    ).getAngle().plus(new Rotation2d(Math.PI)),
+                    true
+                )
+            )
         );
         
         // shoot
-        controller.b().onTrue(
-            handoff.getShootCommand(Volts.of(8), shooter::checkNoteShot)
+        controller.b().and(shooter::upToSpeed).onTrue(
+            intake.getShootCommand(Volts.of(12), shooter::checkNoteShot)
             .andThen(new InstantCommand(shooter::stop, shooter))
-            .unless(() -> !shooter.upToSpeed())
         );
+
+        // controller.leftTrigger().onTrue(new InstantCommand(() -> {
+        //     arm.setArmAngle(null);
+        // }));
+        // controller.rightTrigger().onTrue(new InstantCommand(() -> {
+        //     ARM_POSITIONS.put(ArmPosition.RANDY, ARM_POSITIONS.get(ArmPosition.RANDY).plus(Degrees.of(1)));
+        //     arm.moveArm(ArmPosition.RANDY, drive::getPose);
+        // }));
+
+
+        controller.leftTrigger().onTrue(new InstantCommand(() -> {
+            ARM_POSITIONS.put(ArmPosition.RANDY, ARM_POSITIONS.get(ArmPosition.RANDY).minus(Degrees.of(.5)));
+            arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
+        }));
+        controller.rightTrigger().onTrue(new InstantCommand(() -> {
+            ARM_POSITIONS.put(ArmPosition.RANDY, ARM_POSITIONS.get(ArmPosition.RANDY).plus(Degrees.of(.5)));
+            arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
+        }));
+        controller.a().onTrue(new InstantCommand(() -> {
+            System.out.println("RANDY IS : " + ARM_POSITIONS.get(ArmPosition.RANDY));
+        
+        }));
 
         // // drive to specific pose
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());

@@ -2,6 +2,7 @@ package frc.robot.subsystems.noteIO.arm;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.*;
 import com.ctre.phoenix6.configs.*;
 // import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
@@ -40,17 +41,18 @@ public class ArmIOFalcon500 implements ArmIO {
     StatusSignal<Double> rotorPositionSignal;
 
     StatusSignal<Double> closedLoopReferenceSignal;
+    StatusSignal<Double> closedLoopErrorSignal;
 
     StatusSignal<Boolean> faultFusedSensorOutOfSync;
     StatusSignal<Boolean> stickyFaultFusedSensorOutOfSync;
     StatusSignal<Boolean> faultRemoteSensorOutOfSync;
     StatusSignal<Boolean> stickyFaultRemoteSensorOutOfSync;
 
-    private static final double gearRatio = 100 * 48 / 22d;
+    private static final double gearRatio = 100 * 54 / 15d;
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKp = 20;
-    private static final double driveKd = 0.0d;
+    private static final double driveKp = 150;
+    private static final double driveKd = 0d;
     private static final double driveKi = 0.0d;
 
     // Uhh Feedforward momment!
@@ -62,7 +64,7 @@ public class ArmIOFalcon500 implements ArmIO {
     private static final double driveFeedforwardKa = 0;
 
     // private final boolean motorInverted = false;
-    private final Measure<Angle> absoluteEncoderOffset = Radians.of(-2.72);
+    private final Measure<Angle> absoluteEncoderOffset = Radians.of(-3.71);
 
     int index;
 
@@ -90,16 +92,18 @@ public class ArmIOFalcon500 implements ArmIO {
         rotorPositionSignal = driveFalcon.getRotorPosition();
 
         closedLoopReferenceSignal = driveFalcon.getClosedLoopReference();
+        closedLoopErrorSignal = driveFalcon.getClosedLoopError();
         closedLoopReferenceSignal.setUpdateFrequency(100);
+        closedLoopErrorSignal.setUpdateFrequency(100);
 
         faultFusedSensorOutOfSync = driveFalcon.getFault_FusedSensorOutOfSync();
         stickyFaultFusedSensorOutOfSync = driveFalcon.getStickyFault_FusedSensorOutOfSync();
         faultRemoteSensorOutOfSync = driveFalcon.getFault_RemoteSensorDataInvalid();
         stickyFaultRemoteSensorOutOfSync = driveFalcon.getStickyFault_RemoteSensorDataInvalid();
 
-        driveMMConfig.MotionMagicCruiseVelocity = 5; // 5 rotations every 1 seconds
-        driveMMConfig.MotionMagicAcceleration = 30; // .5 second to reach max speed
-        driveMMConfig.MotionMagicJerk = 100; // .33 seconds to reach max accel
+        driveMMConfig.MotionMagicCruiseVelocity = 3; // 5 rotations every 1 seconds (defaualt)
+        driveMMConfig.MotionMagicAcceleration = 5; // .5 second to reach max speed (defaualt)
+        driveMMConfig.MotionMagicJerk = 10; // .33 seconds to reach max accel (defaualt)
 
         // Feedforward momment!
 
@@ -111,6 +115,9 @@ public class ArmIOFalcon500 implements ArmIO {
         CANcoderConfig.MagnetSensor.MagnetOffset = absoluteEncoderOffset.in(Rotations); // CHANGGE
 
         driveFalconConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        driveFalconConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        
+
 
         // fuses (trust)
         driveFeedbackConfig.FeedbackRemoteSensorID = driveCancoder.getDeviceID();
@@ -121,8 +128,8 @@ public class ArmIOFalcon500 implements ArmIO {
         driveFalconConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         driveFalconConfig.CurrentLimits.StatorCurrentLimit = 60;
 
-        driveFalconConfig.TorqueCurrent.PeakForwardTorqueCurrent = 130;
-        driveFalconConfig.TorqueCurrent.PeakReverseTorqueCurrent = -130;
+        driveFalconConfig.TorqueCurrent.PeakForwardTorqueCurrent = 80;
+        driveFalconConfig.TorqueCurrent.PeakReverseTorqueCurrent = -80;
 
         driveFalconConfig.Voltage.PeakForwardVoltage = 12;
         driveFalconConfig.Voltage.PeakReverseVoltage = -12;
@@ -171,6 +178,8 @@ public class ArmIOFalcon500 implements ArmIO {
                 absolutePositionSignal,
                 absoluteVelocitySignal,
                 rotorPositionSignal,
+                closedLoopReferenceSignal,
+                closedLoopErrorSignal,
                 faultFusedSensorOutOfSync,
                 stickyFaultFusedSensorOutOfSync,
                 faultRemoteSensorOutOfSync,
@@ -189,8 +198,9 @@ public class ArmIOFalcon500 implements ArmIO {
         // RotationsPerSecond.of(absolutePositionSignal.getValueAsDouble());
         inputs.absoluteArmVelocity = RotationsPerSecond.of(absoluteVelocitySignal.getValueAsDouble());
 
-        inputs.rotorPositionSignal = Rotations.of(rotorPositionSignal.getValueAsDouble());
-        inputs.closedLoopReference = Rotations.of(closedLoopReferenceSignal.getValueAsDouble());
+        inputs.rotorPosition = Rotations.of(rotorPositionSignal.getValueAsDouble());
+        inputs.closedLoopReference = Rotations.of(closedLoopReferenceSignal.getValueAsDouble() / gearRatio);
+        inputs.closedLoopError = Rotations.of(closedLoopErrorSignal.getValueAsDouble() / gearRatio);
 
         // CHeck with colin if it works
         inputs.faultFusedSensorOutOfSync = faultFusedSensorOutOfSync.getValue();
