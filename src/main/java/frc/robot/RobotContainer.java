@@ -189,7 +189,7 @@ public class RobotContainer {
         new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 30);}).onTrue(
         // controller.x().onTrue(
             // new AutoRoutine(new MechanismsPath(AutoPathConstants.threeNoteWing, drive, intake, shooter, arm))
-            new EventMarkerBuilder(AutoPathConstants.fourNoteWingSplits, drive, intake, handoff, shooter, arm).getCommandSequence()
+            new EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake, handoff, shooter, arm).getCommandSequence()
 
             // drive.runOnce(
             //     () -> {
