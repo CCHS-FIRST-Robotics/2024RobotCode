@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.AutoPathConstants;
 import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
@@ -33,7 +34,8 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean checkNoteShot() {
-        return inputs.motor1Current > 30 && Timer.getFPGATimestamp() - startTime > 0.5;
+        // return inputs.motor1Current > 30 && Timer.getFPGATimestamp() - startTime > 0.5;
+        return Timer.getFPGATimestamp() - startTime > AutoPathConstants.Q_SHOOT_TIME;
     }
 
     @Override
@@ -46,8 +48,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean checkInHandoff() {
-        // also placeholder, i think could use current limits with the handoff motor idk
-        return false;
+        return Timer.getFPGATimestamp() - startTime > 0.1;
     }
 
     public Command getShootNoteCommand(Measure<Velocity<Angle>> v) {

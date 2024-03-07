@@ -28,6 +28,8 @@ public class Arm extends SubsystemBase {
     @SuppressWarnings({ "unused" })
     private SysIdRoutine sysIdRoutine;
 
+    private double currentAngle = 0;
+
     // length and position of the arm in relation to the robot's center
     private final Measure<Distance> armLength = Inches.of(16); // TODO: set this
     private final Translation2d armOffset = new Translation2d(0.0, .425); // TODO: set this
@@ -82,6 +84,7 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
+        Logger.recordOutput("Arm Angle", currentAngle);
         // System.out.println("testingggg");
 
         // trust!
@@ -90,6 +93,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void setArmAngle(Measure<Angle> angle) {
+        currentAngle = angle.magnitude();
         io.setDrivePosition(angle);
     }
 

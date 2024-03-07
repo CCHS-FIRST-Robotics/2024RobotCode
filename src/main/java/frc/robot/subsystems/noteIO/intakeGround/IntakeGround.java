@@ -1,5 +1,6 @@
 package frc.robot.subsystems.noteIO.intakeGround;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -8,6 +9,7 @@ import org.littletonrobotics.junction.Logger;
 public class IntakeGround extends SubsystemBase {
     IntakeGroundIO io;
     double volts = 0;
+    private double startTime;
     IntakeGroundIOInputsAutoLogged inputs = new IntakeGroundIOInputsAutoLogged();
 
     public IntakeGround(IntakeGroundIO io) {
@@ -16,6 +18,7 @@ public class IntakeGround extends SubsystemBase {
 
     public void start(double v) {
         volts = v;
+        startTime = Timer.getFPGATimestamp();
     }
 
     public void stop() {
@@ -36,7 +39,8 @@ public class IntakeGround extends SubsystemBase {
     }
 
     private boolean checkNoteThere() {
-        return inputs.motor1Current > 15 && inputs.motor1Velocity > 5000 * (volts / 12);
+        // return inputs.motor1Current > 15 && inputs.motor1Velocity > 5000 * (volts / 12);
+        return Timer.getFPGATimestamp() - startTime > 0.1;
     }
 
     public Command startEndCommmand() {

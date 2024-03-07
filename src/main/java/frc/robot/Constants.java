@@ -23,6 +23,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.geometry.*;
@@ -113,6 +114,9 @@ public final class Constants {
                 public static final String THREE_NOTE_WING2 = "SThreeNote.2";
                 public static final String THREE_NOTE_WING = "SThreeNote";
                 public static final String FOUR_NOTE_WING = "SFourNote";
+                public static final String FOUR_NOTE_WING1 = "SFourNote.1";
+                public static final String FOUR_NOTE_WING2 = "SFourNote.2";
+                public static final String FOUR_NOTE_WING3 = "SFourNote.3";
                 public static final String TWO_NOTE_LEFT = "STwoNoteLeft";
                 public static final String TWO_NOTE_CENTER = "STwoNoteCenter";
                 public static final String TWO_NOTE_RIGHT = "STwoNoteRight";
@@ -120,6 +124,7 @@ public final class Constants {
 
                 public static final ArrayList<String> threeNoteWing = new ArrayList<String>();
                 public static final ArrayList<String> threeNoteWingSplits = new ArrayList<String>();
+                public static final ArrayList<String> fourNoteWingSplits = new ArrayList<String>();
 
                 public static final ArrayList<ArrayList<String>> pathLists = new ArrayList<ArrayList<String>>();
 
@@ -135,11 +140,14 @@ public final class Constants {
                 public static final double INTAKE_TIME = 0.3;
                 public static final double SHOOT_TIME = 0.5;// idk
 
-                public static final int DRIVE_POS = 0;
-                public static final int ARM_SHOOT = 1;
-                public static final int SHOOT = 2;
-                public static final int ARM_INTAKE = 3;
-                public static final int INTAKE = 4;
+                // quokka auto consts
+                public static final double Q_MAX_ARM_MOVE_TIME = 0.5;
+                public static final double Q_INTAKE_SET_TIME = 0.4;
+                public static final double Q_INTAKE_TIME = 0.5;
+                public static final double Q_INIT_SHOOT_SET_TIME = 2;
+                public static final double Q_SHOOT_SET_TIME = 1;
+                public static final double Q_SHOOT_TIME = 0.5;
+                public static final Measure<Velocity<Angle>> SHOOT_SPEED = RadiansPerSecond.of(5); // idk
 
 
                 static {
@@ -149,6 +157,10 @@ public final class Constants {
 
                         threeNoteWingSplits.add(THREE_NOTE_WING1);
                         threeNoteWingSplits.add(THREE_NOTE_WING2);
+
+                        fourNoteWingSplits.add(FOUR_NOTE_WING1);
+                        fourNoteWingSplits.add(FOUR_NOTE_WING2);
+                        fourNoteWingSplits.add(FOUR_NOTE_WING3);
 
                         pathLists.add(threeNoteWing);
 

@@ -45,6 +45,9 @@ public final class EventMarkerBuilder {
     private Shooter shooter;
     private Arm arm;
 
+    private String path;
+    private double totalTime;
+
     private Command command;
 
     public EventMarkerBuilder(ArrayList<String> pathList, Drive drive, IntakeGround intake, IntakeArm handoff,
@@ -55,35 +58,71 @@ public final class EventMarkerBuilder {
         this.arm = arm;
         this.handoff = handoff;
 
+        shooter.start(AutoPathConstants.SHOOT_SPEED);
+
         for (String path : pathList) {
             addCommand(path);
         }
-    } 
+
+        // command = command.andThen(arm.moveArm(ArmPosition.SHOOT, arm.getPosFromPath(path, totalTime))).andThen(
+        //         handoff.getShootCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS), shooter::checkNoteShot));
+
+    }
 
     public void addCommand(String path) {
+        this.path = path;
         DriveTrajectory traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
         ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
-        double totalTime = choreoTrajectory.getTotalTime() + AutoPathConstants.SHOOT_TIME + AutoPathConstants.SHOOT_TIME; // + time to shoot
+        double totalTime = choreoTrajectory.getTotalTime() + AutoPathConstants.Q_INIT_SHOOT_SET_TIME + AutoPathConstants.Q_MAX_ARM_MOVE_TIME + AutoPathConstants.Q_SHOOT_TIME; // + time to shoot
         List<Pair<Double, Command>> eventMarkers = new ArrayList<Pair<Double, Command>>();
 
+        double driveTime = AutoPathConstants.Q_INIT_SHOOT_SET_TIME + AutoPathConstants.Q_MAX_ARM_MOVE_TIME + AutoPathConstants.Q_SHOOT_TIME;
+        double intakeTime = totalTime - AutoPathConstants.Q_INTAKE_SET_TIME - AutoPathConstants.Q_INTAKE_TIME;
+
+        /*
+         * quokka robot
+         */
         // arm shoot
         eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME,
-        arm.moveArm(ArmPosition.SHOOT, arm.getPosFromPath(path, AutoPathConstants.INIT_MOVEMENTS_TIME))));
-        // shoot
-        eventMarkers.add(Pair.of(AutoPathConstants.MAX_ARM_MOVE_TIME,
-        shooter.getReceiveNoteCommand(RadiansPerSecond.of(AutoPathConstants.SHOOTER_HANDOFF_VOLTS))));
+                arm.moveArm(ArmPosition.SHOOT, arm.getPosFromPath(path, AutoPathConstants.INIT_MOVEMENTS_TIME))));
+        // run handoff & shoot
+        eventMarkers.add(Pair.of(AutoPathConstants.Q_MAX_ARM_MOVE_TIME + AutoPathConstants.Q_INIT_SHOOT_SET_TIME,
+                handoff.getShootCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS), shooter::checkNoteShot)));
         // drive
-        eventMarkers.add(Pair.of(AutoPathConstants.MAX_ARM_MOVE_TIME + AutoPathConstants.SHOOT_TIME, drive.followTrajectory(traj)));
-        // arm hand
-        eventMarkers.add(Pair.of((totalTime - AutoPathConstants.MAX_ARM_MOVE_TIME - AutoPathConstants.INTAKE_TIME),
-                arm.moveArm(ArmPosition.INTAKE, arm.getPosFromPath(path,
-                        totalTime - AutoPathConstants.MAX_ARM_MOVE_TIME - AutoPathConstants.INTAKE_TIME))));
+        eventMarkers.add(Pair.of(driveTime,
+                drive.followTrajectory(traj)));
+        // arm intake
+        eventMarkers.add(Pair.of((driveTime),
+                arm.moveArm(ArmPosition.INTAKE, arm.getPosFromPath(path, 0))));
         // intake
-        eventMarkers.add(Pair.of((totalTime - AutoPathConstants.INTAKE_TIME),
-                intake.getIntakeCommand(AutoPathConstants.INTAKE_HANDOFF_VOLTS)));
-        // handoff
-        eventMarkers.add(Pair.of((totalTime - AutoPathConstants.INTAKE_TIME),
-                handoff.getHandoffCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS))));
+        eventMarkers.add(Pair.of((intakeTime),
+                handoff.getHandoffCommand(Volt.of(AutoPathConstants.INTAKE_VOLTS))));
+
+        /*
+         * final robot
+         */
+        // // arm shoot
+        // eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME,
+        // arm.moveArm(ArmPosition.SHOOT, arm.getPosFromPath(path,
+        // AutoPathConstants.INIT_MOVEMENTS_TIME))));
+        // // shoot
+        // eventMarkers.add(Pair.of(AutoPathConstants.MAX_ARM_MOVE_TIME,
+        // shooter.getReceiveNoteCommand(RadiansPerSecond.of(AutoPathConstants.SHOOTER_HANDOFF_VOLTS))));
+        // // drive
+        // eventMarkers.add(Pair.of(AutoPathConstants.MAX_ARM_MOVE_TIME +
+        // AutoPathConstants.SHOOT_TIME, drive.followTrajectory(traj)));
+        // // arm hand
+        // eventMarkers.add(Pair.of((totalTime - AutoPathConstants.MAX_ARM_MOVE_TIME -
+        // AutoPathConstants.INTAKE_TIME),
+        // arm.moveArm(ArmPosition.INTAKE, arm.getPosFromPath(path,
+        // totalTime - AutoPathConstants.MAX_ARM_MOVE_TIME -
+        // AutoPathConstants.INTAKE_TIME))));
+        // // intake
+        // eventMarkers.add(Pair.of((totalTime - AutoPathConstants.INTAKE_TIME),
+        // intake.getIntakeCommand(AutoPathConstants.INTAKE_HANDOFF_VOLTS)));
+        // // handoff
+        // eventMarkers.add(Pair.of((totalTime - AutoPathConstants.INTAKE_TIME),
+        // handoff.getHandoffCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS))));
 
         if (command == null) {
             command = (new AutoCommand(eventMarkers, totalTime));
