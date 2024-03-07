@@ -3771,13 +3771,22 @@
         "SFiveNote": {
             "waypoints": [
                 {
-                    "x": 1.9,
-                    "y": 5.580503940582275,
+                    "x": 1.825031042098999,
+                    "y": 5.589984893798828,
                     "heading": 0,
                     "isInitialGuess": false,
                     "translationConstrained": true,
                     "headingConstrained": true,
-                    "controlIntervalCount": 22
+                    "controlIntervalCount": 8
+                },
+                {
+                    "x": 2.9442968368530273,
+                    "y": 6.371496677398682,
+                    "heading": 0,
+                    "isInitialGuess": false,
+                    "translationConstrained": true,
+                    "headingConstrained": true,
+                    "controlIntervalCount": 18
                 },
                 {
                     "x": 7.510047912597656,
@@ -3804,16 +3813,7 @@
                     "isInitialGuess": false,
                     "translationConstrained": true,
                     "headingConstrained": true,
-                    "controlIntervalCount": 10
-                },
-                {
-                    "x": 6.191178798675537,
-                    "y": 6.430674076080322,
-                    "heading": 0,
-                    "isInitialGuess": true,
-                    "translationConstrained": true,
-                    "headingConstrained": true,
-                    "controlIntervalCount": 11
+                    "controlIntervalCount": 17
                 },
                 {
                     "x": 7.706243515014648,
@@ -3831,16 +3831,7 @@
                     "isInitialGuess": false,
                     "translationConstrained": true,
                     "headingConstrained": true,
-                    "controlIntervalCount": 13
-                },
-                {
-                    "x": 5.875086307525635,
-                    "y": 6.528771877288818,
-                    "heading": 0,
-                    "isInitialGuess": true,
-                    "translationConstrained": true,
-                    "headingConstrained": true,
-                    "controlIntervalCount": 22
+                    "controlIntervalCount": 31
                 },
                 {
                     "x": 3.642284393310547,
@@ -3883,15 +3874,6 @@
                     "y": 5.5606303215026855,
                     "heading": 0,
                     "isInitialGuess": false,
-                    "translationConstrained": true,
-                    "headingConstrained": true,
-                    "controlIntervalCount": 18
-                },
-                {
-                    "x": 7.2071146965026855,
-                    "y": 3.172985076904297,
-                    "heading": 0,
-                    "isInitialGuess": true,
                     "translationConstrained": true,
                     "headingConstrained": true,
                     "controlIntervalCount": 40
@@ -5012,15 +4994,15 @@
                 },
                 {
                     "scope": [
-                        11,
-                        12
+                        10,
+                        11
                     ],
                     "type": "StraightLine"
                 },
                 {
                     "scope": [
-                        1,
-                        2
+                        2,
+                        3
                     ],
                     "type": "StraightLine"
                 },
