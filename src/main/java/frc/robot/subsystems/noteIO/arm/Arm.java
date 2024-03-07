@@ -2,6 +2,7 @@ package frc.robot.subsystems.noteIO.arm;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.ARM_POSITIONS;
+import static frc.robot.Constants.SPEAKER_POSE;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -37,30 +38,15 @@ public class Arm extends SubsystemBase {
     /** Arm angle look up table key: meters, values: degrees */
     private static final InterpolatingDoubleTreeMap armAngleMap = new InterpolatingDoubleTreeMap();
 
-    // thiefed from littleton lmao
+    // meters, degrees
     static {
-        armAngleMap.put(1.026639, 52.0);
-        armAngleMap.put(1.156125, 50.0);
-        armAngleMap.put(1.174623, 50.0);
-        armAngleMap.put(1.38735, 49.0);
-        armAngleMap.put(1.618575, 44.0);
-        armAngleMap.put(1.8498, 40.5);
-        armAngleMap.put(2.081025, 37.5);
-        armAngleMap.put(2.31225, 36.0);
-        armAngleMap.put(2.543475, 34.0);
-        armAngleMap.put(2.7747, 33.0);
-        armAngleMap.put(3.005925, 31.0);
-        armAngleMap.put(3.23715, 30.0);
-        armAngleMap.put(3.468375, 28.5);
-        armAngleMap.put(3.468375, 28.0);
-        armAngleMap.put(3.6996, 27.5);
-        armAngleMap.put(3.912327, 26.5);
-        armAngleMap.put(4.16205, 26.25);
-        armAngleMap.put(4.393275, 25.25);
-        armAngleMap.put(4.6245, 25.0);
-        armAngleMap.put(4.855725, 24.75);
-        armAngleMap.put(5.170191, 24.6);
-        armAngleMap.put(5.373669, 24.25);
+        armAngleMap.put(1.12776, 19.7d);
+        armAngleMap.put(1.43256, 23.7d);
+        armAngleMap.put(1.73736, 24.7d);
+        armAngleMap.put(2.34696, 32.7d);
+        armAngleMap.put(3.71856, 38.7d);
+        armAngleMap.put(4.63296, 41.7d);
+        
       }
 
     public Arm(ArmIO io) {
@@ -89,7 +75,7 @@ public class Arm extends SubsystemBase {
 
         // trust!
         // io.setDriveVoltage(Volts.of(1));
-        setArmAngle(Degrees.of(30));
+        // setArmAngle(Degrees.of(30));
     }
 
     public void setArmAngle(Measure<Angle> angle) {
@@ -125,7 +111,10 @@ public class Arm extends SubsystemBase {
 
     private Command moveToShoot(Supplier<Pose2d> robotPose) {
         return run(() -> {
-            double angle = armAngleMap.get(robotPose.get().getTranslation().getNorm());
+            double angle = armAngleMap.get(
+                robotPose.get().getTranslation().minus(
+                    SPEAKER_POSE.getTranslation()
+                ).getNorm());
             setArmAngle(Degrees.of(angle));
         });
     }

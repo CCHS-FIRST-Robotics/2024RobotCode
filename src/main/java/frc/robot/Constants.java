@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static edu.wpi.first.units.Units.*;
@@ -50,21 +51,33 @@ public final class Constants {
                 REPLAY
         }
 
-    public static final Mode CURRENT_MODE = Mode.SIM;
+    public static final Mode CURRENT_MODE = Mode.REAL;
 
 
     public static enum ArmPosition {
         INTAKE,
         SHOOT,
         AMP,
-        MAIN
+        MAIN,
+        WILANG,
+        ALLAN,
+        RANDOM,
+        LEGAL_DRINKING_AGE,
+        RANDY,
     }
 
-    public static Map<ArmPosition, Measure<Angle>> ARM_POSITIONS = Map.of(
-        ArmPosition.INTAKE, Degrees.of(0),
-        ArmPosition.AMP, Degrees.of(90),
-        ArmPosition.MAIN, Degrees.of(15)
-    );
+    public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(Map.of(
+        ArmPosition.INTAKE, Degrees.of(-5),
+        ArmPosition.AMP, Degrees.of(75),
+        ArmPosition.MAIN, Degrees.of(42),
+        ArmPosition.WILANG, Degrees.of(60),
+        ArmPosition.ALLAN, Degrees.of(30),
+        ArmPosition.RANDOM, Degrees.of(Math.random() * 75),
+        ArmPosition.LEGAL_DRINKING_AGE, Degrees.of(21),
+        ArmPosition.RANDY, Degrees.of(30)
+    ));
+
+    public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.5, new Rotation2d(0));
 
     // ports
     public static final int XBOX_CONTROLLER_PORT = 0;

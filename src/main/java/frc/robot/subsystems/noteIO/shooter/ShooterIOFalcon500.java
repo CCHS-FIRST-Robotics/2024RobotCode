@@ -2,7 +2,10 @@ package frc.robot.subsystems.noteIO.shooter;
 
 import static edu.wpi.first.units.Units.*;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -11,13 +14,27 @@ import edu.wpi.first.units.*;
 
 public class ShooterIOFalcon500 implements ShooterIO {
     private TalonFX motor1, motor2;
-    private VelocityVoltage velocityControl;
+    private VelocityVoltage velocityControl = new VelocityVoltage(0);
+
+    private final TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
+    private final Slot0Configs drivePID = talonFXConfig.Slot0;
+
+    private static final double driveKp = 0.3;
+    private static final double driveKd = 0d;
+    private static final double driveKi = 0.0d;
+
+    private static final double driveFeedforwardKs = 0;
+    // Units needed are volts * seconds / rotations, max rpm is 6,380
+    private static final double driveFeedforwardKv = .125; // 6380 rotaions per minute is 319/3
+                                                                      // rotations per second
+    private static final double driveFeedforwardKa = 0;
 
     private StatusSignal<Double> voltageSignal1;
     private StatusSignal<Double> currentSignal1;
     private StatusSignal<Double> positionSignal1;
     private StatusSignal<Double> velocitySignal1;
     private StatusSignal<Double> temperatureSignal1;
+    private StatusSignal<Double> closedLoopReferenceSignal;
 
     private StatusSignal<Double> voltageSignal2;
     private StatusSignal<Double> currentSignal2;
@@ -35,6 +52,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
         positionSignal1 = motor1.getPosition();
         velocitySignal1 = motor1.getVelocity();
         temperatureSignal1 = motor1.getDeviceTemp();
+        closedLoopReferenceSignal = motor1.getClosedLoopReference();
 
         voltageSignal2 = motor2.getMotorVoltage();
         currentSignal2 = motor2.getStatorCurrent();
@@ -43,15 +61,22 @@ public class ShooterIOFalcon500 implements ShooterIO {
         velocitySignal2 = motor2.getVelocity();
         temperatureSignal2 = motor2.getDeviceTemp();
 
-        // current limiting
-        TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
         talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         talonFXConfig.CurrentLimits.StatorCurrentLimit = 60;
+
+        drivePID.kP = driveKp;
+        drivePID.kI = driveKi;
+        drivePID.kD = driveKd;
+        drivePID.kA = driveFeedforwardKa; // dont use it (forn now)(trust) (use it ocne sysid works)
+        drivePID.kS = driveFeedforwardKs;
+        drivePID.kV = driveFeedforwardKv;
+
         motor1.getConfigurator().apply(talonFXConfig);
         motor2.getConfigurator().apply(talonFXConfig);
     }
 
     @Override
+    @AutoLogOutput
     public void setVelocity(Measure<Velocity<Angle>> v) {
         motor1.setControl(velocityControl.withVelocity(v.in(RotationsPerSecond)));
         motor2.setControl(velocityControl.withVelocity(v.in(RotationsPerSecond)));
@@ -64,6 +89,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
     }
 
     @Override
+    @AutoLogOutput
     public boolean upToSpeed(Measure<Velocity<Angle>> targetVelocity) {
         return velocitySignal1.refresh().getValue() > targetVelocity.in(RotationsPerSecond) * 0.95;
     }
@@ -76,6 +102,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
                 positionSignal1,
                 velocitySignal1,
                 temperatureSignal1,
+                closedLoopReferenceSignal,
                 voltageSignal2,
                 currentSignal2,
                 positionSignal2,
@@ -93,5 +120,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
         inputs.motor2Position = positionSignal2.getValue();
         inputs.motor2Velocity = velocitySignal2.getValue();
         inputs.motor2Temperature = temperatureSignal2.getValue();
+
+        inputs.closedLoopReference = closedLoopReferenceSignal.getValue();
     }
 }
