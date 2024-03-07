@@ -49,7 +49,7 @@ public final class Constants {
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(Map.of(
         ArmPosition.INTAKE, Degrees.of(-5),
         ArmPosition.AMP, Degrees.of(75),
-        ArmPosition.MAIN, Degrees.of(40),
+        ArmPosition.MAIN, Degrees.of(42),
         ArmPosition.WILANG, Degrees.of(60),
         ArmPosition.ALLAN, Degrees.of(30),
         ArmPosition.RANDOM, Degrees.of(Math.random() * 75),
@@ -57,7 +57,7 @@ public final class Constants {
         ArmPosition.RANDY, Degrees.of(30)
     ));
 
-    public static final Pose2d SPEAKER_POSE = new Pose2d(0, 0, new Rotation2d(0));
+    public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.5, new Rotation2d(0));
 
     // ports
     public static final int XBOX_CONTROLLER_PORT = 0;

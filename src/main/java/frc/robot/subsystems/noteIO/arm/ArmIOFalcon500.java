@@ -51,7 +51,7 @@ public class ArmIOFalcon500 implements ArmIO {
     private static final double gearRatio = 100 * 54 / 15d;
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKp = 180;
+    private static final double driveKp = 150;
     private static final double driveKd = 0d;
     private static final double driveKi = 0.0d;
 

@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.ARM_POSITIONS;
+import static frc.robot.Constants.SPEAKER_POSE;
 
 // import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
@@ -104,7 +105,8 @@ public class RobotContainer {
                 drive.getKinematics(),
                 new Rotation2d(),
                 drive.getModulePositions(),
-                new Pose2d());
+                new Pose2d(1.35, 5.5, new Rotation2d())
+        );
         drive.setPoseEstimator(poseEstimator);
         camera.setPoseEstimator(poseEstimator);
 
@@ -121,17 +123,19 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // using joysticks
-        // drive.setDefaultCommand(
-        //     new DriveWithJoysticks(
-        //     drive,
-        //     controller::getLeftX,
-        //     () -> -controller.getLeftY(),
-        //     () -> -controller.getRightX(),
-        //     () -> {
-        //     return 1.0;
-        //     },
-        //     () -> Rotation2d.fromDegrees(controller.getHID().getPOV()))
-        // );
+        drive.setDefaultCommand(
+            new DriveWithJoysticks(
+                drive,
+                () -> -controller.getLeftX(),
+                () -> -controller.getLeftY(),
+                () -> .75 * controller.getRightX(),
+                () -> {
+                return 1.0;
+                },
+                () -> Rotation2d.fromDegrees(controller.getHID().getPOV()),
+                false
+            )
+        );
 
         // // break when leftTrigger is held
         // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
@@ -143,12 +147,12 @@ public class RobotContainer {
         // controller.b().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(12)), () -> intake.stop(), intake));
 
         // controller.x().onTrue(arm.moveArm(ArmPosition.INTAKE, drive::getPose));
-        controller.y().onTrue(arm.moveArm(ArmPosition.RANDY, drive::getPose));
+        // controller.y().onTrue(arm.moveArm(ArmPosition.RANDY, drive::getPose));
 
         // intake (stops automatically)
         controller.x().onTrue(
             intake.getIntakeCommand(Volts.of(2.7))
-            // .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
+            .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
         );
 
         // // shoot with arm
@@ -176,7 +180,23 @@ public class RobotContainer {
         // prime shooter
         controller.b().and(() -> !shooter.upToSpeed()).onTrue(
             new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95)), shooter)
-            // .alongWith(arm.moveArm(Constants.ArmPosition.RANDY, drive::getPose))
+            // new InstantCommand()
+            .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
+            .alongWith(
+                new DriveWithJoysticks(
+                    drive,
+                    () -> -controller.getLeftX(),
+                    () -> -controller.getLeftY(),
+                    () -> controller.getRightX(),
+                    () -> {
+                        return 1.0;
+                    },
+                    () -> drive.getPose().getTranslation().minus(
+                        SPEAKER_POSE.getTranslation()
+                    ).getAngle().plus(new Rotation2d(Math.PI)),
+                    true
+                )
+            )
         );
         
         // shoot
