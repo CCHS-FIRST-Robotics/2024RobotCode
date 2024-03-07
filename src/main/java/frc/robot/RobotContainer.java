@@ -259,7 +259,7 @@ public class RobotContainer {
         
         // shoot
         controller.b().and(shooter::upToSpeed).onTrue(
-            intake.getShootCommand(Volts.of(12), shooter::checkNoteShot)
+            handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
             .andThen(new InstantCommand(shooter::stop, shooter))
         );
 
