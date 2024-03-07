@@ -183,10 +183,10 @@ public class RobotContainer {
         // controller.y().onTrue(arm.moveArm(ArmPosition.RANDY, drive::getPose));
 
         // intake (stops automatically)
-        controller.x().onTrue(
-            intake.getIntakeCommand(Volts.of(2.7))
-            .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
-        );
+        // controller.x().onTrue(
+        //     intake.getIntakeCommand(Volts.of(2.7))
+        //     .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
+        // );
 
         // // shoot with arm
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
