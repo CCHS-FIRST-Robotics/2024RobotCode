@@ -29,8 +29,6 @@ public class Arm extends SubsystemBase {
     @SuppressWarnings({ "unused" })
     private SysIdRoutine sysIdRoutine;
 
-    private double currentAngle = 0;
-
     // length and position of the arm in relation to the robot's center
     private final Measure<Distance> armLength = Inches.of(16); // TODO: set this
     private final Translation2d armOffset = new Translation2d(0.0, .425); // TODO: set this
@@ -70,7 +68,6 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
-        Logger.recordOutput("Arm Angle", currentAngle);
         // System.out.println("testingggg");
 
         // trust!
@@ -79,8 +76,8 @@ public class Arm extends SubsystemBase {
     }
 
     public void setArmAngle(Measure<Angle> angle) {
-        currentAngle = angle.magnitude();
         io.setDrivePosition(angle);
+        Logger.recordOutput("ArmTargetAngle", angle); // TEMPORARY, should work in the inputs class but phoenix is bugged rn
     }
 
     public Measure<Angle> getArmAngle() {
@@ -111,11 +108,12 @@ public class Arm extends SubsystemBase {
 
     private Command moveToShoot(Supplier<Pose2d> robotPose) {
         return run(() -> {
-            double angle = armAngleMap.get(
-                robotPose.get().getTranslation().minus(
+            double distance = robotPose.get().getTranslation().minus(
                     SPEAKER_POSE.getTranslation()
-                ).getNorm());
+                ).getNorm();
+            double angle = armAngleMap.get(distance);
             setArmAngle(Degrees.of(angle));
+            Logger.recordOutput("SpeakerDistance", distance);
         });
     }
 

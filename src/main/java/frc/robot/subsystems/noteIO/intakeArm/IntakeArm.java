@@ -18,7 +18,7 @@ public class IntakeArm extends SubsystemBase {
     // Debouncer currentDebouncer = new Debouncer(0.3,
     // Debouncer.DebounceType.kRising);
     private IntakeArmIOInputsAutoLogged inputs = new IntakeArmIOInputsAutoLogged();
-    private boolean intake = false;;
+    private boolean intake = false;
     private boolean shoot = false;
 
     public IntakeArm(IntakeArmIO io) {

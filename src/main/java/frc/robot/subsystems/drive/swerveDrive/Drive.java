@@ -77,12 +77,12 @@ public class Drive extends SubsystemBase {
     private Translation2d wiiLinearVelocity = new Translation2d();
 
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
-    private double kPx = 0.35; // 0.4
-    private double kPy = 0.35; // 0.33
+    private double kPx = 0.5; // 0.4
+    private double kPy = 0.5; // 0.33
     private double kPHeading = 3; // 0.25 // 0.5
 
-    private double kDx = 0; // 
-    private double kDy = 0; // 
+    private double kDx = 0.05; // 
+    private double kDy = 0.05; // 
     private double kDHeading = .3; // 
 
     private double kIx = 0.12; // 0.12

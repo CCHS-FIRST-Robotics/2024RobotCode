@@ -17,40 +17,49 @@ public class ShooterIOSim implements ShooterIO {
     PIDController feedback = new PIDController(0, 0, 0);
     SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0, 12 * (3 / 319d), 0);
 
-    double prevSetpoint;
+    Measure<Velocity<Angle>> prevSetpoint = RotationsPerSecond.of(0);
 
     public ShooterIOSim() {
 
     }
 
-    public void updateInputs(IntakeArmIOInputs inputs) {
+    @Override
+    public void updateInputs(ShooterIOInputs inputs) {
         motor.update(Constants.PERIOD);
 
-        inputs.motorVoltage = appliedVoltage.in(Volts);
-        inputs.motorCurrent = motor.getCurrentDrawAmps();
-        inputs.motorVelocity = motor.getAngularVelocityRPM() * 60;
+        inputs.motor1Voltage = appliedVoltage.in(Volts);
+        inputs.motor1Current = motor.getCurrentDrawAmps();
+        inputs.motor1Velocity = motor.getAngularVelocityRPM() / 60;
+
+        inputs.motor2Voltage = appliedVoltage.in(Volts);
+        inputs.motor2Current = motor.getCurrentDrawAmps();
+        inputs.motor2Velocity = motor.getAngularVelocityRPM() / 60;
     }
 
-    public void setVoltage(double volts) {
-        appliedVoltage = Volts.of(volts);
-        motor.setInputVoltage(volts);
+    @Override
+    public void setVoltage(Measure<Voltage> volts) {
+        appliedVoltage = volts;
+        motor.setInputVoltage(volts.in(Volts));
     }
 
-    public void setVelocity(double velocity) {
+    @Override
+    public void setVelocity(Measure<Velocity<Angle>> velocity) {
         double volts = feedforward.calculate(
-                prevSetpoint,
-                velocity,
-                Constants.PERIOD)
+                prevSetpoint.in(RotationsPerSecond)
+                // velocity.in(RotationsPerSecond),
+                // Constants.PERIOD
+                )
                 + feedback.calculate(
-                        motor.getAngularVelocityRPM() * 60,
-                        velocity);
-        setVoltage(volts);
+                        motor.getAngularVelocityRPM() / 60,
+                        velocity.in(RotationsPerSecond));
+        setVoltage(Volts.of(volts));
 
         prevSetpoint = velocity;
     }
-
-    public boolean upToSpeed() {
-        return motor.getAngularVelocityRPM() > 5000;
+    
+    @Override
+    public boolean upToSpeed(Measure<Velocity<Angle>> targetVelocity) {
+        return motor.getAngularVelocityRPM() > targetVelocity.in(Rotations.per(Minute));
     }
 
 }
