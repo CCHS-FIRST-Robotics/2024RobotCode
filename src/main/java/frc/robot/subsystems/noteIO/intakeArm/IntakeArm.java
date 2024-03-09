@@ -40,13 +40,13 @@ public class IntakeArm extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs("intake", inputs);
+        Logger.processInputs("IntakeArm", inputs);
 
         io.setVoltage(volts);
     }
 
-    public Command getIntakeCommand(Measure<Voltage> v) {
-        // turns motor on until note detected
+    // turns motor on until note detected
+    public Command getArmIntakeCommand(Measure<Voltage> v) {
         return new FunctionalCommand(
                 () -> start(v),
                 () -> {
@@ -56,8 +56,8 @@ public class IntakeArm extends SubsystemBase {
                 this);
     }
 
+    // turns motor on until shooter detects note
     public Command getShootCommand(Measure<Voltage> v, BooleanSupplier shooterDone) {
-        // turns motor on until shooter detects note
         return new FunctionalCommand(
                 () -> start(v),
                 () -> {

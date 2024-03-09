@@ -33,7 +33,6 @@ public final class Constants {
 
     public static final Mode CURRENT_MODE = Mode.REAL;
 
-
     public static enum ArmPosition {
         INTAKE,
         SHOOT,
@@ -47,15 +46,14 @@ public final class Constants {
     }
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(Map.of(
-        ArmPosition.INTAKE, Degrees.of(-5),
-        ArmPosition.AMP, Degrees.of(75),
-        ArmPosition.MAIN, Degrees.of(42),
-        ArmPosition.WILANG, Degrees.of(60),
-        ArmPosition.ALLAN, Degrees.of(30),
-        ArmPosition.RANDOM, Degrees.of(Math.random() * 75),
-        ArmPosition.LEGAL_DRINKING_AGE, Degrees.of(21),
-        ArmPosition.RANDY, Degrees.of(30)
-    ));
+            ArmPosition.INTAKE, Degrees.of(-5),
+            ArmPosition.AMP, Degrees.of(75),
+            ArmPosition.MAIN, Degrees.of(42),
+            ArmPosition.WILANG, Degrees.of(60),
+            ArmPosition.ALLAN, Degrees.of(30),
+            ArmPosition.RANDOM, Degrees.of(Math.random() * 75),
+            ArmPosition.LEGAL_DRINKING_AGE, Degrees.of(21),
+            ArmPosition.RANDY, Degrees.of(30)));
 
     public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.5, new Rotation2d(0));
 
@@ -68,7 +66,8 @@ public final class Constants {
     public static final int FR_TALON_ID = 2;
     public static final int BL_TALON_ID = 3;
     public static final int BR_TALON_ID = 4;
-    public static final int INTAKE_ID = 21;
+    public static final int BASE_INTAKE_ID = 1000;
+    public static final int ARM_INTAKE_ID = 21;
     public static final int SHOOTER_ID_1 = 22;
     public static final int SHOOTER_ID_2 = 23;
 

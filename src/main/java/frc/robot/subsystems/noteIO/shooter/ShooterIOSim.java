@@ -52,5 +52,4 @@ public class ShooterIOSim implements ShooterIO {
     public boolean upToSpeed() {
         return motor.getAngularVelocityRPM() > 5000;
     }
-
 }

@@ -1,10 +1,10 @@
-package frc.robot.subsystems.noteIO.intakeGround;
+package frc.robot.subsystems.noteIO.intakeBase;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface IntakeGroundIO {
+public interface IntakeBaseIO {
     @AutoLog
-    public static class IntakeGroundIOInputs {
+    public static class IntakeBaseIOInputs {
         public double motor1Voltage;
         public double motor1Current;
         public double motor1Velocity;
@@ -19,6 +19,6 @@ public interface IntakeGroundIO {
     public default void setVoltage(double volts) {
     }
 
-    public default void updateInputs(IntakeGroundIOInputsAutoLogged inputs) {
+    public default void updateInputs(IntakeBaseIOInputsAutoLogged inputs) {
     }
 }
