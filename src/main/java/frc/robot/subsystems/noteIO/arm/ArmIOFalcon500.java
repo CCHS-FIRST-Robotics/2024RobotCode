@@ -2,7 +2,7 @@ package frc.robot.subsystems.noteIO.arm;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
+// import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.*;
 import com.ctre.phoenix6.configs.*;
 // import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
@@ -116,8 +116,6 @@ public class ArmIOFalcon500 implements ArmIO {
 
         driveFalconConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         driveFalconConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        
-
 
         // fuses (trust)
         driveFeedbackConfig.FeedbackRemoteSensorID = driveCancoder.getDeviceID();
