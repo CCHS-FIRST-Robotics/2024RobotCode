@@ -5,9 +5,9 @@ import static edu.wpi.first.units.Units.*;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.units.*;
@@ -15,7 +15,6 @@ import edu.wpi.first.units.*;
 public class ShooterIOFalcon500 implements ShooterIO {
     private TalonFX motor1, motor2;
     private VelocityVoltage velocityControl = new VelocityVoltage(0);
-
     private final TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
     private final Slot0Configs drivePID = talonFXConfig.Slot0;
 
@@ -26,7 +25,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
     private static final double driveFeedforwardKs = 0;
     // Units needed are volts * seconds / rotations, max rpm is 6,380
     private static final double driveFeedforwardKv = .125; // 6380 rotaions per minute is 319/3
-                                                                      // rotations per second
+                                                           // rotations per second
     private static final double driveFeedforwardKa = 0;
 
     private StatusSignal<Double> voltageSignal1;
@@ -34,13 +33,14 @@ public class ShooterIOFalcon500 implements ShooterIO {
     private StatusSignal<Double> positionSignal1;
     private StatusSignal<Double> velocitySignal1;
     private StatusSignal<Double> temperatureSignal1;
-    private StatusSignal<Double> closedLoopReferenceSignal;
 
     private StatusSignal<Double> voltageSignal2;
     private StatusSignal<Double> currentSignal2;
     private StatusSignal<Double> positionSignal2;
     private StatusSignal<Double> velocitySignal2;
     private StatusSignal<Double> temperatureSignal2;
+
+    private StatusSignal<Double> closedLoopReferenceSignal;
 
     public ShooterIOFalcon500(int id1, int id2) {
         motor1 = new TalonFX(id1);
@@ -67,7 +67,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
         drivePID.kP = driveKp;
         drivePID.kI = driveKi;
         drivePID.kD = driveKd;
-        drivePID.kA = driveFeedforwardKa; // dont use it (forn now)(trust) (use it ocne sysid works)
+        drivePID.kA = driveFeedforwardKa; // dont use it (for now)(trust) (use it ocne sysid works)
         drivePID.kS = driveFeedforwardKs;
         drivePID.kV = driveFeedforwardKv;
 
