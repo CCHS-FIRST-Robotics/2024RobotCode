@@ -146,9 +146,9 @@ public class RobotContainer {
         // intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
 
         // base intake
-        controller.x().onTrue(armIntake.getArmIntakeCommand(null));
+        controller.x().onTrue(baseIntake.getBaseIntakeCommand(12));
 
-        // intake (stops automatically)
+        // intake
         controller.a().onTrue(
                 armIntake.getArmIntakeCommand(Volts.of(2.7))
                         .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose)));
@@ -179,6 +179,7 @@ public class RobotContainer {
         controller.b().and(shooter::upToSpeed).onTrue(
                 // shoot
                 armIntake.getShootCommand(Volts.of(12), shooter::checkNoteShot)
+                        // stop shooter
                         .andThen(new InstantCommand(shooter::stop, shooter)));
 
         // manual intake

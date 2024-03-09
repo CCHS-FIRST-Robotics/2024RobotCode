@@ -11,11 +11,9 @@ public class IntakeBaseIONEO implements IntakeBaseIO {
     public IntakeBaseIONEO(int id1, int id2) {
         motor1 = new CANSparkMax(id1, MotorType.kBrushless);
         encoder1 = motor1.getEncoder();
-
         motor2 = new CANSparkMax(id1, MotorType.kBrushless);
         encoder2 = motor1.getEncoder();
 
-        // get rotations per second
         encoder1.setVelocityConversionFactor(1 / 60);
         encoder2.setVelocityConversionFactor(1 / 60);
     }
