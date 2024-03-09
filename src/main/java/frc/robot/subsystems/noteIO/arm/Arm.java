@@ -74,7 +74,7 @@ public class Arm extends SubsystemBase {
 
         // trust!
         // io.setDriveVoltage(Volts.of(1));
-        setArmAngle(Degrees.of(30));
+        // setArmAngle(Degrees.of(30));
         // io.setDriveCurrent(Amps.of(9.2));
     }
 

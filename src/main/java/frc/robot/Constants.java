@@ -66,8 +66,8 @@ public final class Constants {
     }
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(Map.of(
-        ArmPosition.INTAKE, Degrees.of(-3.5),
-        ArmPosition.AMP, Degrees.of(75),
+        ArmPosition.INTAKE, Degrees.of(-2),
+        ArmPosition.AMP, Degrees.of(95),
         ArmPosition.MAIN, Degrees.of(42),
         ArmPosition.WILANG, Degrees.of(60),
         ArmPosition.ALLAN, Degrees.of(30),
@@ -93,7 +93,7 @@ public final class Constants {
 
     // miscellaneous
     public static final double PERIOD = .02;
-    public static final double ANALOG_DEADZONE = .05;
+    public static final double ANALOG_DEADZONE = .02;
     public static final Pose3d[] APRIL_TAG_LOCATIONS = {
             new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)),
             new Pose3d(0, 2, 0, new Rotation3d(0, 0, 0)),
@@ -102,8 +102,8 @@ public final class Constants {
     };
 
         // TODO: change to tunable numbers
-        public static final double LIENAR_SPEED_EXPONENT = 2;
-        public static final double ANGULAR_SPEED_EXPONENT = 2.5;
+        public static final double LIENAR_SPEED_EXPONENT = 1.8;
+        public static final double ANGULAR_SPEED_EXPONENT = 2;
 
 
         public static enum EventCommand {
@@ -155,12 +155,12 @@ public final class Constants {
                 public static final double SHOOT_TIME = 0.5;// idk
 
                 // quokka auto consts
-                public static final double Q_MAX_ARM_MOVE_TIME = 1;
+                public static final double Q_MAX_ARM_MOVE_TIME = .5;
                 public static final double Q_INTAKE_SET_TIME = 0.4;
                 public static final double Q_INTAKE_TIME = 0.1;
                 public static final double Q_INIT_SHOOT_SET_TIME = 2;
                 public static final double Q_SHOOT_SET_TIME = 1;
-                public static final double Q_SHOOT_TIME = 0.5;
+                public static final double Q_SHOOT_TIME = 0.4;
                 public static final Measure<Velocity<Angle>> SHOOT_SPEED = RotationsPerSecond.of(95); // idk
 
 

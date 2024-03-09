@@ -64,16 +64,14 @@ public class ArmIOFalcon500 implements ArmIO {
                                                                                   // rotations per second
     private static final double driveFeedforwardKaV = 0;
 
-    private static final double driveKpTC = 10;
-    private static final double driveKdTC = 0;
+    private static final double driveKpTC = 620; // 550
+    private static final double driveKdTC = 120; // 50
     private static final double driveKiTC = 0.0d;
 
     // Uhh Feedforward momment!
-    private static final double driveFeedforwardKgTC = 9.2; // .435V
+    private static final double driveFeedforwardKgTC = 8.9; // 9.2A
     private static final double driveFeedforwardKsTC = 0;
-    // Units needed are volts * seconds / rotations, max rpm is 6,380
-    private static final double driveFeedforwardKvTC = 0; // 6380 rotaions per minute is 319/3
-                                                                                  // rotations per second
+    private static final double driveFeedforwardKvTC = 0; // only used for viscous friction losses in TC
     private static final double driveFeedforwardKaTC = 0;
 
     boolean torqueCurrent = true;
@@ -117,8 +115,8 @@ public class ArmIOFalcon500 implements ArmIO {
         stickyFaultRemoteSensorOutOfSync = driveFalcon.getStickyFault_RemoteSensorDataInvalid();
 
         driveMMConfig.MotionMagicCruiseVelocity = 5; // 5 rotations every 1 seconds (defaualt)
-        driveMMConfig.MotionMagicAcceleration = 15; // .5 second to reach max speed (defaualt)
-        driveMMConfig.MotionMagicJerk = 50; // .33 seconds to reach max accel (defaualt)
+        driveMMConfig.MotionMagicAcceleration = 10; // .5 second to reach max speed (defaualt)
+        driveMMConfig.MotionMagicJerk = 25; // .33 seconds to reach max accel (defaualt)
 
         // Feedforward momment!
 
@@ -142,8 +140,8 @@ public class ArmIOFalcon500 implements ArmIO {
         driveFalconConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         driveFalconConfig.CurrentLimits.StatorCurrentLimit = 60;
 
-        driveFalconConfig.TorqueCurrent.PeakForwardTorqueCurrent = 80;
-        driveFalconConfig.TorqueCurrent.PeakReverseTorqueCurrent = -80;
+        driveFalconConfig.TorqueCurrent.PeakForwardTorqueCurrent = 70;
+        driveFalconConfig.TorqueCurrent.PeakReverseTorqueCurrent = -70;
 
         driveFalconConfig.Voltage.PeakForwardVoltage = 12;
         driveFalconConfig.Voltage.PeakReverseVoltage = -12;

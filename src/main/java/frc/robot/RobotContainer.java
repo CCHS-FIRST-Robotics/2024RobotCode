@@ -186,13 +186,9 @@ public class RobotContainer {
 
         // intake (stops automatically)
         // controller.x().onTrue(
-        //     intake.getIntakeCommand(Volts.of(2.7))
+        //     handoff.getHandoffCommand(Volts.of(2.7))
         //     .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
         // );
-
-        controller.y().onTrue(
-            handoff.getHandoffCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS))
-        );
 
         controller.leftTrigger().onTrue(
              arm.moveArm(ArmPosition.SHOOT, drive::getPose)
@@ -200,6 +196,27 @@ public class RobotContainer {
 
         controller.rightTrigger().onTrue(
              arm.moveArm(ArmPosition.INTAKE, drive::getPose)
+        );
+
+        controller.leftBumper().onTrue(
+             arm.moveArm(ArmPosition.AMP, drive::getPose)
+        );
+
+        controller.rightBumper().onTrue(
+             arm.moveArm(ArmPosition.MAIN, drive::getPose)
+        );
+
+        // prime shooter (AMP)
+        controller.y().and(() -> !shooter.upToSpeed()).onTrue(
+            new InstantCommand(() -> shooter.start(RotationsPerSecond.of(40)), shooter)
+            // new InstantCommand()
+            .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose))
+        );
+        
+        // shoot
+        controller.y().and(shooter::upToSpeed).onTrue(
+            handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
+            .andThen(new InstantCommand(shooter::stop, shooter))
         );
 
         // // shoot with arm
