@@ -111,8 +111,8 @@ public class DriveWithJoysticks extends Command {
                         );
 
                         // angularSpeed = nextState.velocity
-                        //                 - headingController.calculate(drive.getYaw().getRadians(), nextState.position);
-                        angularSpeed = -headingController.calculate(drive.getYaw().getRadians(), headingGoal);
+                        //                 + headingController.calculate(drive.getYaw().getRadians(), nextState.position);
+                        angularSpeed = headingController.calculate(drive.getYaw().getRadians(), headingGoal);
                         Logger.recordOutput("TEstingwtf", drive.getYaw().getRadians() - headingGoal);
                         Logger.recordOutput("TEstingwtf1", drive.getYaw().getRadians());
                         Logger.recordOutput("TEstingwtf2", headingGoal);

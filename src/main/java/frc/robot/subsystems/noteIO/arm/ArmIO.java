@@ -37,6 +37,10 @@ public interface ArmIO {
     public default void setDriveVoltage(Measure<Voltage> volts) {
     }
 
+    /** Run the drive motor at the specified voltage. */
+    public default void setDriveCurrent(Measure<Current> current) {
+    }
+
     /** Run the turn motor to the specified position. */
     public default void setDrivePosition(Measure<Angle> positionRad) {
     }

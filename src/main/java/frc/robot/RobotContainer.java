@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.ARM_POSITIONS;
 import static frc.robot.Constants.SPEAKER_POSE;
 
+import javax.sound.sampled.SourceDataLine;
+
 // import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -67,7 +69,7 @@ public class RobotContainer {
 
     private final Arm arm;
     private final IntakeArm handoff;
-    private final IntakeGround intake;
+    // private final IntakeGround intake;
     private final Shooter shooter;
 
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -92,7 +94,7 @@ public class RobotContainer {
                         useWiiRemotes);
                 camera = new Vision(new CameraIOZED());
                 arm = new Arm(new ArmIOFalcon500(20, 19));
-                intake = new IntakeGround(new IntakeGroundIONEO(100, 101)); ////////change
+                // intake = new IntakeGround(new IntakeGroundIONEO(100, 101)); ////////change
                 handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
                 shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
@@ -109,7 +111,7 @@ public class RobotContainer {
                 camera = new Vision(new CameraIOZED());
                 arm = new Arm(new ArmIOSim());
                 handoff = new IntakeArm(new IntakeIOSim());
-                intake = new IntakeGround(new IntakeGroundIOSim()); ////////change
+                // intake = new IntakeGround(new IntakeGroundIOSim()); ////////change
                 shooter = new Shooter(new ShooterIOSim());
                 break;
             default: // replayed robot
@@ -124,7 +126,7 @@ public class RobotContainer {
                 camera = new Vision(new CameraIOZED());
                 arm = new Arm(new ArmIOFalcon500(20, 19));
                 handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
-                intake = new IntakeGround(new IntakeGroundIONEO(100, 101)); ////////change
+                // intake = new IntakeGround(new IntakeGroundIONEO(100, 101)); ////////change
                 shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
         }
@@ -134,8 +136,8 @@ public class RobotContainer {
             new Rotation2d(),
             drive.getModulePositions(),
             new Pose2d(
-                1.4318007230758516,
-                5.557066917419431,
+                1.3,
+                5.56,
                 new Rotation2d()
             )
         );
@@ -161,7 +163,7 @@ public class RobotContainer {
                 drive,
                 () -> -controller.getLeftX(),
                 () -> -controller.getLeftY(),
-                () -> .75 * controller.getRightX(),
+                () -> .75 * -controller.getRightX(),
                 () -> {
                 return 1.0;
                 },
@@ -188,13 +190,27 @@ public class RobotContainer {
         //     .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
         // );
 
+        controller.y().onTrue(
+            handoff.getHandoffCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS))
+        );
+
+        controller.leftTrigger().onTrue(
+             arm.moveArm(ArmPosition.SHOOT, drive::getPose)
+        );
+
+        controller.rightTrigger().onTrue(
+             arm.moveArm(ArmPosition.INTAKE, drive::getPose)
+        );
+
         // // shoot with arm
         // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
         // String path = AutoPathConstants.THREE_NOTE_WING;
-        new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
-        // controller.x().onTrue(
+        // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
+        controller.x().onTrue(
             // new AutoRoutine(new MechanismsPath(AutoPathConstants.threeNoteWing, drive, intake, shooter, arm))
-            new EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake, handoff, shooter, arm).getCommandSequence()
+            //  EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake, handoff, shooter, arm).getCommandSequence()
+            new EventMarkerBuilder(AutoPathConstants.fourNoteWingSplits, drive, handoff, shooter, arm).getCommandSequence()    
+
 
             // drive.runOnce(
             //     () -> {
@@ -272,18 +288,18 @@ public class RobotContainer {
         // }));
 
 
-        controller.leftTrigger().onTrue(new InstantCommand(() -> {
-            ARM_POSITIONS.put(ArmPosition.RANDY, ARM_POSITIONS.get(ArmPosition.RANDY).minus(Degrees.of(.5)));
-            arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
-        }));
-        controller.rightTrigger().onTrue(new InstantCommand(() -> {
-            ARM_POSITIONS.put(ArmPosition.RANDY, ARM_POSITIONS.get(ArmPosition.RANDY).plus(Degrees.of(.5)));
-            arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
-        }));
-        controller.a().onTrue(new InstantCommand(() -> {
-            System.out.println("RANDY IS : " + ARM_POSITIONS.get(ArmPosition.RANDY));
+        // controller.leftTrigger().onTrue(new InstantCommand(() -> {
+        //     ARM_POSITIONS.put(ArmPosition.RANDY, ARM_POSITIONS.get(ArmPosition.RANDY).minus(Degrees.of(.5)));
+        //     arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
+        // }));
+        // controller.rightTrigger().onTrue(new InstantCommand(() -> {
+        //     ARM_POSITIONS.put(ArmPosition.RANDY, ARM_POSITIONS.get(ArmPosition.RANDY).plus(Degrees.of(.5)));
+        //     arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
+        // }));
+        // controller.a().onTrue(new InstantCommand(() -> {
+        //     System.out.println("RANDY IS : " + ARM_POSITIONS.get(ArmPosition.RANDY));
         
-        }));
+        // }));
 
         // // drive to specific pose
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());

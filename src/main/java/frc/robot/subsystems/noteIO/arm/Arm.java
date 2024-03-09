@@ -42,7 +42,9 @@ public class Arm extends SubsystemBase {
         armAngleMap.put(1.43256, 23.7d);
         armAngleMap.put(1.73736, 24.7d);
         armAngleMap.put(2.34696, 32.7d);
-        armAngleMap.put(3.71856, 38.7d);
+        armAngleMap.put(2.9, 37.4d);
+        armAngleMap.put(3.1, 37.9d);
+        armAngleMap.put(3.71856, 38.9d);
         armAngleMap.put(4.63296, 41.7d);
         
       }
@@ -72,7 +74,8 @@ public class Arm extends SubsystemBase {
 
         // trust!
         // io.setDriveVoltage(Volts.of(1));
-        // setArmAngle(Degrees.of(30));
+        setArmAngle(Degrees.of(30));
+        // io.setDriveCurrent(Amps.of(9.2));
     }
 
     public void setArmAngle(Measure<Angle> angle) {

@@ -18,13 +18,15 @@ public class Shooter extends SubsystemBase {
     private double startTime;
     private ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
+    boolean gottenToSpeed;
+
     public Shooter(ShooterIO io) {
         this.io = io;
     }
 
     public void start(Measure<Velocity<Angle>> v) {
         velocity = v;
-        startTime = Timer.getFPGATimestamp();
+        gottenToSpeed = false;
     }
 
     public void stop() {
@@ -36,9 +38,10 @@ public class Shooter extends SubsystemBase {
         return io.upToSpeed(velocity);
     }
 
+    @AutoLogOutput
     public boolean checkNoteShot() {
-        // return inputs.motor1Current > 18 && Timer.getFPGATimestamp() - startTime > 2;
-        return Timer.getFPGATimestamp() - startTime > AutoPathConstants.Q_SHOOT_TIME;
+        return inputs.motor1Current > 18 && gottenToSpeed;
+        // return Timer.getFPGATimestamp() - startTime > AutoPathConstants.Q_SHOOT_TIME;
     }
 
     @Override
@@ -47,9 +50,14 @@ public class Shooter extends SubsystemBase {
         Logger.processInputs("shooter", inputs);
         Logger.recordOutput("Shooting", velocity.magnitude() != 0);
 
+        if (upToSpeed()) {
+            gottenToSpeed = true;
+        }
+
         io.setVelocity(velocity);
     }
 
+    @AutoLogOutput
     public boolean checkInHandoff() {
         return Timer.getFPGATimestamp() - startTime > 0.1;
     }

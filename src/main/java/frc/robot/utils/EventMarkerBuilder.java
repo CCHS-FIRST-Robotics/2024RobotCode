@@ -53,24 +53,30 @@ public final class EventMarkerBuilder {
 
     private Command command;
 
-    public EventMarkerBuilder(ArrayList<String> pathList, Drive drive, IntakeGround intake, IntakeArm handoff,
+    public EventMarkerBuilder(ArrayList<String> pathList, Drive drive, IntakeArm handoff,
             Shooter shooter, Arm arm) {
         this.drive = drive;
-        this.intake = intake;
+        // this.intake = intake;
         this.shooter = shooter;
         this.arm = arm;
         this.handoff = handoff;
 
         command = new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95)), shooter)
                     .andThen(Commands.waitUntil(shooter::upToSpeed)
+                    .andThen(
+                        arm.moveArm(ArmPosition.SHOOT, drive::getPose)
+                        .alongWith(handoff.getShootCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS), shooter::checkNoteShot))
+                    ).until(shooter::checkNoteShot)
         );
 
         for (String path : pathList) {
             addCommand(path);
         }
 
-        // command = command.andThen(arm.moveArm(ArmPosition.SHOOT, arm.getPosFromPath(path, totalTime))).andThen(
-        //         handoff.getShootCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS), shooter::checkNoteShot));
+        command = command.andThen(
+            new InstantCommand(() -> shooter.stop())
+            .alongWith(new InstantCommand(() -> handoff.stop()))
+        );
 
     }
 
@@ -80,25 +86,26 @@ public final class EventMarkerBuilder {
         ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
         List<Pair<Double, Command>> eventMarkers = new ArrayList<Pair<Double, Command>>();
 
-        double driveTime = AutoPathConstants.Q_MAX_ARM_MOVE_TIME + AutoPathConstants.Q_SHOOT_TIME;
-        double totalTime = choreoTrajectory.getTotalTime() + driveTime; // + time to shoot
-        double intakeTime = totalTime - AutoPathConstants.Q_INTAKE_SET_TIME - AutoPathConstants.Q_INTAKE_TIME;
+        double driveTime = Math.max(AutoPathConstants.Q_MAX_ARM_MOVE_TIME, choreoTrajectory.getTotalTime());
+        double intakeTime = driveTime + AutoPathConstants.Q_INTAKE_TIME;
+        double shootTime = intakeTime + AutoPathConstants.Q_MAX_ARM_MOVE_TIME;
+        double totalTime = shootTime + AutoPathConstants.Q_SHOOT_TIME; // + time to shoot
 
         /*
          * quokka robot
          */
-        // arm shoot
         eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME,
+                arm.moveArm(ArmPosition.INTAKE, drive::getPose)
+                .alongWith(drive.followTrajectory(traj))
+                .alongWith(handoff.getHandoffCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS)))
+                // .alongWith(new InstantCommand(() -> System.out.println("sdhfdhfdsbdfhy")))
+        ));
+        // arm shoot
+        eventMarkers.add(Pair.of(intakeTime,
                 arm.moveArm(ArmPosition.SHOOT, drive::getPose))); // use current pose because it might not be following the path well
         // run handoff & shoot
-        eventMarkers.add(Pair.of(AutoPathConstants.Q_MAX_ARM_MOVE_TIME,
+        eventMarkers.add(Pair.of(shootTime,
                 handoff.getShootCommand(Volt.of(AutoPathConstants.INTAKE_VOLTS), shooter::checkNoteShot)));
-        // drive & arm & intake
-        eventMarkers.add(Pair.of(driveTime,
-                drive.followTrajectory(traj)
-                .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
-                .alongWith(handoff.getHandoffCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS)))
-        ));
 
         /*
          * final robot

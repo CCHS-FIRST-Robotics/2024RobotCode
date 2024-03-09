@@ -50,7 +50,7 @@ public final class Constants {
             REPLAY
     }
 
-    public static final Mode CURRENT_MODE = Mode.SIM;
+    public static final Mode CURRENT_MODE = Mode.REAL;
 
 
     public static enum ArmPosition {
@@ -66,7 +66,7 @@ public final class Constants {
     }
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(Map.of(
-        ArmPosition.INTAKE, Degrees.of(-5),
+        ArmPosition.INTAKE, Degrees.of(-3.5),
         ArmPosition.AMP, Degrees.of(75),
         ArmPosition.MAIN, Degrees.of(42),
         ArmPosition.WILANG, Degrees.of(60),
@@ -76,7 +76,7 @@ public final class Constants {
         ArmPosition.RANDY, Degrees.of(30)
     ));
 
-    public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.5, new Rotation2d(0));
+    public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
 
     // ports
     public static final int XBOX_CONTROLLER_PORT = 0;
@@ -133,8 +133,10 @@ public final class Constants {
                 public static final String TWO_NOTE_CENTER = "STwoNoteCenter";
                 public static final String TWO_NOTE_RIGHT = "STwoNoteRight";
                 public static final String FOUR_NOTE_LEFT = "SFourNoteLeft";
+                public static final String TWO_NOTE_TEST = "STest1.1";
 
                 public static final ArrayList<String> threeNoteWing = new ArrayList<String>();
+                 public static final ArrayList<String> twoNoteTest = new ArrayList<String>();
                 public static final ArrayList<String> threeNoteWingSplits = new ArrayList<String>();
                 public static final ArrayList<String> fourNoteWingSplits = new ArrayList<String>();
 
@@ -142,7 +144,7 @@ public final class Constants {
 
                 public static final double INTAKE_VOLTS = 12;
                 public static final double SHOOT_VOLTS = 12;
-                public static final double INTAKE_HANDOFF_VOLTS = 3;
+                public static final double INTAKE_HANDOFF_VOLTS = 5;
                 public static final double SHOOTER_HANDOFF_VOLTS = 6;
                 public static final Measure<Angle> ARM_HANDOFF_ANGLE = Radians.of(80 * Math.PI / 180); // double check for final
                 public static final Measure<Angle> QUOKKA_ARM_INTAKE_ANGLE = Radians.of(80 * Math.PI / 180); // double check
@@ -153,9 +155,9 @@ public final class Constants {
                 public static final double SHOOT_TIME = 0.5;// idk
 
                 // quokka auto consts
-                public static final double Q_MAX_ARM_MOVE_TIME = 0.5;
+                public static final double Q_MAX_ARM_MOVE_TIME = 1;
                 public static final double Q_INTAKE_SET_TIME = 0.4;
-                public static final double Q_INTAKE_TIME = 0.5;
+                public static final double Q_INTAKE_TIME = 0.1;
                 public static final double Q_INIT_SHOOT_SET_TIME = 2;
                 public static final double Q_SHOOT_SET_TIME = 1;
                 public static final double Q_SHOOT_TIME = 0.5;
@@ -173,6 +175,8 @@ public final class Constants {
                         fourNoteWingSplits.add(FOUR_NOTE_WING1);
                         fourNoteWingSplits.add(FOUR_NOTE_WING2);
                         fourNoteWingSplits.add(FOUR_NOTE_WING3);
+
+                        twoNoteTest.add(TWO_NOTE_TEST);
 
                         pathLists.add(threeNoteWing);
 

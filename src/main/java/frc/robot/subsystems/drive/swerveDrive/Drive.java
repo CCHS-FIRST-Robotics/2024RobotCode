@@ -77,16 +77,16 @@ public class Drive extends SubsystemBase {
     private Translation2d wiiLinearVelocity = new Translation2d();
 
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
-    private double kPx = 0.5; // 0.4
-    private double kPy = 0.5; // 0.33
+    private double kPx = 2.3; // 0.4
+    private double kPy = 2.3; // 0.33
     private double kPHeading = 3; // 0.25 // 0.5
 
-    private double kDx = 0.05; // 
-    private double kDy = 0.05; // 
+    private double kDx = 0.1; // 
+    private double kDy = 0.1; // 
     private double kDHeading = .3; // 
 
-    private double kIx = 0.12; // 0.12
-    private double kIy = 0.12; // 0.15
+    private double kIx = 0.1; // 0.12
+    private double kIy = 0.1; // 0.15
     // private double kPlinear =
     private double kIHeading = 0.00; // 0.05
 
@@ -203,9 +203,9 @@ public class Drive extends SubsystemBase {
             module.setBrakeMode(isBrakeMode);
         }
 
-        xController.setTolerance(.01);
-        yController.setTolerance(.01);
-        headingController.setTolerance(.005);
+        xController.setTolerance(.035);
+        yController.setTolerance(.035);
+        headingController.setTolerance(.025);
 
         if (isWiiMode) {
             this.isWiiMode = true;
@@ -638,25 +638,6 @@ public class Drive extends SubsystemBase {
 
     /** Returns an array of module translations. */
     public static Translation2d[] getModuleTranslations() {
-        // return new Translation2d[] {
-        // new Translation2d(-trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) /
-        // 2.0),
-        // new Translation2d(trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) /
-        // 2.0),
-        // new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) /
-        // 2.0),
-        // new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) /
-        // 2.0)
-        // };
-        // return new Translation2d[] {
-        // new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) /
-        // 2.0),
-        // new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) /
-        // 2.0),
-        // new Translation2d(-trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) /
-        // 2.0),
-        // new Translation2d(trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0)
-        // };
         return new Translation2d[] {
                 new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
                 new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),

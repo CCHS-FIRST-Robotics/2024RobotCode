@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants.AutoPathConstants;
 
 import java.util.function.BooleanSupplier;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class IntakeArm extends SubsystemBase {
@@ -34,10 +36,11 @@ public class IntakeArm extends SubsystemBase {
         volts = Volts.of(0);
     }
 
+    @AutoLogOutput
     private boolean checkNoteThere() {
-        // return inputs.motorCurrent > 30 && (Timer.getFPGATimestamp() - startTime >
-        // 0.5);
-        return Timer.getFPGATimestamp() - startTime > AutoPathConstants.Q_INTAKE_TIME;
+        return inputs.motorCurrent > (25d / 3d) * volts.in(Volts) && (Timer.getFPGATimestamp() - startTime >
+        0.5);
+        // return Timer.getFPGATimestamp() - startTime > AutoPathConstants.Q_INTAKE_TIME;
         // return currentDebouncer.calculate(inputs.motorCurrent > 30);
         // return inputs.motorCurrent > 30 && inputs.motorVelocity > 98 * (volts / 12);
     }
