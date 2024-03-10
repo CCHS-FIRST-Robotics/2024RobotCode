@@ -61,8 +61,10 @@ public class ShooterIOFalcon500 implements ShooterIO {
         velocitySignal2 = motor2.getVelocity();
         temperatureSignal2 = motor2.getDeviceTemp();
 
-        talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        talonFXConfig.CurrentLimits.StatorCurrentLimit = 60;
+        talonFXConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        talonFXConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        talonFXConfig.CurrentLimits.SupplyTimeThreshold = 1;
+        
 
         drivePID.kP = driveKp;
         drivePID.kI = driveKi;

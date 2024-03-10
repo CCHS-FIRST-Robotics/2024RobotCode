@@ -137,8 +137,11 @@ public class ArmIOFalcon500 implements ArmIO {
         driveFeedbackConfig.SensorToMechanismRatio = 1.0; // fuck maybe? CHANGE????
         driveFeedbackConfig.RotorToSensorRatio = gearRatio; // CHNAGE
 
-        driveFalconConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        driveFalconConfig.CurrentLimits.StatorCurrentLimit = 60;
+        // driveFalconConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        // driveFalconConfig.CurrentLimits.StatorCurrentLimit = 60;
+        driveFalconConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        driveFalconConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        driveFalconConfig.CurrentLimits.SupplyTimeThreshold = .5;
 
         driveFalconConfig.TorqueCurrent.PeakForwardTorqueCurrent = 70;
         driveFalconConfig.TorqueCurrent.PeakReverseTorqueCurrent = -70;

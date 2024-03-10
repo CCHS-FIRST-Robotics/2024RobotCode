@@ -29,8 +29,8 @@ public class IntakeArmIOFalcon500 implements IntakeArmIO {
 
         // current limiting
         TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
-        talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        talonFXConfig.CurrentLimits.StatorCurrentLimit = 60;
+        talonFXConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        talonFXConfig.CurrentLimits.SupplyCurrentLimit = 20;
         motor.getConfigurator().apply(talonFXConfig);
     }
 
