@@ -1,24 +1,15 @@
 package frc.robot.subsystems.vision;
 
-import java.util.ArrayList;
-
-import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.LogTable;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
-
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.numbers.*;
-import frc.robot.utils.AprilTag;
-import frc.robot.utils.TimestampedPose2d;
-import frc.robot.utils.TimestampedPose3d;
-import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
+import org.littletonrobotics.junction.LogTable;
+import edu.wpi.first.units.*;
+import edu.wpi.first.math.*;
+import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.numbers.*;
+import java.util.ArrayList;
+import frc.robot.utils.*;
+import frc.robot.utils.AprilTag;
 
 public interface CameraIO {
     public static class CameraIOInputs implements LoggableInputs {
@@ -37,14 +28,17 @@ public interface CameraIO {
 
         // Localization data
         TimestampedPose2d tagPoseEstimate = new TimestampedPose2d(new Pose2d(-1, -1, new Rotation2d(-1)), 0);
-        TimestampedPose3d tagPoseEstimate3d = new TimestampedPose3d(new Pose3d(-1, -1, -1, new Rotation3d(-1, -1, -1)), 0);
+        TimestampedPose3d tagPoseEstimate3d = new TimestampedPose3d(new Pose3d(-1, -1, -1, new Rotation3d(-1, -1, -1)),
+                0);
 
-        TimestampedPose3d zedPoseEstimate3d = new TimestampedPose3d(new Pose3d(-1, -1, -1, new Rotation3d(-1, -1, -1)), 0);
+        TimestampedPose3d zedPoseEstimate3d = new TimestampedPose3d(new Pose3d(-1, -1, -1, new Rotation3d(-1, -1, -1)),
+                0);
         TimestampedPose2d zedPoseEstimate = new TimestampedPose2d(new Pose2d(-1, -1, new Rotation2d(-1)), 0);
         Matrix<N3, N1> zedPoseCovar = VecBuilder.fill(0, 0, 0);
 
         /*
-         * IMPLEMENTS LOGGABLE INPUTS MANUALLY (NOT AUTOLOG) TO LOG CUSTOM AprilTag OBJECTS
+         * IMPLEMENTS LOGGABLE INPUTS MANUALLY (NOT AUTOLOG) TO LOG CUSTOM AprilTag
+         * OBJECTS
          */
         @Override
         public void toLog(LogTable table) {
@@ -104,5 +98,6 @@ public interface CameraIO {
     }
 
     /** Updates the set of loggable inputs. */
-    public default void updateInputs(CameraIOInputs inputs) {}
+    public default void updateInputs(CameraIOInputs inputs) {
+    }
 }
