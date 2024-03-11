@@ -92,6 +92,7 @@ public final class Constants {
     public static final int ARM_INTAKE_ID = 21;
     public static final int SHOOTER_ID_1 = 22;
     public static final int SHOOTER_ID_2 = 23;
+    public static final int HANDOFF_ID = 24;
 
     // miscellaneous
     public static final double PERIOD = .02;

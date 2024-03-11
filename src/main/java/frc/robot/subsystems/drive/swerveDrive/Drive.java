@@ -1,48 +1,29 @@
-package frc.robot.subsystems.swerveDrive;
+package frc.robot.subsystems.drive.swerveDrive;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.geometry.Twist3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.MutableMeasure.mutable;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
-import edu.wpi.first.wpilibj2.command.Command;
+
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
-
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.units.*;
+import frc.robot.utils.DriveTrajectory;
+import frc.robot.utils.PoseEstimator;
+import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
-import org.opencv.ml.ANN_MLP;
-
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.FollowPathHolonomic;
-import com.revrobotics.CANSparkBase.IdleMode;
-
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.utils.DriveTrajectory;
+import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.PoseEstimator;
 
 
@@ -103,16 +84,17 @@ public class Drive extends SubsystemBase {
      */
     
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
-    private double kPx = 0.35; // 0.4
-    private double kPy = 0.35; // 0.33
-    private double kPHeading = 2; // 0.25 // 0.5
+    private double kPx = 2.3; // 0.4
+    private double kPy = 2.3; // 0.33
+    private double kPHeading = 3; // 0.25 // 0.5
 
-    private double kDx = 0.35; // 0.4
-    private double kDy = 0.35; // 0.33
-    private double kDHeading = 2; // 0.25 // 0.5
+    private double kDx = 0.1; // 
+    private double kDy = 0.1; // 
+    private double kDHeading = .3; // 
 
-    private double kIx = 0.12; // 0.12
-    private double kIy = 0.12; // 0.15
+    private double kIx = 0.1; // 0.12
+    private double kIy = 0.1; // 0.15
+    // private double kPlinear =
     private double kIHeading = 0.00; // 0.05
 
     private PIDController xController = new PIDController(kPx, kIx, kDx);
@@ -141,7 +123,7 @@ public class Drive extends SubsystemBase {
     
     // Tell SysId how to record a frame of data for each motor on the mechanism being
     // characterized (real uses URCL, sim uses manual logging)
-    Consumer<SysIdRoutineLog> log = (Constants.currentMode == Mode.REAL) ? 
+    Consumer<SysIdRoutineLog> log = (Constants.CURRENT_MODE == Mode.REAL) ? 
                 null : log -> {
                     // Record a frame for the left motors.  Since these share an encoder, we consider
                     // the entire group to be one motor.
@@ -184,6 +166,10 @@ public class Drive extends SubsystemBase {
     private boolean isBrakeMode = true;
     private Timer lastMovementTimer = new Timer();
 
+    // auto path
+   private ArrayList<String> autoPaths;
+   private int currentPathNum = 1; // 0 in the list is the first path
+
     // Control modes for the drive
     public enum CONTROL_MODE {
         DISABLED,
@@ -222,9 +208,9 @@ public class Drive extends SubsystemBase {
             module.setBrakeMode(isBrakeMode);
         }
 
-        xController.setTolerance(.01);
-        yController.setTolerance(.01);
-        headingController.setTolerance(.005);
+        xController.setTolerance(.035);
+        yController.setTolerance(.035);
+        headingController.setTolerance(.025);
     }
 
     public void periodic() {
@@ -660,5 +646,29 @@ public class Drive extends SubsystemBase {
             .andThen(characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
             .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward))
             .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+    }
+    
+    public Command followTrajectory(DriveTrajectory traj) {
+        return runOnce(
+                () -> {
+                    System.out.println("recording pos traj");
+                    Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
+                    runPosition(traj);
+                }
+            );
+    }
+
+
+    /* added for auto stuff - not good but maybe better? */
+    public Command followTrajectory(ArrayList<String> path) {
+        return runOnce(
+                () -> {
+                    DriveTrajectory traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.get(currentPathNum));
+                    System.out.println("recording pos traj");
+                    Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
+                    currentPathNum++;
+                    runPosition(traj);
+                }
+            );
     }
 }

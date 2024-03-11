@@ -40,11 +40,8 @@ import frc.robot.utils.EventMarkerBuilder;
 import frc.robot.utils.MechanismsPath;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.noteIO.arm.*;
-import frc.robot.subsystems.noteIO.intakeBase.*;
 import frc.robot.subsystems.noteIO.intakeArm.*;
-import frc.robot.subsystems.noteIO.intakeGround.IntakeGround;
-import frc.robot.subsystems.noteIO.intakeGround.IntakeGroundIONEO;
-import frc.robot.subsystems.noteIO.intakeGround.IntakeGroundIOSim;
+import frc.robot.subsystems.noteIO.intakeGround.*;
 import frc.robot.subsystems.noteIO.shooter.*;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -64,7 +61,7 @@ public class RobotContainer {
 
     private final Arm arm;
     private final IntakeArm handoff;
-    // private final IntakeGround intake;
+    private final IntakeGround intake;
     private final Shooter shooter;
 
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -86,8 +83,7 @@ public class RobotContainer {
                         new ModuleIOSparkMax(3));
                 camera = new Vision(new CameraIOZED());
                 arm = new Arm(new ArmIOFalcon500(Constants.ARM_ID, Constants.ARM_CANCODER_ID));
-                baseIntake = new IntakeBase(new IntakeBaseIONEO(Constants.BASE_INTAKE_ID, Constants.BASE_INTAKE_ID));
-                // armIntake = new IntakeGround(new IntakeGroundIONEO(100, 101)); ////////change
+                intake = new IntakeGround(new IntakeGroundIONEO(Constants.BASE_INTAKE_ID, Constants.BASE_INTAKE_ID));
                 handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.ARM_INTAKE_ID));
                 shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
@@ -102,8 +98,8 @@ public class RobotContainer {
                         new ModuleIOSim());
                 camera = new Vision(new CameraIOZED());
                 arm = new Arm(new ArmIOSim());
-                handoff = new IntakeArm(new IntakeIOSim());
-                // intake = new IntakeGround(new IntakeGroundIOSim()); ////////change
+                handoff = new IntakeArm(new IntakeArmIOSim());
+                intake = new IntakeGround(new IntakeGroundIOSim()); ////////change
                 shooter = new Shooter(new ShooterIOSim());
                 break;
             default: // replayed robot
@@ -116,8 +112,8 @@ public class RobotContainer {
                         new ModuleIOSparkMax(3));
                 camera = new Vision(new CameraIOZED());
                 arm = new Arm(new ArmIOFalcon500(Constants.ARM_ID, Constants.ARM_CANCODER_ID));
-                handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
-                // intake = new IntakeGround(new IntakeGroundIONEO(100, 101)); ////////change
+                handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.HANDOFF_ID));
+                intake = new IntakeGround(new IntakeGroundIONEO(100, 101)); ////////change
                 shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
         }
@@ -156,7 +152,8 @@ public class RobotContainer {
                 () -> -controller.getLeftY(), 
                 () -> -controller.getRightX(), 
                 () -> {return 1.0;},
-                () -> Rotation2d.fromDegrees(controller.getHID().getPOV())
+                () -> Rotation2d.fromDegrees(controller.getHID().getPOV()),
+                false
             )
         );
 
@@ -203,7 +200,7 @@ public class RobotContainer {
         // intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
 
         // base intake
-        controller.x().onTrue(baseIntake.getBaseIntakeCommand(12));
+        controller.x().onTrue(intake.getBaseIntakeCommand(12));
 
         // intake (stops automatically)
         // controller.x().onTrue(
