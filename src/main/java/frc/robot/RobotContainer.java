@@ -29,7 +29,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.commands.*;
-import frc.robot.commands.AutoRoutine;
 import frc.robot.Constants.AutoPathConstants;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants.ArmPosition;
@@ -37,7 +36,6 @@ import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.EventMarkerBuilder;
-import frc.robot.utils.MechanismsPath;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.noteIO.arm.*;
 import frc.robot.subsystems.noteIO.intakeArm.*;
@@ -200,7 +198,7 @@ public class RobotContainer {
         // intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
 
         // base intake
-        controller.x().onTrue(intake.getBaseIntakeCommand(12));
+        controller.x().onTrue(intake.getIntakeCommand(12));
 
         // intake (stops automatically)
         // controller.x().onTrue(
