@@ -9,11 +9,11 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmPosition;
 import edu.wpi.first.units.*;
-import edu.wpi.first.math.MathUtil;
+// import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
-import edu.wpi.first.math.interpolation.InverseInterpolator;
+// import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+// import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -46,8 +46,8 @@ public class Arm extends SubsystemBase {
         armAngleMap.put(3.1, 37.4d);
         armAngleMap.put(3.71856, 38.8d);
         armAngleMap.put(4.63296, 41.7d);
-        
-      }
+
+    }
 
     public Arm(ArmIO io) {
         this.io = io;

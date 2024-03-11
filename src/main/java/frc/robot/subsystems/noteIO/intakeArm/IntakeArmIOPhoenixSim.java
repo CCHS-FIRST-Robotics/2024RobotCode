@@ -1,5 +1,5 @@
 package frc.robot.subsystems.noteIO.intakeArm;
 
-public class IntakeIOPhoenixSim {
+public class IntakeArmIOPhoenixSim {
 
 }

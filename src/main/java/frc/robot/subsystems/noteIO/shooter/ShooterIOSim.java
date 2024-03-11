@@ -61,5 +61,4 @@ public class ShooterIOSim implements ShooterIO {
     public boolean upToSpeed(Measure<Velocity<Angle>> targetVelocity) {
         return motor.getAngularVelocityRPM() > targetVelocity.in(Rotations.per(Minute));
     }
-
 }

@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 /**
  * to do:
  * 
- * better simulation code
  * sysID for shooter (same as arm)
  */
 public final class Main {

@@ -70,6 +70,7 @@ public class IntakeArm extends SubsystemBase {
                 this);
     }
 
+    // turns motor on until shooter detects note
     public Command getShootCommand(Measure<Voltage> v, BooleanSupplier shooterDone) {
         // turns motor on until shooter detects note
         

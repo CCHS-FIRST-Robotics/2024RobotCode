@@ -7,11 +7,11 @@ import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
 
-public class IntakeIOSim implements IntakeArmIO {
+public class IntakeArmIOSim implements IntakeArmIO {
     Measure<Voltage> appliedVoltage = Volts.of(0);
     DCMotorSim motor = new DCMotorSim(DCMotor.getFalcon500(1), 1, .001);
 
-    public IntakeIOSim() {
+    public IntakeArmIOSim() {
 
     }
 
