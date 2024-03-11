@@ -38,13 +38,13 @@ public class Arm extends SubsystemBase {
 
     // meters, degrees
     static {
-        armAngleMap.put(1.12776, 19.7d);
-        armAngleMap.put(1.43256, 23.7d);
+        armAngleMap.put(1.05, 16.5d);
+        armAngleMap.put(1.43256, 23d);
         armAngleMap.put(1.73736, 24.7d);
         armAngleMap.put(2.34696, 32.7d);
-        armAngleMap.put(2.9, 37.4d);
-        armAngleMap.put(3.1, 37.9d);
-        armAngleMap.put(3.71856, 38.9d);
+        armAngleMap.put(2.9, 37d);
+        armAngleMap.put(3.1, 37.4d);
+        armAngleMap.put(3.71856, 38.8d);
         armAngleMap.put(4.63296, 41.7d);
         
       }
