@@ -43,7 +43,7 @@ public class IntakeGround extends SubsystemBase {
 
     private boolean checkNoteThere() {
         // return inputs.motor1Current > 15 && inputs.motor1Velocity > 5000 * (volts / 12);
-        return Timer.getFPGATimestamp() - startTime > 0.1;
+        return inputs.motor1Current > 30 && Timer.getFPGATimestamp() - startTime > 0.1;
     }
 
     public Command startEndCommmand() {

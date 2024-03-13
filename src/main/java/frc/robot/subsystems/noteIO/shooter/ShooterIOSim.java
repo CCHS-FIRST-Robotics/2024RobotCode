@@ -27,13 +27,13 @@ public class ShooterIOSim implements ShooterIO {
     public void updateInputs(ShooterIOInputs inputs) {
         motor.update(Constants.PERIOD);
 
-        inputs.motor1Voltage = appliedVoltage.in(Volts);
-        inputs.motor1Current = motor.getCurrentDrawAmps();
-        inputs.motor1Velocity = motor.getAngularVelocityRPM() / 60;
+        inputs.leftShooterVoltage = appliedVoltage.in(Volts);
+        inputs.leftShooterCurrent = motor.getCurrentDrawAmps();
+        inputs.leftShooterVelocity = motor.getAngularVelocityRPM() / 60;
 
-        inputs.motor2Voltage = appliedVoltage.in(Volts);
-        inputs.motor2Current = motor.getCurrentDrawAmps();
-        inputs.motor2Velocity = motor.getAngularVelocityRPM() / 60;
+        inputs.rightShooterVoltage = appliedVoltage.in(Volts);
+        inputs.rightShooterCurrent = motor.getCurrentDrawAmps();
+        inputs.rightShooterVelocity = motor.getAngularVelocityRPM() / 60;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class ShooterIOSim implements ShooterIO {
     }
 
     @Override
-    public void setVelocity(Measure<Velocity<Angle>> velocity) {
+    public void setVelocity(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
         double volts = feedforward.calculate(
                 prevSetpoint.in(RotationsPerSecond)
                 // velocity.in(RotationsPerSecond),
@@ -51,14 +51,14 @@ public class ShooterIOSim implements ShooterIO {
                 )
                 + feedback.calculate(
                         motor.getAngularVelocityRPM() / 60,
-                        velocity.in(RotationsPerSecond));
+                        leftVelocity.in(RotationsPerSecond));
         setVoltage(Volts.of(volts));
 
-        prevSetpoint = velocity;
+        prevSetpoint = leftVelocity;
     }
     
     @Override
-    public boolean upToSpeed(Measure<Velocity<Angle>> targetVelocity) {
-        return motor.getAngularVelocityRPM() > targetVelocity.in(Rotations.per(Minute));
+    public boolean upToSpeed(Measure<Velocity<Angle>> leftTargetVelocity, Measure<Velocity<Angle>> rightTargetVelocity) {
+        return motor.getAngularVelocityRPM() > leftTargetVelocity.in(Rotations.per(Minute));
     }
 }

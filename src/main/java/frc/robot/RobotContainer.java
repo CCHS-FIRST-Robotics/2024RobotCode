@@ -172,19 +172,6 @@ public class RobotContainer {
          * Move drive (future: other subsystems) to track a target
          */
         Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
-        controller.rightTrigger().whileTrue(
-            new DriveWithJoysticks(
-                drive,
-                () -> controller.getLeftX(),
-                () -> controller.getLeftY(),
-                () -> .75 * -controller.getRightX(),
-                () -> {
-                return 1.0;
-                },
-                () -> Rotation2d.fromDegrees(controller.getHID().getPOV()),
-                false
-            )
-        );
         
         /*
          * Drive Characterization Code

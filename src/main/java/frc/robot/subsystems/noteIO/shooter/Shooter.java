@@ -14,7 +14,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
     private ShooterIO io;
-    private Measure<Velocity<Angle>> velocity = RotationsPerSecond.of(0);
+    private Measure<Velocity<Angle>> leftVelocity = RotationsPerSecond.of(0);
+    private Measure<Velocity<Angle>> rightVelocity = RotationsPerSecond.of(0);
     private double startTime;
     private ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
@@ -24,23 +25,25 @@ public class Shooter extends SubsystemBase {
         this.io = io;
     }
 
-    public void start(Measure<Velocity<Angle>> v) {
-        velocity = v;
+    public void start(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
+        this.leftVelocity = leftVelocity;
+        this.rightVelocity = rightVelocity;
         gottenToSpeed = false;
     }
 
     public void stop() {
-        velocity = RotationsPerSecond.of(0);
+        leftVelocity = RotationsPerSecond.of(0);
+        rightVelocity = RotationsPerSecond.of(0);
     }
 
     @AutoLogOutput
     public boolean upToSpeed() {
-        return io.upToSpeed(velocity);
+        return io.upToSpeed(leftVelocity, rightVelocity);
     }
 
     @AutoLogOutput
     public boolean checkNoteShot() {
-        return inputs.motor1Current > 18 && gottenToSpeed;
+        return inputs.leftShooterCurrent > 18 && gottenToSpeed;
         // return Timer.getFPGATimestamp() - startTime > AutoPathConstants.Q_SHOOT_TIME;
     }
 
@@ -48,13 +51,13 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("shooter", inputs);
-        Logger.recordOutput("Shooting", velocity.magnitude() != 0);
+        Logger.recordOutput("Shooting", leftVelocity.magnitude() != 0 || rightVelocity.magnitude() != 0);
 
         if (upToSpeed()) {
             gottenToSpeed = true;
         }
 
-        io.setVelocity(velocity);
+        io.setVelocity(leftVelocity, rightVelocity);
     }
 
     @AutoLogOutput
@@ -62,10 +65,10 @@ public class Shooter extends SubsystemBase {
         return Timer.getFPGATimestamp() - startTime > 0.1;
     }
 
-    public Command getShootNoteCommand(Measure<Velocity<Angle>> v) {
+    public Command getShootNoteCommand(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
         // turns on motor to shoot note
         return new FunctionalCommand(
-                () -> start(v),
+                () -> start(leftVelocity, rightVelocity),
                 () -> {
                 },
                 (interrupted) -> stop(),
@@ -73,10 +76,10 @@ public class Shooter extends SubsystemBase {
                 this);
     }
 
-    public Command getReceiveNoteCommand(Measure<Velocity<Angle>> v) {
+    public Command getReceiveNoteCommand(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
         // turns on motor until note is fully detected inside handoff
         return new FunctionalCommand(
-                () -> start(v),
+                () -> start(leftVelocity, rightVelocity),
                 () -> {
                 },
                 (interrupted) -> stop(),

@@ -20,13 +20,13 @@ public interface ShooterIO {
         public double motor2Temperature;
     }
 
-    public default void setVelocity(Measure<Velocity<Angle>> v) {
+    public default void setVelocity(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
     }
 
     public default void setVoltage(Measure<Voltage> v) {
     }
 
-    public default boolean upToSpeed(Measure<Velocity<Angle>> targetVelocity) {
+    public default boolean upToSpeed(Measure<Velocity<Angle>> leftTargetVelocity, Measure<Velocity<Angle>> rightTargetVelocity) {
         return false;
     }
 
