@@ -65,7 +65,6 @@ public class ShooterIOFalcon500 implements ShooterIO {
         talonFXConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         talonFXConfig.CurrentLimits.SupplyCurrentLimit = 60;
         talonFXConfig.CurrentLimits.SupplyTimeThreshold = 1;
-        
 
         drivePID.kP = driveKp;
         drivePID.kI = driveKi;
@@ -105,9 +104,10 @@ public class ShooterIOFalcon500 implements ShooterIO {
 
     @Override
     @AutoLogOutput
-    public boolean upToSpeed(Measure<Velocity<Angle>> leftTargetVelocity, Measure<Velocity<Angle>> rightTargetVelocity) {
+    public boolean upToSpeed(Measure<Velocity<Angle>> leftTargetVelocity,
+            Measure<Velocity<Angle>> rightTargetVelocity) {
         return velocitySignalLeft.getValue() > leftTargetVelocity.in(RotationsPerSecond)
-            && velocitySignalRight.getValue() > rightTargetVelocity.in(RotationsPerSecond);
+                && velocitySignalRight.getValue() > rightTargetVelocity.in(RotationsPerSecond);
     }
 
     @Override
@@ -125,17 +125,17 @@ public class ShooterIOFalcon500 implements ShooterIO {
                 velocitySignalRight,
                 temperatureSignalRight);
 
-        inputs.leftShooterVoltage = voltageSignalLeft.getValue();
-        inputs.leftShooterCurrent = currentSignalLeft.getValue();
-        inputs.leftShooterPosition = positionSignalLeft.getValue();
-        inputs.leftShooterVelocity = velocitySignalLeft.getValue();
-        inputs.leftShooterTemperature = temperatureSignalLeft.getValue();
+        inputs.leftMotorVoltage = voltageSignalLeft.getValue();
+        inputs.leftMotorCurrent = currentSignalLeft.getValue();
+        inputs.leftMotorPosition = positionSignalLeft.getValue();
+        inputs.leftMotorVelocity = velocitySignalLeft.getValue();
+        inputs.leftMotorTemperature = temperatureSignalLeft.getValue();
 
-        inputs.rightShooterVoltage = voltageSignalRight.getValue();
-        inputs.rightShooterCurrent = currentSignalRight.getValue();
-        inputs.rightShooterPosition = positionSignalRight.getValue();
-        inputs.rightShooterVelocity = velocitySignalRight.getValue();
-        inputs.rightShooterTemperature = temperatureSignalRight.getValue();
+        inputs.rightMotorVoltage = voltageSignalRight.getValue();
+        inputs.rightMotorCurrent = currentSignalRight.getValue();
+        inputs.rightMotorPosition = positionSignalRight.getValue();
+        inputs.rightMotorVelocity = velocitySignalRight.getValue();
+        inputs.rightMotorTemperature = temperatureSignalRight.getValue();
 
         inputs.closedLoopReference = closedLoopReferenceSignal.getValue();
     }

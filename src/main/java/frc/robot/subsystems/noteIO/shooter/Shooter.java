@@ -43,7 +43,7 @@ public class Shooter extends SubsystemBase {
 
     @AutoLogOutput
     public boolean checkNoteShot() {
-        return inputs.leftShooterCurrent > 18 && gottenToSpeed;
+        return inputs.leftMotorCurrent > 18 && gottenToSpeed;
         // return Timer.getFPGATimestamp() - startTime > AutoPathConstants.Q_SHOOT_TIME;
     }
 
@@ -76,7 +76,8 @@ public class Shooter extends SubsystemBase {
                 this);
     }
 
-    public Command getReceiveNoteCommand(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
+    public Command getReceiveNoteCommand(Measure<Velocity<Angle>> leftVelocity,
+            Measure<Velocity<Angle>> rightVelocity) {
         // turns on motor until note is fully detected inside handoff
         return new FunctionalCommand(
                 () -> start(leftVelocity, rightVelocity),

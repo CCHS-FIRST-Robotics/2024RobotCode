@@ -6,18 +6,19 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ShooterIO {
     @AutoLog
     public static class ShooterIOInputs {
-        public double motor1Current;
-        public double motor1Voltage;
-        public double motor1Position;
-        public double motor1Velocity;
-        public double motor1Temperature;
-        public double closedLoopReference;
+        public double leftMotorCurrent;
+        public double leftMotorVoltage;
+        public double leftMotorPosition;
+        public double leftMotorVelocity;
+        public double leftMotorTemperature;
 
-        public double motor2Current;
-        public double motor2Voltage;
-        public double motor2Position;
-        public double motor2Velocity;
-        public double motor2Temperature;
+        public double rightMotorCurrent;
+        public double rightMotorVoltage;
+        public double rightMotorPosition;
+        public double rightMotorVelocity;
+        public double rightMotorTemperature;
+
+        public double closedLoopReference;
     }
 
     public default void setVelocity(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
@@ -26,7 +27,8 @@ public interface ShooterIO {
     public default void setVoltage(Measure<Voltage> v) {
     }
 
-    public default boolean upToSpeed(Measure<Velocity<Angle>> leftTargetVelocity, Measure<Velocity<Angle>> rightTargetVelocity) {
+    public default boolean upToSpeed(Measure<Velocity<Angle>> leftTargetVelocity,
+            Measure<Velocity<Angle>> rightTargetVelocity) {
         return false;
     }
 
