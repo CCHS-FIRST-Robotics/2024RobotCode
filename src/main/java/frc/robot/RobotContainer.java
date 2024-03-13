@@ -149,17 +149,17 @@ public class RobotContainer {
         // ! colin look at this because idk what it's used for
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
 
-        // // // Generate a trajectory to a pose when the X button is pressed (and
+        // Generate a trajectory to a pose when the X button is pressed (and
         // switch
-        // // drive to position control)
-        // // String path = AutoPathConstants.THREE_NOTE_WING;
-        // // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() ==
+        // drive to position control)
+        // String path = AutoPathConstants.THREE_NOTE_WING;
+        // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() ==
         // 10);}).onTrue(
         // controller1.x().onTrue(
-        // // new AutoRoutine(new MechanismsPath(AutoPathConstants.threeNoteWing, drive,
-        // // intake, shooter, arm))
-        // // EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake,
-        // // handoff, shooter, arm).getCommandSequence()
+        // new AutoRoutine(new MechanismsPath(AutoPathConstants.threeNoteWing, drive,
+        // intake, shooter, arm))
+        // EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake,
+        // handoff, shooter, arm).getCommandSequence()
         // new EventMarkerBuilder(AutoPathConstants.fourNoteWingSplits, drive, handoff,
         // shooter,
         // arm).getCommandSequence());
@@ -189,9 +189,8 @@ public class RobotContainer {
                 new RunCommand(drive::stopWithX, drive));
 
         // turn on brake vs coast mode
-        // controller.b().onTrue(
-        // Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
-        // );
+        // controller1.b().onTrue(
+        // Commands.runOnce(drive::toggleDriveMotorsBrakeMode));
 
         // outtake
         controller1.x().whileTrue(
