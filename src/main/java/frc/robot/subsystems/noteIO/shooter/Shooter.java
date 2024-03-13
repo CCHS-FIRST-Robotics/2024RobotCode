@@ -2,20 +2,15 @@ package frc.robot.subsystems.noteIO.shooter;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.units.*;
-import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.AutoLogOutput;
-// import frc.robot.Constants.AutoPathConstants;
 
 public class Shooter extends SubsystemBase {
     private ShooterIO io;
     private Measure<Velocity<Angle>> leftVelocity = RotationsPerSecond.of(0);
     private Measure<Velocity<Angle>> rightVelocity = RotationsPerSecond.of(0);
-    private double startTime;
     private ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
     public Shooter(ShooterIO io) {
@@ -49,11 +44,6 @@ public class Shooter extends SubsystemBase {
         Logger.recordOutput("Shooter on", leftVelocity.magnitude() != 0 || rightVelocity.magnitude() != 0);
 
         io.setVelocity(leftVelocity, rightVelocity);
-    }
-
-    @AutoLogOutput
-    public boolean checkInHandoff() {
-        return Timer.getFPGATimestamp() - startTime > 0.1;
     }
 
     public Command getShootNoteCommand(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
