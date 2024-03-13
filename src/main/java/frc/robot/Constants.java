@@ -82,17 +82,15 @@ public final class Constants {
     public static final int XBOX_CONTROLLER_ALTERNATE_PORT = 1;
 
     // ids
-    public static final int FL_TALON_ID = 1;
-    public static final int FR_TALON_ID = 2;
-    public static final int BL_TALON_ID = 3;
-    public static final int BR_TALON_ID = 4;
-    public static final int ARM_ID = 20;
     public static final int ARM_CANCODER_ID = 19;
-    public static final int BASE_INTAKE_ID = 1000;
-    public static final int ARM_INTAKE_ID = 21;
+    public static final int ARM_LEAD_ID = 20;
+    public static final int ARM_FOLLOW_ID = 21;
     public static final int SHOOTER_ID_1 = 22;
     public static final int SHOOTER_ID_2 = 23;
     public static final int HANDOFF_ID = 24;
+    public static final int INTAKE_ID1 = 25;
+    public static final int INTAKE_ID2 = 26;
+    
 
     // miscellaneous
     public static final double PERIOD = .02;

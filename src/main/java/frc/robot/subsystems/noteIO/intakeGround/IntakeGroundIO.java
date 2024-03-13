@@ -2,8 +2,6 @@ package frc.robot.subsystems.noteIO.intakeGround;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import frc.robot.subsystems.noteIO.intakeGround.IntakeBaseIOInputsAutoLogged;
-
 public interface IntakeGroundIO {
     @AutoLog
     public static class IntakeGroundIOInputs {

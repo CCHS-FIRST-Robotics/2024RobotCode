@@ -80,9 +80,9 @@ public class RobotContainer {
                         new ModuleIOSparkMax(2),
                         new ModuleIOSparkMax(3));
                 camera = new Vision(new CameraIOZED());
-                arm = new Arm(new ArmIOFalcon500(Constants.ARM_ID, Constants.ARM_CANCODER_ID));
-                intake = new IntakeGround(new IntakeGroundIONEO(Constants.BASE_INTAKE_ID, Constants.BASE_INTAKE_ID));
-                handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.ARM_INTAKE_ID));
+                arm = new Arm(new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID, Constants.ARM_CANCODER_ID));
+                intake = new IntakeGround(new IntakeGroundIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
+                handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.HANDOFF_ID));
                 shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
             case SIM:
@@ -109,9 +109,9 @@ public class RobotContainer {
                         new ModuleIOSparkMax(2),
                         new ModuleIOSparkMax(3));
                 camera = new Vision(new CameraIOZED());
-                arm = new Arm(new ArmIOFalcon500(Constants.ARM_ID, Constants.ARM_CANCODER_ID));
+                arm = new Arm(new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID, Constants.ARM_CANCODER_ID));
+                intake = new IntakeGround(new IntakeGroundIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
                 handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.HANDOFF_ID));
-                intake = new IntakeGround(new IntakeGroundIONEO(100, 101)); ////////change
                 shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
         }
