@@ -3,7 +3,6 @@ package frc.robot.subsystems.noteIO.intakeGround;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj2.command.*;
-import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.Logger;
@@ -31,11 +30,7 @@ public class IntakeGround extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("intake", inputs);
-        Logger.recordOutput("Ground On", volts != Volts.of(0));
-
-        if (checkNoteThere()) {
-            stop();
-        }
+        Logger.recordOutput("Intake on", volts != Volts.of(0));
 
         io.setVoltage(volts);
     }
@@ -46,27 +41,14 @@ public class IntakeGround extends SubsystemBase {
         // 12);
     }
 
+    // turns motor on until note detected
     public Command getIntakeCommand(Measure<Voltage> v) {
-        // turns motor on until note detected
         return new FunctionalCommand(
                 () -> start(v),
                 () -> {
                 },
                 (interrupted) -> stop(),
                 () -> checkNoteThere(),
-                this);
-    }
-
-    public Command getHandNoteCommand(Measure<Voltage> v, BooleanSupplier noteHanded) {
-        // turns motor on until note not detected
-        // ! ^ This might not work in reality because the current might drop under even
-        // ! though we still have the note in the intake
-        return new FunctionalCommand(
-                () -> start(v),
-                () -> {
-                },
-                (interrupted) -> stop(),
-                noteHanded,
                 this);
     }
 }

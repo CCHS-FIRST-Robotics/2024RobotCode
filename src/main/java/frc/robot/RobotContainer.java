@@ -179,8 +179,9 @@ public class RobotContainer {
         // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
 
         /*
-         * Controller 1
+         * Controller 1:
          * - Driving
+         * - Intake / Outtake
          * -
          */
 

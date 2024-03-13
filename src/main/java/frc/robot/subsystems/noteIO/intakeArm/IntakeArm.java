@@ -45,6 +45,7 @@ public class IntakeArm extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("handoff", inputs);
+        Logger.recordOutput("Handoff on", volts != Volts.of(0));
 
         io.setVoltage(volts);
     }

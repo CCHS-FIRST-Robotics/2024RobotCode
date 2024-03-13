@@ -18,8 +18,6 @@ public class Shooter extends SubsystemBase {
     private double startTime;
     private ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    boolean gottenToSpeed;
-
     public Shooter(ShooterIO io) {
         this.io = io;
     }
@@ -27,7 +25,6 @@ public class Shooter extends SubsystemBase {
     public void start(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
         this.leftVelocity = leftVelocity;
         this.rightVelocity = rightVelocity;
-        gottenToSpeed = false;
     }
 
     public void stop() {
@@ -42,19 +39,14 @@ public class Shooter extends SubsystemBase {
 
     @AutoLogOutput
     public boolean checkNoteShot() {
-        return inputs.leftMotorCurrent > 18 && gottenToSpeed;
-        // return Timer.getFPGATimestamp() - startTime > AutoPathConstants.Q_SHOOT_TIME;
+        return inputs.leftMotorCurrent > 18 && upToSpeed();
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("shooter", inputs);
-        Logger.recordOutput("Shooting", leftVelocity.magnitude() != 0 || rightVelocity.magnitude() != 0);
-
-        if (upToSpeed()) {
-            gottenToSpeed = true;
-        }
+        Logger.recordOutput("Shooter on", leftVelocity.magnitude() != 0 || rightVelocity.magnitude() != 0);
 
         io.setVelocity(leftVelocity, rightVelocity);
     }
@@ -72,18 +64,6 @@ public class Shooter extends SubsystemBase {
                 },
                 (interrupted) -> stop(),
                 () -> checkNoteShot(),
-                this);
-    }
-
-    public Command getReceiveNoteCommand(Measure<Velocity<Angle>> leftVelocity,
-            Measure<Velocity<Angle>> rightVelocity) {
-        // turns on motor until note is fully detected inside handoff
-        return new FunctionalCommand(
-                () -> start(leftVelocity, rightVelocity),
-                () -> {
-                },
-                (interrupted) -> stop(),
-                () -> checkInHandoff(),
                 this);
     }
 }
