@@ -10,10 +10,6 @@ import edu.wpi.first.wpilibj.RobotBase;
  * to do:
  * 
  * sysID for shooter (same as arm)
- * 
- * method for base intake that doesn't autostop
- * start arm intake and then move arm down
- * when arm down, start base intake continuously until arm intake detects it
  */
 public final class Main {
     private Main() {

@@ -58,8 +58,8 @@ public class RobotContainer {
     private final Intake intake;
     private final Shooter shooter;
 
-    private final CommandXboxController controller1 = new CommandXboxController(0);
-    private final CommandXboxController controller2 = new CommandXboxController(0);
+    private final CommandXboxController controller1 = new CommandXboxController(Constants.CONTROLLER_PORT_1);
+    private final CommandXboxController controller2 = new CommandXboxController(Constants.CONTROLLER_PORT_2);
 
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
@@ -193,7 +193,8 @@ public class RobotContainer {
         // Commands.runOnce(drive::toggleDriveMotorsBrakeMode));
 
         // outtake
-        controller1.x().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
+        controller1.x().whileTrue(
+                new StartEndCommand(() -> intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
 
         // normal intake (intake stops when it detects note)
         // controller1.a().onTrue(
@@ -211,14 +212,10 @@ public class RobotContainer {
                         // move arm down
                         .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
                         // turn on intake until detected by handoff
-                        .alongWith(intake.getIntakeCommand(Volts.of(12), handoff::checkNoteThere)));
+                        .alongWith(intake.getIntakeCommand(Volts.of(12),
+                                handoff::checkNoteThere)));
 
         // shoot (amp)
-        controller1.y().and(() -> !shooter.upToSpeed()).onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(40), RotationsPerSecond.of(40)), shooter)
-                        // move arm
-                        .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose)));
         controller1.y().and(shooter::upToSpeed).onTrue(
                 // handoff
                 handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
@@ -226,9 +223,30 @@ public class RobotContainer {
                         .andThen(new InstantCommand(shooter::stop, shooter)));
 
         // shoot (speaker)
-        controller1.b().and(() -> !shooter.upToSpeed()).onTrue(
+        controller1.b().and(shooter::upToSpeed).onTrue(
+                // handoff
+                handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
+                        // stop shooter
+                        .andThen(new InstantCommand(shooter::stop, shooter)));
+
+        /*
+         * Controller 2:
+         * - Prime shooter (amp and speaker)
+         */
+
+        // prime shooter (amp)
+        controller2.y().and(() -> !shooter.upToSpeed()).onTrue(
                 // prime shooter
-                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95), RotationsPerSecond.of(95)), shooter)
+                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(40),
+                        RotationsPerSecond.of(40)), shooter)
+                        // move arm
+                        .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose)));
+
+        // prime shooter (speaker)
+        controller2.b().and(() -> !shooter.upToSpeed()).onTrue(
+                // prime shooter
+                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95),
+                        RotationsPerSecond.of(95)), shooter)
                         // move arm
                         .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
                         // turn robot towards speaker
@@ -248,11 +266,6 @@ public class RobotContainer {
                                                 .plus(new Rotation2d(
                                                         Math.PI)),
                                         true)));
-        controller1.b().and(shooter::upToSpeed).onTrue(
-                // handoff
-                handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
-                        // stop shooter
-                        .andThen(new InstantCommand(shooter::stop, shooter)));
 
         // set arm pos
         // controller1.leftTrigger().onTrue(

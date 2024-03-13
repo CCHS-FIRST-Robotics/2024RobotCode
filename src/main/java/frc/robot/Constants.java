@@ -47,8 +47,8 @@ public final class Constants {
     public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
 
     // ports
-    public static final int XBOX_CONTROLLER_PORT = 0;
-    public static final int XBOX_CONTROLLER_ALTERNATE_PORT = 1;
+    public static final int CONTROLLER_PORT_1 = 0;
+    public static final int CONTROLLER_PORT_2 = 1;
 
     // ids
     public static final int ARM_CANCODER_ID = 19;
