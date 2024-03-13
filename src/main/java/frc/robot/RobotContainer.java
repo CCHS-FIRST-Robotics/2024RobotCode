@@ -39,7 +39,7 @@ import frc.robot.utils.EventMarkerBuilder;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.noteIO.arm.*;
 import frc.robot.subsystems.noteIO.handoff.*;
-import frc.robot.subsystems.noteIO.intakeGround.*;
+import frc.robot.subsystems.noteIO.intake.*;
 import frc.robot.subsystems.noteIO.shooter.*;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -59,7 +59,7 @@ public class RobotContainer {
 
         private final Arm arm;
         private final Handoff handoff;
-        private final IntakeGround intake;
+        private final Intake intake;
         private final Shooter shooter;
 
         private final CommandXboxController controller1 = new CommandXboxController(0);
@@ -84,8 +84,8 @@ public class RobotContainer {
                                 arm = new Arm(
                                                 new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID,
                                                                 Constants.ARM_CANCODER_ID));
-                                intake = new IntakeGround(
-                                                new IntakeGroundIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
+                                intake = new Intake(
+                                                new IntakeIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
                                 handoff = new Handoff(new HandoffIOFalcon500(Constants.HANDOFF_ID));
                                 shooter = new Shooter(
                                                 new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
@@ -102,7 +102,7 @@ public class RobotContainer {
                                 camera = new Vision(new CameraIOZED());
                                 arm = new Arm(new ArmIOSim());
                                 handoff = new Handoff(new HandoffIOSim());
-                                intake = new IntakeGround(new IntakeGroundIOSim()); //////// change
+                                intake = new Intake(new IntakeIOSim()); //////// change
                                 shooter = new Shooter(new ShooterIOSim());
                                 break;
                         default: // replayed robot
@@ -117,8 +117,8 @@ public class RobotContainer {
                                 arm = new Arm(
                                                 new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID,
                                                                 Constants.ARM_CANCODER_ID));
-                                intake = new IntakeGround(
-                                                new IntakeGroundIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
+                                intake = new Intake(
+                                                new IntakeIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
                                 handoff = new Handoff(new HandoffIOFalcon500(Constants.HANDOFF_ID));
                                 shooter = new Shooter(
                                                 new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));

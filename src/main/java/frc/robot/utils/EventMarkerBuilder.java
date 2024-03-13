@@ -30,7 +30,7 @@ import frc.robot.commands.AutoCommand;
 import frc.robot.subsystems.drive.swerveDrive.Drive;
 import frc.robot.subsystems.noteIO.arm.Arm;
 import frc.robot.subsystems.noteIO.handoff.Handoff;
-import frc.robot.subsystems.noteIO.intakeGround.IntakeGround;
+import frc.robot.subsystems.noteIO.intake.Intake;
 import frc.robot.subsystems.noteIO.shooter.Shooter;
 import edu.wpi.first.units.Units.*;
 
@@ -43,7 +43,7 @@ public final class EventMarkerBuilder {
 
         private ArrayList<String> pathList;
         private Drive drive;
-        private IntakeGround intake;
+        private Intake intake;
         private Handoff handoff;
         private Shooter shooter;
         private Arm arm;

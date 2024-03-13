@@ -1,4 +1,4 @@
-package frc.robot.subsystems.noteIO.intakeGround;
+package frc.robot.subsystems.noteIO.intake;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -7,16 +7,16 @@ import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
 
-public class IntakeGroundIOSim implements IntakeGroundIO {
+public class IntakeIOSim implements IntakeIO {
     Measure<Voltage> appliedVoltage = Volts.of(0);
     DCMotorSim motor1 = new DCMotorSim(DCMotor.getNEO(1), 1, .001);
     DCMotorSim motor2 = new DCMotorSim(DCMotor.getNEO(1), 1, .001);
 
-    public IntakeGroundIOSim() {
+    public IntakeIOSim() {
 
     }
 
-    public void updateInputs(IntakeGroundIOInputs inputs) {
+    public void updateInputs(IntakeIOInputs inputs) {
         motor1.update(Constants.PERIOD);
         motor2.update(Constants.PERIOD);
 

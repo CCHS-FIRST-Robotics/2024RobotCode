@@ -1,4 +1,4 @@
-package frc.robot.subsystems.noteIO.intakeGround;
+package frc.robot.subsystems.noteIO.intake;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -12,11 +12,11 @@ import edu.wpi.first.units.*;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 
-public class IntakeGroundIONEO implements IntakeGroundIO {
+public class IntakeIONEO implements IntakeIO {
     CANSparkMax intake1, intake2;
     RelativeEncoder encoder1, encoder2;
 
-    public IntakeGroundIONEO(int id1, int id2) {
+    public IntakeIONEO(int id1, int id2) {
         intake1 = new CANSparkMax(id1, MotorType.kBrushless);
         intake2 = new CANSparkMax(id1, MotorType.kBrushless);
 
@@ -50,7 +50,7 @@ public class IntakeGroundIONEO implements IntakeGroundIO {
     }
 
     @Override
-    public void updateInputs(IntakeGroundIOInputs inputs) {
+    public void updateInputs(IntakeIOInputs inputs) {
         inputs.motor1Voltage = intake1.getBusVoltage();
         inputs.motor1Current = intake1.getOutputCurrent();
         inputs.motor1Velocity = encoder1.getVelocity();
