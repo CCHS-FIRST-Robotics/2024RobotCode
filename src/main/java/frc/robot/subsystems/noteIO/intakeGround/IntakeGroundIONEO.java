@@ -1,10 +1,15 @@
 package frc.robot.subsystems.noteIO.intakeGround;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import com.revrobotics.RelativeEncoder;
+
+import edu.wpi.first.units.*;
+
 import com.revrobotics.CANSparkBase.IdleMode;
 
 public class IntakeGroundIONEO implements IntakeGroundIO {
@@ -16,7 +21,7 @@ public class IntakeGroundIONEO implements IntakeGroundIO {
         intake2 = new CANSparkMax(id1, MotorType.kBrushless);
 
         encoder1 = intake1.getEncoder();
-        encoder2 = intake2.getEncoder(); //should this be motor 2?
+        encoder2 = intake2.getEncoder(); // should this be motor 2?
 
         intake1.setCANTimeout(500);
         intake2.setCANTimeout(500);
@@ -39,9 +44,9 @@ public class IntakeGroundIONEO implements IntakeGroundIO {
     }
 
     @Override
-    public void setVoltage(double volts) {
-        intake1.setVoltage(volts);
-        intake2.setVoltage(volts);
+    public void setVoltage(Measure<Voltage> v) {
+        intake1.setVoltage(v.in(Volts));
+        intake2.setVoltage(v.in(Volts));
     }
 
     @Override

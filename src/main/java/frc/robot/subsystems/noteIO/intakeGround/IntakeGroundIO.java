@@ -1,5 +1,6 @@
 package frc.robot.subsystems.noteIO.intakeGround;
 
+import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeGroundIO {
@@ -16,7 +17,7 @@ public interface IntakeGroundIO {
         public double motor2Temperature;
     }
 
-    public default void setVoltage(double volts) {
+    public default void setVoltage(Measure<Voltage> volts) {
     }
 
     public default void updateInputs(IntakeGroundIOInputs inputs) {

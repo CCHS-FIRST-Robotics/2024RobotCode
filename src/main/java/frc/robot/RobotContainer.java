@@ -62,7 +62,8 @@ public class RobotContainer {
     private final IntakeGround intake;
     private final Shooter shooter;
 
-    private final CommandXboxController controller = new CommandXboxController(0);
+    private final CommandXboxController controller1 = new CommandXboxController(0);
+    private final CommandXboxController controller2 = new CommandXboxController(0);
 
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
@@ -148,93 +149,114 @@ public class RobotContainer {
      * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+        // Move drive (future: other subsystems) to track a target
+        // ! colin look at this because idk what it's used for
+        Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
+
         // drive with joysticks
         drive.setDefaultCommand(
                 new DriveWithJoysticks(
                         drive,
-                        controller::getLeftX,
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getRightX(),
+                        controller1::getLeftX,
+                        () -> -controller1.getLeftY(),
+                        () -> -controller1.getRightX(),
                         () -> {
                             return 1.0;
                         },
-                        () -> Rotation2d.fromDegrees(controller.getHID().getPOV()),
+                        () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
                         false));
 
-        // Follow the nearest apriltag while the right trigger is held
-        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
-
-        // Stop when the left trigger is held (safety stop)
-        controller.leftTrigger().whileTrue(
-                new RunCommand(drive::stopWithX, drive));
-
-        // Turn on brake vs coast mode
+        // turn on brake vs coast mode
         // controller.b().onTrue(
         // Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
         // );
 
-        /*
-         * Move drive (future: other subsystems) to track a target
-         */
-        Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
+        // stop when left trigger is held
+        controller1.leftTrigger().whileTrue(
+                new RunCommand(drive::stopWithX, drive));
+
+        // follow nearest apriltag while right trigger is held
+        // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
 
         /*
-         * Drive Characterization Code
+         * Controller 1
+         * - Driving
+         * -
          */
-
-        // break when leftTrigger is held
-        // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
         // outtake
-        // controller.a().whileTrue(new StartEndCommand(() ->
-        // intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
+        controller1.x().whileTrue(new StartEndCommand(() -> intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
 
         // base intake
-        controller.x().onTrue(intake.getIntakeCommand(12));
+        controller1.a().onTrue(intake.getIntakeCommand(Volts.of(12)));
 
         // intake (stops automatically)
-        // controller.x().onTrue(
-        // handoff.getHandoffCommand(Volts.of(2.7))
-        // .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
-        // );
+        controller1.a().onTrue(
+                handoff.getHandoffCommand(Volts.of(2.7))
+                        .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose)));
 
-        controller.leftTrigger().onTrue(
-                arm.moveArm(ArmPosition.SHOOT, drive::getPose));
-
-        controller.rightTrigger().onTrue(
-                arm.moveArm(ArmPosition.INTAKE, drive::getPose));
-
-        controller.leftBumper().onTrue(
-                arm.moveArm(ArmPosition.AMP, drive::getPose));
-
-        controller.rightBumper().onTrue(
-                arm.moveArm(ArmPosition.MAIN, drive::getPose));
-
-        // prime shooter (AMP)
-        controller.y().and(() -> !shooter.upToSpeed()).onTrue(
+        // shoot (amp)
+        controller1.y().and(() -> !shooter.upToSpeed()).onTrue(
                 new InstantCommand(() -> shooter.start(RotationsPerSecond.of(40),
                         RotationsPerSecond.of(40)), shooter)
-                        // new InstantCommand()
                         .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose)));
-
-        // shoot
-        controller.y().and(shooter::upToSpeed).onTrue(
+        controller1.y().and(shooter::upToSpeed).onTrue(
                 handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
                         .andThen(new InstantCommand(shooter::stop, shooter)));
 
-        // // shoot with arm
+        // shoot (speaker)
+        controller1.b().and(() -> !shooter.upToSpeed()).onTrue(
+                // prime shooter
+                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95),
+                        RotationsPerSecond.of(95)), shooter)
+                        // move arm
+                        .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
+                        // turn robot towards speaker
+                        .alongWith(
+                                new DriveWithJoysticks(
+                                        drive,
+                                        () -> -controller1.getLeftX(),
+                                        () -> -controller1.getLeftY(),
+                                        () -> controller1.getRightX(),
+                                        () -> {
+                                            return 1.0;
+                                        },
+                                        () -> drive.getPose().getTranslation()
+                                                .minus(
+                                                        SPEAKER_POSE.getTranslation())
+                                                .getAngle()
+                                                .plus(new Rotation2d(
+                                                        Math.PI)),
+                                        true)));
+        controller1.b().and(shooter::upToSpeed).onTrue(
+                handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
+                        .andThen(new InstantCommand(shooter::stop, shooter)));
+
+        // set arm pos
+        // controller1.leftTrigger().onTrue(
+        // arm.moveArm(ArmPosition.SHOOT, drive::getPose));
+
+        // controller1.rightTrigger().onTrue(
+        // arm.moveArm(ArmPosition.INTAKE, drive::getPose));
+
+        // controller1.leftBumper().onTrue(
+        // arm.moveArm(ArmPosition.AMP, drive::getPose));
+
+        // controller1.rightBumper().onTrue(
+        // arm.moveArm(ArmPosition.MAIN, drive::getPose));
+
         // Generate a trajectory to a pose when the X button is pressed (and switch
         // drive to position control)
         // String path = AutoPathConstants.THREE_NOTE_WING;
         // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
-        controller.x().onTrue(
+        controller1.x().onTrue(
                 // new AutoRoutine(new MechanismsPath(AutoPathConstants.threeNoteWing, drive,
                 // intake, shooter, arm))
                 // EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake,
                 // handoff, shooter, arm).getCommandSequence()
                 new EventMarkerBuilder(AutoPathConstants.fourNoteWingSplits, drive, handoff, shooter,
                         arm)
-                        .getCommandSequence()
+                        .getCommandSequence());
 
         // drive.runOnce(
         // () -> {
@@ -254,7 +276,6 @@ public class RobotContainer {
         // drive.runPosition(traj);
         // }
         // ).asProxy().andThen(new AutoRoutine(drive, new MechanismsPath(path, intake)))
-        );
 
         // controller.b().onTrue(
         // // move arm
@@ -276,34 +297,7 @@ public class RobotContainer {
         // .andThen(new InstantCommand(shooter::stop, shooter))
         // );
 
-        // prime shooter
-        controller.b().and(() -> !shooter.upToSpeed()).onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95),
-                        RotationsPerSecond.of(95)), shooter)
-                        // move arm
-                        .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
-                        // turn robot towards speaker
-                        .alongWith(
-                                new DriveWithJoysticks(
-                                        drive,
-                                        () -> -controller.getLeftX(),
-                                        () -> -controller.getLeftY(),
-                                        () -> controller.getRightX(),
-                                        () -> {
-                                            return 1.0;
-                                        },
-                                        () -> drive.getPose().getTranslation()
-                                                .minus(
-                                                        SPEAKER_POSE.getTranslation())
-                                                .getAngle()
-                                                .plus(new Rotation2d(
-                                                        Math.PI)),
-                                        true)));
-        controller.b().and(shooter::upToSpeed).onTrue(
-                handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
-                        .andThen(new InstantCommand(shooter::stop, shooter)));
-
+        // arm positioning stuff
         // controller.leftTrigger().onTrue(new InstantCommand(() -> {
         // ARM_POSITIONS.put(ArmPosition.RANDY,
         // ARM_POSITIONS.get(ArmPosition.RANDY).minus(Degrees.of(.5)));
@@ -316,21 +310,6 @@ public class RobotContainer {
         // }));
         // controller.a().onTrue(new InstantCommand(() -> {
         // System.out.println("RANDY IS : " + ARM_POSITIONS.get(ArmPosition.RANDY));
-        // }));
-
-        // controller.leftTrigger().onTrue(new InstantCommand(() -> {
-        // ARM_POSITIONS.put(ArmPosition.RANDY,
-        // ARM_POSITIONS.get(ArmPosition.RANDY).minus(Degrees.of(.5)));
-        // arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
-        // }));
-        // controller.rightTrigger().onTrue(new InstantCommand(() -> {
-        // ARM_POSITIONS.put(ArmPosition.RANDY,
-        // ARM_POSITIONS.get(ArmPosition.RANDY).plus(Degrees.of(.5)));
-        // arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
-        // }));
-        // controller.a().onTrue(new InstantCommand(() -> {
-        // System.out.println("RANDY IS : " + ARM_POSITIONS.get(ArmPosition.RANDY));
-
         // }));
 
         // // drive to specific pose
