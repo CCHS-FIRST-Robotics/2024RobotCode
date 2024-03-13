@@ -1,4 +1,4 @@
-package frc.robot.subsystems.noteIO.intakeArm;
+package frc.robot.subsystems.noteIO.handoff;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -7,15 +7,15 @@ import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
 
-public class IntakeArmIOSim implements IntakeArmIO {
+public class HandoffIOSim implements HandoffIO {
     Measure<Voltage> appliedVoltage = Volts.of(0);
     DCMotorSim motor = new DCMotorSim(DCMotor.getFalcon500(1), 1, .001);
 
-    public IntakeArmIOSim() {
+    public HandoffIOSim() {
 
     }
 
-    public void updateInputs(IntakeArmIOInputs inputs) {
+    public void updateInputs(HandoffIOInputs inputs) {
         motor.update(Constants.PERIOD);
 
         inputs.motorVoltage = appliedVoltage.in(Volts);

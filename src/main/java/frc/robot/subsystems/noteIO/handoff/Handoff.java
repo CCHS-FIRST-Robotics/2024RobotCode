@@ -1,8 +1,9 @@
-package frc.robot.subsystems.noteIO.intakeArm;
+package frc.robot.subsystems.noteIO.handoff;
 
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj2.command.*;
+
 // import edu.wpi.first.math.filter.Debouncer;
 import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj.Timer;
@@ -11,15 +12,15 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 // import frc.robot.Constants.AutoPathConstants;
 
-public class IntakeArm extends SubsystemBase {
-    private IntakeArmIO io;
+public class Handoff extends SubsystemBase {
+    private HandoffIO io;
     private Measure<Voltage> volts = Volts.of(0);
     private double startTime;
     // Debouncer currentDebouncer = new Debouncer(0.3,
     // Debouncer.DebounceType.kRising);
-    private IntakeArmIOInputsAutoLogged inputs = new IntakeArmIOInputsAutoLogged();
+    private HandoffIOInputsAutoLogged inputs = new HandoffIOInputsAutoLogged();
 
-    public IntakeArm(IntakeArmIO io) {
+    public Handoff(HandoffIO io) {
         this.io = io;
     }
 

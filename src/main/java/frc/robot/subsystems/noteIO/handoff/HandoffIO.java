@@ -1,11 +1,11 @@
-package frc.robot.subsystems.noteIO.intakeArm;
+package frc.robot.subsystems.noteIO.handoff;
 
 import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface IntakeArmIO {
+public interface HandoffIO {
     @AutoLog
-    public static class IntakeArmIOInputs {
+    public static class HandoffIOInputs {
         public double motorCurrent;
         public double motorVoltage;
         public double motorPosition;
@@ -16,6 +16,6 @@ public interface IntakeArmIO {
     public default void setVoltage(Measure<Voltage> v) {
     }
 
-    public default void updateInputs(IntakeArmIOInputs inputs) {
+    public default void updateInputs(HandoffIOInputs inputs) {
     }
 }

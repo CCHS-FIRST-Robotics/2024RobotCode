@@ -1,4 +1,4 @@
-package frc.robot.subsystems.noteIO.intakeArm;
+package frc.robot.subsystems.noteIO.handoff;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -8,7 +8,7 @@ import edu.wpi.first.units.*;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 
-public class IntakeArmIOFalcon500 implements IntakeArmIO {
+public class HandoffIOFalcon500 implements HandoffIO {
     private TalonFX motor;
 
     private StatusSignal<Double> voltageSignal;
@@ -17,7 +17,7 @@ public class IntakeArmIOFalcon500 implements IntakeArmIO {
     private StatusSignal<Double> velocitySignal;
     private StatusSignal<Double> temperatureSignal;
 
-    public IntakeArmIOFalcon500(int id) {
+    public HandoffIOFalcon500(int id) {
         motor = new TalonFX(id);
 
         voltageSignal = motor.getMotorVoltage();
@@ -40,7 +40,7 @@ public class IntakeArmIOFalcon500 implements IntakeArmIO {
     }
 
     @Override
-    public void updateInputs(IntakeArmIOInputs inputs) {
+    public void updateInputs(HandoffIOInputs inputs) {
         BaseStatusSignal.refreshAll(voltageSignal, currentSignal, positionSignal, velocitySignal, temperatureSignal);
 
         inputs.motorVoltage = voltageSignal.getValue();
