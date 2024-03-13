@@ -5,12 +5,11 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.AutoPathConstants;
 import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.Timer;
-
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.AutoLogOutput;
+// import frc.robot.Constants.AutoPathConstants;
 
 public class Shooter extends SubsystemBase {
     private ShooterIO io;

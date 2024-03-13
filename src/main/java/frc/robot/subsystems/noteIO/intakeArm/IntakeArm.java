@@ -6,7 +6,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.Constants.AutoPathConstants;
+// import frc.robot.Constants.AutoPathConstants;
 
 import java.util.function.BooleanSupplier;
 
@@ -38,9 +38,9 @@ public class IntakeArm extends SubsystemBase {
 
     @AutoLogOutput
     private boolean checkNoteThere() {
-        return inputs.motorCurrent > (25d / 3d) * volts.in(Volts) && (Timer.getFPGATimestamp() - startTime >
-        0.5);
-        // return Timer.getFPGATimestamp() - startTime > AutoPathConstants.Q_INTAKE_TIME;
+        return inputs.motorCurrent > (25d / 3d) * volts.in(Volts) && (Timer.getFPGATimestamp() - startTime > 0.5);
+        // return Timer.getFPGATimestamp() - startTime >
+        // AutoPathConstants.Q_INTAKE_TIME;
         // return currentDebouncer.calculate(inputs.motorCurrent > 30);
         // return inputs.motorCurrent > 30 && inputs.motorVelocity > 98 * (volts / 12);
     }
@@ -73,7 +73,7 @@ public class IntakeArm extends SubsystemBase {
     // turns motor on until shooter detects note
     public Command getShootCommand(Measure<Voltage> v, BooleanSupplier shooterDone) {
         // turns motor on until shooter detects note
-        
+
         return new FunctionalCommand(
                 () -> start(v),
                 () -> {

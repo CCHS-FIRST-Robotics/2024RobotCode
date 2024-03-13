@@ -8,7 +8,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants;
-import frc.robot.subsystems.noteIO.intakeArm.IntakeArmIO.IntakeArmIOInputs;
 
 public class ShooterIOSim implements ShooterIO {
     Measure<Voltage> appliedVoltage = Volts.of(0);
