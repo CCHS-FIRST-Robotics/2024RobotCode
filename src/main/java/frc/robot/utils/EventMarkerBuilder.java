@@ -61,22 +61,24 @@ public final class EventMarkerBuilder {
         this.arm = arm;
         this.handoff = handoff;
 
-        command = new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95)), shooter)
-                    .andThen(Commands.waitUntil(shooter::upToSpeed)
-                    .andThen(
-                        arm.moveArm(ArmPosition.SHOOT, drive::getPose)
-                        .alongWith(handoff.getShootCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS), shooter::checkNoteShot))
-                    ).until(shooter::checkNoteShot)
-        );
+        command = new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95), RotationsPerSecond.of(95)),
+                shooter)
+                .andThen(Commands.waitUntil(shooter::upToSpeed)
+                        .andThen(
+                                arm.moveArm(ArmPosition.SHOOT, drive::getPose)
+                                        .alongWith(
+                                                handoff.getShootCommand(
+                                                        Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS),
+                                                        shooter::checkNoteShot)))
+                        .until(shooter::checkNoteShot));
 
         for (String path : pathList) {
             addCommand(path);
         }
 
         command = command.andThen(
-            new InstantCommand(() -> shooter.stop())
-            .alongWith(new InstantCommand(() -> handoff.stop()))
-        );
+                new InstantCommand(() -> shooter.stop())
+                        .alongWith(new InstantCommand(() -> handoff.stop())));
 
     }
 
@@ -96,16 +98,20 @@ public final class EventMarkerBuilder {
          */
         eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME,
                 arm.moveArm(ArmPosition.INTAKE, drive::getPose)
-                .alongWith(drive.followTrajectory(traj))
-                .alongWith(handoff.getHandoffCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS)))
-                // .alongWith(new InstantCommand(() -> System.out.println("sdhfdhfdsbdfhy")))
+                        .alongWith(drive.followTrajectory(traj))
+                        .alongWith(handoff.getHandoffCommand(
+                                Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS)))
+        // .alongWith(new InstantCommand(() -> System.out.println("sdhfdhfdsbdfhy")))
         ));
         // arm shoot
         eventMarkers.add(Pair.of(intakeTime,
-                arm.moveArm(ArmPosition.SHOOT, drive::getPose))); // use current pose because it might not be following the path well
+                arm.moveArm(ArmPosition.SHOOT, drive::getPose))); // use current pose because it might
+                                                                  // not be following
+                                                                  // the path well
         // run handoff & shoot
         eventMarkers.add(Pair.of(shootTime,
-                handoff.getShootCommand(Volt.of(AutoPathConstants.INTAKE_VOLTS), shooter::checkNoteShot)));
+                handoff.getShootCommand(Volt.of(AutoPathConstants.INTAKE_VOLTS),
+                        shooter::checkNoteShot)));
 
         /*
          * final robot

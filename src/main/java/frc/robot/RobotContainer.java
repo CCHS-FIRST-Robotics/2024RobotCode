@@ -80,10 +80,14 @@ public class RobotContainer {
                         new ModuleIOSparkMax(2),
                         new ModuleIOSparkMax(3));
                 camera = new Vision(new CameraIOZED());
-                arm = new Arm(new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID, Constants.ARM_CANCODER_ID));
-                intake = new IntakeGround(new IntakeGroundIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
+                arm = new Arm(
+                        new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID,
+                                Constants.ARM_CANCODER_ID));
+                intake = new IntakeGround(
+                        new IntakeGroundIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
                 handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.HANDOFF_ID));
-                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
+                shooter = new Shooter(
+                        new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
             case SIM:
                 // instantiate physics sim IO implementations
@@ -97,7 +101,7 @@ public class RobotContainer {
                 camera = new Vision(new CameraIOZED());
                 arm = new Arm(new ArmIOSim());
                 handoff = new IntakeArm(new IntakeArmIOSim());
-                intake = new IntakeGround(new IntakeGroundIOSim()); ////////change
+                intake = new IntakeGround(new IntakeGroundIOSim()); //////// change
                 shooter = new Shooter(new ShooterIOSim());
                 break;
             default: // replayed robot
@@ -109,23 +113,25 @@ public class RobotContainer {
                         new ModuleIOSparkMax(2),
                         new ModuleIOSparkMax(3));
                 camera = new Vision(new CameraIOZED());
-                arm = new Arm(new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID, Constants.ARM_CANCODER_ID));
-                intake = new IntakeGround(new IntakeGroundIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
+                arm = new Arm(
+                        new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID,
+                                Constants.ARM_CANCODER_ID));
+                intake = new IntakeGround(
+                        new IntakeGroundIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
                 handoff = new IntakeArm(new IntakeArmIOFalcon500(Constants.HANDOFF_ID));
-                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
+                shooter = new Shooter(
+                        new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
         }
 
         poseEstimator = new PoseEstimator(
-            drive.getKinematics(),
-            new Rotation2d(),
-            drive.getModulePositions(),
-            new Pose2d(
-                1.3,
-                5.56,
-                new Rotation2d()
-            )
-        );
+                drive.getKinematics(),
+                new Rotation2d(),
+                drive.getModulePositions(),
+                new Pose2d(
+                        1.3,
+                        5.56,
+                        new Rotation2d()));
 
         drive.setPoseEstimator(poseEstimator);
         camera.setPoseEstimator(poseEstimator);
@@ -144,38 +150,37 @@ public class RobotContainer {
     private void configureButtonBindings() {
         // drive with joysticks
         drive.setDefaultCommand(
-            new DriveWithJoysticks(
-                drive, 
-                controller::getLeftX, 
-                () -> -controller.getLeftY(), 
-                () -> -controller.getRightX(), 
-                () -> {return 1.0;},
-                () -> Rotation2d.fromDegrees(controller.getHID().getPOV()),
-                false
-            )
-        );
+                new DriveWithJoysticks(
+                        drive,
+                        controller::getLeftX,
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getRightX(),
+                        () -> {
+                            return 1.0;
+                        },
+                        () -> Rotation2d.fromDegrees(controller.getHID().getPOV()),
+                        false));
 
         // Follow the nearest apriltag while the right trigger is held
         // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
 
         // Stop when the left trigger is held (safety stop)
         controller.leftTrigger().whileTrue(
-            new RunCommand(drive::stopWithX, drive)
-        );
+                new RunCommand(drive::stopWithX, drive));
 
         // Turn on brake vs coast mode
         // controller.b().onTrue(
-        //     Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
+        // Commands.runOnce(drive::toggleDriveMotorsBrakeMode)
         // );
 
-        /* 
+        /*
          * Move drive (future: other subsystems) to track a target
          */
         Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
-        
+
         /*
          * Drive Characterization Code
-         */ 
+         */
 
         // break when leftTrigger is held
         // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
@@ -189,65 +194,66 @@ public class RobotContainer {
 
         // intake (stops automatically)
         // controller.x().onTrue(
-        //     handoff.getHandoffCommand(Volts.of(2.7))
-        //     .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
+        // handoff.getHandoffCommand(Volts.of(2.7))
+        // .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose))
         // );
 
         controller.leftTrigger().onTrue(
-             arm.moveArm(ArmPosition.SHOOT, drive::getPose)
-        );
+                arm.moveArm(ArmPosition.SHOOT, drive::getPose));
 
         controller.rightTrigger().onTrue(
-             arm.moveArm(ArmPosition.INTAKE, drive::getPose)
-        );
+                arm.moveArm(ArmPosition.INTAKE, drive::getPose));
 
         controller.leftBumper().onTrue(
-             arm.moveArm(ArmPosition.AMP, drive::getPose)
-        );
+                arm.moveArm(ArmPosition.AMP, drive::getPose));
 
         controller.rightBumper().onTrue(
-             arm.moveArm(ArmPosition.MAIN, drive::getPose)
-        );
+                arm.moveArm(ArmPosition.MAIN, drive::getPose));
 
         // prime shooter (AMP)
         controller.y().and(() -> !shooter.upToSpeed()).onTrue(
-            new InstantCommand(() -> shooter.start(RotationsPerSecond.of(40)), shooter)
-            // new InstantCommand()
-            .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose))
-        );
-        
+                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(40),
+                        RotationsPerSecond.of(40)), shooter)
+                        // new InstantCommand()
+                        .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose)));
+
         // shoot
         controller.y().and(shooter::upToSpeed).onTrue(
-            handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
-            .andThen(new InstantCommand(shooter::stop, shooter))
-        );
+                handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
+                        .andThen(new InstantCommand(shooter::stop, shooter)));
 
         // // shoot with arm
-        // Generate a trajectory to a pose when the X button is pressed (and switch drive to position control)
+        // Generate a trajectory to a pose when the X button is pressed (and switch
+        // drive to position control)
         // String path = AutoPathConstants.THREE_NOTE_WING;
         // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
         controller.x().onTrue(
-            // new AutoRoutine(new MechanismsPath(AutoPathConstants.threeNoteWing, drive, intake, shooter, arm))
-            //  EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake, handoff, shooter, arm).getCommandSequence()
-            new EventMarkerBuilder(AutoPathConstants.fourNoteWingSplits, drive, handoff, shooter, arm).getCommandSequence()    
+                // new AutoRoutine(new MechanismsPath(AutoPathConstants.threeNoteWing, drive,
+                // intake, shooter, arm))
+                // EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake,
+                // handoff, shooter, arm).getCommandSequence()
+                new EventMarkerBuilder(AutoPathConstants.fourNoteWingSplits, drive, handoff, shooter,
+                        arm)
+                        .getCommandSequence()
 
+        // drive.runOnce(
+        // () -> {
 
-            // drive.runOnce(
-            //     () -> {
-                    
-            //         var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
-            //         // adjust so that the start of the trajectory is where the robot is
-            //         // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
-            //         // traj.translateBy(drive.getPose().getTranslation());
+        // var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
+        // // adjust so that the start of the trajectory is where the robot is
+        // //
+        // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
+        // // traj.translateBy(drive.getPose().getTranslation());
 
-            //         System.out.println("recording pos traj");
-            //         Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
+        // System.out.println("recording pos traj");
+        // Logger.recordOutput("Auto/GeneratedTrajectory",
+        // traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
 
-            //         System.out.println("Writing trajectory to CSV");
-            //         traj.toCSV(path);
-            //         drive.runPosition(traj);
-            //     }
-            // ).asProxy().andThen(new AutoRoutine(drive, new MechanismsPath(path, intake)))
+        // System.out.println("Writing trajectory to CSV");
+        // traj.toCSV(path);
+        // drive.runPosition(traj);
+        // }
+        // ).asProxy().andThen(new AutoRoutine(drive, new MechanismsPath(path, intake)))
         );
 
         // controller.b().onTrue(
@@ -260,21 +266,21 @@ public class RobotContainer {
 
         // shoot (one command - probably used for amp)
         // controller.b().onTrue(
-        //         // prime shooter
-        //         new InstantCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter)
-        //                 // wait until shooter is up to speed
-        //                 .alongWith(Commands.waitUntil(shooter::upToSpeed))
-        //                 // shoot
-        //                 .andThen(intake.getShootCommand(Volts.of(4), shooter::checkNoteShot))
-        //                 // stop shooter
-        //                 .andThen(new InstantCommand(shooter::stop, shooter))
+        // // prime shooter
+        // new InstantCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter)
+        // // wait until shooter is up to speed
+        // .alongWith(Commands.waitUntil(shooter::upToSpeed))
+        // // shoot
+        // .andThen(intake.getShootCommand(Volts.of(4), shooter::checkNoteShot))
+        // // stop shooter
+        // .andThen(new InstantCommand(shooter::stop, shooter))
         // );
-
 
         // prime shooter
         controller.b().and(() -> !shooter.upToSpeed()).onTrue(
                 // prime shooter
-                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95)), shooter)
+                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95),
+                        RotationsPerSecond.of(95)), shooter)
                         // move arm
                         .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
                         // turn robot towards speaker
@@ -295,9 +301,8 @@ public class RobotContainer {
                                                         Math.PI)),
                                         true)));
         controller.b().and(shooter::upToSpeed).onTrue(
-            handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
-            .andThen(new InstantCommand(shooter::stop, shooter))
-        );
+                handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
+                        .andThen(new InstantCommand(shooter::stop, shooter)));
 
         // controller.leftTrigger().onTrue(new InstantCommand(() -> {
         // ARM_POSITIONS.put(ArmPosition.RANDY,
@@ -313,18 +318,19 @@ public class RobotContainer {
         // System.out.println("RANDY IS : " + ARM_POSITIONS.get(ArmPosition.RANDY));
         // }));
 
-
         // controller.leftTrigger().onTrue(new InstantCommand(() -> {
-        //     ARM_POSITIONS.put(ArmPosition.RANDY, ARM_POSITIONS.get(ArmPosition.RANDY).minus(Degrees.of(.5)));
-        //     arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
+        // ARM_POSITIONS.put(ArmPosition.RANDY,
+        // ARM_POSITIONS.get(ArmPosition.RANDY).minus(Degrees.of(.5)));
+        // arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
         // }));
         // controller.rightTrigger().onTrue(new InstantCommand(() -> {
-        //     ARM_POSITIONS.put(ArmPosition.RANDY, ARM_POSITIONS.get(ArmPosition.RANDY).plus(Degrees.of(.5)));
-        //     arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
+        // ARM_POSITIONS.put(ArmPosition.RANDY,
+        // ARM_POSITIONS.get(ArmPosition.RANDY).plus(Degrees.of(.5)));
+        // arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
         // }));
         // controller.a().onTrue(new InstantCommand(() -> {
-        //     System.out.println("RANDY IS : " + ARM_POSITIONS.get(ArmPosition.RANDY));
-        
+        // System.out.println("RANDY IS : " + ARM_POSITIONS.get(ArmPosition.RANDY));
+
         // }));
 
         // // drive to specific pose
