@@ -10,8 +10,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * to do:
  * 
  * sysID for shooter (same as arm)
- * add a fixed arm angle for speaker so that we can still shoot if odom is
- * broken
+ * 
  * method for base intake that doesn't autostop
  * start arm intake and then move arm down
  * when arm down, start base intake continuously until arm intake detects it

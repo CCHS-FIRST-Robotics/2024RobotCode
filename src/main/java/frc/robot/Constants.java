@@ -33,26 +33,16 @@ public final class Constants {
 
     public static enum ArmPosition {
         INTAKE,
-        SHOOT,
         AMP,
-        MAIN,
-        WILANG,
-        ALLAN,
-        RANDOM,
-        LEGAL_DRINKING_AGE,
-        RANDY,
+        SPEAKER,
+        SHOOT,
     }
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(
             Map.of(
                     ArmPosition.INTAKE, Degrees.of(-2),
                     ArmPosition.AMP, Degrees.of(95),
-                    ArmPosition.MAIN, Degrees.of(42),
-                    ArmPosition.WILANG, Degrees.of(60),
-                    ArmPosition.ALLAN, Degrees.of(30),
-                    ArmPosition.RANDOM, Degrees.of(Math.random() * 75),
-                    ArmPosition.LEGAL_DRINKING_AGE, Degrees.of(21),
-                    ArmPosition.RANDY, Degrees.of(30)));
+                    ArmPosition.SPEAKER, Degrees.of(40))); // ! TODO: actually make this accurate because it ain't
 
     public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
 

@@ -46,7 +46,6 @@ public class Arm extends SubsystemBase {
         armAngleMap.put(3.1, 37.4d);
         armAngleMap.put(3.71856, 38.8d);
         armAngleMap.put(4.63296, 41.7d);
-
     }
 
     public Arm(ArmIO io) {
@@ -80,7 +79,8 @@ public class Arm extends SubsystemBase {
 
     public void setArmAngle(Measure<Angle> angle) {
         io.setDrivePosition(angle);
-        Logger.recordOutput("ArmTargetAngle", angle); // TEMPORARY, should work in the inputs class but phoenix is bugged rn
+        Logger.recordOutput("ArmTargetAngle", angle); // TEMPORARY, should work in the inputs class but phoenix is
+                                                      // bugged rn
     }
 
     public Measure<Angle> getArmAngle() {
@@ -112,8 +112,7 @@ public class Arm extends SubsystemBase {
     private Command moveToShoot(Supplier<Pose2d> robotPose) {
         return run(() -> {
             double distance = robotPose.get().getTranslation().minus(
-                    SPEAKER_POSE.getTranslation()
-                ).getNorm();
+                    SPEAKER_POSE.getTranslation()).getNorm();
             double angle = armAngleMap.get(distance);
             setArmAngle(Degrees.of(angle));
             Logger.recordOutput("SpeakerDistance", distance);
@@ -141,11 +140,12 @@ public class Arm extends SubsystemBase {
             if (time >= eventTime) {
                 Translation2d translationToTargetGround = new Translation2d(state.x, state.y);
                 Pose3d targetPose = new Pose3d(new Pose2d(state.x, state.y, new Rotation2d(state.heading)));
-                
+
                 Translation2d armOffset = getArmOffset();
-                Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.getNorm(), targetPose.getZ());
+                Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.getNorm(),
+                        targetPose.getZ());
                 Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
-                
+
                 return () -> new Pose2d(translationToTargetGround, targetArmAngle);
             }
         }
