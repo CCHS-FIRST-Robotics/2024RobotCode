@@ -18,7 +18,7 @@ public class IntakeIONEO implements IntakeIO {
 
     public IntakeIONEO(int id1, int id2) {
         intake1 = new CANSparkMax(id1, MotorType.kBrushless);
-        intake2 = new CANSparkMax(id1, MotorType.kBrushless);
+        intake2 = new CANSparkMax(id2, MotorType.kBrushless);
         encoder1 = intake1.getEncoder();
         encoder2 = intake2.getEncoder(); // should this be motor 2?
 
@@ -26,8 +26,8 @@ public class IntakeIONEO implements IntakeIO {
         intake2.setCANTimeout(500);
         intake1.setInverted(true);
         intake2.setInverted(false);
-        intake1.setSmartCurrentLimit(30);
-        intake2.setSmartCurrentLimit(30);
+        intake1.setSmartCurrentLimit(20);
+        intake2.setSmartCurrentLimit(20);
         intake1.setIdleMode(IdleMode.kCoast);
         intake2.setIdleMode(IdleMode.kCoast);
         intake1.setCANTimeout(0);

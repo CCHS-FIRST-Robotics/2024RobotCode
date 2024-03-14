@@ -34,7 +34,7 @@ public class Shooter extends SubsystemBase {
 
     @AutoLogOutput
     public boolean checkNoteShot() {
-        return inputs.leftMotorCurrent > 18 && upToSpeed();
+        return inputs.leftShooterCurrent > 18 && upToSpeed();
     }
 
     @Override
@@ -43,7 +43,8 @@ public class Shooter extends SubsystemBase {
         Logger.processInputs("shooter", inputs);
         Logger.recordOutput("Shooter on", leftVelocity.magnitude() != 0 || rightVelocity.magnitude() != 0);
 
-        io.setVelocity(leftVelocity, rightVelocity);
+        // io.setVelocity(leftVelocity, rightVelocity);
+        io.setVoltage(Volts.of(1));
     }
 
     public Command getShootNoteCommand(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {

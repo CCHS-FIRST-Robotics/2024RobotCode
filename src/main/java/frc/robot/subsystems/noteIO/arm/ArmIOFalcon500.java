@@ -51,7 +51,7 @@ public class ArmIOFalcon500 implements ArmIO {
     StatusSignal<Boolean> faultRemoteSensorOutOfSync;
     StatusSignal<Boolean> stickyFaultRemoteSensorOutOfSync;
 
-    private static final double gearRatio = 100 * 54 / 15d; // 100 * 54 / 15d
+    private static final double gearRatio = 100 * 26d / 14d; // 100 * 54 / 15d
 
     // TODO: update constants in periodic once tunable is set up
     private static final double driveKpV = 0; // 180
@@ -66,12 +66,12 @@ public class ArmIOFalcon500 implements ArmIO {
                                                                                   // rotations per second
     private static final double driveFeedforwardKaV = 0;
 
-    private static final double driveKpTC = 0; // 620
-    private static final double driveKdTC = 0; // 120
+    private static final double driveKpTC = 550; // 620
+    private static final double driveKdTC = 60; // 120
     private static final double driveKiTC = 0.0d;
 
     // Uhh Feedforward momment!
-    private static final double driveFeedforwardKgTC = 8.9; // 9.2A
+    private static final double driveFeedforwardKgTC = 8; // 9.2A
     private static final double driveFeedforwardKsTC = 0;
     private static final double driveFeedforwardKvTC = 0; // only used for viscous friction losses in TC
     private static final double driveFeedforwardKaTC = 0;
@@ -79,7 +79,7 @@ public class ArmIOFalcon500 implements ArmIO {
     boolean torqueCurrent = true;
 
     // private final boolean motorInverted = false;
-    private final Measure<Angle> absoluteEncoderOffset = Radians.of(-3.71); // -3.71
+    private final Measure<Angle> absoluteEncoderOffset = Radians.of(4.25); // -3.71
 
     int index;
 
@@ -118,8 +118,8 @@ public class ArmIOFalcon500 implements ArmIO {
         stickyFaultRemoteSensorOutOfSync = leadFalcon.getStickyFault_RemoteSensorDataInvalid();
 
         driveMMConfig.MotionMagicCruiseVelocity = 98d / gearRatio; // max rps of the motor (almost)
-        driveMMConfig.MotionMagicAcceleration = 10; // .5 second to reach max speed (defaualt)
-        driveMMConfig.MotionMagicJerk = 25; // .33 seconds to reach max accel (defaualt)
+        driveMMConfig.MotionMagicAcceleration = 2; // .5 second to reach max speed (defaualt)
+        driveMMConfig.MotionMagicJerk = 5; // .33 seconds to reach max accel (defaualt)
 
         // Feedforward momment!
 
@@ -127,10 +127,10 @@ public class ArmIOFalcon500 implements ArmIO {
         // https://pro.docs.ctr-electronics.com/en/latest/docs/api-reference/device-specific/talonfx/remote-sensors.html)
         // zeros the magnet!
         CANcoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-        CANcoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+        CANcoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         CANcoderConfig.MagnetSensor.MagnetOffset = absoluteEncoderOffset.in(Rotations); // CHANGGE
 
-        driveFalconConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        driveFalconConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         driveFalconConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
 

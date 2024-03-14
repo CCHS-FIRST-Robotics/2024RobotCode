@@ -5,9 +5,11 @@ import static edu.wpi.first.units.Units.*;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -66,6 +68,8 @@ public class ShooterIOFalcon500 implements ShooterIO {
         talonFXConfig.CurrentLimits.SupplyCurrentLimit = 60;
         talonFXConfig.CurrentLimits.SupplyTimeThreshold = 1;
 
+        talonFXConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
         drivePID.kP = driveKp;
         drivePID.kI = driveKi;
         drivePID.kD = driveKd;
@@ -74,6 +78,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
         drivePID.kV = driveFeedforwardKv;
 
         configFalcon(leftShooter, talonFXConfig);
+        talonFXConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         configFalcon(rightShooter, talonFXConfig);
     }
 
@@ -125,17 +130,17 @@ public class ShooterIOFalcon500 implements ShooterIO {
                 velocitySignalRight,
                 temperatureSignalRight);
 
-        inputs.leftMotorVoltage = voltageSignalLeft.getValue();
-        inputs.leftMotorCurrent = currentSignalLeft.getValue();
-        inputs.leftMotorPosition = positionSignalLeft.getValue();
-        inputs.leftMotorVelocity = velocitySignalLeft.getValue();
-        inputs.leftMotorTemperature = temperatureSignalLeft.getValue();
+        inputs.leftShooterVoltage = voltageSignalLeft.getValue();
+        inputs.leftShooterCurrent = currentSignalLeft.getValue();
+        inputs.leftShooterPosition = positionSignalLeft.getValue();
+        inputs.leftShooterVelocity = velocitySignalLeft.getValue();
+        inputs.leftShooterTemperature = temperatureSignalLeft.getValue();
 
-        inputs.rightMotorVoltage = voltageSignalRight.getValue();
-        inputs.rightMotorCurrent = currentSignalRight.getValue();
-        inputs.rightMotorPosition = positionSignalRight.getValue();
-        inputs.rightMotorVelocity = velocitySignalRight.getValue();
-        inputs.rightMotorTemperature = temperatureSignalRight.getValue();
+        inputs.rightShooterVoltage = voltageSignalRight.getValue();
+        inputs.rightShooterCurrent = currentSignalRight.getValue();
+        inputs.rightShooterPosition = positionSignalRight.getValue();
+        inputs.rightShooterVelocity = velocitySignalRight.getValue();
+        inputs.rightShooterTemperature = temperatureSignalRight.getValue();
 
         inputs.closedLoopReference = closedLoopReferenceSignal.getValue();
     }

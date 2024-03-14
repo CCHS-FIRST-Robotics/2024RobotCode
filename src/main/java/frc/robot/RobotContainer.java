@@ -172,21 +172,21 @@ public class RobotContainer {
      */
 
     // drive with joysticks
-    drive.setDefaultCommand(
-        new DriveWithJoysticks(
-            drive,
-            controller1::getLeftX,
-            () -> -controller1.getLeftY(),
-            () -> -controller1.getRightX(),
-            () -> {
-              return 1.0;
-            },
-            () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-            false));
+    // drive.setDefaultCommand(
+    //     new DriveWithJoysticks(
+    //         drive,
+    //         controller1::getLeftX,
+    //         () -> -controller1.getLeftY(),
+    //         () -> -controller1.getRightX(),
+    //         () -> {
+    //           return 1.0;
+    //         },
+    //         () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
+    //         false));
 
     // break when left trigger is held
-    controller1.leftTrigger().whileTrue(
-        new RunCommand(drive::stopWithX, drive));
+    // controller1.leftTrigger().whileTrue(
+    //     new RunCommand(drive::stopWithX, drive));
 
     // turn on brake vs coast mode
     // controller1.b().onTrue(

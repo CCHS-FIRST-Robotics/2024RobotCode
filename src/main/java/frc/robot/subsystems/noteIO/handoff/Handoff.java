@@ -41,7 +41,8 @@ public class Handoff extends SubsystemBase {
         Logger.processInputs("handoff", inputs);
         Logger.recordOutput("Handoff on", volts != Volts.of(0));
 
-        io.setVoltage(volts);
+        // io.setVoltage(volts);
+        io.setVoltage(Volts.of(4));
     }
 
     // turns motor on until note detected
