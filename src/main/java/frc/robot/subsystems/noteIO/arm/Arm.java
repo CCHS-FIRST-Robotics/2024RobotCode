@@ -131,15 +131,10 @@ public class Arm extends SubsystemBase {
         });
     }
 
-    private Command moveToSpeakerShoot() {
-        return run(() -> {
-            setArmAngle(Degrees.of(angle));
-        });
-    }
-
     public Command moveArm(ArmPosition position, Supplier<Pose2d> robotPose) {
         if (position == ArmPosition.SHOOT) {
-            return moveToShoot(robotPose);
+            // return moveToShoot(robotPose);
+            return run(() -> setArmAngle(Constants.ARM_POSITIONS.get(ArmPosition.SPEAKER)));
         }
 
         Measure<Angle> angle = ARM_POSITIONS.get(position);
