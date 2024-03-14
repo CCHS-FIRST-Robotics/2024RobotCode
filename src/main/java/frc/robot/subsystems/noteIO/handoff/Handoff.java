@@ -31,7 +31,7 @@ public class Handoff extends SubsystemBase {
 
     @AutoLogOutput
     public boolean checkNoteThere() {
-        return inputs.motorCurrent > (25d / 3d) * volts.in(Volts) && (Timer.getFPGATimestamp() - startTime > 0.5);
+        return inputs.motorCurrent > 50 && (Timer.getFPGATimestamp() - startTime > 0.5);
         // return Timer.getFPGATimestamp()-startTime>AutoPathConstants.Q_INTAKE_TIME;
     }
 
@@ -41,8 +41,8 @@ public class Handoff extends SubsystemBase {
         Logger.processInputs("handoff", inputs);
         Logger.recordOutput("Handoff on", volts != Volts.of(0));
 
-        // io.setVoltage(volts);
-        io.setVoltage(Volts.of(4));
+        io.setVoltage(volts);
+        // io.setVoltage(Volts.of(4));
     }
 
     // turns motor on until note detected

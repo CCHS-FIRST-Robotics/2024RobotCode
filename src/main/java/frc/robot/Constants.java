@@ -40,9 +40,9 @@ public final class Constants {
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(
             Map.of(
-                    ArmPosition.INTAKE, Degrees.of(-2),
+                    ArmPosition.INTAKE, Degrees.of(-14),
                     ArmPosition.AMP, Degrees.of(95),
-                    ArmPosition.SPEAKER, Degrees.of(40))); // ! TODO: actually make this accurate because it ain't
+                    ArmPosition.SPEAKER, Degrees.of(25))); // ! TODO: actually make this accurate because it ain't
 
     public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
 

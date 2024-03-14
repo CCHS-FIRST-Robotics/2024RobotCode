@@ -172,17 +172,17 @@ public class RobotContainer {
      */
 
     // drive with joysticks
-    // drive.setDefaultCommand(
-    //     new DriveWithJoysticks(
-    //         drive,
-    //         controller1::getLeftX,
-    //         () -> -controller1.getLeftY(),
-    //         () -> -controller1.getRightX(),
-    //         () -> {
-    //           return 1.0;
-    //         },
-    //         () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-    //         false));
+    drive.setDefaultCommand(
+        new DriveWithJoysticks(
+            drive,
+            controller1::getLeftX,
+            () -> -controller1.getLeftY(),
+            () -> -controller1.getRightX(),
+            () -> {
+              return 1.0;
+            },
+            () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
+            false));
 
     // break when left trigger is held
     // controller1.leftTrigger().whileTrue(
@@ -193,8 +193,8 @@ public class RobotContainer {
     // Commands.runOnce(drive::toggleDriveMotorsBrakeMode));
 
     // outtake
-    controller1.x().whileTrue(
-        new StartEndCommand(() -> intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
+    // controller1.x().whileTrue(
+    //     new StartEndCommand(() -> intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
 
     // normal intake (intake stops when it detects note)
     // controller1.a().onTrue(
@@ -208,26 +208,31 @@ public class RobotContainer {
     // continuous base intake (intake stops when note is detected in handoff)
     controller1.a().onTrue(
         // turn on handoff
-        handoff.getHandoffCommand(Volts.of(2.7))
+        handoff.getHandoffCommand(Volts.of(6))
             // move arm down
             .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
             // turn on intake until detected by handoff
-            .andThen(intake.getIntakeCommand(Volts.of(12),
+            .alongWith(intake.getIntakeCommand(Volts.of(3),
                 handoff::checkNoteThere)));
 
     // shoot (amp)
     controller1.y().and(shooter::upToSpeed).onTrue(
         // handoff
-        handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
+        handoff.getShootCommand(Volts.of(6), shooter::checkNoteShot)
             // stop shooter
             .andThen(new InstantCommand(shooter::stop, shooter)));
 
     // shoot (speaker)
-    controller1.b().and(shooter::upToSpeed).onTrue(
+    // controller1.b().and(shooter::upToSpeed).onTrue(
+    controller1.b().onTrue(
         // handoff
         handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
             // stop shooter
             .andThen(new InstantCommand(shooter::stop, shooter)));
+
+    controller1.x().onTrue(
+        arm.moveArm(ArmPosition.SPEAKER, drive::getPose)
+    );
 
     /*
      * Controller 2:

@@ -108,7 +108,7 @@ public class ModuleIOSparkMax implements ModuleIO {
                                                                          // (default: 200ms)
 
         turnSparkMax.setInverted(isTurnMotorInverted);
-        if (index == 2) {
+        if (index == 1) {
             driveSparkMax.setInverted(true);
         } else {
             driveSparkMax.setInverted(false);
