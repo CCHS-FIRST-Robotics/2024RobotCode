@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.units.*;
+import edu.wpi.first.wpilibj.Timer;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -13,8 +15,16 @@ public class Shooter extends SubsystemBase {
     private Measure<Velocity<Angle>> rightVelocity = RotationsPerSecond.of(0);
     private ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
+    double time;
+
     public Shooter(ShooterIO io) {
         this.io = io;
+    }
+
+    public void start(Measure<Velocity<Angle>> velocity) {
+        this.leftVelocity = velocity;
+        this.rightVelocity = velocity;
+        time = Timer.getFPGATimestamp();
     }
 
     public void start(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
@@ -34,7 +44,7 @@ public class Shooter extends SubsystemBase {
 
     @AutoLogOutput
     public boolean checkNoteShot() {
-        return inputs.leftShooterCurrent > 30;
+        return inputs.leftShooterCurrent > 40 && Timer.getFPGATimestamp() - time > 1;
     }
 
     @Override
@@ -43,7 +53,7 @@ public class Shooter extends SubsystemBase {
         Logger.processInputs("shooter", inputs);
         Logger.recordOutput("Shooter on", leftVelocity.magnitude() != 0 || rightVelocity.magnitude() != 0);
 
-        // io.setVelocity(leftVelocity, rightVelocity);
+        io.setVelocity(leftVelocity, rightVelocity);
         // io.setVoltage(Volts.of(6));
     }
 

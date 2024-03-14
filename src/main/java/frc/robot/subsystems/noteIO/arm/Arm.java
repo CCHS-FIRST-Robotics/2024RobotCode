@@ -16,6 +16,8 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 // import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.choreo.lib.Choreo;
@@ -35,6 +37,9 @@ public class Arm extends SubsystemBase {
 
     /** Arm angle look up table key: meters, values: degrees */
     private static final InterpolatingDoubleTreeMap armAngleMap = new InterpolatingDoubleTreeMap();
+
+    @AutoLogOutput
+    private Measure<Angle> targetAngle = Degrees.of(0);
 
     // meters, degrees
     static {
@@ -73,14 +78,21 @@ public class Arm extends SubsystemBase {
 
         // trust!
         // io.setDriveVoltage(Volts.of(1));
-        setArmAngle(Degrees.of(-10));
+        // setArmAngle(Degrees.of(-10));
         // io.setDriveCurrent(Amps.of(8));
     }
 
     public void setArmAngle(Measure<Angle> angle) {
         io.setDrivePosition(angle);
-        Logger.recordOutput("ArmTargetAngle", angle); // TEMPORARY, should work in the inputs class but phoenix is
-                                                      // bugged rn
+        targetAngle = angle;
+    }
+
+    /**
+     * @return true if the arm is within .1 degrees of the goal (not setpoint)
+     */
+    @AutoLogOutput
+    public boolean isAtGoal() {
+        return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < 7;
     }
 
     public Measure<Angle> getArmAngle() {
@@ -134,28 +146,29 @@ public class Arm extends SubsystemBase {
         return run(() -> setArmAngle(angle));
     }
 
-    public Supplier<Pose2d> getPosFromPath(String path, double eventTime) {
-        ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
+    // dont want to remove this but we probably shouldnt be using it
+    // public Supplier<Pose2d> getPosFromPath(String path, double eventTime) {
+    //     ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
 
-        double timeToEnd = choreoTrajectory.getTotalTime();
+    //     double timeToEnd = choreoTrajectory.getTotalTime();
 
-        for (int i = 0; i < (int) (timeToEnd / Constants.PERIOD) + 2; i++) {
-            double time = i * Constants.PERIOD;
-            ChoreoTrajectoryState state = choreoTrajectory.sample(time);
+    //     for (int i = 0; i < (int) (timeToEnd / Constants.PERIOD) + 2; i++) {
+    //         double time = i * Constants.PERIOD;
+    //         ChoreoTrajectoryState state = choreoTrajectory.sample(time);
 
-            if (time >= eventTime) {
-                Translation2d translationToTargetGround = new Translation2d(state.x, state.y);
-                Pose3d targetPose = new Pose3d(new Pose2d(state.x, state.y, new Rotation2d(state.heading)));
+    //         if (time >= eventTime) {
+    //             Translation2d translationToTargetGround = new Translation2d(state.x, state.y);
+    //             Pose3d targetPose = new Pose3d(new Pose2d(state.x, state.y, new Rotation2d(state.heading)));
 
-                Translation2d armOffset = getArmOffset();
-                Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.getNorm(),
-                        targetPose.getZ());
-                Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
+    //             Translation2d armOffset = getArmOffset();
+    //             Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.getNorm(),
+    //                     targetPose.getZ());
+    //             Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
 
-                return () -> new Pose2d(translationToTargetGround, targetArmAngle);
-            }
-        }
+    //             return () -> new Pose2d(translationToTargetGround, targetArmAngle);
+    //         }
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 }

@@ -36,15 +36,24 @@ public final class Constants {
         AMP,
         SPEAKER,
         SHOOT,
+        MAIN
     }
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(
             Map.of(
                     ArmPosition.INTAKE, Degrees.of(-14),
                     ArmPosition.AMP, Degrees.of(95),
-                    ArmPosition.SPEAKER, Degrees.of(25))); // ! TODO: actually make this accurate because it ain't
+                    ArmPosition.SPEAKER, Degrees.of(3),
+                    ArmPosition.MAIN, Degrees.of(-5)
+            )
+    ); // ! TODO: actually make this accurate because it ain't
 
     public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
+
+    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(95);
+    public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(95);
+
+    public static final Measure<Velocity<Angle>> SHOOTER_AMP_SPEED = RotationsPerSecond.of(30);
 
     // ports
     public static final int CONTROLLER_PORT_1 = 0;
