@@ -110,28 +110,16 @@ public final class EventMarkerBuilder {
         /*
          * final robot
          */
-        // // arm shoot
-        // eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME,
-        // arm.moveArm(ArmPosition.SHOOT, arm.getPosFromPath(path,
-        // AutoPathConstants.INIT_MOVEMENTS_TIME))));
-        // // shoot
-        // eventMarkers.add(Pair.of(AutoPathConstants.MAX_ARM_MOVE_TIME,
-        // shooter.getReceiveNoteCommand(RadiansPerSecond.of(AutoPathConstants.SHOOTER_HANDOFF_VOLTS))));
-        // // drive
-        // eventMarkers.add(Pair.of(AutoPathConstants.MAX_ARM_MOVE_TIME +
-        // AutoPathConstants.SHOOT_TIME, drive.followTrajectory(traj)));
-        // // arm hand
-        // eventMarkers.add(Pair.of((totalTime - AutoPathConstants.MAX_ARM_MOVE_TIME -
-        // AutoPathConstants.INTAKE_TIME),
-        // arm.moveArm(ArmPosition.INTAKE, arm.getPosFromPath(path,
-        // totalTime - AutoPathConstants.MAX_ARM_MOVE_TIME -
-        // AutoPathConstants.INTAKE_TIME))));
-        // // intake
-        // eventMarkers.add(Pair.of((totalTime - AutoPathConstants.INTAKE_TIME),
-        // intake.getIntakeCommand(AutoPathConstants.INTAKE_HANDOFF_VOLTS)));
-        // // handoff
-        // eventMarkers.add(Pair.of((totalTime - AutoPathConstants.INTAKE_TIME),
-        // handoff.getHandoffCommand(Volt.of(AutoPathConstants.INTAKE_HANDOFF_VOLTS))));
+        eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME,
+                arm.moveArm(ArmPosition.INTAKE, drive::getPose)
+                .alongWith(drive.followTrajectory(traj))
+                // along with intake
+        ));
+        // when intaked handoff
+        // when handoff arm shoot
+        eventMarkers.add(Pair.of(intakeTime,
+                arm.moveArm(ArmPosition.SHOOT, drive::getPose)));
+        // shoot
 
         if (command == null) {
             command = (new AutoCommand(eventMarkers, totalTime));
