@@ -74,6 +74,8 @@ public final class Constants {
     public static final double LIENAR_SPEED_EXPONENT = 1.8;
     public static final double ANGULAR_SPEED_EXPONENT = 2;
 
+    // private static final Measure SPEAKER_SHOOT_ANGLE = new Measure.
+
     public static enum EventCommand {
         INTAKE,
         SHOOT,

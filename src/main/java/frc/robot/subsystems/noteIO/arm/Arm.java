@@ -119,6 +119,12 @@ public class Arm extends SubsystemBase {
         });
     }
 
+    private Command moveToSpeakerShoot() {
+        return run(() -> {
+            setArmAngle(Degrees.of(angle));
+        });
+    }
+
     public Command moveArm(ArmPosition position, Supplier<Pose2d> robotPose) {
         if (position == ArmPosition.SHOOT) {
             return moveToShoot(robotPose);
