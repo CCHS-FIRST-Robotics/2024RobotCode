@@ -85,59 +85,38 @@ public final class Constants {
     }
 
     public static class AutoPathConstants {
-        // i feel like there has to be a better way to do this than how i did lol
+        // all auto paths starts at (1.3, 5.544)
 
         public static final Map<Pair<Double, Constants.EventCommand>, ArrayList<String>> eventMarkerMap = new HashMap<>();
 
         // file names for paths
-        public static final String THREE_NOTE_WING1 = "SThreeNote.1";
-        public static final String THREE_NOTE_WING2 = "SThreeNote.2";
-        public static final String THREE_NOTE_WING = "SThreeNote";
-        public static final String FOUR_NOTE_WING = "SFourNote";
-        public static final String FOUR_NOTE_WING1 = "SFourNote.1";
-        public static final String FOUR_NOTE_WING2 = "SFourNote.2";
-        public static final String FOUR_NOTE_WING3 = "SFourNote.3";
-        public static final String TWO_NOTE_LEFT = "STwoNoteLeft";
-        public static final String TWO_NOTE_CENTER = "STwoNoteCenter";
-        public static final String TWO_NOTE_RIGHT = "STwoNoteRight";
-        public static final String FOUR_NOTE_LEFT = "SFourNoteLeft";
-        public static final String TWO_NOTE_TEST = "STest1.1";
+        public static final String THREE_NOTE_WING1 = "ThreeNoteWing.1";
+        public static final String THREE_NOTE_WING2 = "ThreeNoteWing.2";
+        public static final String FOUR_NOTE_WING1 = "FourNoteWing.1";
+        public static final String FOUR_NOTE_WING2 = "FourNoteWing.2";
+        public static final String FOUR_NOTE_WING3 = "FourNoteWing.3";
+        public static final String TWO_NOTE_LEFT = "TwoNoteLeft.1";
+        public static final String TWO_NOTE_CENTER = "TwoNoteCenter.1";
+        public static final String TWO_NOTE_RIGHT = "TwoNoteRight.1";
 
-        public static final ArrayList<String> threeNoteWing = new ArrayList<String>();
         public static final ArrayList<String> twoNoteTest = new ArrayList<String>();
         public static final ArrayList<String> threeNoteWingSplits = new ArrayList<String>();
         public static final ArrayList<String> fourNoteWingSplits = new ArrayList<String>();
 
-        public static final ArrayList<ArrayList<String>> pathLists = new ArrayList<ArrayList<String>>();
-
-        public static final double INTAKE_VOLTS = 12;
-        public static final double SHOOT_VOLTS = 12;
-        public static final double INTAKE_HANDOFF_VOLTS = 5;
-        public static final double SHOOTER_HANDOFF_VOLTS = 6;
-        public static final Measure<Angle> ARM_HANDOFF_ANGLE = Radians.of(80 * Math.PI / 180); // double check
-                                                                                               // for final
-        public static final Measure<Angle> QUOKKA_ARM_INTAKE_ANGLE = Radians.of(80 * Math.PI / 180); // double
-                                                                                                     // check
-
+        public static final double INTAKE_VOLTS = 6;
+        public static final double HANDOFF_VOLTS = 6;
+  
         public static final double INIT_MOVEMENTS_TIME = 0.0;
-        public static final double MAX_ARM_MOVE_TIME = 0.5;
-        public static final double INTAKE_TIME = 0.3;
-        public static final double SHOOT_TIME = 0.5;// idk
+        public static final double MAX_ARM_MOVE_TIME = .5;
+        public static final double INTAKE_TIME = 0.1;
+        public static final double SHOOT_TIME = 0.4;
 
-        // quokka auto consts
-        public static final double Q_MAX_ARM_MOVE_TIME = .5;
-        public static final double Q_INTAKE_SET_TIME = 0.4;
-        public static final double Q_INTAKE_TIME = 0.1;
-        public static final double Q_INIT_SHOOT_SET_TIME = 2;
-        public static final double Q_SHOOT_SET_TIME = 1;
-        public static final double Q_SHOOT_TIME = 0.4;
-        public static final Measure<Velocity<Angle>> SHOOT_SPEED = RotationsPerSecond.of(95); // idk
+        public static final Pose2d AUTO_START_POS = new Pose2d(1.3, 5.544, new Rotation2d(0));
+
+        public static final Measure<Velocity<Angle>> SHOOT_SPEED_LEFT = RotationsPerSecond.of(95);
+        public static final Measure<Velocity<Angle>> SHOOT_SPEED_RIGHT = RotationsPerSecond.of(95); // idk
 
         static {
-            threeNoteWing.add(THREE_NOTE_WING);
-            threeNoteWing.add(THREE_NOTE_WING1);
-            threeNoteWing.add(THREE_NOTE_WING2);
-
             threeNoteWingSplits.add(THREE_NOTE_WING1);
             threeNoteWingSplits.add(THREE_NOTE_WING2);
 
@@ -145,73 +124,7 @@ public final class Constants {
             fourNoteWingSplits.add(FOUR_NOTE_WING2);
             fourNoteWingSplits.add(FOUR_NOTE_WING3);
 
-            twoNoteTest.add(TWO_NOTE_TEST);
-
-            pathLists.add(threeNoteWing);
-
-            /*
-             * three note w/ quokka; 1 drive traj
-             */
-            eventMarkerMap.put(Pair.of(0.0, EventCommand.DRIVE_PATH), threeNoteWing);
-            eventMarkerMap.put(Pair.of(0.0, EventCommand.ARM_SHOOT), threeNoteWing);
-            eventMarkerMap.put(Pair.of(0.15, EventCommand.SHOOT), threeNoteWing);
-            eventMarkerMap.put(Pair.of(0.25, EventCommand.ARM_HANDOFF), threeNoteWing);
-            eventMarkerMap.put(Pair.of(0.36, EventCommand.INTAKE), threeNoteWing);
-            eventMarkerMap.put(Pair.of(0.74, EventCommand.ARM_SHOOT), threeNoteWing);
-            eventMarkerMap.put(Pair.of(0.9, EventCommand.SHOOT), threeNoteWing);
-            eventMarkerMap.put(Pair.of(1.1, EventCommand.ARM_HANDOFF), threeNoteWing);
-            eventMarkerMap.put(Pair.of(1.2, EventCommand.INTAKE), threeNoteWing);
-            eventMarkerMap.put(Pair.of(1.5, EventCommand.ARM_SHOOT), threeNoteWing);
-            eventMarkerMap.put(Pair.of(1.58, EventCommand.SHOOT), threeNoteWing);
-
-            // probably a way to consolidate times here cause stuff happens at the same time
-            // for similar patterns ill do it later
-            /*
-             * commands that work for a final robot intake
-             */
-            // eventMarkerMap.put(Pair.of(0.0, EventCommand.ARM_SHOOT), threeNoteWing);
-            // eventMarkerMap.put(Pair.of(0.0, EventCommand.SHOOT), threeNoteWing); //
-            // change
-            // eventMarkerMap.put(Pair.of(0.0, EventCommand.DRIVE_PATH), threeNoteWing);
-            // eventMarkerMap.put(Pair.of(0.3, EventCommand.ARM_HANDOFF), threeNoteWing);
-            // eventMarkerMap.put(Pair.of(0.4, EventCommand.INTAKE), threeNoteWing);
-            // eventMarkerMap.put(Pair.of(0.6, EventCommand.INTAKE_HANDOFF), threeNoteWing);
-            // eventMarkerMap.put(Pair.of(0.6, EventCommand.SHOOTER_HANDOFF),
-            // threeNoteWing);
-            // eventMarkerMap.put(Pair.of(0.67, EventCommand.ARM_SHOOT), threeNoteWing);
-            // eventMarkerMap.put(Pair.of(0.77, EventCommand.SHOOT), threeNoteWing);
-            // eventMarkerMap.put(Pair.of(0.77, EventCommand.DRIVE_PATH), threeNoteWing);
-            // eventMarkerMap.put(Pair.of(0.8, EventCommand.ARM_HANDOFF), threeNoteWing);
-            // eventMarkerMap.put(Pair.of(1.31, EventCommand.INTAKE), threeNoteWing);
-            // eventMarkerMap.put(Pair.of(1.5, EventCommand.INTAKE_HANDOFF), threeNoteWing);
-            // eventMarkerMap.put(Pair.of(1.5, EventCommand.SHOOTER_HANDOFF),
-            // threeNoteWing);
-            // eventMarkerMap.put(Pair.of(1.6, EventCommand.ARM_SHOOT), threeNoteWing);
-            // eventMarkerMap.put(Pair.of(1.67, EventCommand.SHOOT), threeNoteWing);
-
-            // eventMarkerMap.put(Pair.of(1.0, intake.startEndCommmand()), FOUR_NOTE_WING);
-            // eventMarkerMap.put(Pair.of(2.68, intake.startEndCommmand()), FOUR_NOTE_WING);
-            // eventMarkerMap.put(Pair.of(4.8, intake.startEndCommmand()), FOUR_NOTE_WING);
-
-            // eventMarkerMap.put(Pair.of(.91, intake.startEndCommmand()), TWO_NOTE_LEFT);
-
-            // eventMarkerMap.put(Pair.of(.38, intake.startEndCommmand()), TWO_NOTE_CENTER);
-
-            // eventMarkerMap.put(Pair.of(1.25, intake.startEndCommmand()), TWO_NOTE_RIGHT);
-
-            // eventMarkerMap.put(Pair.of(.38, intake.startEndCommmand()), FOUR_NOTE_LEFT);
-            // eventMarkerMap.put(Pair.of(2.31, intake.startEndCommmand()), FOUR_NOTE_LEFT);
-            // eventMarkerMap.put(Pair.of(5.41, intake.startEndCommmand()), FOUR_NOTE_LEFT);
-
-            /*
-             * start against speaker (1.4, 5.55, 0)
-             * WM (2.75, 5.55, 0)
-             * WM-WL angle .71
-             * WR
-             * 
-             * 
-             */
-
+            twoNoteTest.add(TWO_NOTE_CENTER);
         }
     }
 }
