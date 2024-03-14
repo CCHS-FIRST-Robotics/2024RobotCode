@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.*;
 import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.units.*;
+
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -37,8 +39,9 @@ public class Intake extends SubsystemBase {
         // io.setVoltage(Volts.of(3));
     }
 
+    @AutoLogOutput
     public boolean checkNoteThere() {
-        return inputs.motor1Current > 30 && Timer.getFPGATimestamp() - startTime > 0.1;
+        return inputs.motor1Current > 28 && Timer.getFPGATimestamp() - startTime > 0.1;
     }
 
     // turns motor on until note detected

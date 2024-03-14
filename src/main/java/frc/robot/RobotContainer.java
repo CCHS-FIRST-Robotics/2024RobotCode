@@ -286,6 +286,20 @@ public class RobotContainer {
         .alongWith(new InstantCommand(() -> intake.stop()))
     );
 
+    controller2.povUp().onTrue(
+        // prime shooter
+        new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+            // move arm
+            .alongWith(arm.moveArm(ArmPosition.SHOOT_FAR, drive::getPose))
+    );
+
+    controller2.povDown().onTrue(
+        // prime shooter
+        new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+            // move arm
+            .alongWith(arm.moveArm(ArmPosition.SHOOT_MID, drive::getPose))
+    );
+
     // set arm pos
     // controller1.leftTrigger().onTrue(
     // arm.moveArm(ArmPosition.SHOOT, drive::getPose));
