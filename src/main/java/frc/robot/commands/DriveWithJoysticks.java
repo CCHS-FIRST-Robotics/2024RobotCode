@@ -33,6 +33,8 @@ public class DriveWithJoysticks extends Command {
         double prevHeadingSpeed;
         PIDController headingController;
 
+        boolean useHeadingFeedback;
+
         TrapezoidProfile angularProfile;
 
         ChassisSpeeds prevSpeeds;
@@ -43,7 +45,8 @@ public class DriveWithJoysticks extends Command {
                         Supplier<Double> leftYSupplier,
                         Supplier<Double> rightXSupplier,
                         Supplier<Double> linearSpeedMultiplierSupplier,
-                        Supplier<Rotation2d> headingSupplier) {
+                        Supplier<Rotation2d> headingSupplier,
+                        boolean useHeadingFeedback) {
                 addRequirements(drive);
                 this.drive = drive;
 
@@ -54,6 +57,8 @@ public class DriveWithJoysticks extends Command {
                 this.linearSpeedMultiplierSupplier = linearSpeedMultiplierSupplier;
 
                 headingAngleSupplier = headingSupplier;
+
+                this.useHeadingFeedback = useHeadingFeedback;
 
                 angularProfile = new TrapezoidProfile(
                                 new Constraints(drive.getMaxAngularSpeed(), drive.getMaxAngularAcceleration()));
@@ -88,7 +93,7 @@ public class DriveWithJoysticks extends Command {
                 Translation2d linearVelocity = new Translation2d(linearSpeed, linearDirection);
 
                 // APPLY ABSOLUTE HEADING CONTROL
-                if (angularSpeed == 0) {
+                if (angularSpeed == 0 && useHeadingFeedback) {
                         headingGoal = headingAngleSupplier.get().getDegrees() == -1 ? headingGoal
                                         : MathUtil.angleModulus(headingAngleSupplier.get().getRadians());
                         // double currentHeadingRad = drive.getYaw().getRadians();
@@ -105,8 +110,13 @@ public class DriveWithJoysticks extends Command {
                                         targetState // goal state
                         );
 
-                        angularSpeed = nextState.velocity
-                                        + headingController.calculate(drive.getYaw().getRadians(), nextState.position);
+                        // angularSpeed = nextState.velocity
+                        //                 - headingController.calculate(drive.getYaw().getRadians(), nextState.position);
+                        angularSpeed = -headingController.calculate(drive.getYaw().getRadians(), headingGoal);
+                        Logger.recordOutput("TEstingwtf", drive.getYaw().getRadians() - headingGoal);
+                        Logger.recordOutput("TEstingwtf1", drive.getYaw().getRadians());
+                        Logger.recordOutput("TEstingwtf2", headingGoal);
+
                         if (headingController.atSetpoint())
                                 angularSpeed = 0;
                         // divide by max speed to get as a percentage of max (for continuity with

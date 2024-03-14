@@ -29,7 +29,7 @@ public class HardwareConstants {
         public static final double ANGULAR_SPEED_EXPONENT = 2.5;
 
         // motor constants
-        public static final int FALCON_MAX_RPM = 7500;
-        public static final int CIM_MAX_RPM = 5330;
-        public static final int NEO_MAX_RPM = 5676;
+        public static final int FALCON_MAX_RPS = 7500 / 60;
+        public static final int CIM_MAX_RPS = 5330 / 60;
+        public static final int NEO_MAX_RPS = 5676 / 60;
 }

@@ -9,8 +9,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 /**
  * to do:
  * 
- * sysID for shooter
- * phoenix6 signal logging
+ * sysID for shooter (same as arm)
  */
 public final class Main {
     private Main() {

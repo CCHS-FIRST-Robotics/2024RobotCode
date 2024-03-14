@@ -1,19 +1,21 @@
-package frc.robot.subsystems.noteIO.intakeGround;
+package frc.robot.subsystems.noteIO.intakeBase;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
-public class IntakeGroundIONEO implements IntakeGroundIO {
+public class IntakeBaseIONEO implements IntakeBaseIO {
     CANSparkMax motor1, motor2;
     RelativeEncoder encoder1, encoder2;
 
-    public IntakeGroundIONEO(int id1, int id2) {
+    public IntakeBaseIONEO(int id1, int id2) {
         motor1 = new CANSparkMax(id1, MotorType.kBrushless);
         encoder1 = motor1.getEncoder();
-
         motor2 = new CANSparkMax(id1, MotorType.kBrushless);
         encoder2 = motor1.getEncoder();
+
+        encoder1.setVelocityConversionFactor(1 / 60);
+        encoder2.setVelocityConversionFactor(1 / 60);
     }
 
     @Override
@@ -23,7 +25,7 @@ public class IntakeGroundIONEO implements IntakeGroundIO {
     }
 
     @Override
-    public void updateInputs(IntakeGroundIOInputsAutoLogged inputs) {
+    public void updateInputs(IntakeBaseIOInputsAutoLogged inputs) {
         inputs.motor1Voltage = motor1.getBusVoltage();
         inputs.motor1Current = motor1.getOutputCurrent();
         inputs.motor1Velocity = encoder1.getVelocity();

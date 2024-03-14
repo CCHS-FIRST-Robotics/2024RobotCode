@@ -18,22 +18,15 @@ public interface ArmIO {
         public Measure<Angle> absoluteArmPosition = Radians.of(0.0);
         public Measure<Velocity<Angle>> absoluteArmVelocity = RadiansPerSecond.of(0.0);
 
-        public Measure<Angle> rotorPositionSignal = Radians.of(0.0);
+        public Measure<Angle> rotorPosition = Radians.of(0.0);
 
-        public Measure<Current> torqueCurrent = Amps.of(0);
+        public Measure<Angle> closedLoopReference = Radians.of(0.0);
+        public Measure<Angle> closedLoopError = Radians.of(0.0);
 
-        
-
-
-        public String name = "";
-
-        // check withc ol.in if works
         public boolean faultFusedSensorOutOfSync = false;
         public boolean stickyFaultFusedSensorOutOfSync = false;
         public boolean faultRemoteSensorOutOfSync = false;
         public boolean stickyFaultRemoteSensorOutOfSync = false;
-
-
     }
 
     /** Updates the set of loggable inputs. */

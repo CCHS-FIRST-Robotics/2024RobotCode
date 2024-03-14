@@ -8,11 +8,12 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.*;
+import frc.robot.Constants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.filter.MedianFilter;
-import frc.robot.Constants;
 
+@SuppressWarnings("unused")
 public class ModuleIOSparkMax implements ModuleIO {
     /* MOTOR CONTROLLERS + PID */
     private final CANSparkMax driveSparkMax;
@@ -107,7 +108,7 @@ public class ModuleIOSparkMax implements ModuleIO {
                                                                          // (default: 200ms)
 
         turnSparkMax.setInverted(isTurnMotorInverted);
-        if (index == 2 || index == 3) {
+        if (index == 2) {
             driveSparkMax.setInverted(false);
         } else {
             driveSparkMax.setInverted(true);
@@ -138,8 +139,8 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMax.setCANTimeout(0);
 
         System.out.println("TESTING");
-        // System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
-        // System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
+        System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
+        System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
     }
 
     /*
@@ -209,23 +210,16 @@ public class ModuleIOSparkMax implements ModuleIO {
      * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVelocity(double)
      */
     public void setDriveVelocity(Measure<Velocity<Angle>> velocity) {
-        // velocity = velocity.times(driveAfterEncoderReduction);
-        // System.out.println(velocity.in(Rotations.per(Minute)));
-        // System.out.println(velocity.baseUnitMagnitude());
-        // velocity = velocity * driveAfterEncoderReduction;
-        // System.out.println(Rotations.per(Minute).convertFrom(velocity,
-        // RadiansPerSecond));
-
-        // driveSparkMaxPIDF.setReference(
-        //         velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
-        //         // velocity * (60) / (2*Math.PI) * driveAfterEncoderReduction,
-        //         CANSparkMax.ControlType.kVelocity,
-        //         0,
-        //         // driveFeedforward.calculate(velocityRadPerSec)
-        //         driveFeedforward.calculate(prevVelocity.in(RadiansPerSecond), velocity.in(RadiansPerSecond),
-        //                 Constants.PERIOD)
-        // driveFeedforward.calculate(prevVelocity, velocity, Constants.PERIOD)
-        // );
+        driveSparkMaxPIDF.setReference(
+            velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
+            CANSparkMax.ControlType.kVelocity,
+            0,
+            driveFeedforward.calculate(
+                prevVelocity.in(RadiansPerSecond),
+                velocity.in(RadiansPerSecond),
+                Constants.PERIOD
+            )
+        );
         prevVelocity = velocity;
     }
 
@@ -236,12 +230,13 @@ public class ModuleIOSparkMax implements ModuleIO {
      */
     public void setTurnPosition(Measure<Angle> position) {
         // Adjust from [-PI, PI] (wrapped angle, so initially -pi was 2pi) -> [0, 2PI]
-        // position = Radians.of(
-        //         MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
-        // turnSparkMaxPIDF.setReference(
-        //         position.in(Rotations),
-        //         CANSparkMax.ControlType.kPosition,
-        //         0);
+        position = Radians.of(
+        MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
+
+        turnSparkMaxPIDF.setReference(
+        position.in(Rotations),
+        CANSparkMax.ControlType.kPosition,
+        0);
     }
 
     /*

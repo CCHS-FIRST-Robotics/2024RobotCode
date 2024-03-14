@@ -1,11 +1,18 @@
 package frc.robot.subsystems.noteIO.arm;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.ARM_POSITIONS;
+import static frc.robot.Constants.SPEAKER_POSE;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.ArmPosition;
 import edu.wpi.first.units.*;
+// import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+// import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
+// import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -14,22 +21,36 @@ import org.littletonrobotics.junction.Logger;
 public class Arm extends SubsystemBase {
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
+    @SuppressWarnings({ "unused" })
     private SysIdRoutine sysIdRoutine;
 
     // length and position of the arm in relation to the robot's center
-    private final double armLength = 0.0; // TODO: set this
+    private final Measure<Distance> armLength = Inches.of(16); // TODO: set this
     private final Translation2d armOffset = new Translation2d(0.0, .425); // TODO: set this
+
+    /** Arm angle look up table key: meters, values: degrees */
+    private static final InterpolatingDoubleTreeMap armAngleMap = new InterpolatingDoubleTreeMap();
+
+    // meters, degrees
+    static {
+        armAngleMap.put(1.12776, 19.7d);
+        armAngleMap.put(1.43256, 23.7d);
+        armAngleMap.put(1.73736, 24.7d);
+        armAngleMap.put(2.34696, 32.7d);
+        armAngleMap.put(3.71856, 38.7d);
+        armAngleMap.put(4.63296, 41.7d);
+
+    }
 
     public Arm(ArmIO io) {
         this.io = io;
 
         sysIdRoutine = new SysIdRoutine(
                 new SysIdRoutine.Config( // Calculate ~ how far it's going to go (less than 90 deg)
-                    Volts.per(Second).of(1),
-                    Volts.of(3),
-                    Seconds.of(3),
-                    (state) -> Logger.recordOutput("SysIdArmTestState", state.toString())
-                ),
+                        Volts.per(Second).of(.8),
+                        Volts.of(3),
+                        Seconds.of(5),
+                        (state) -> Logger.recordOutput("SysIdArmTestState", state.toString())),
                 new SysIdRoutine.Mechanism(
                         (Measure<Voltage> volts) -> {
                             io.setDriveVoltage(volts);
@@ -42,10 +63,11 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
+        // System.out.println("testingggg");
 
         // trust!
         // io.setDriveVoltage(Volts.of(1));
-        // setArmAngle(Degrees.of(90));
+        // setArmAngle(Degrees.of(30));
     }
 
     public void setArmAngle(Measure<Angle> angle) {
@@ -65,7 +87,7 @@ public class Arm extends SubsystemBase {
     }
 
     public Translation2d getEndEffectorPosition() {
-        return new Translation2d(armLength, new Rotation2d(getArmAngle().in(Radians))).plus(armOffset);
+        return new Translation2d(armLength.in(Meters), new Rotation2d(getArmAngle().in(Radians))).plus(armOffset);
     }
 
     public Command alignWithTarget(Supplier<Translation2d> translationToTargetGround, Supplier<Pose3d> targetPose) {
@@ -76,5 +98,23 @@ public class Arm extends SubsystemBase {
             Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
             setArmAngle(Radians.of(Math.PI / 2.0 - targetArmAngle.getRadians())); // add 90 degrees since 0 is vertical
         });
+    }
+
+    private Command moveToShoot(Supplier<Pose2d> robotPose) {
+        return run(() -> {
+            double angle = armAngleMap.get(
+                    robotPose.get().getTranslation().minus(
+                            SPEAKER_POSE.getTranslation()).getNorm());
+            setArmAngle(Degrees.of(angle));
+        });
+    }
+
+    public Command moveArm(ArmPosition position, Supplier<Pose2d> robotPose) {
+        if (position == ArmPosition.SHOOT) {
+            return moveToShoot(robotPose);
+        }
+
+        Measure<Angle> angle = ARM_POSITIONS.get(position);
+        return run(() -> setArmAngle(angle));
     }
 }

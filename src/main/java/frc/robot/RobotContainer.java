@@ -5,19 +5,24 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.SPEAKER_POSE;
 
-import edu.wpi.first.math.MathUtil;
+// import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.DriveWithJoysticks;
-import frc.robot.commands.DriveWithWiimote;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+// import frc.robot.commands.DriveWithJoysticks;
+// import frc.robot.commands.DriveWithWiimote;
+// import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.Constants.ArmPosition;
+import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.noteIO.arm.*;
+import frc.robot.subsystems.noteIO.intakeBase.*;
 import frc.robot.subsystems.noteIO.intakeArm.*;
 import frc.robot.subsystems.noteIO.shooter.*;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -29,18 +34,21 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * scheduler calls). Instead, the structure of the robot (including subsystems,
  * commands, and button mappings) should be declared here.
  */
+
+@SuppressWarnings("unused")
 public class RobotContainer {
     private final Drive drive;
     private final Vision camera;
     private final PoseEstimator poseEstimator;
 
     private final Arm arm;
-    private final IntakeArm intake;
+    private final IntakeBase baseIntake;
+    private final IntakeArm armIntake;
     private final Shooter shooter;
 
     private final CommandXboxController controller = new CommandXboxController(0);
-    private final CommandGenericHID wiiRemote = new CommandGenericHID(2);
-    private final boolean useWiiRemotes = false;
+    // private final CommandGenericHID wiiRemote = new CommandGenericHID(2);
+    // private final boolean useWiiRemotes = false;
 
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
@@ -48,7 +56,6 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-        // creating the drivebase
         switch (Constants.CURRENT_MODE) {
             case REAL:
                 // instantiate hardware IO implementations
@@ -58,8 +65,12 @@ public class RobotContainer {
                         new ModuleIOSparkMax(1),
                         new ModuleIOSparkMax(2),
                         new ModuleIOSparkMax(3),
-                        useWiiRemotes);
+                        false);
                 camera = new Vision(new CameraIOZED());
+                arm = new Arm(new ArmIOFalcon500(Constants.ARM_ID, Constants.ARM_CANCODER_ID));
+                baseIntake = new IntakeBase(new IntakeBaseIONEO(Constants.BASE_INTAKE_ID, Constants.BASE_INTAKE_ID));
+                armIntake = new IntakeArm(new IntakeArmIOFalcon500(Constants.ARM_INTAKE_ID));
+                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
             case SIM:
                 // instantiate physics sim IO implementations
@@ -72,9 +83,13 @@ public class RobotContainer {
                         new ModuleIOSim(),
                         false);
                 camera = new Vision(new CameraIOZED());
+                arm = new Arm(new ArmIOSim());
+                baseIntake = new IntakeBase(new IntakeBaseIOSim());
+                armIntake = new IntakeArm(new IntakeArmIOSim());
+                shooter = new Shooter(new ShooterIOSim());
                 break;
             default: // replayed robot
-                // disable IO implementations
+                     // disable IO implementations
                 drive = new Drive(
                         new GyroIONavX(),
                         new ModuleIOSparkMax(0),
@@ -83,6 +98,10 @@ public class RobotContainer {
                         new ModuleIOSparkMax(3),
                         false);
                 camera = new Vision(new CameraIOZED());
+                arm = new Arm(new ArmIOFalcon500(Constants.ARM_ID, Constants.ARM_CANCODER_ID));
+                baseIntake = new IntakeBase(new IntakeBaseIONEO(Constants.BASE_INTAKE_ID, Constants.BASE_INTAKE_ID));
+                armIntake = new IntakeArm(new IntakeArmIOFalcon500(Constants.ARM_INTAKE_ID));
+                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
         }
 
@@ -90,13 +109,9 @@ public class RobotContainer {
                 drive.getKinematics(),
                 new Rotation2d(),
                 drive.getModulePositions(),
-                new Pose2d());
+                new Pose2d(1.35, 5.5, new Rotation2d()));
         drive.setPoseEstimator(poseEstimator);
         camera.setPoseEstimator(poseEstimator);
-
-        arm = new Arm(new ArmIOFalcon500(20, 19));
-        intake = new IntakeArm(new IntakeArmIOFalcon500(Constants.INTAKE_ID));
-        shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
 
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
 
@@ -110,65 +125,86 @@ public class RobotContainer {
      * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        // // using joysticks
-        // drive.setDefaultCommand(
-        // new DriveWithJoysticks(
-        // drive,
-        // controller::getLeftX,
-        // () -> -controller.getLeftY(),
-        // () -> -controller.getRightX(),
-        // () -> {
-        // return 1.0;
-        // },
-        // () -> Rotation2d.fromDegrees(controller.getHID().getPOV())));
+        // drive with joysticks
+        drive.setDefaultCommand(
+                new DriveWithJoysticks(
+                        drive,
+                        () -> -controller.getLeftX(),
+                        () -> -controller.getLeftY(),
+                        () -> .75 * controller.getRightX(),
+                        () -> {
+                            return 1.0;
+                        },
+                        () -> Rotation2d.fromDegrees(controller.getHID().getPOV()),
+                        false));
 
-        // // break when leftTrigger is held
+        // break when leftTrigger is held
         // controller.leftTrigger().whileTrue(new RunCommand(drive::stopWithX, drive));
 
         // outtake
-        controller.x().whileTrue(new StartEndCommand(() -> intake.start(-2), () -> intake.stop(), intake));
+        // controller.a().whileTrue(new StartEndCommand(() ->
+        // intake.start(Volts.of(-2.9)), () -> intake.stop(), intake));
 
-        // intake (auto stop)
-        controller.a().onTrue(intake.getIntakeCommand(2.9));
+        // base intake
+        controller.x().onTrue(baseIntake.getBaseIntakeCommand(12));
 
-        // intake 
-        controller.y().whileTrue(new StartEndCommand(() -> intake.start(4), () -> intake.stop(), intake));
+        // intake
+        controller.a().onTrue(
+                armIntake.getArmIntakeCommand(Volts.of(2.7))
+                        .alongWith(arm.moveArm(Constants.ArmPosition.INTAKE, drive::getPose)));
 
-        // prime shooter
-        // controller.b().whileTrue(new StartEndCommand(() -> shooter.start(10), () -> shooter.stop(), shooter));
-
-        controller.b().onTrue(
-                        // prime shooter
-                        new InstantCommand(() -> shooter.start(10), shooter)
-                        // wait until shooter is up to speed
-                        .alongWith(Commands.waitUntil(shooter::upToSpeed))
-                        // shoot
-                        .andThen(intake.getShootCommand(10, shooter::checkNoteShot))
+        // shoot with arm
+        controller.b().and(() -> !shooter.upToSpeed()).onTrue(
+                // prime shooter
+                new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95)), shooter)
+                        // move arm
+                        .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
+                        // turn robot towards speaker
+                        .alongWith(
+                                new DriveWithJoysticks(
+                                        drive,
+                                        () -> -controller.getLeftX(),
+                                        () -> -controller.getLeftY(),
+                                        () -> controller.getRightX(),
+                                        () -> {
+                                            return 1.0;
+                                        },
+                                        () -> drive.getPose().getTranslation()
+                                                .minus(
+                                                        SPEAKER_POSE.getTranslation())
+                                                .getAngle()
+                                                .plus(new Rotation2d(
+                                                        Math.PI)),
+                                        true)));
+        controller.b().and(shooter::upToSpeed).onTrue(
+                // shoot
+                armIntake.getShootCommand(Volts.of(12), shooter::checkNoteShot)
                         // stop shooter
-                        .andThen(new InstantCommand(shooter::stop, shooter))
-        );
+                        .andThen(new InstantCommand(shooter::stop, shooter)));
 
+        // manual intake
+        // controller.b().whileTrue(new StartEndCommand(() ->
+        // intake.start(Volts.of(12)), () -> intake.stop(), intake));
 
-        // // intake & arm
-        // controller.a().onTrue(
-        //         // position the arm
-        //         new InstantCommand(() -> arm.setArmAngle(Radians.of(10)))
-        //                 // run intake
-        //                 .andThen(intake.getIntakeCommand(10))
-        //     );
+        // controller.x().onTrue(arm.moveArm(ArmPosition.INTAKE, drive::getPose));
+        // controller.y().onTrue(arm.moveArm(ArmPosition.RANDY, drive::getPose));
 
-        // // shoot & arm
-        // controller.b().onTrue(
-        //         // position the arm
-        //         new InstantCommand(() -> arm.setArmAngle(Radians.of(100)))
-        //                 // prime shooter
-        //                 .andThen(new InstantCommand(() -> shooter.start(10), shooter))
-        //                 // shoot
-        //                 .andThen(intake.getShootCommand(10, shooter::checkNoteShot)
-        //                         // stop shooter
-        //                         .andThen(new InstantCommand(() -> shooter.stop(), shooter))));
+        // arm position tuning
+        // controller.leftTrigger().onTrue(new InstantCommand(() -> {
+        // ARM_POSITIONS.put(ArmPosition.RANDY,
+        // ARM_POSITIONS.get(ArmPosition.RANDY).minus(Degrees.of(.5)));
+        // arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
+        // }));
+        // controller.rightTrigger().onTrue(new InstantCommand(() -> {
+        // ARM_POSITIONS.put(ArmPosition.RANDY,
+        // ARM_POSITIONS.get(ArmPosition.RANDY).plus(Degrees.of(.5)));
+        // arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.RANDY));
+        // }));
+        // controller.a().onTrue(new InstantCommand(() -> {
+        // System.out.println("RANDY IS : " + ARM_POSITIONS.get(ArmPosition.RANDY));
+        // }));
 
-        // // drive to specific pose
+        // drive to specific pose
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
         // controller.rightTrigger().whileTrue(
         // new DriveWithJoysticks(
@@ -184,7 +220,7 @@ public class RobotContainer {
         // return targetTranslation.getAngle();
         // }));
 
-        // // create a trajectory to a specific pose
+        // create trajectory to a specific pose
         // controller.a().onTrue(
         // new MoveToPose(
         // drive,
@@ -200,10 +236,10 @@ public class RobotContainer {
         // var traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
         // traj.translateBy(traj.positionTrajectory.get(0).getTranslation().unaryMinus());
 
-        // // follow nearest aprilTag when rightTrigger is held
+        // follow nearest aprilTag when rightTrigger is held
         // controller.rightTrigger().whileTrue(new FollowAprilTag(drive, camera));
 
-        // // record robot trajectory
+        // record robot trajectory
         // System.out.println("recording pos traj");
         // Logger.recordOutput("Auto/GeneratedTrajectory",
         // traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
@@ -212,7 +248,7 @@ public class RobotContainer {
         // traj.toCSV(path);
         // drive.runPosition(traj);
 
-        // // sysID
+        // sysID
         // controller.rightTrigger().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
         // controller.rightTrigger().whileTrue(drive.sysIdDynamic(Direction.kForward));
         // controller.rightTrigger().whileTrue(drive.sysIdFull());
