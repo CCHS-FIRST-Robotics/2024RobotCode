@@ -9,7 +9,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix.motorcontrol.InvertType;
+// import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
