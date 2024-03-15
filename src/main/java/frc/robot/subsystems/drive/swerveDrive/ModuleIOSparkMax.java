@@ -109,9 +109,9 @@ public class ModuleIOSparkMax implements ModuleIO {
 
         turnSparkMax.setInverted(isTurnMotorInverted);
         if (index == 10) {
-            driveSparkMax.setInverted(false);
-        } else {
             driveSparkMax.setInverted(true);
+        } else {
+            driveSparkMax.setInverted(false);
         }
 
         driveSparkMax.setSmartCurrentLimit(50);

@@ -157,8 +157,11 @@ public class RobotContainer {
     // drive to position control)
     // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() ==
     // 10);}).onTrue(
+    // controller1.x().onTrue(
+    //     new EventMarkerBuilder(AutoPathConstants.twoNoteTest, drive, intake, handoff,shooter, arm).getCommandSequence()
+    // );
     controller1.x().onTrue(
-        new EventMarkerBuilder(AutoPathConstants.twoNoteTest, drive, intake, handoff,shooter, arm).getCommandSequence()
+        drive.followTrajectory(AutoPathConstants.twoNoteTest)
     );
 
     /*
@@ -172,12 +175,13 @@ public class RobotContainer {
     drive.setDefaultCommand(
         new DriveWithJoysticks(
             drive,
-            () -> -controller1.getLeftX(),
+            () -> controller1.getLeftX(),
             () -> controller1.getLeftY(),
             () -> -.75 * controller1.getRightX(),
             () -> {
               return 1.0;
             },
+            // () -> {return new Rotation2d();},
             () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
             false));
 

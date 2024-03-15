@@ -168,7 +168,7 @@ public class Drive extends SubsystemBase {
 
     // auto path
    private ArrayList<String> autoPaths;
-   private int currentPathNum = 1; // 0 in the list is the first path
+   private int currentPathNum = 0; // 0 in the list is the first path
 
     // Control modes for the drive
     public enum CONTROL_MODE {
