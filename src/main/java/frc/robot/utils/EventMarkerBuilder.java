@@ -52,17 +52,14 @@ public final class EventMarkerBuilder {
         // maybe change???? have it move to right in front of speaker first if not there before starting auto path?
         // command = new MoveToPose(drive, );
 
-        command = command.andThen(new InstantCommand(
-                () -> shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT, AutoPathConstants.SHOOT_SPEED_RIGHT),
-                shooter)
-                .andThen(Commands.waitUntil(shooter::upToSpeed)
-                        .andThen(
-                                arm.moveArm(ArmPosition.SHOOT, drive::getPose)
-                                        .alongWith(
-                                                handoff.getShootCommand(
-                                                        Volt.of(AutoPathConstants.HANDOFF_VOLTS),
-                                                        shooter::checkNoteShot)))
-                        .until(shooter::checkNoteShot)));
+        command = new InstantCommand(() -> shooter.start(RotationsPerSecond.of(95)), shooter)
+                .andThen(
+                    arm.moveArm(ArmPosition.SPEAKER, drive::getPose)
+                    .alongWith(
+                        Commands.waitUntil(shooter::upToSpeed)
+                        .andThen(handoff.getShootCommand(Volt.of(AutoPathConstants.HANDOFF_VOLTS), shooter::checkNoteShot))
+                    ).until(shooter::checkNoteShot)
+                );
 
         for (String path : pathList) {
             addCommand(path);

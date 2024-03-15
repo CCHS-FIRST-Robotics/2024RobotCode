@@ -336,6 +336,9 @@ public class Drive extends SubsystemBase {
                 if (yController.atSetpoint()) yPID = 0;
                 if (headingController.atSetpoint()) headingPID = 0;
 
+                Logger.recordOutput("headingpidout", headingPID);
+                Logger.recordOutput("rotout", twistSetpointTrajectory.dtheta + headingPID);
+
                 // Add the PID output to the velocity setpoint
                 chassisSetpoint = new ChassisSpeeds(
                     twistSetpointTrajectory.dx + xPID,
@@ -573,6 +576,13 @@ public class Drive extends SubsystemBase {
 
     /** Returns an array of module translations. */
     public static Translation2d[] getModuleTranslations() {
+        // return new Translation2d[] {
+        //     new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
+        //     new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
+        //     new Translation2d(trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0),
+        //     new Translation2d(-trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0)
+        // };
+
         return new Translation2d[] {
             new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
             new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),

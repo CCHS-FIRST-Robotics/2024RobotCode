@@ -111,7 +111,7 @@ public final class Constants {
         public static final String FOUR_NOTE_WING2 = "FourNoteWing.2";
         public static final String FOUR_NOTE_WING3 = "FourNoteWing.3";
         public static final String TWO_NOTE_LEFT = "TwoNoteLeft.1";
-        public static final String TWO_NOTE_CENTER = "TwoNoteCenter.1";
+        public static final String TWO_NOTE_CENTER = "TwoNoteCenterSS.1";
         public static final String TWO_NOTE_RIGHT = "TwoNoteRight.1";
 
         public static final ArrayList<String> twoNoteTest = new ArrayList<String>();

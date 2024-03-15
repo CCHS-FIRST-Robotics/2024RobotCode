@@ -155,17 +155,11 @@ public class RobotContainer {
     // Generate a trajectory to a pose when the X button is pressed (and
     // switch
     // drive to position control)
-    // String path = AutoPathConstants.THREE_NOTE_WING;
     // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() ==
     // 10);}).onTrue(
-    // controller1.x().onTrue(
-    // new AutoRoutine(new MechanismsPath(AutoPathConstants.threeNoteWing, drive,
-    // intake, shooter, arm))
-    // EventMarkerBuilder(AutoPathConstants.threeNoteWingSplits, drive, intake,
-    // handoff, shooter, arm).getCommandSequence()
-    // new EventMarkerBuilder(AutoPathConstants.fourNoteWingSplits, drive, handoff,
-    // shooter,
-    // arm).getCommandSequence());
+    controller1.x().onTrue(
+        new EventMarkerBuilder(AutoPathConstants.twoNoteTest, drive, intake, handoff,shooter, arm).getCommandSequence()
+    );
 
     /*
      * Controller 1:
@@ -179,7 +173,7 @@ public class RobotContainer {
         new DriveWithJoysticks(
             drive,
             () -> -controller1.getLeftX(),
-            () -> -controller1.getLeftY(),
+            () -> controller1.getLeftY(),
             () -> -.75 * controller1.getRightX(),
             () -> {
               return 1.0;
