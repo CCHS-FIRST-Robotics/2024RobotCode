@@ -157,12 +157,12 @@ public class RobotContainer {
     // drive to position control)
     // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() ==
     // 10);}).onTrue(
-    // controller1.x().onTrue(
-    //     new EventMarkerBuilder(AutoPathConstants.twoNoteTest, drive, intake, handoff,shooter, arm).getCommandSequence()
-    // );
     controller1.x().onTrue(
-        drive.followTrajectory(AutoPathConstants.twoNoteTest)
+        new EventMarkerBuilder(AutoPathConstants.twoNoteTest, drive, intake, handoff,shooter, arm).getCommandSequence()
     );
+    // controller1.x().onTrue(
+    //     drive.followTrajectory(AutoPathConstants.twoNoteTest)
+    // );
 
     /*
      * Controller 1:
