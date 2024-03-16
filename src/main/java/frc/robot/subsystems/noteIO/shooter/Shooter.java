@@ -44,7 +44,7 @@ public class Shooter extends SubsystemBase {
 
     @AutoLogOutput
     public boolean checkNoteShot() {
-        return inputs.leftShooterCurrent > 40 && Timer.getFPGATimestamp() - time > 1;
+        return inputs.leftShooterCurrent > 40 * (leftVelocity.in(RotationsPerSecond) / 95d) && Timer.getFPGATimestamp() - time > 1;
     }
 
     @Override

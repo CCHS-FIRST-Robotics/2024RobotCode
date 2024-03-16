@@ -1654,7 +1654,7 @@
             "usesDefaultFieldObstacles": true,
             "circleObstacles": [],
             "eventMarkers": [],
-            "isTrajectoryStale": false
+            "isTrajectoryStale": true
         },
         "TwoNoteLeftSS": {
             "waypoints": [
@@ -2066,7 +2066,7 @@
             "usesDefaultFieldObstacles": true,
             "circleObstacles": [],
             "eventMarkers": [],
-            "isTrajectoryStale": false
+            "isTrajectoryStale": true
         },
         "TwoNoteRightCenterSS": {
             "waypoints": [
@@ -3625,7 +3625,7 @@
             "usesDefaultFieldObstacles": true,
             "circleObstacles": [],
             "eventMarkers": [],
-            "isTrajectoryStale": false
+            "isTrajectoryStale": true
         },
         "FiveNoteLeft": {
             "waypoints": [
@@ -7056,6 +7056,7 @@
                     "translationConstrained": true,
                     "headingConstrained": true,
                     "controlIntervalCount": 9
+                    "controlIntervalCount": 9
                 },
                 {
                     "x": 2.7160582542419434,
@@ -7064,6 +7065,7 @@
                     "isInitialGuess": false,
                     "translationConstrained": true,
                     "headingConstrained": true,
+                    "controlIntervalCount": 9
                     "controlIntervalCount": 9
                 },
                 {
@@ -7260,6 +7262,7 @@
                     "translationConstrained": true,
                     "headingConstrained": true,
                     "controlIntervalCount": 9
+                    "controlIntervalCount": 9
                 },
                 {
                     "timestamp": 0.7425919981467322,
@@ -7270,6 +7273,7 @@
                     "isInitialGuess": false,
                     "translationConstrained": true,
                     "headingConstrained": true,
+                    "controlIntervalCount": 9
                     "controlIntervalCount": 9
                 },
                 {
@@ -7309,7 +7313,20 @@
             "defaultControlIntervalCount": 40,
             "usesDefaultFieldObstacles": true,
             "circleObstacles": [],
-            "eventMarkers": [],
+            "eventMarkers": [
+                {
+                    "name": "Intake",
+                    "target": 1,
+                    "targetTimestamp": 0.7425919956356102,
+                    "offset": 0,
+                    "command": {
+                        "type": "named",
+                        "data": {
+                            "name": "Intake"
+                        }
+                    }
+                }
+            ],
             "isTrajectoryStale": false
         },
         "TwoNoteRightSS": {
@@ -7751,7 +7768,7 @@
             "usesDefaultFieldObstacles": true,
             "circleObstacles": [],
             "eventMarkers": [],
-            "isTrajectoryStale": false
+            "isTrajectoryStale": true
         },
         "ThreeNoteRightRSS": {
             "waypoints": [
