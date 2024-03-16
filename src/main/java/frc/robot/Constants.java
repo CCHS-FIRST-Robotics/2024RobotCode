@@ -105,18 +105,37 @@ public final class Constants {
         public static final Map<Pair<Double, Constants.EventCommand>, ArrayList<String>> eventMarkerMap = new HashMap<>();
 
         // file names for paths
-        public static final String THREE_NOTE_WING1 = "ThreeNoteWing.1";
-        public static final String THREE_NOTE_WING2 = "ThreeNoteWing.2";
+        public static final String TWO_NOTE_LEFT = "TwoNoteLeftSS.1";
+        public static final String TWO_NOTE_CENTER = "TwoNoteCenterSS.1";
+        public static final String TWO_NOTE_RIGHT = "TwoNoteRightSS.1";
+        
+        public static final String THREE_NOTE_WRR1 = "ThreeNoteRightRSS.1";
+        public static final String THREE_NOTE_WRR2 = "ThreeNoteRightRSS.2";
+        public static final String THREE_NOTE_WRC1 = "ThreeNoteRightCSS.1";
+        public static final String THREE_NOTE_WRC2 = "ThreeNoteRightCSS.2";
+        public static final String THREE_NOTE_WLL1 = "ThreeNoteLeftLSS.1";
+        public static final String THREE_NOTE_WLL2 = "ThreeNoteLeftLSS.2";
+        public static final String THREE_NOTE_WLC1 = "ThreeNoteLeftCSS.1";
+        public static final String THREE_NOTE_WLC2 = "ThreeNoteLeftCSS.2";
+
+
         public static final String FOUR_NOTE_WING1 = "FourNoteWing.1";
         public static final String FOUR_NOTE_WING2 = "FourNoteWing.2";
         public static final String FOUR_NOTE_WING3 = "FourNoteWing.3";
-        public static final String TWO_NOTE_LEFT = "TwoNoteLeft.1";
-        public static final String TWO_NOTE_CENTER = "TwoNoteCenterSS.1";
-        public static final String TWO_NOTE_RIGHT = "TwoNoteRight.1";
+        public static final String FOUR_NOTE_L1 = "FourNoteLeftSS.1";
+        public static final String FOUR_NOTE_L2 = "FourNoteLeftSS.2";
+        public static final String FOUR_NOTE_L3 = "FourNoteLeftSS.3";
 
-        public static final ArrayList<String> twoNoteTest = new ArrayList<String>();
-        public static final ArrayList<String> threeNoteWingSplits = new ArrayList<String>();
-        public static final ArrayList<String> fourNoteWingSplits = new ArrayList<String>();
+        public static final ArrayList<String> twoNoteLeft = new ArrayList<String>();
+        public static final ArrayList<String> twoNoteRight = new ArrayList<String>();
+        public static final ArrayList<String> twoNoteCenter = new ArrayList<String>();
+        public static final ArrayList<String> threeNoteWRR = new ArrayList<String>();
+        public static final ArrayList<String> threeNoteWRC = new ArrayList<String>();
+        public static final ArrayList<String> threeNoteWLL = new ArrayList<String>();
+        public static final ArrayList<String> threeNoteWLC = new ArrayList<String>();
+        public static final ArrayList<String> fourNoteWing = new ArrayList<String>();
+        public static final ArrayList<String> fourNoteLeft = new ArrayList<String>();
+
 
         public static final double INTAKE_VOLTS = 6;
         public static final double HANDOFF_VOLTS = 6;
@@ -132,14 +151,30 @@ public final class Constants {
         public static final Measure<Velocity<Angle>> SHOOT_SPEED_RIGHT = RotationsPerSecond.of(95); // idk
 
         static {
-            threeNoteWingSplits.add(THREE_NOTE_WING1);
-            threeNoteWingSplits.add(THREE_NOTE_WING2);
+            twoNoteLeft.add(TWO_NOTE_LEFT);
+            twoNoteCenter.add(TWO_NOTE_CENTER);
+            twoNoteRight.add(TWO_NOTE_RIGHT);
 
-            fourNoteWingSplits.add(FOUR_NOTE_WING1);
-            fourNoteWingSplits.add(FOUR_NOTE_WING2);
-            fourNoteWingSplits.add(FOUR_NOTE_WING3);
 
-            twoNoteTest.add(TWO_NOTE_CENTER);
+            threeNoteWRR.add(THREE_NOTE_WRR1);
+            threeNoteWRR.add(THREE_NOTE_WRR2);
+
+            threeNoteWRC.add(THREE_NOTE_WRC1);
+            threeNoteWRC.add(THREE_NOTE_WRC2);
+            
+            threeNoteWLL.add(THREE_NOTE_WLL1);
+            threeNoteWLL.add(THREE_NOTE_WLL2);
+            
+            threeNoteWLC.add(THREE_NOTE_WLC1);
+            threeNoteWLC.add(THREE_NOTE_WLC2);
+
+            fourNoteLeft.add(FOUR_NOTE_L1);
+            fourNoteLeft.add(FOUR_NOTE_L2);
+            fourNoteLeft.add(FOUR_NOTE_L3);
+
+            fourNoteWing.add(FOUR_NOTE_WING1);
+            fourNoteWing.add(FOUR_NOTE_WING2);
+            fourNoteWing.add(FOUR_NOTE_WING3);
         }
     }
 }
