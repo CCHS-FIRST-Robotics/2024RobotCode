@@ -208,8 +208,8 @@ public class RobotContainer {
     drive.setDefaultCommand(
         new DriveWithJoysticks(
             drive,
-            () -> controller1.getLeftX(),
-            () -> controller1.getLeftY(),
+            () -> -controller1.getLeftX(),
+            () -> -controller1.getLeftY(),
             () -> -.75 * controller1.getRightX(),
             () -> {
               return 1.0;

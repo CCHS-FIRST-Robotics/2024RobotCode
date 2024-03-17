@@ -84,16 +84,16 @@ public class Drive extends SubsystemBase {
      */
     
     // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
-    private double kPx = 2.3; // 0.4
-    private double kPy = 2.3; // 0.33
+    private double kPx = 2.7; // 2.3
+    private double kPy = 2.7; // 2.3
     private double kPHeading = 3; // 0.25 // 0.5
 
-    private double kDx = 0.1; // 
-    private double kDy = 0.1; // 
-    private double kDHeading = .3; // 
+    private double kDx = 0.12; // .1
+    private double kDy = 0.12; // .1
+    private double kDHeading = .3; // .3
 
-    private double kIx = 0.1; // 0.12
-    private double kIy = 0.1; // 0.15
+    private double kIx = 0.05; // 0.12
+    private double kIy = 0.05; // 0.15
     // private double kPlinear =
     private double kIHeading = 0.00; // 0.05
 
