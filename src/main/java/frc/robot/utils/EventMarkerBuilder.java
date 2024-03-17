@@ -32,15 +32,16 @@ import frc.robot.subsystems.noteIO.shooter.Shooter;
 import edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 
 import com.choreo.lib.*;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
 
-import org.json.*;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+// import org.json.*;
+// import org.json.simple.JSONArray;
+// import org.json.simple.JSONObject;
+// import org.json.simple.parser.JSONParser;
 
 public final class EventMarkerBuilder {
     private Drive drive;
@@ -63,12 +64,11 @@ public final class EventMarkerBuilder {
 
         // maybe change???? have it move to right in front of speaker first if not there before starting auto path?
         // command = new MoveToPose(drive, );
-
         command = new InstantCommand(() -> shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT, AutoPathConstants.SHOOT_SPEED_RIGHT), shooter)
                 .andThen(
                     arm.moveArm(ArmPosition.SPEAKER, drive::getPose)
                     .alongWith(
-                        Commands.waitUntil(shooter::upToSpeed)
+                        Commands.waitUntil(() -> shooter.upToSpeed() && arm.isAtGoal())
                         .andThen(handoff.getShootCommand(AutoPathConstants.HANDOFF_IN_VOLTS, shooter::checkNoteShot))
                     ).until(shooter::checkNoteShot)
                 );
@@ -76,6 +76,8 @@ public final class EventMarkerBuilder {
         for (String path : pathList) {
             addCommand(path);
         }
+
+        System.out.println("fihffhusdhfd");
 
         command = command.andThen(
                 new InstantCommand(() -> shooter.stop())
@@ -130,32 +132,32 @@ public final class EventMarkerBuilder {
         }
     }
 
-    public static ArrayList<Double> getEventMarkers(String path) {
-        var traj_dir = new File(Filesystem.getDeployDirectory(), "choreo");
-        var traj_file = new File(traj_dir, path + ".traj");
+    // public static ArrayList<Double> getEventMarkers(String path) {
+    //     var traj_dir = new File(Filesystem.getDeployDirectory(), "choreo");
+    //     var traj_file = new File(traj_dir, path + ".traj");
 
-        var timestamps = new ArrayList<Double>(); 
+    //     var timestamps = new ArrayList<Double>(); 
 
-        try {
-            // parsing file "JSONExample.json" 
-            Object obj = new JSONParser().parse(new FileReader(traj_file)); 
-            // typecasting obj to JSONObject 
-            JSONObject jo = (JSONObject) obj;
+    //     try {
+    //         // parsing file "JSONExample.json" 
+    //         Object obj = new JSONParser().parse(new FileReader(traj_file)); 
+    //         // typecasting obj to JSONObject 
+    //         JSONObject jo = (JSONObject) obj;
 
-            // getting timestamps
-            JSONArray eventMarkers = (JSONArray) jo.get("eventMarkers");
-            eventMarkers.forEach((marker) -> {
-                timestamps.add(
-                    (Double) ((JSONObject) marker).get("timestamp")
-                );
-            });
+    //         // getting timestamps
+    //         JSONArray eventMarkers = (JSONArray) jo.get("eventMarkers");
+    //         eventMarkers.forEach((marker) -> {
+    //             timestamps.add(
+    //                 (Double) ((JSONObject) marker).get("timestamp")
+    //             );
+    //         });
 
-        } catch (Exception ex) {
-            DriverStation.reportError(ex.getMessage(), ex.getStackTrace());
-        }
+    //     } catch (Exception ex) {
+    //         DriverStation.reportError(ex.getMessage(), ex.getStackTrace());
+    //     }
 
-        return timestamps;
-    }
+    //     return timestamps;
+    // }
 
     public Command getCommandSequence() {
         return command;

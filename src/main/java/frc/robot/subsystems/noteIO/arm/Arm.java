@@ -92,7 +92,12 @@ public class Arm extends SubsystemBase {
      */
     @AutoLogOutput
     public boolean isAtGoal() {
-        return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < 7;
+        return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < 2;
+    }
+
+    @AutoLogOutput
+    public boolean isUnderStage() {
+        return getArmAngle().in(Degrees) < -22;
     }
 
     public Measure<Angle> getArmAngle() {

@@ -26,8 +26,8 @@ public class IntakeIONEO implements IntakeIO {
         intake2.setCANTimeout(500);
         intake1.setInverted(true);
         intake2.setInverted(false);
-        intake1.setSmartCurrentLimit(30);
-        intake2.setSmartCurrentLimit(30);
+        intake1.setSmartCurrentLimit(40);
+        intake2.setSmartCurrentLimit(40);
         intake1.setIdleMode(IdleMode.kCoast);
         intake2.setIdleMode(IdleMode.kCoast);
         intake1.setCANTimeout(0);

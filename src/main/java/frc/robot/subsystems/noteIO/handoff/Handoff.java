@@ -23,15 +23,18 @@ public class Handoff extends SubsystemBase {
     public void start(Measure<Voltage> v) {
         volts = v;
         startTime = Timer.getFPGATimestamp();
+        System.out.println("teu9shuhufhds");
     }
 
     public void stop() {
         volts = Volts.of(0);
+        // startTime = Timer.getFPGATimestamp();
     }
 
     @AutoLogOutput
     public boolean checkNoteThere() {
-        return inputs.motorCurrent > 50 && (Timer.getFPGATimestamp() - startTime > 0.5);
+        // return false;
+        return inputs.motorCurrent > 25 && (Timer.getFPGATimestamp() - startTime > 0.5);
         // return Timer.getFPGATimestamp()-startTime>AutoPathConstants.Q_INTAKE_TIME;
     }
 
@@ -54,7 +57,7 @@ public class Handoff extends SubsystemBase {
                 (interrupted) -> {
                     stop();
                 },
-                () -> checkNoteThere(),
+                this::checkNoteThere,
                 this);
     }
 

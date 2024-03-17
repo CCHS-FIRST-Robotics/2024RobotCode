@@ -129,8 +129,8 @@ public class RobotContainer {
         new Rotation2d(),
         drive.getModulePositions(),
         new Pose2d(
-            1.3,
-            5.56,
+            0.795, // 0.987 (2NC)
+            4.552, // 4.620 (2NC)
             new Rotation2d()));
 
     drive.setPoseEstimator(poseEstimator);
@@ -139,6 +139,39 @@ public class RobotContainer {
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
 
     configureButtonBindings();
+  }
+
+  public void switchDriveThing() {
+    System.out.println("ahahhhhhhh");
+    drive.removeDefaultCommand();
+    drive.setDefaultCommand(
+                new DriveWithJoysticks(
+                    drive,
+                    () -> -controller1.getLeftX(),
+                    () -> -controller1.getLeftY(),
+                    () -> -.75 * controller1.getRightX(),
+                    () -> {
+                    return 1.0;
+                    },
+                    // () -> {return new Rotation2d();},
+                    () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
+                    false));
+  }
+
+  public void switchDriveThing2() {
+    drive.removeDefaultCommand();
+    drive.setDefaultCommand(
+                new DriveWithJoysticks(
+                    drive,
+                    () -> controller1.getLeftX(),
+                    () -> controller1.getLeftY(),
+                    () -> -.75 * controller1.getRightX(),
+                    () -> {
+                    return 1.0;
+                    },
+                    // () -> {return new Rotation2d();},
+                    () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
+                    false));
   }
 
   /**
@@ -157,9 +190,9 @@ public class RobotContainer {
     // drive to position control)
     // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() ==
     // 10);}).onTrue(
-    controller1.x().onTrue(
-        new EventMarkerBuilder(AutoPathConstants.twoNoteTest, drive, intake, handoff,shooter, arm).getCommandSequence()
-    );
+    // controller1.x().onTrue(
+        // new EventMarkerBuilder(AutoPathConstants.twoNoteCenter, drive, intake, handoff,shooter, arm).getCommandSequence()
+    // );
     // controller1.x().onTrue(
     //     drive.followTrajectory(AutoPathConstants.twoNoteTest)
     // );
@@ -184,6 +217,14 @@ public class RobotContainer {
             // () -> {return new Rotation2d();},
             () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
             false));
+
+    controller1.leftBumper().onTrue(
+        new InstantCommand(() -> switchDriveThing(), drive)
+    );
+
+    controller1.rightBumper().onTrue(
+        new InstantCommand(() -> switchDriveThing2(), drive)
+    );
 
     // break when left trigger is held
     // controller1.leftTrigger().whileTrue(
@@ -253,23 +294,24 @@ public class RobotContainer {
         handoff.getHandoffCommand(Volts.of(6))
              // move arm down
             .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
-            .alongWith(
-                Commands.waitUntil(arm::isAtGoal)
-                // turn on intake until detected by handoff
-                .andThen(intake.getIntakeCommand(Volts.of(3),
-                    handoff::checkNoteThere))
-            )
+            // .alongWith(
+            //     Commands.waitUntil(arm::isAtGoal)
+            //     // turn on intake until detected by handoff
+            //     .andThen(intake.getIntakeCommand(Volts.of(4),
+            //         handoff::checkNoteThere))
+            // )
+            .alongWith(intake.getIntakeCommand(Volts.of(4), handoff::checkNoteThere))
             
     );
 
     // outtake
     controller2.x().whileTrue(
         new StartEndCommand(
-            () -> intake.start(Volts.of(-4)), () -> intake.stop(), intake
+            () -> intake.start(Volts.of(-3)), () -> intake.stop(), intake
         )
         .alongWith(
             new StartEndCommand(
-                () -> handoff.start(Volts.of(-6)), () -> handoff.stop(), handoff
+                () -> handoff.start(Volts.of(-2)), () -> handoff.stop(), handoff
             )
         )
     );
@@ -278,10 +320,21 @@ public class RobotContainer {
         arm.moveArm(ArmPosition.MAIN, drive::getPose)
     );
 
+    controller2.rightBumper().onTrue(
+        arm.moveArm(ArmPosition.LOWER, drive::getPose)
+    );
+
     controller2.leftTrigger().onTrue(
-        new InstantCommand(() -> shooter.stop())
-        .alongWith(new InstantCommand(() -> handoff.stop()))
-        .alongWith(new InstantCommand(() -> intake.stop()))
+        new InstantCommand(() -> shooter.stop(), shooter)
+        .alongWith(new InstantCommand(() -> handoff.stop(), handoff))
+        .alongWith(new InstantCommand(() -> intake.stop(), intake))
+    );
+
+    controller2.leftBumper().whileTrue(
+        new StartEndCommand(() -> intake.start(Volts.of(3)), intake::stop, intake)
+        .alongWith(
+            new StartEndCommand(() -> handoff.start(Volts.of(2)), handoff::stop, handoff)
+        )
     );
 
     controller2.povUp().onTrue(
@@ -392,6 +445,19 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
-  }
+    return new EventMarkerBuilder(AutoPathConstants.twoCLpath, drive, intake, handoff,shooter, arm).getCommandSequence();
+    // Command command = new InstantCommand(() -> shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT, AutoPathConstants.SHOOT_SPEED_RIGHT), shooter)
+    // .andThen(
+    //     arm.moveArm(ArmPosition.SPEAKER, drive::getPose)
+    //     .alongWith(
+    //         Commands.waitUntil(() -> shooter.upToSpeed() && arm.isAtGoal())
+    //         .andThen(handoff.getShootCommand(AutoPathConstants.HANDOFF_IN_VOLTS, shooter::checkNoteShot))
+    //     ).until(shooter::checkNoteShot)
+    // );
+
+    // command = command.andThen(
+    //             new InstantCommand(() -> shooter.stop())
+    //                     .alongWith(new InstantCommand(() -> handoff.stop())));
+    // return command;
+    }
 }

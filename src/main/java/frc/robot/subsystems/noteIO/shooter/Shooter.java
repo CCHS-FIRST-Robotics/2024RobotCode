@@ -30,6 +30,7 @@ public class Shooter extends SubsystemBase {
     public void start(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
         this.leftVelocity = leftVelocity;
         this.rightVelocity = rightVelocity;
+        time = Timer.getFPGATimestamp();
     }
 
     public void stop() {
@@ -44,14 +45,14 @@ public class Shooter extends SubsystemBase {
 
     @AutoLogOutput
     public boolean checkNoteShot() {
-        return inputs.leftShooterCurrent > 40 * (leftVelocity.in(RotationsPerSecond) / 95d) && Timer.getFPGATimestamp() - time > 1;
+        return inputs.leftShooterCurrent > 40 && Timer.getFPGATimestamp() - time > 1;
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("shooter", inputs);
-        Logger.recordOutput("Shooter on", leftVelocity.magnitude() != 0 || rightVelocity.magnitude() != 0);
+        Logger.recordOutput("Shooter on", leftVelocity.in(RadiansPerSecond) != 0 || rightVelocity.in(RadiansPerSecond) != 0);
 
         io.setVelocity(leftVelocity, rightVelocity);
         // io.setVoltage(Volts.of(6));

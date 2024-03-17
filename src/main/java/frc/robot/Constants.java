@@ -37,16 +37,18 @@ public final class Constants {
         SPEAKER,
         SHOOT,
         MAIN,
+        LOWER,
         SHOOT_MID,
         SHOOT_FAR
     }
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(
             Map.of(
-                    ArmPosition.INTAKE, Degrees.of(-12),
-                    ArmPosition.AMP, Degrees.of(95),
-                    ArmPosition.SPEAKER, Degrees.of(4),
+                    ArmPosition.INTAKE, Degrees.of(-14),
+                    ArmPosition.AMP, Degrees.of(88),
+                    ArmPosition.SPEAKER, Degrees.of(5),
                     ArmPosition.MAIN, Degrees.of(-23),
+                    ArmPosition.LOWER, Degrees.of(-10),
                     ArmPosition.SHOOT_MID, Degrees.of(20),
                     ArmPosition.SHOOT_FAR, Degrees.of(35)
             )
@@ -119,12 +121,16 @@ public final class Constants {
         public static final String THREE_NOTE_WLC2 = "ThreeNoteLeftCSS.2";
 
 
-        public static final String FOUR_NOTE_WING1 = "FourNoteWing.1";
-        public static final String FOUR_NOTE_WING2 = "FourNoteWing.2";
-        public static final String FOUR_NOTE_WING3 = "FourNoteWing.3";
+        public static final String FOUR_NOTE_WING1 = "FourNoteWingSS.1";
+        public static final String FOUR_NOTE_WING2 = "FourNoteWingSS.2";
+        public static final String FOUR_NOTE_WING3 = "FourNoteWingSS.3";
         public static final String FOUR_NOTE_L1 = "FourNoteLeftSS.1";
         public static final String FOUR_NOTE_L2 = "FourNoteLeftSS.2";
         public static final String FOUR_NOTE_L3 = "FourNoteLeftSS.3";
+
+        public static final String TESTING_RED1 = "TestingSS.1";
+
+        public static final String TWOCL = "2CL.1";
 
         public static final ArrayList<String> twoNoteLeft = new ArrayList<String>();
         public static final ArrayList<String> twoNoteRight = new ArrayList<String>();
@@ -135,6 +141,10 @@ public final class Constants {
         public static final ArrayList<String> threeNoteWLC = new ArrayList<String>();
         public static final ArrayList<String> fourNoteWing = new ArrayList<String>();
         public static final ArrayList<String> fourNoteLeft = new ArrayList<String>();
+
+        public static final ArrayList<String> twoCLpath = new ArrayList<String>();
+
+        public static final ArrayList<String> testingRed = new ArrayList<String>();
 
 
         public static final Measure<Voltage> INTAKE_VOLTS = Volts.of(4);
@@ -176,6 +186,10 @@ public final class Constants {
             fourNoteWing.add(FOUR_NOTE_WING1);
             fourNoteWing.add(FOUR_NOTE_WING2);
             fourNoteWing.add(FOUR_NOTE_WING3);
+
+            twoCLpath.add(TWOCL);
+
+            testingRed.add(TESTING_RED1);
         }
     }
 }
