@@ -23,6 +23,7 @@ import org.littletonrobotics.junction.Logger;
 import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
 import com.choreo.lib.ChoreoTrajectoryState;
+import com.ctre.phoenix6.Orchestra;
 
 // rev sucks
 public class Arm extends SubsystemBase {
@@ -172,4 +173,8 @@ public class Arm extends SubsystemBase {
 
     //     return null;
     // }
+
+    public void addToOrchestra(Orchestra orchestra, int trackNum) {
+        io.addToOrchestra(orchestra, trackNum);
+    }
 }

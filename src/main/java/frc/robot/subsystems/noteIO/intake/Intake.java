@@ -10,6 +10,8 @@ import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.Orchestra;
+
 public class Intake extends SubsystemBase {
     IntakeIO io;
     Measure<Voltage> volts = Volts.of(0);
@@ -38,6 +40,11 @@ public class Intake extends SubsystemBase {
 
         io.setVoltage(volts);
         // io.setVoltage(Volts.of(3));
+    }
+
+    @AutoLogOutput
+    public boolean isOn() {
+        return volts.in(Volts) != 0;
     }
 
     @AutoLogOutput

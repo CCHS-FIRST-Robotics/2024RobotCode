@@ -7,6 +7,9 @@ import edu.wpi.first.units.*;
 import edu.wpi.first.wpilibj.Timer;
 
 import org.littletonrobotics.junction.Logger;
+
+import com.ctre.phoenix6.Orchestra;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Shooter extends SubsystemBase {
@@ -58,6 +61,11 @@ public class Shooter extends SubsystemBase {
         // io.setVoltage(Volts.of(6));
     }
 
+    @AutoLogOutput
+    public boolean isOn() {
+        return leftVelocity.in(RotationsPerSecond) != 0;
+    }
+
     public Command getShootNoteCommand(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
         // turns on motor to shoot note
         return new FunctionalCommand(
@@ -67,5 +75,9 @@ public class Shooter extends SubsystemBase {
                 (interrupted) -> stop(),
                 () -> checkNoteShot(),
                 this);
+    }
+
+    public void addToOrchestra(Orchestra orchestra, int trackNum) {
+        io.addToOrchestra(orchestra, trackNum);
     }
 }

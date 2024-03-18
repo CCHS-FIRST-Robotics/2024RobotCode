@@ -42,6 +42,8 @@ import frc.robot.subsystems.noteIO.intake.*;
 import frc.robot.subsystems.noteIO.shooter.*;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import com.ctre.phoenix6.Orchestra;
+
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a "declarative" paradigm, very little robot logic should
@@ -60,6 +62,7 @@ public class RobotContainer {
   private final Handoff handoff;
   private final Intake intake;
   private final Shooter shooter;
+  private final Orchestra jukebox = new Orchestra();
 
   private final CommandXboxController controller1 = new CommandXboxController(Constants.CONTROLLER_PORT_1);
   private final CommandXboxController controller2 = new CommandXboxController(Constants.CONTROLLER_PORT_2);
@@ -135,6 +138,13 @@ public class RobotContainer {
 
     drive.setPoseEstimator(poseEstimator);
     camera.setPoseEstimator(poseEstimator);
+
+    handoff.addToOrchestra(jukebox, 0);
+    shooter.addToOrchestra(jukebox, 1);
+    arm.addToOrchestra(jukebox, 3);
+
+    jukebox.loadMusic("music/rick.chrp");
+    jukebox.play();
 
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
 
