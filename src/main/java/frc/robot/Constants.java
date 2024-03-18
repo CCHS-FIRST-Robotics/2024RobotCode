@@ -29,7 +29,7 @@ public final class Constants {
         REPLAY
     }
 
-    public static final Mode CURRENT_MODE = Mode.REAL;
+    public static final Mode CURRENT_MODE = Mode.SIM;
 
     public static enum ArmPosition {
         INTAKE,

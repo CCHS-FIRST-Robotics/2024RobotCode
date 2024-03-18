@@ -287,31 +287,25 @@ public class RobotContainer {
     );
 
     // continuous base intake (intake stops when note is detected in handoff)
-    controller2.a().onTrue(
+    controller1.a().onTrue(
         // turn on handoff
         handoff.getHandoffCommand(Volts.of(6))
-             // move arm down
-            .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
-            // .alongWith(
-            //     Commands.waitUntil(arm::isAtGoal)
-            //     // turn on intake until detected by handoff
-            //     .andThen(intake.getIntakeCommand(Volts.of(4),
-            //         handoff::checkNoteThere))
-            // )
-            .alongWith(intake.getIntakeCommand(Volts.of(6), handoff::checkNoteThere))
-            
+        // turn on intake (until handoff stops)
+        .raceWith(intake.getIntakeCommand(Volts.of(6)))
+        //  move arm down
+        .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
+        // .alongWith(
+        //     Commands.waitUntil(arm::isAtGoal)
+        //     // turn on intake until detected by handoff
+        //     .andThen(intake.getIntakeCommand(Volts.of(4),
+        //         handoff::checkNoteThere))
+        // )
     );
 
     // outtake
     controller2.x().whileTrue(
-        new StartEndCommand(
-            () -> intake.start(Volts.of(-3)), () -> intake.stop(), intake
-        )
-        .alongWith(
-            new StartEndCommand(
-                () -> handoff.start(Volts.of(-2)), () -> handoff.stop(), handoff
-            )
-        )
+        intake.getIntakeCommand(Volts.of(-3))
+        .alongWith(handoff.getHandoffManualCommand(Volts.of(-2)))
     );
 
     controller2.rightTrigger().onTrue(
@@ -323,30 +317,28 @@ public class RobotContainer {
     );
 
     controller2.leftTrigger().onTrue(
-        new InstantCommand(() -> shooter.stop(), shooter)
-        .alongWith(new InstantCommand(() -> handoff.stop(), handoff))
-        .alongWith(new InstantCommand(() -> intake.stop(), intake))
+        new InstantCommand(shooter::stop, shooter)
+        .alongWith(new InstantCommand(handoff::stop, handoff))
+        .alongWith(new InstantCommand(intake::stop, intake))
     );
 
     controller2.leftBumper().whileTrue(
-        new StartEndCommand(() -> intake.start(Volts.of(3)), intake::stop, intake)
-        .alongWith(
-            new StartEndCommand(() -> handoff.start(Volts.of(2)), handoff::stop, handoff)
-        )
+        intake.getIntakeCommand(Volts.of(3))
+        .alongWith(handoff.getHandoffManualCommand(Volts.of(2)))
+    );
+
+    controller2.povDown().onTrue(
+        // start handoff
+        handoff.getHandoffCommand(Volts.of(4))
+            // move arm down
+            .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
     );
 
     controller2.povUp().onTrue(
         // prime shooter
-        new StartEndCommand(() -> handoff.start(Volts.of(4)), intake::stop, intake)
-            // move arm
-            .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
-    );
-
-    controller2.povDown().onTrue(
-        // prime shooter
         new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
             // move arm
-            .alongWith(arm.moveArm(ArmPosition.SHOOT_MID, drive::getPose))
+            .alongWith(arm.moveArm(ArmPosition.SHOOT_FAR, drive::getPose))
     );
 
     // set arm pos
