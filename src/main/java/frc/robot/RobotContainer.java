@@ -129,7 +129,7 @@ public class RobotContainer {
         new Rotation2d(),
         drive.getModulePositions(),
         new Pose2d(
-            0.795, // 0.987 (2NC)
+            .795, // 0.987 (2NC)
             4.552, // 4.620 (2NC)
             new Rotation2d()));
 
@@ -149,7 +149,7 @@ public class RobotContainer {
                     drive,
                     () -> -controller1.getLeftX(),
                     () -> -controller1.getLeftY(),
-                    () -> -.75 * controller1.getRightX(),
+                    () -> -.65 * controller1.getRightX(),
                     () -> {
                     return 1.0;
                     },
@@ -165,7 +165,7 @@ public class RobotContainer {
                     drive,
                     () -> controller1.getLeftX(),
                     () -> controller1.getLeftY(),
-                    () -> -.75 * controller1.getRightX(),
+                    () -> -.65 * controller1.getRightX(),
                     () -> {
                     return 1.0;
                     },
@@ -188,10 +188,8 @@ public class RobotContainer {
     // Generate a trajectory to a pose when the X button is pressed (and
     // switch
     // drive to position control)
-    // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() ==
-    // 10);}).onTrue(
-    // controller1.x().onTrue(
-        // new EventMarkerBuilder(AutoPathConstants.twoNoteCenter, drive, intake, handoff,shooter, arm).getCommandSequence()
+    // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
+    //     new EventMarkerBuilder(AutoPathConstants.blueThree2CLSS, drive, intake, handoff,shooter, arm).getCommandSequence()
     // );
     // controller1.x().onTrue(
     //     drive.followTrajectory(AutoPathConstants.twoNoteTest)
@@ -210,7 +208,7 @@ public class RobotContainer {
             drive,
             () -> -controller1.getLeftX(),
             () -> -controller1.getLeftY(),
-            () -> -.75 * controller1.getRightX(),
+            () -> -.65 * controller1.getRightX(),
             () -> {
               return 1.0;
             },
@@ -300,7 +298,7 @@ public class RobotContainer {
             //     .andThen(intake.getIntakeCommand(Volts.of(4),
             //         handoff::checkNoteThere))
             // )
-            .alongWith(intake.getIntakeCommand(Volts.of(4), handoff::checkNoteThere))
+            .alongWith(intake.getIntakeCommand(Volts.of(6), handoff::checkNoteThere))
             
     );
 
@@ -339,9 +337,9 @@ public class RobotContainer {
 
     controller2.povUp().onTrue(
         // prime shooter
-        new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+        new StartEndCommand(() -> handoff.start(Volts.of(4)), intake::stop, intake)
             // move arm
-            .alongWith(arm.moveArm(ArmPosition.SHOOT_FAR, drive::getPose))
+            .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
     );
 
     controller2.povDown().onTrue(
@@ -445,7 +443,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new EventMarkerBuilder(AutoPathConstants.twoCLpath, drive, intake, handoff,shooter, arm).getCommandSequence();
+    return new EventMarkerBuilder(AutoPathConstants.blueThree2CLSS, drive, intake, handoff,shooter, arm).getCommandSequence();
     // Command command = new InstantCommand(() -> shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT, AutoPathConstants.SHOOT_SPEED_RIGHT), shooter)
     // .andThen(
     //     arm.moveArm(ArmPosition.SPEAKER, drive::getPose)

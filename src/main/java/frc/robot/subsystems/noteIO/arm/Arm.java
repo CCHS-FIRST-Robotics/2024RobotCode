@@ -92,7 +92,7 @@ public class Arm extends SubsystemBase {
      */
     @AutoLogOutput
     public boolean isAtGoal() {
-        return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < 2;
+        return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < 1;
     }
 
     @AutoLogOutput

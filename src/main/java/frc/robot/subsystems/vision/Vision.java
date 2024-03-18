@@ -61,8 +61,8 @@ public class Vision extends SubsystemBase {
                 System.err.println("pose added");
             Logger.recordOutput("testRecordedPose", pose.pose);
             Logger.recordOutput("testRecordedTimestamp", pose.timestamp);
-            poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp / 1000000, poseEstimator
-                    .getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
+            // poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp / 1000000, poseEstimator
+            //         .getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
         }
 
         if (getZedPoseEstimate().pose.getX() > 0) {

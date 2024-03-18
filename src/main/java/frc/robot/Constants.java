@@ -44,7 +44,7 @@ public final class Constants {
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(
             Map.of(
-                    ArmPosition.INTAKE, Degrees.of(-14),
+                    ArmPosition.INTAKE, Degrees.of(-20),
                     ArmPosition.AMP, Degrees.of(88),
                     ArmPosition.SPEAKER, Degrees.of(5),
                     ArmPosition.MAIN, Degrees.of(-23),
@@ -132,6 +132,18 @@ public final class Constants {
 
         public static final String TWOCL = "2CL.1";
 
+        public static final String B_THREE_LCLSS1 = "BlueThreeLCLSS.1";
+        public static final String B_THREE_LCLSS2 = "BlueThreeLCLSS.2";
+
+        public static final String B_THREE_RCLSS1 = "BlueThreeRCLSS.1";
+        public static final String B_THREE_RCLSS2 = "BlueThreeRCLSS.2";
+
+        public static final String B_THREE_2CL1 = "BlueThreeNoteCLSS.1";
+        public static final String B_THREE_2CL2 = "BlueThreeNoteCLSS.2";
+
+        public static final String R_THREE_CLSS1 = "RedThreeNoteCLSS.1";
+        public static final String R_THREE_CLSS2 = "RedThreeNoteCLSS.2";
+
         public static final ArrayList<String> twoNoteLeft = new ArrayList<String>();
         public static final ArrayList<String> twoNoteRight = new ArrayList<String>();
         public static final ArrayList<String> twoNoteCenter = new ArrayList<String>();
@@ -141,6 +153,11 @@ public final class Constants {
         public static final ArrayList<String> threeNoteWLC = new ArrayList<String>();
         public static final ArrayList<String> fourNoteWing = new ArrayList<String>();
         public static final ArrayList<String> fourNoteLeft = new ArrayList<String>();
+
+        public static final ArrayList<String> blueThreeLCLSS = new ArrayList<String>();
+        public static final ArrayList<String> blueThreeRCLSS = new ArrayList<String>();
+        public static final ArrayList<String> blueThree2CLSS = new ArrayList<String>();
+        public static final ArrayList<String> redThreeCLSS = new ArrayList<String>();
 
         public static final ArrayList<String> twoCLpath = new ArrayList<String>();
 
@@ -190,6 +207,18 @@ public final class Constants {
             twoCLpath.add(TWOCL);
 
             testingRed.add(TESTING_RED1);
+
+            blueThree2CLSS.add(B_THREE_2CL1);
+            blueThree2CLSS.add(B_THREE_2CL2);
+
+            blueThreeLCLSS.add(B_THREE_LCLSS1);
+            blueThreeLCLSS.add(B_THREE_LCLSS2);
+
+            blueThreeRCLSS.add(B_THREE_RCLSS1);
+            blueThreeRCLSS.add(B_THREE_RCLSS2);
+
+            redThreeCLSS.add(R_THREE_CLSS1);
+            redThreeCLSS.add(R_THREE_CLSS2);
         }
     }
 }
