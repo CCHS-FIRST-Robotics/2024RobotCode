@@ -20,9 +20,9 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-import com.choreo.lib.Choreo;
-import com.choreo.lib.ChoreoTrajectory;
-import com.choreo.lib.ChoreoTrajectoryState;
+// import com.choreo.lib.Choreo;
+// import com.choreo.lib.ChoreoTrajectory;
+// import com.choreo.lib.ChoreoTrajectoryState;
 import com.ctre.phoenix6.Orchestra;
 
 // rev sucks
@@ -128,7 +128,7 @@ public class Arm extends SubsystemBase {
         });
     }
 
-    private Command moveToShoot(Supplier<Pose2d> robotPose) {
+    public Command moveToShoot(Supplier<Pose2d> robotPose) {
         return run(() -> {
             double distance = robotPose.get().getTranslation().minus(
                     SPEAKER_POSE.getTranslation()).getNorm();
@@ -150,28 +150,32 @@ public class Arm extends SubsystemBase {
 
     // dont want to remove this but we probably shouldnt be using it
     // public Supplier<Pose2d> getPosFromPath(String path, double eventTime) {
-    //     ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
+    // ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
 
-    //     double timeToEnd = choreoTrajectory.getTotalTime();
+    // double timeToEnd = choreoTrajectory.getTotalTime();
 
-    //     for (int i = 0; i < (int) (timeToEnd / Constants.PERIOD) + 2; i++) {
-    //         double time = i * Constants.PERIOD;
-    //         ChoreoTrajectoryState state = choreoTrajectory.sample(time);
+    // for (int i = 0; i < (int) (timeToEnd / Constants.PERIOD) + 2; i++) {
+    // double time = i * Constants.PERIOD;
+    // ChoreoTrajectoryState state = choreoTrajectory.sample(time);
 
-    //         if (time >= eventTime) {
-    //             Translation2d translationToTargetGround = new Translation2d(state.x, state.y);
-    //             Pose3d targetPose = new Pose3d(new Pose2d(state.x, state.y, new Rotation2d(state.heading)));
+    // if (time >= eventTime) {
+    // Translation2d translationToTargetGround = new Translation2d(state.x,
+    // state.y);
+    // Pose3d targetPose = new Pose3d(new Pose2d(state.x, state.y, new
+    // Rotation2d(state.heading)));
 
-    //             Translation2d armOffset = getArmOffset();
-    //             Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.getNorm(),
-    //                     targetPose.getZ());
-    //             Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
+    // Translation2d armOffset = getArmOffset();
+    // Translation2d tranlationToTargetHigh = new
+    // Translation2d(translationToTargetGround.getNorm(),
+    // targetPose.getZ());
+    // Rotation2d targetArmAngle =
+    // tranlationToTargetHigh.minus(armOffset).getAngle();
 
-    //             return () -> new Pose2d(translationToTargetGround, targetArmAngle);
-    //         }
-    //     }
+    // return () -> new Pose2d(translationToTargetGround, targetArmAngle);
+    // }
+    // }
 
-    //     return null;
+    // return null;
     // }
 
     public void addToOrchestra(Orchestra orchestra, int trackNum) {
