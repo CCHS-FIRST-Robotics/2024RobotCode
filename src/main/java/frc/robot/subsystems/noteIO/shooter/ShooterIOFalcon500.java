@@ -9,6 +9,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.Orchestra;
 // import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
@@ -143,5 +144,11 @@ public class ShooterIOFalcon500 implements ShooterIO {
         inputs.rightShooterTemperature = temperatureSignalRight.getValue();
 
         inputs.closedLoopReference = closedLoopReferenceSignal.getValue();
+    }
+
+    @Override
+    public void addToOrchestra(Orchestra orchestra, int trackNum) {
+        orchestra.addInstrument(leftShooter, trackNum);
+        orchestra.addInstrument(rightShooter, trackNum + 1);
     }
 }

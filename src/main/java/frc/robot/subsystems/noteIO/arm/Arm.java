@@ -23,6 +23,7 @@ import org.littletonrobotics.junction.Logger;
 import com.choreo.lib.Choreo;
 import com.choreo.lib.ChoreoTrajectory;
 import com.choreo.lib.ChoreoTrajectoryState;
+import com.ctre.phoenix6.Orchestra;
 
 // rev sucks
 public class Arm extends SubsystemBase {
@@ -83,6 +84,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void setArmAngle(Measure<Angle> angle) {
+        System.out.println("arm ahh");
         io.setDrivePosition(angle);
         targetAngle = angle;
     }
@@ -92,7 +94,7 @@ public class Arm extends SubsystemBase {
      */
     @AutoLogOutput
     public boolean isAtGoal() {
-        return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < 2;
+        return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < 1;
     }
 
     @AutoLogOutput
@@ -139,11 +141,11 @@ public class Arm extends SubsystemBase {
     public Command moveArm(ArmPosition position, Supplier<Pose2d> robotPose) {
         if (position == ArmPosition.SHOOT) {
             // return moveToShoot(robotPose);
-            return run(() -> setArmAngle(Constants.ARM_POSITIONS.get(ArmPosition.SPEAKER)));
+            return runOnce(() -> setArmAngle(Constants.ARM_POSITIONS.get(ArmPosition.SPEAKER)));
         }
 
         Measure<Angle> angle = ARM_POSITIONS.get(position);
-        return run(() -> setArmAngle(angle));
+        return runOnce(() -> setArmAngle(angle));
     }
 
     // dont want to remove this but we probably shouldnt be using it
@@ -171,4 +173,8 @@ public class Arm extends SubsystemBase {
 
     //     return null;
     // }
+
+    public void addToOrchestra(Orchestra orchestra, int trackNum) {
+        io.addToOrchestra(orchestra, trackNum);
+    }
 }

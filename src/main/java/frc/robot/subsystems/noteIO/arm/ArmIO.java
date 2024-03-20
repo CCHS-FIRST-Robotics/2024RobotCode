@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.Orchestra;
+
 public interface ArmIO {
 
     @AutoLog
@@ -52,5 +54,7 @@ public interface ArmIO {
     public default void setCharacterizationVoltage(Measure<Voltage> volts){
 
     }
+
+    public default void addToOrchestra(Orchestra orchestra, int trackNum) {}
 
 }

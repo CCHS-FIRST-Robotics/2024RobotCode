@@ -10,6 +10,8 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 // import frc.robot.Constants.AutoPathConstants;
 
+import com.ctre.phoenix6.Orchestra;
+
 public class Handoff extends SubsystemBase {
     private HandoffIO io;
     private Measure<Voltage> volts = Volts.of(0);
@@ -48,29 +50,39 @@ public class Handoff extends SubsystemBase {
         // io.setVoltage(Volts.of(4));
     }
 
+    @AutoLogOutput
+    public boolean isOn() {
+        return volts.in(Volts) != 0;
+    }
+
+    // turns motor on until interrupted
+    public Command getHandoffManualCommand(Measure<Voltage> v) {
+        return new StartEndCommand(
+                () -> start(v),
+                this::stop,
+                this
+        );
+    }
+
     // turns motor on until note detected
     public Command getHandoffCommand(Measure<Voltage> v) {
-        return new FunctionalCommand(
+        return new StartEndCommand(
                 () -> start(v),
-                () -> {
-                },
-                (interrupted) -> {
-                    stop();
-                },
-                this::checkNoteThere,
-                this);
+                this::stop,
+                this
+        ).until(this::checkNoteThere);
     }
 
     // turns motor on until shooter detects note
     public Command getShootCommand(Measure<Voltage> v, BooleanSupplier shooterDone) {
-        return new FunctionalCommand(
+        return new StartEndCommand(
                 () -> start(v),
-                () -> {
-                },
-                (interrupted) -> {
-                    stop();
-                },
-                shooterDone,
-                this);
+                this::stop,
+                this
+        ).until(shooterDone);
+    }
+
+    public void addToOrchestra(Orchestra orchestra, int trackNum) {
+        io.addToOrchestra(orchestra, trackNum);
     }
 }

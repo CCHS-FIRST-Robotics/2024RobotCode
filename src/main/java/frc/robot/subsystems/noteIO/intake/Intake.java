@@ -10,6 +10,8 @@ import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.Orchestra;
+
 public class Intake extends SubsystemBase {
     IntakeIO io;
     Measure<Voltage> volts = Volts.of(0);
@@ -23,6 +25,7 @@ public class Intake extends SubsystemBase {
     public void start(Measure<Voltage> v) {
         volts = v;
         startTime = Timer.getFPGATimestamp();
+        System.out.println("dhsudhhuh");
     }
 
     public void stop() {
@@ -40,18 +43,22 @@ public class Intake extends SubsystemBase {
     }
 
     @AutoLogOutput
+    public boolean isOn() {
+        return volts.in(Volts) != 0;
+    }
+
+    @AutoLogOutput
     public boolean checkNoteThere() {
         return inputs.motor1Current > 28 && Timer.getFPGATimestamp() - startTime > 0.1;
     }
 
+    // turns motor on
+    public Command getIntakeCommand(Measure<Voltage> v) {
+        return startEnd(() -> start(v), this::stop);
+    }
+
     // turns motor on until note detected
     public Command getIntakeCommand(Measure<Voltage> v, BooleanSupplier noteDetected) {
-        return new FunctionalCommand(
-                () -> start(v),
-                () -> {
-                },
-                (interrupted) -> stop(),
-                noteDetected,
-                this);
+        return startEnd(() -> start(v), this::stop).until(noteDetected);
     }
 }

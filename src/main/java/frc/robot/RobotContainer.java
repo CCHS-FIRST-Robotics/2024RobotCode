@@ -42,6 +42,8 @@ import frc.robot.subsystems.noteIO.intake.*;
 import frc.robot.subsystems.noteIO.shooter.*;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import com.ctre.phoenix6.Orchestra;
+
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a "declarative" paradigm, very little robot logic should
@@ -60,6 +62,7 @@ public class RobotContainer {
   private final Handoff handoff;
   private final Intake intake;
   private final Shooter shooter;
+  private final Orchestra jukebox = new Orchestra();
 
   private final CommandXboxController controller1 = new CommandXboxController(Constants.CONTROLLER_PORT_1);
   private final CommandXboxController controller2 = new CommandXboxController(Constants.CONTROLLER_PORT_2);
@@ -129,12 +132,19 @@ public class RobotContainer {
         new Rotation2d(),
         drive.getModulePositions(),
         new Pose2d(
-            0.795, // 0.987 (2NC)
+            .795, // 0.987 (2NC)
             4.552, // 4.620 (2NC)
             new Rotation2d()));
 
     drive.setPoseEstimator(poseEstimator);
     camera.setPoseEstimator(poseEstimator);
+
+    handoff.addToOrchestra(jukebox, 0);
+    shooter.addToOrchestra(jukebox, 1);
+    arm.addToOrchestra(jukebox, 3);
+
+    jukebox.loadMusic("music/rick.chrp");
+    jukebox.play();
 
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
 
@@ -149,7 +159,7 @@ public class RobotContainer {
                     drive,
                     () -> -controller1.getLeftX(),
                     () -> -controller1.getLeftY(),
-                    () -> -.75 * controller1.getRightX(),
+                    () -> -.65 * controller1.getRightX(),
                     () -> {
                     return 1.0;
                     },
@@ -165,7 +175,7 @@ public class RobotContainer {
                     drive,
                     () -> controller1.getLeftX(),
                     () -> controller1.getLeftY(),
-                    () -> -.75 * controller1.getRightX(),
+                    () -> -.65 * controller1.getRightX(),
                     () -> {
                     return 1.0;
                     },
@@ -188,10 +198,8 @@ public class RobotContainer {
     // Generate a trajectory to a pose when the X button is pressed (and
     // switch
     // drive to position control)
-    // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() ==
-    // 10);}).onTrue(
-    // controller1.x().onTrue(
-        // new EventMarkerBuilder(AutoPathConstants.twoNoteCenter, drive, intake, handoff,shooter, arm).getCommandSequence()
+    // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
+    //     new EventMarkerBuilder(AutoPathConstants.blueThree2CLSS, drive, intake, handoff,shooter, arm).getCommandSequence()
     // );
     // controller1.x().onTrue(
     //     drive.followTrajectory(AutoPathConstants.twoNoteTest)
@@ -210,7 +218,7 @@ public class RobotContainer {
             drive,
             () -> -controller1.getLeftX(),
             () -> -controller1.getLeftY(),
-            () -> -.75 * controller1.getRightX(),
+            () -> -.65 * controller1.getRightX(),
             () -> {
               return 1.0;
             },
@@ -289,31 +297,25 @@ public class RobotContainer {
     );
 
     // continuous base intake (intake stops when note is detected in handoff)
-    controller2.a().onTrue(
+    controller1.a().onTrue(
         // turn on handoff
         handoff.getHandoffCommand(Volts.of(6))
-             // move arm down
-            .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
-            // .alongWith(
-            //     Commands.waitUntil(arm::isAtGoal)
-            //     // turn on intake until detected by handoff
-            //     .andThen(intake.getIntakeCommand(Volts.of(4),
-            //         handoff::checkNoteThere))
-            // )
-            .alongWith(intake.getIntakeCommand(Volts.of(4), handoff::checkNoteThere))
-            
+        // turn on intake (until handoff stops)
+        .raceWith(intake.getIntakeCommand(Volts.of(6)))
+        //  move arm down
+        .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
+        // .alongWith(
+        //     Commands.waitUntil(arm::isAtGoal)
+        //     // turn on intake until detected by handoff
+        //     .andThen(intake.getIntakeCommand(Volts.of(4),
+        //         handoff::checkNoteThere))
+        // )
     );
 
     // outtake
     controller2.x().whileTrue(
-        new StartEndCommand(
-            () -> intake.start(Volts.of(-3)), () -> intake.stop(), intake
-        )
-        .alongWith(
-            new StartEndCommand(
-                () -> handoff.start(Volts.of(-2)), () -> handoff.stop(), handoff
-            )
-        )
+        intake.getIntakeCommand(Volts.of(-3))
+        .alongWith(handoff.getHandoffManualCommand(Volts.of(-2)))
     );
 
     controller2.rightTrigger().onTrue(
@@ -325,16 +327,21 @@ public class RobotContainer {
     );
 
     controller2.leftTrigger().onTrue(
-        new InstantCommand(() -> shooter.stop(), shooter)
-        .alongWith(new InstantCommand(() -> handoff.stop(), handoff))
-        .alongWith(new InstantCommand(() -> intake.stop(), intake))
+        new InstantCommand(shooter::stop, shooter)
+        .alongWith(new InstantCommand(handoff::stop, handoff))
+        .alongWith(new InstantCommand(intake::stop, intake))
     );
 
     controller2.leftBumper().whileTrue(
-        new StartEndCommand(() -> intake.start(Volts.of(3)), intake::stop, intake)
-        .alongWith(
-            new StartEndCommand(() -> handoff.start(Volts.of(2)), handoff::stop, handoff)
-        )
+        intake.getIntakeCommand(Volts.of(3))
+        .alongWith(handoff.getHandoffManualCommand(Volts.of(2)))
+    );
+
+    controller2.povDown().onTrue(
+        // start handoff
+        handoff.getHandoffCommand(Volts.of(4))
+            // move arm down
+            .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
     );
 
     controller2.povUp().onTrue(
@@ -342,13 +349,6 @@ public class RobotContainer {
         new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
             // move arm
             .alongWith(arm.moveArm(ArmPosition.SHOOT_FAR, drive::getPose))
-    );
-
-    controller2.povDown().onTrue(
-        // prime shooter
-        new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-            // move arm
-            .alongWith(arm.moveArm(ArmPosition.SHOOT_MID, drive::getPose))
     );
 
     // set arm pos
@@ -445,7 +445,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new EventMarkerBuilder(AutoPathConstants.twoCLpath, drive, intake, handoff,shooter, arm).getCommandSequence();
+    return new EventMarkerBuilder(AutoPathConstants.blueThree2CLSS, drive, intake, handoff,shooter, arm).getCommandSequence();
     // Command command = new InstantCommand(() -> shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT, AutoPathConstants.SHOOT_SPEED_RIGHT), shooter)
     // .andThen(
     //     arm.moveArm(ArmPosition.SPEAKER, drive::getPose)
