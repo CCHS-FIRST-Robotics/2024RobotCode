@@ -139,12 +139,12 @@ public class RobotContainer {
     drive.setPoseEstimator(poseEstimator);
     camera.setPoseEstimator(poseEstimator);
 
-    handoff.addToOrchestra(jukebox, 0);
-    shooter.addToOrchestra(jukebox, 1);
-    arm.addToOrchestra(jukebox, 3);
+    // handoff.addToOrchestra(jukebox, 0);
+    // shooter.addToOrchestra(jukebox, 1);
+    // arm.addToOrchestra(jukebox, 3);
 
-    jukebox.loadMusic("music/rick.chrp");
-    jukebox.play();
+    // jukebox.loadMusic("music/sandstorm.chrp");
+    // jukebox.play();
 
     autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
 
@@ -165,7 +165,10 @@ public class RobotContainer {
                     },
                     // () -> {return new Rotation2d();},
                     () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-                    false));
+                    false,
+                    false
+        )
+    );
   }
 
   public void switchDriveThing2() {
@@ -181,7 +184,10 @@ public class RobotContainer {
                     },
                     // () -> {return new Rotation2d();},
                     () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-                    false));
+                    false,
+                    false
+        )
+    );
   }
 
   /**
@@ -224,7 +230,10 @@ public class RobotContainer {
             },
             // () -> {return new Rotation2d();},
             () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-            false));
+            false,
+            false
+        )
+    );
 
     controller1.leftBumper().onTrue(
         new InstantCommand(() -> switchDriveThing(), drive)
@@ -233,6 +242,10 @@ public class RobotContainer {
     controller1.rightBumper().onTrue(
         new InstantCommand(() -> switchDriveThing2(), drive)
     );
+
+    // controller1.a().onTrue(
+    //     arm.sysIdFull().andThen(arm.moveArm(ArmPosition.SPEAKER, drive::getPose))
+    // );
 
     // break when left trigger is held
     // controller1.leftTrigger().whileTrue(
@@ -297,7 +310,7 @@ public class RobotContainer {
     );
 
     // continuous base intake (intake stops when note is detected in handoff)
-    controller1.a().onTrue(
+    controller2.a().onTrue(
         // turn on handoff
         handoff.getHandoffCommand(Volts.of(6))
         // turn on intake (until handoff stops)
@@ -335,6 +348,7 @@ public class RobotContainer {
     controller2.leftBumper().whileTrue(
         intake.getIntakeCommand(Volts.of(3))
         .alongWith(handoff.getHandoffManualCommand(Volts.of(2)))
+        .alongWith(new StartEndCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter::stop, shooter))
     );
 
     controller2.povDown().onTrue(

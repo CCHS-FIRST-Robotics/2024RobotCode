@@ -29,7 +29,7 @@ public final class Constants {
         REPLAY
     }
 
-    public static final Mode CURRENT_MODE = Mode.SIM;
+    public static final Mode CURRENT_MODE = Mode.REAL;
 
     public static enum ArmPosition {
         INTAKE,
@@ -44,7 +44,7 @@ public final class Constants {
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(
             Map.of(
-                    ArmPosition.INTAKE, Degrees.of(-20),
+                    ArmPosition.INTAKE, Degrees.of(-14),
                     ArmPosition.AMP, Degrees.of(88),
                     ArmPosition.SPEAKER, Degrees.of(5),
                     ArmPosition.MAIN, Degrees.of(-23),
@@ -56,7 +56,7 @@ public final class Constants {
 
     public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
 
-    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(95);
+    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(75);
     public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(95);
 
     public static final Measure<Velocity<Angle>> SHOOTER_AMP_SPEED = RotationsPerSecond.of(95);

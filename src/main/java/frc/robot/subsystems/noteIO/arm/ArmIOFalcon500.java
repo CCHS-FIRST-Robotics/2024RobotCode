@@ -66,9 +66,9 @@ public class ArmIOFalcon500 implements ArmIO {
                                                                                   // rotations per second
     private static final double driveFeedforwardKaV = 0;
 
-    private static final double driveKpTC = 550; // 620
-    private static final double driveKdTC = 60; // 120
-    private static final double driveKiTC = 0.0d;
+    private static final double driveKpTC = 650; // 620
+    private static final double driveKdTC = 1000; // 120
+    private static final double driveKiTC = 1d;
 
     // Uhh Feedforward momment!
     private static final double driveFeedforwardKgTC = 8; // 9.2A
@@ -118,8 +118,8 @@ public class ArmIOFalcon500 implements ArmIO {
         stickyFaultRemoteSensorOutOfSync = leadFalcon.getStickyFault_RemoteSensorDataInvalid();
 
         driveMMConfig.MotionMagicCruiseVelocity = 98d / gearRatio; // max rps of the motor (almost)
-        driveMMConfig.MotionMagicAcceleration = 2; // .5 second to reach max speed (defaualt)
-        driveMMConfig.MotionMagicJerk = 5; // .33 seconds to reach max accel (defaualt)
+        driveMMConfig.MotionMagicAcceleration = 1; // .5 second to reach max speed (defaualt)
+        driveMMConfig.MotionMagicJerk = 3; // .33 seconds to reach max accel (defaualt)
 
         // Feedforward momment!
 
@@ -146,8 +146,8 @@ public class ArmIOFalcon500 implements ArmIO {
         driveFalconConfig.CurrentLimits.SupplyCurrentLimit = 60;
         driveFalconConfig.CurrentLimits.SupplyTimeThreshold = .5;
 
-        driveFalconConfig.TorqueCurrent.PeakForwardTorqueCurrent = 70;
-        driveFalconConfig.TorqueCurrent.PeakReverseTorqueCurrent = -70;
+        driveFalconConfig.TorqueCurrent.PeakForwardTorqueCurrent = 90;
+        driveFalconConfig.TorqueCurrent.PeakReverseTorqueCurrent = -90;
 
         driveFalconConfig.Voltage.PeakForwardVoltage = 12;
         driveFalconConfig.Voltage.PeakReverseVoltage = -12;

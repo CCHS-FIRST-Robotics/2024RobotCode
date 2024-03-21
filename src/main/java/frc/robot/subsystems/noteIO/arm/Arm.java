@@ -44,14 +44,12 @@ public class Arm extends SubsystemBase {
 
     // meters, degrees
     static {
-        armAngleMap.put(1.05, 16.5d);
-        armAngleMap.put(1.43256, 23d);
-        armAngleMap.put(1.73736, 24.7d);
-        armAngleMap.put(2.34696, 32.7d);
-        armAngleMap.put(2.9, 37d);
-        armAngleMap.put(3.1, 37.4d);
-        armAngleMap.put(3.71856, 38.8d);
-        armAngleMap.put(4.63296, 41.7d);
+        armAngleMap.put(1.3, 5d);
+        armAngleMap.put(1.8, 9d);
+        armAngleMap.put(2.3, 15d);
+        armAngleMap.put(2.8, 20d);
+        armAngleMap.put(3.3, 24d);
+        armAngleMap.put(3.8, 26d);
     }
 
     public Arm(ArmIO io) {
@@ -59,13 +57,13 @@ public class Arm extends SubsystemBase {
 
         sysIdRoutine = new SysIdRoutine(
                 new SysIdRoutine.Config( // Calculate ~ how far it's going to go (less than 90 deg)
-                        Volts.per(Second).of(.8),
-                        Volts.of(3),
-                        Seconds.of(5),
+                        Volts.per(Second).of(.2),
+                        Volts.of(.5),
+                        Seconds.of(2),
                         (state) -> Logger.recordOutput("SysIdArmTestState", state.toString())),
                 new SysIdRoutine.Mechanism(
                         (Measure<Voltage> volts) -> {
-                            io.setDriveVoltage(volts);
+                            io.setDriveCurrent(Amps.of(6 * Math.cos(getArmAngle().in(Radians)) + volts.in(Volts))); // literal slander
                         },
                         null,
                         this));
@@ -79,12 +77,12 @@ public class Arm extends SubsystemBase {
 
         // trust!
         // io.setDriveVoltage(Volts.of(1));
-        // setArmAngle(Degrees.of(-10));
+        // setArmAngle(Degrees.of(10));
         // io.setDriveCurrent(Amps.of(8));
     }
 
     public void setArmAngle(Measure<Angle> angle) {
-        System.out.println("arm ahh");
+        // System.out.println("arm ahh");
         io.setDrivePosition(angle);
         targetAngle = angle;
     }
@@ -180,5 +178,20 @@ public class Arm extends SubsystemBase {
 
     public void addToOrchestra(Orchestra orchestra, int trackNum) {
         io.addToOrchestra(orchestra, trackNum);
+    }
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return sysIdRoutine.quasistatic(direction);
+    }
+    
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return sysIdRoutine.dynamic(direction);
+    }
+
+    public Command sysIdFull() {
+        return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward)
+            .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
+            .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward))
+            .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
     }
 }
