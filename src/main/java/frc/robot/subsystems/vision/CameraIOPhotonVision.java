@@ -1,24 +1,14 @@
 package frc.robot.subsystems.vision;
 
-import java.util.Optional;
-
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
-
+import org.photonvision.*;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonTrackedTarget;
+import edu.wpi.first.math.*;
+import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.numbers.*;
+import java.util.*;
 import frc.robot.utils.TimestampedPose2d;
-
-import java.util.List;
 
 public class CameraIOPhotonVision implements CameraIO {
     PhotonCamera camera = new PhotonCamera("limelight");
@@ -30,9 +20,6 @@ public class CameraIOPhotonVision implements CameraIO {
     );
     private double lastEstTimestamp = 0;
 
-    /**
-     * Constructs a new CameraIOPhotonVision object
-     */
     public CameraIOPhotonVision() {
         System.out.println("[Init] Creating CameraIOPhotonVision");
         poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
@@ -56,8 +43,8 @@ public class CameraIOPhotonVision implements CameraIO {
         List<PhotonTrackedTarget> targets = camera.getLatestResult().getTargets();
         int numTags = 0;
         double avgDist = 0;
-        for (var target : targets) {
-            var tagPose = poseEstimator.getFieldTags().getTagPose(target.getFiducialId());
+        for (PhotonTrackedTarget target : targets) {
+            Optional<Pose3d> tagPose = poseEstimator.getFieldTags().getTagPose(target.getFiducialId());
             if (tagPose.isEmpty()) {
                 continue;
             }
@@ -83,20 +70,20 @@ public class CameraIOPhotonVision implements CameraIO {
         return estimatedStandardDeviations;
     }
 
-    // @Override
-    // public void updateInputs(CameraIOInputs inputs) {
-    // var visionEst = getEstimatedGlobalPose();
-    // visionEst.ifPresent(
-    // est -> {
-    // var estPose = est.estimatedPose.toPose2d();
-    // // Change our trust in the measurement based on the tags we can see
-    // var estStdDevs = getEstimationStdDevs(estPose);
+    @Override
+    public void updateInputs(CameraIOInputs inputs) {
+    var visionEst = getEstimatedGlobalPose();
+    visionEst.ifPresent(
+    est -> {
+    var estPose = est.estimatedPose.toPose2d();
+    // Change our trust in the measurement based on the tags we can see
+    Matrix<N3, N1> estStdDevs = getEstimatedStandardDeviations(estPose);
 
-    // drivetrain.addVisionMeasurement(
-    // est.estimatedPose.toPose2d(), , estStdDevs);
-    // });
+    drivetrain.addVisionMeasurement(
+    est.estimatedPose.toPose2d(), , estStdDevs);
+    });
 
-    // TimestampedPose2d pose = new TimestampedPose2d(est.estimatedPose.toPose2d(),
-    // est.timestampSeconds)
-    // }
+    TimestampedPose2d pose = new TimestampedPose2d(est.estimatedPose.toPose2d(),
+    est.timestampSeconds)
+    }
 }
