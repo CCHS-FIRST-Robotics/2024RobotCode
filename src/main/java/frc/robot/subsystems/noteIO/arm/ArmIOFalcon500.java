@@ -6,6 +6,8 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.*;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 // import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;

@@ -38,19 +38,19 @@ public final class Constants {
         SHOOT,
         MAIN,
         LOWER,
-        SHOOT_MID,
-        SHOOT_FAR
+        STAGE,
+        CLOSE_SUB
     }
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(
             Map.of(
-                    ArmPosition.INTAKE, Degrees.of(-14),
+                    ArmPosition.INTAKE, Degrees.of(-10),
                     ArmPosition.AMP, Degrees.of(88),
-                    ArmPosition.SPEAKER, Degrees.of(5),
+                    ArmPosition.SPEAKER, Degrees.of(6.5),
                     ArmPosition.MAIN, Degrees.of(-23),
                     ArmPosition.LOWER, Degrees.of(-10),
-                    ArmPosition.SHOOT_MID, Degrees.of(20),
-                    ArmPosition.SHOOT_FAR, Degrees.of(35)
+                    ArmPosition.STAGE, Degrees.of(27),
+                    ArmPosition.CLOSE_SUB, Degrees.of(14.5)
             )
     ); // ! TODO: actually make this accurate because it ain't
 

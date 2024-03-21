@@ -132,8 +132,8 @@ public class RobotContainer {
         new Rotation2d(),
         drive.getModulePositions(),
         new Pose2d(
-            .795, // 0.987 (2NC)
-            4.552, // 4.620 (2NC)
+            1.3, // 0.987 (2NC)
+            5.5, // 4.620 (2NC)
             new Rotation2d()));
 
     drive.setPoseEstimator(poseEstimator);
@@ -166,7 +166,7 @@ public class RobotContainer {
                     // () -> {return new Rotation2d();},
                     () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
                     false,
-                    false
+                    true
         )
     );
   }
@@ -185,7 +185,7 @@ public class RobotContainer {
                     // () -> {return new Rotation2d();},
                     () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
                     false,
-                    false
+                    true
         )
     );
   }
@@ -224,14 +224,14 @@ public class RobotContainer {
             drive,
             () -> -controller1.getLeftX(),
             () -> -controller1.getLeftY(),
-            () -> -.65 * controller1.getRightX(),
+            () -> -.7 * controller1.getRightX(),
             () -> {
               return 1.0;
             },
             // () -> {return new Rotation2d();},
             () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
             false,
-            false
+            true
         )
     );
 
@@ -243,9 +243,9 @@ public class RobotContainer {
         new InstantCommand(() -> switchDriveThing2(), drive)
     );
 
-    // controller1.a().onTrue(
-    //     arm.sysIdFull().andThen(arm.moveArm(ArmPosition.SPEAKER, drive::getPose))
-    // );
+    controller1.a().onTrue(
+        arm.sysIdFull()
+    );
 
     // break when left trigger is held
     // controller1.leftTrigger().whileTrue(
@@ -284,29 +284,54 @@ public class RobotContainer {
             // move arm
             .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose)));
 
-    // prime shooter (speaker)
+    // prime shooter (speaker - anywhere)
     controller2.b().and(() -> !shooter.upToSpeed()).onTrue(
         // prime shooter
         new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
             // move arm
-            .alongWith(arm.moveArm(ArmPosition.SPEAKER, drive::getPose))
+            .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
             // turn robot towards speaker
-            // .alongWith(
-            //     new DriveWithJoysticks(
-            //         drive,
-            //         () -> -controller1.getLeftX(),
-            //         () -> -controller1.getLeftY(),
-            //         () -> controller1.getRightX(),
-            //         () -> {
-            //           return 1.0;
-            //         },
-            //         () -> drive.getPose().getTranslation()
-            //             .minus(
-            //                 SPEAKER_POSE.getTranslation())
-            //             .getAngle()
-            //             .plus(new Rotation2d(
-            //                 Math.PI)),
-            //         true))
+            .alongWith(
+                new DriveWithJoysticks(
+                    drive,
+                    () -> -controller1.getLeftX(),
+                    () -> -controller1.getLeftY(),
+                    () -> -.7 * controller1.getRightX(),
+                    () -> {
+                    return 1.0;
+                    },
+                    () -> drive.getPose().getTranslation()
+                        .minus(
+                            SPEAKER_POSE.getTranslation())
+                        .getAngle()
+                        .plus(new Rotation2d(Math.PI)),
+                    true,
+                    true
+                )
+            )
+    );
+    // prime shooter (speaker - subwoofer)
+    controller2.povUp().and(() -> !shooter.upToSpeed()).onTrue(
+        // prime shooter
+        new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+            // move arm
+            .alongWith(arm.moveArm(ArmPosition.SPEAKER, drive::getPose))
+    );
+
+    // prime shooter (speaker - stage)
+    controller2.povRight().and(() -> !shooter.upToSpeed()).onTrue(
+        // prime shooter
+        new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+            // move arm
+            .alongWith(arm.moveArm(ArmPosition.CLOSE_SUB, drive::getPose))
+    );
+
+    // prime shooter (speaker - stage)
+    controller2.povLeft().and(() -> !shooter.upToSpeed()).onTrue(
+        // prime shooter
+        new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+            // move arm
+            .alongWith(arm.moveArm(ArmPosition.STAGE, drive::getPose))
     );
 
     // continuous base intake (intake stops when note is detected in handoff)
@@ -356,13 +381,6 @@ public class RobotContainer {
         handoff.getHandoffCommand(Volts.of(4))
             // move arm down
             .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
-    );
-
-    controller2.povUp().onTrue(
-        // prime shooter
-        new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-            // move arm
-            .alongWith(arm.moveArm(ArmPosition.SHOOT_FAR, drive::getPose))
     );
 
     // set arm pos

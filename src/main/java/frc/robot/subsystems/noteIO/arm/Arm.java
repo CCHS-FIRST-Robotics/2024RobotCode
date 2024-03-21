@@ -15,6 +15,8 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 // import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 // import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -46,10 +48,11 @@ public class Arm extends SubsystemBase {
     static {
         armAngleMap.put(1.3, 5d);
         armAngleMap.put(1.8, 9d);
-        armAngleMap.put(2.3, 15d);
-        armAngleMap.put(2.8, 20d);
-        armAngleMap.put(3.3, 24d);
-        armAngleMap.put(3.8, 26d);
+        armAngleMap.put(2.3, 16d);
+        armAngleMap.put(2.8, 22d);
+        armAngleMap.put(3.3, 25.5d);
+        armAngleMap.put(3.8, 27d);
+        armAngleMap.put(5d, 30d);
     }
 
     public Arm(ArmIO io) {
@@ -57,13 +60,13 @@ public class Arm extends SubsystemBase {
 
         sysIdRoutine = new SysIdRoutine(
                 new SysIdRoutine.Config( // Calculate ~ how far it's going to go (less than 90 deg)
-                        Volts.per(Second).of(.2),
-                        Volts.of(.5),
-                        Seconds.of(2),
+                        Volts.per(Second).of(.5),
+                        Volts.of(2),
+                        Seconds.of(5),
                         (state) -> Logger.recordOutput("SysIdArmTestState", state.toString())),
                 new SysIdRoutine.Mechanism(
                         (Measure<Voltage> volts) -> {
-                            io.setDriveCurrent(Amps.of(6 * Math.cos(getArmAngle().in(Radians)) + volts.in(Volts))); // literal slander
+                            io.setDriveCurrent(Amps.of(7 * Math.cos(getArmAngle().in(Radians)) + volts.in(Volts))); // literal slander
                         },
                         null,
                         this));
@@ -77,7 +80,7 @@ public class Arm extends SubsystemBase {
 
         // trust!
         // io.setDriveVoltage(Volts.of(1));
-        // setArmAngle(Degrees.of(10));
+        // setArmAngle(Degrees.of(-10));
         // io.setDriveCurrent(Amps.of(8));
     }
 
@@ -138,8 +141,8 @@ public class Arm extends SubsystemBase {
 
     public Command moveArm(ArmPosition position, Supplier<Pose2d> robotPose) {
         if (position == ArmPosition.SHOOT) {
-            // return moveToShoot(robotPose);
-            return runOnce(() -> setArmAngle(Constants.ARM_POSITIONS.get(ArmPosition.SPEAKER)));
+            return moveToShoot(robotPose);
+            // return runOnce(() -> setArmAngle(Constants.ARM_POSITIONS.get(ArmPosition.SPEAKER)));
         }
 
         Measure<Angle> angle = ARM_POSITIONS.get(position);
@@ -189,9 +192,10 @@ public class Arm extends SubsystemBase {
     }
 
     public Command sysIdFull() {
-        return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward)
-            .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
-            .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward))
-            .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+        return (sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(() -> getArmAngle().in(Degrees) > 60))
+            .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(() -> getArmAngle().in(Degrees) < 0))
+            .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(() -> getArmAngle().in(Degrees) > 60))
+            .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(() -> getArmAngle().in(Degrees) < 0))
+            .andThen(new InstantCommand(() -> io.setDriveCurrent(Amps.of(0))));
     }
 }

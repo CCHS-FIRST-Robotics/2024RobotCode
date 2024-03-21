@@ -7343,8 +7343,8 @@
                     "controlIntervalCount": 16
                 },
                 {
-                    "x": 0.7990475296974182,
-                    "y": 4.5584235191345215,
+                    "x": 0.9846823811531067,
+                    "y": 4.660923480987549,
                     "heading": 2.09399,
                     "isInitialGuess": false,
                     "translationConstrained": true,
@@ -10389,8 +10389,8 @@
         "BlueTwoNoteLCLSS": {
             "waypoints": [
                 {
-                    "x": 0.790112316608429,
-                    "y": 4.55,
+                    "x": 0.7951310276985168,
+                    "y": 4.55242919921875,
                     "heading": 2.083186123436449,
                     "isInitialGuess": false,
                     "translationConstrained": true,
@@ -20132,6 +20132,15 @@
                     "translationConstrained": true,
                     "headingConstrained": true,
                     "controlIntervalCount": 40
+                },
+                {
+                    "x": 1.0700230598449707,
+                    "y": 5.4712233543396,
+                    "heading": 0,
+                    "isInitialGuess": false,
+                    "translationConstrained": true,
+                    "headingConstrained": true,
+                    "controlIntervalCount": 40
                 }
             ],
             "trajectory": [
@@ -21814,50 +21823,6 @@
                 {
                     "scope": [
                         5
-                    ],
-                    "type": "StopPoint"
-                }
-            ],
-            "usesControlIntervalGuessing": true,
-            "defaultControlIntervalCount": 40,
-            "usesDefaultFieldObstacles": true,
-            "circleObstacles": [],
-            "eventMarkers": [],
-            "isTrajectoryStale": true
-        },
-        "New Path": {
-            "waypoints": [
-                {
-                    "x": 0.79,
-                    "y": 6.55,
-                    "heading": -2.0955914215323115,
-                    "isInitialGuess": false,
-                    "translationConstrained": true,
-                    "headingConstrained": true,
-                    "controlIntervalCount": 40
-                },
-                {
-                    "x": 15.28,
-                    "y": 5.5368499755859375,
-                    "heading": 0,
-                    "isInitialGuess": false,
-                    "translationConstrained": true,
-                    "headingConstrained": true,
-                    "controlIntervalCount": 40
-                }
-            ],
-            "trajectory": [],
-            "trajectoryWaypoints": [],
-            "constraints": [
-                {
-                    "scope": [
-                        "first"
-                    ],
-                    "type": "StopPoint"
-                },
-                {
-                    "scope": [
-                        "last"
                     ],
                     "type": "StopPoint"
                 }
