@@ -50,9 +50,7 @@ public final class Constants {
                     ArmPosition.MAIN, Degrees.of(-23),
                     ArmPosition.LOWER, Degrees.of(-10),
                     ArmPosition.SHOOT_MID, Degrees.of(20),
-                    ArmPosition.SHOOT_FAR, Degrees.of(35)
-            )
-    ); // ! TODO: actually make this accurate because it ain't
+                    ArmPosition.SHOOT_FAR, Degrees.of(35))); // ! TODO: actually make this accurate because it ain't
 
     public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
 
@@ -101,8 +99,16 @@ public final class Constants {
         ARM_HANDOFF
     }
 
+    public static class StartPosistions {
+        public static final Pose2d blueAmp = new Pose2d(0.790, 6.550, new Rotation2d());
+        public static final Pose2d blueCenter = new Pose2d(1.3, 5.544, new Rotation2d());
+        public static final Pose2d blueSource = new Pose2d(0.79, 4.55, new Rotation2d());
+        public static final Pose2d redAmp = new Pose2d(15.75, 6.55, new Rotation2d());
+        public static final Pose2d redCenter = new Pose2d(15.27, 5.544, new Rotation2d());
+        public static final Pose2d redSource = new Pose2d(15.75, 4.55, new Rotation2d());
+    }
+
     public static class AutoPathConstants {
-        // all auto paths starts at (1.3, 5.544)
 
         public static final Map<Pair<Double, Constants.EventCommand>, ArrayList<String>> eventMarkerMap = new HashMap<>();
 
@@ -110,7 +116,7 @@ public final class Constants {
         public static final String TWO_NOTE_LEFT = "TwoNoteLeftSS.1";
         public static final String TWO_NOTE_CENTER = "TwoNoteCenterSS.1";
         public static final String TWO_NOTE_RIGHT = "TwoNoteRightSS.1";
-        
+
         public static final String THREE_NOTE_WRR1 = "ThreeNoteRightRSS.1";
         public static final String THREE_NOTE_WRR2 = "ThreeNoteRightRSS.2";
         public static final String THREE_NOTE_WRC1 = "ThreeNoteRightCSS.1";
@@ -119,7 +125,6 @@ public final class Constants {
         public static final String THREE_NOTE_WLL2 = "ThreeNoteLeftLSS.2";
         public static final String THREE_NOTE_WLC1 = "ThreeNoteLeftCSS.1";
         public static final String THREE_NOTE_WLC2 = "ThreeNoteLeftCSS.2";
-
 
         public static final String FOUR_NOTE_WING1 = "FourNoteWingSS.1";
         public static final String FOUR_NOTE_WING2 = "FourNoteWingSS.2";
@@ -163,11 +168,10 @@ public final class Constants {
 
         public static final ArrayList<String> testingRed = new ArrayList<String>();
 
-
         public static final Measure<Voltage> INTAKE_VOLTS = Volts.of(4);
         public static final Measure<Voltage> HANDOFF_IN_VOLTS = Volts.of(6);
         public static final Measure<Voltage> HANDOFF_OUT_VOLTS = Volts.of(12);
-  
+
         public static final double INIT_MOVEMENTS_TIME = 0.0;
         public static final double MAX_ARM_MOVE_TIME = .5;
         public static final double INTAKE_TIME = 0.3;
@@ -183,16 +187,15 @@ public final class Constants {
             twoNoteCenter.add(TWO_NOTE_CENTER);
             twoNoteRight.add(TWO_NOTE_RIGHT);
 
-
             threeNoteWRR.add(THREE_NOTE_WRR1);
             threeNoteWRR.add(THREE_NOTE_WRR2);
 
             threeNoteWRC.add(THREE_NOTE_WRC1);
             threeNoteWRC.add(THREE_NOTE_WRC2);
-            
+
             threeNoteWLL.add(THREE_NOTE_WLL1);
             threeNoteWLL.add(THREE_NOTE_WLL2);
-            
+
             threeNoteWLC.add(THREE_NOTE_WLC1);
             threeNoteWLC.add(THREE_NOTE_WLC2);
 
