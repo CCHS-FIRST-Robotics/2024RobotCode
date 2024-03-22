@@ -44,9 +44,9 @@ public final class Constants {
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(
             Map.of(
-                    ArmPosition.INTAKE, Degrees.of(-10),
+                    ArmPosition.INTAKE, Degrees.of(-5),
                     ArmPosition.AMP, Degrees.of(88),
-                    ArmPosition.SPEAKER, Degrees.of(6.5),
+                    ArmPosition.SPEAKER, Degrees.of(5),
                     ArmPosition.MAIN, Degrees.of(-23),
                     ArmPosition.LOWER, Degrees.of(-10),
                     ArmPosition.STAGE, Degrees.of(27),
@@ -56,10 +56,10 @@ public final class Constants {
 
     public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
 
-    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(75);
-    public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(95);
+    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(80);
+    public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(90);
 
-    public static final Measure<Velocity<Angle>> SHOOTER_AMP_SPEED = RotationsPerSecond.of(95);
+    public static final Measure<Velocity<Angle>> SHOOTER_AMP_SPEED = RotationsPerSecond.of(30);
 
     // ports
     public static final int CONTROLLER_PORT_1 = 0;
@@ -108,7 +108,7 @@ public final class Constants {
 
         // file names for paths
         public static final String TWO_NOTE_LEFT = "TwoNoteLeftSS.1";
-        public static final String TWO_NOTE_CENTER = "TwoNoteCenterSS.1";
+        public static final String TWO_NOTE_CENTER = "TwoNoteCenter.1";
         public static final String TWO_NOTE_RIGHT = "TwoNoteRightSS.1";
         
         public static final String THREE_NOTE_WRR1 = "ThreeNoteRightRSS.1";
@@ -164,13 +164,13 @@ public final class Constants {
         public static final ArrayList<String> testingRed = new ArrayList<String>();
 
 
-        public static final Measure<Voltage> INTAKE_VOLTS = Volts.of(4);
+        public static final Measure<Voltage> INTAKE_VOLTS = Volts.of(6);
         public static final Measure<Voltage> HANDOFF_IN_VOLTS = Volts.of(6);
         public static final Measure<Voltage> HANDOFF_OUT_VOLTS = Volts.of(12);
   
         public static final double INIT_MOVEMENTS_TIME = 0.0;
-        public static final double MAX_ARM_MOVE_TIME = .5;
-        public static final double INTAKE_TIME = 0.3;
+        public static final double MAX_ARM_MOVE_TIME = 1;
+        public static final double INTAKE_TIME = 2;
         public static final double SHOOT_TIME = 0.5;
 
         public static final Pose2d AUTO_START_POS = new Pose2d(1.3, 5.544, new Rotation2d(0));

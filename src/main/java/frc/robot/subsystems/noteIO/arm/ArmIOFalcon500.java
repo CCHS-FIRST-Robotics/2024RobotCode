@@ -56,12 +56,12 @@ public class ArmIOFalcon500 implements ArmIO {
     private static final double gearRatio = 100 * 26d / 14d; // 100 * 54 / 15d
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKpV = 0; // 180
-    private static final double driveKdV = 0d; // 3
+    private static final double driveKpV = 180; // 180
+    private static final double driveKdV = .5d; // 3
     private static final double driveKiV = 0.0d;
 
     // Uhh Feedforward momment!
-    private static final double driveFeedforwardKgV = 0; // .435V
+    private static final double driveFeedforwardKgV = .395; // .435V
     private static final double driveFeedforwardKsV = 0;
     // Units needed are volts * seconds / rotations, max rpm is 6,380
     private static final double driveFeedforwardKvV = 12 * (3 / 319d) / gearRatio; // 6380 rotaions per minute is 319/3
@@ -78,7 +78,7 @@ public class ArmIOFalcon500 implements ArmIO {
     private static final double driveFeedforwardKvTC = 0; // only used for viscous friction losses in TC
     private static final double driveFeedforwardKaTC = 0;
 
-    boolean torqueCurrent = true;
+    boolean torqueCurrent = false;
 
     // private final boolean motorInverted = false;
     private final Measure<Angle> absoluteEncoderOffset = Radians.of(4.25); // -3.71
@@ -120,7 +120,7 @@ public class ArmIOFalcon500 implements ArmIO {
         stickyFaultRemoteSensorOutOfSync = leadFalcon.getStickyFault_RemoteSensorDataInvalid();
 
         driveMMConfig.MotionMagicCruiseVelocity = 98d / gearRatio; // max rps of the motor (almost)
-        driveMMConfig.MotionMagicAcceleration = 1; // .5 second to reach max speed (defaualt)
+        driveMMConfig.MotionMagicAcceleration = 2; // .5 second to reach max speed (defaualt)
         driveMMConfig.MotionMagicJerk = 3; // .33 seconds to reach max accel (defaualt)
 
         // Feedforward momment!
@@ -146,7 +146,7 @@ public class ArmIOFalcon500 implements ArmIO {
         // driveFalconConfig.CurrentLimits.StatorCurrentLimit = 60;
         driveFalconConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         driveFalconConfig.CurrentLimits.SupplyCurrentLimit = 60;
-        driveFalconConfig.CurrentLimits.SupplyTimeThreshold = .5;
+        driveFalconConfig.CurrentLimits.SupplyTimeThreshold = .2;
 
         driveFalconConfig.TorqueCurrent.PeakForwardTorqueCurrent = 90;
         driveFalconConfig.TorqueCurrent.PeakReverseTorqueCurrent = -90;

@@ -26,6 +26,7 @@ import org.littletonrobotics.junction.Logger;
 // import com.choreo.lib.ChoreoTrajectory;
 // import com.choreo.lib.ChoreoTrajectoryState;
 import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.SignalLogger;
 
 // rev sucks
 public class Arm extends SubsystemBase {
@@ -47,12 +48,14 @@ public class Arm extends SubsystemBase {
     // meters, degrees
     static {
         armAngleMap.put(1.3, 5d);
-        armAngleMap.put(1.8, 9d);
-        armAngleMap.put(2.3, 16d);
-        armAngleMap.put(2.8, 22d);
-        armAngleMap.put(3.3, 25.5d);
-        armAngleMap.put(3.8, 27d);
-        armAngleMap.put(5d, 30d);
+        armAngleMap.put(1.8, 8d);
+        armAngleMap.put(2.3, 15d);
+        armAngleMap.put(2.6, 19.5d);
+        armAngleMap.put(2.8, 21.5d);
+        armAngleMap.put(3d, 23.5d);
+        armAngleMap.put(3.3, 25d);
+        armAngleMap.put(3.8, 25.8d);
+        armAngleMap.put(4.3d, 26.2d);
     }
 
     public Arm(ArmIO io) {
@@ -60,13 +63,14 @@ public class Arm extends SubsystemBase {
 
         sysIdRoutine = new SysIdRoutine(
                 new SysIdRoutine.Config( // Calculate ~ how far it's going to go (less than 90 deg)
-                        Volts.per(Second).of(.5),
-                        Volts.of(2),
+                        Volts.per(Second).of(2),
+                        Volts.of(8.75),
                         Seconds.of(5),
-                        (state) -> Logger.recordOutput("SysIdArmTestState", state.toString())),
+                        (state) -> SignalLogger.writeString("SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism(
                         (Measure<Voltage> volts) -> {
-                            io.setDriveCurrent(Amps.of(7 * Math.cos(getArmAngle().in(Radians)) + volts.in(Volts))); // literal slander
+                            // io.setDriveCurrent(Amps.of(7 * Math.cos(getArmAngle().in(Radians)) + volts.in(Volts))); // literal slander
+                            io.setDriveCurrent(Amps.of(volts.in(Volts)));
                         },
                         null,
                         this));
@@ -79,8 +83,8 @@ public class Arm extends SubsystemBase {
         // System.out.println("testingggg");
 
         // trust!
-        // io.setDriveVoltage(Volts.of(1));
-        // setArmAngle(Degrees.of(-10));
+        // io.setDriveVoltage(Volts.of(.395));
+        // setArmAngle(Degrees.of(23.5));
         // io.setDriveCurrent(Amps.of(8));
     }
 
@@ -95,7 +99,7 @@ public class Arm extends SubsystemBase {
      */
     @AutoLogOutput
     public boolean isAtGoal() {
-        return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < 1;
+        return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < .8;
     }
 
     @AutoLogOutput

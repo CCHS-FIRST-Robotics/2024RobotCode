@@ -3,6 +3,7 @@ package frc.robot.subsystems.noteIO.handoff;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.units.*;
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -32,6 +33,7 @@ public class HandoffIOFalcon500 implements HandoffIO {
         TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
         talonFXConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         talonFXConfig.CurrentLimits.SupplyCurrentLimit = 20;
+        talonFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         motor.getConfigurator().apply(talonFXConfig);
     }
 
