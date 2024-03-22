@@ -91,14 +91,16 @@ public final class EventMarkerBuilder {
         List<Pair<Double, Command>> eventMarkers = new ArrayList<Pair<Double, Command>>();
 
         double driveTime = Math.max(AutoPathConstants.MAX_ARM_MOVE_TIME, choreoTrajectory.getTotalTime());
-        // double intakeTime = driveTime + AutoPathConstants.INTAKE_TIME;
-        double shootTime = driveTime + AutoPathConstants.MAX_ARM_MOVE_TIME;
+        double intakeTime = driveTime + AutoPathConstants.INTAKE_TIME;
+        double shootTime = intakeTime + AutoPathConstants.MAX_ARM_MOVE_TIME;
         double totalTime = shootTime + AutoPathConstants.SHOOT_TIME;
 
         // start drive and more arm to inake
         eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME,
             // turn on handoff
             handoff.getHandoffCommand(AutoPathConstants.HANDOFF_IN_VOLTS)
+            // turn on intake (no matter where arm is)
+            .alongWith(intake.getIntakeCommand(AutoPathConstants.INTAKE_VOLTS, handoff::checkNoteThere))
             // move arm down
             .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
             // drive
@@ -110,13 +112,11 @@ public final class EventMarkerBuilder {
             //     .andThen(intake.getIntakeCommand(AutoPathConstants.INTAKE_VOLTS,
             //         handoff::checkNoteThere))
             // ))
-            // turn on intake (no matter where arm is)
-            .alongWith(intake.getIntakeCommand(AutoPathConstants.INTAKE_VOLTS, handoff::checkNoteThere))
         ));
 
         // arm shoot
-        eventMarkers.add(Pair.of(driveTime,
-                arm.moveArm(ArmPosition.SPEAKER, drive::getPose)));
+        eventMarkers.add(Pair.of(intakeTime,
+                arm.moveArm(ArmPosition.SHOOT, drive::getPose)));
 
         // run handoff & shoot
         eventMarkers.add(Pair.of(shootTime,

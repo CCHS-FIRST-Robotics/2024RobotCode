@@ -170,6 +170,8 @@ public class Drive extends SubsystemBase {
    private ArrayList<String> autoPaths;
    private int currentPathNum = 0; // 0 in the list is the first path
 
+   boolean openLoop = false;
+
     // Control modes for the drive
     public enum CONTROL_MODE {
         DISABLED,
@@ -408,7 +410,8 @@ public class Drive extends SubsystemBase {
                 // Send setpoints to modules
                 SwerveModuleState[] optimizedStates = new SwerveModuleState[4];
                 for (int i = 0; i < 4; i++) {
-                    optimizedStates[i] = modules[i].runSetpoint(setpointStates[i]);
+                    if (openLoop) setpointStates[i].speedMetersPerSecond *= 1d / (maxLinearSpeed.in(MetersPerSecond));
+                    optimizedStates[i] = modules[i].runSetpoint(setpointStates[i], openLoop);
                     
                     // FOR TESTING ONLY
                     // optimizedStates[i] = new SwerveModuleState();
@@ -428,7 +431,7 @@ public class Drive extends SubsystemBase {
                 // Send setpoints to modules
                 optimizedStates = new SwerveModuleState[4];
                 for (int i = 0; i < 4; i++) {
-                    optimizedStates[i] = modules[i].runSetpoint(setpointStates[i]);
+                    optimizedStates[i] = modules[i].runSetpoint(setpointStates[i], false);
                 }
 
                 // Log setpoint states
@@ -484,6 +487,10 @@ public class Drive extends SubsystemBase {
     public void runCharacterization(Measure<Voltage> volts) {
         controlMode = CONTROL_MODE.CHARACTERIZING;
         characterizationVolts.mut_replace(volts.in(Volts), Volts);
+    }
+
+    public void setOpenLoop(boolean isOpenLoop) {
+        openLoop = isOpenLoop;
     }
 
     /** Stops the drive. */

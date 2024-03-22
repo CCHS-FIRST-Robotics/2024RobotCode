@@ -48,7 +48,7 @@ public class Shooter extends SubsystemBase {
 
     @AutoLogOutput
     public boolean checkNoteShot() {
-        return inputs.leftShooterCurrent > 40 && Timer.getFPGATimestamp() - time > 1;
+        return inputs.rightShooterCurrent > 30 && Timer.getFPGATimestamp() - time > 1;
     }
 
     @Override
@@ -57,13 +57,13 @@ public class Shooter extends SubsystemBase {
         Logger.processInputs("shooter", inputs);
         Logger.recordOutput("Shooter on", leftVelocity.in(RadiansPerSecond) != 0 || rightVelocity.in(RadiansPerSecond) != 0);
 
-        io.setVelocity(leftVelocity, rightVelocity);
-        // io.setVoltage(Volts.of(6));
+        // io.setVelocity(leftVelocity, rightVelocity);
+        io.setVoltage(Volts.of(1));
     }
 
     @AutoLogOutput
     public boolean isOn() {
-        return leftVelocity.in(RotationsPerSecond) != 0;
+        return rightVelocity.in(RotationsPerSecond) != 0;
     }
 
     public Command getShootNoteCommand(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {

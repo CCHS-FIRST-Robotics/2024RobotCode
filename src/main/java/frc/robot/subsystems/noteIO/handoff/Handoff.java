@@ -47,7 +47,7 @@ public class Handoff extends SubsystemBase {
         Logger.recordOutput("Handoff on", volts != Volts.of(0));
 
         io.setVoltage(volts);
-        // io.setVoltage(Volts.of(4));
+        // io.setVoltage(Volts.of(2));
     }
 
     @AutoLogOutput
