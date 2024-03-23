@@ -1,15 +1,14 @@
 package frc.robot.subsystems.vision;
 
-import org.photonvision.*;
 import static edu.wpi.first.units.Units.*;
 
+import org.photonvision.*;
+import org.photonvision.PhotonPoseEstimator.*;
 import edu.wpi.first.apriltag.AprilTagFields;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.*;
 import edu.wpi.first.math.geometry.*;
 import java.util.*;
-
-import frc.robot.utils.AprilTag;
+import frc.robot.utils.*;
 
 public class CameraIOPhotonVision implements CameraIO {
     PhotonCamera camera = new PhotonCamera("limelight");
@@ -19,50 +18,46 @@ public class CameraIOPhotonVision implements CameraIO {
             camera,
             new Transform3d() // ! most likely wrong bc camera isn't at the middle of the robot
     );
-    private double lastEstTimestamp = 0;
 
     public CameraIOPhotonVision() {
         System.out.println("[Init] Creating CameraIOPhotonVision");
-        poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-    }
 
-    // returns latest estimated robot pose
-    public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-        Optional<EstimatedRobotPose> visionEst = poseEstimator.update();
-        double latestTimestamp = camera.getLatestResult().getTimestampSeconds();
-        boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
-        if (newResult) {
-            lastEstTimestamp = latestTimestamp;
-        }
-        return visionEst;
+        poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     }
 
     @Override
     public void updateInputs(CameraIOInputs inputs) {
-        var visionEst = getEstimatedGlobalPose();
-        visionEst.ifPresent(est -> {
-            var estPose = est.estimatedPose;
-            var result = camera.getLatestResult();
-            // result.getTargets();
-            PhotonTrackedTarget closest = null;
+        Optional<EstimatedRobotPose> estimate = poseEstimator.update();
+
+        if (estimate.isPresent()) {
+            PhotonPipelineResult cameraResult = camera.getLatestResult();
+            Pose3d estimatedPose3d = estimate.get().estimatedPose;
+            double time = cameraResult.getTimestampSeconds();
+            TimestampedPose3d robotPose = new TimestampedPose3d(estimatedPose3d, time);
+
+            // get closest tags
+            PhotonTrackedTarget closestTag = null;
             double dist = 0.0;
-            for (PhotonTrackedTarget smart : result.getTargets()) {
+            for (PhotonTrackedTarget smart : cameraResult.getTargets()) {
                 inputs.tags.add(new AprilTag(smart.getFiducialId(), smart.getBestCameraToTarget()));
-                if (closest == null || dist > calcMag(smart.getBestCameraToTarget())) {
-                    closest = smart;
+                if (closestTag == null || dist > calcMag(smart.getBestCameraToTarget())) {
+                    closestTag = smart;
                     dist = calcMag(smart.getBestCameraToTarget());
                 }
             }
-            inputs.numTags = inputs.tags.size();
-            if (closest != null) {
-                inputs.primaryTagId = closest.getFiducialId();
-                inputs.primaryTagX = Meters.of(closest.getBestCameraToTarget().getX());
-                inputs.primaryTagY = Meters.of(closest.getBestCameraToTarget().getY());
-                inputs.primaryTagZ = Meters.of(closest.getBestCameraToTarget().getZ());
-                inputs.primaryTagPitch = Radians.of(closest.getPitch());
 
-                closest.getBestCameraToTarget().getX();
+            // add to inputs
+            if (closestTag != null) {
+                inputs.primaryTagId = closestTag.getFiducialId();
+                inputs.primaryTagX = Meters.of(closestTag.getBestCameraToTarget().getX());
+                inputs.primaryTagY = Meters.of(closestTag.getBestCameraToTarget().getY());
+                inputs.primaryTagZ = Meters.of(closestTag.getBestCameraToTarget().getZ());
+                inputs.primaryTagPitch = Radians.of(closestTag.getPitch());
+
+                closestTag.getBestCameraToTarget().getX();
             }
+            inputs.numTags = inputs.tags.size();
+
             // List<edu.wpi.first.apriltag.AprilTag> tags =
             // poseEstimator.getFieldTags().getTags();
             // frc.robot.utils.AprilTag closeet = null;
@@ -75,29 +70,10 @@ public class CameraIOPhotonVision implements CameraIO {
             // // at.pose));
             // }
             // inputs.numTags = inputs.tags.size();
-
-        });
+        }
     }
 
     public static double calcMag(Transform3d vector) {
         return Math.sqrt(vector.getX() * vector.getX() + vector.getY() * vector.getY() + vector.getZ() * vector.getZ());
     }
-
-    // fill tags arraylist
-    // inputs.tags.add
-
-    // var visionEst = getEstimatedGlobalPose();
-    // visionEst.ifPresent(
-    // est -> {
-    // var estPose = est.estimatedPose.toPose2d();
-    // // Change our trust in the measurement based on the tags we can see
-    // Matrix<N3, N1> estStdDevs = getEstimatedStandardDeviations(estPose);
-
-    // drivetrain.addVisionMeasurement(
-    // est.estimatedPose.toPose2d(), , estStdDevs);
-    // });
-
-    // TimestampedPose2d pose = new TimestampedPose2d(est.estimatedPose.toPose2d(),
-    // est.timestampSeconds)
-    // }
 }
