@@ -112,8 +112,8 @@ public class ShooterIOFalcon500 implements ShooterIO {
     @AutoLogOutput
     public boolean upToSpeed(Measure<Velocity<Angle>> leftTargetVelocity,
             Measure<Velocity<Angle>> rightTargetVelocity) {
-        return velocitySignalLeft.getValue() > leftTargetVelocity.in(RotationsPerSecond) * .95
-                && velocitySignalRight.getValue() > rightTargetVelocity.in(RotationsPerSecond) * .95;
+        return velocitySignalLeft.getValue() > leftTargetVelocity.in(RotationsPerSecond) * .90
+                && velocitySignalRight.getValue() > rightTargetVelocity.in(RotationsPerSecond) * .90;
     }
 
     @Override

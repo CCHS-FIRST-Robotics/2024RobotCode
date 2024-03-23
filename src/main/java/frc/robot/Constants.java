@@ -128,9 +128,9 @@ public final class Constants {
         public static final String THREE_NOTE_WLC1 = "ThreeNoteLeftCSS.1";
         public static final String THREE_NOTE_WLC2 = "ThreeNoteLeftCSS.2";
 
-        public static final String FOUR_NOTE_WING1 = "FourNoteWingSS.1";
-        public static final String FOUR_NOTE_WING2 = "FourNoteWingSS.2";
-        public static final String FOUR_NOTE_WING3 = "FourNoteWingSS.3";
+        public static final String FOUR_NOTE_WING1 = "FourNoteWing.1";
+        public static final String FOUR_NOTE_WING2 = "FourNoteWing.2";
+        public static final String FOUR_NOTE_WING3 = "FourNoteWing.3";
         public static final String FOUR_NOTE_L1 = "FourNoteLeftSS.1";
         public static final String FOUR_NOTE_L2 = "FourNoteLeftSS.2";
         public static final String FOUR_NOTE_L3 = "FourNoteLeftSS.3";
@@ -171,18 +171,18 @@ public final class Constants {
         public static final ArrayList<String> testingRed = new ArrayList<String>();
 
 
-        public static final Measure<Voltage> INTAKE_VOLTS = Volts.of(6);
-        public static final Measure<Voltage> HANDOFF_IN_VOLTS = Volts.of(6);
+        public static final Measure<Voltage> INTAKE_VOLTS = Volts.of(4);
+        public static final Measure<Voltage> HANDOFF_IN_VOLTS = Volts.of(5);
         public static final Measure<Voltage> HANDOFF_OUT_VOLTS = Volts.of(12);
 
         public static final double INIT_MOVEMENTS_TIME = 0.0;
         public static final double MAX_ARM_MOVE_TIME = 1;
-        public static final double INTAKE_TIME = 2;
+        public static final double INTAKE_TIME = 1;
         public static final double SHOOT_TIME = 0.5;
 
         public static final Pose2d AUTO_START_POS = new Pose2d(1.3, 5.544, new Rotation2d(0));
 
-        public static final Measure<Velocity<Angle>> SHOOT_SPEED_LEFT = RotationsPerSecond.of(95);
+        public static final Measure<Velocity<Angle>> SHOOT_SPEED_LEFT = RotationsPerSecond.of(85);
         public static final Measure<Velocity<Angle>> SHOOT_SPEED_RIGHT = RotationsPerSecond.of(95); // idk
 
         static {

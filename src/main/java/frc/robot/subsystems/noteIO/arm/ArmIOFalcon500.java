@@ -53,15 +53,15 @@ public class ArmIOFalcon500 implements ArmIO {
     StatusSignal<Boolean> faultRemoteSensorOutOfSync;
     StatusSignal<Boolean> stickyFaultRemoteSensorOutOfSync;
 
-    private static final double gearRatio = 100 * 26d / 14d; // 100 * 54 / 15d
+    private static final double gearRatio = 100 * 26d / 14d; // 100 * 26d / 14d
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKpV = 180; // 180
-    private static final double driveKdV = .5d; // 3
-    private static final double driveKiV = 0.0d;
+    private static final double driveKpV = 175; // 175
+    private static final double driveKdV = .4d; // .4
+    private static final double driveKiV = 0.0d; // 0
 
     // Uhh Feedforward momment!
-    private static final double driveFeedforwardKgV = .395; // .435V
+    private static final double driveFeedforwardKgV = .395; // .395V
     private static final double driveFeedforwardKsV = 0;
     // Units needed are volts * seconds / rotations, max rpm is 6,380
     private static final double driveFeedforwardKvV = 12 * (3 / 319d) / gearRatio; // 6380 rotaions per minute is 319/3
@@ -80,8 +80,7 @@ public class ArmIOFalcon500 implements ArmIO {
 
     boolean torqueCurrent = false;
 
-    // private final boolean motorInverted = false;
-    private final Measure<Angle> absoluteEncoderOffset = Radians.of(4.25); // -3.71
+    private final Measure<Angle> absoluteEncoderOffset = Radians.of(4.25); // 4.25
 
     int index;
 

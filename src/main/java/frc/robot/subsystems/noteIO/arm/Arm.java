@@ -48,14 +48,14 @@ public class Arm extends SubsystemBase {
     // meters, degrees
     static {
         armAngleMap.put(1.3, 5d);
-        armAngleMap.put(1.8, 8d);
-        armAngleMap.put(2.3, 15d);
-        armAngleMap.put(2.6, 19.5d);
-        armAngleMap.put(2.8, 21.5d);
-        armAngleMap.put(3d, 23.5d);
-        armAngleMap.put(3.3, 25d);
-        armAngleMap.put(3.8, 25.8d);
-        armAngleMap.put(4.3d, 26.2d);
+        armAngleMap.put(1.8, 9d);
+        armAngleMap.put(2.3, 21d);
+        armAngleMap.put(2.6, 23d);
+        armAngleMap.put(2.8, 25.2d);
+        armAngleMap.put(3d, 25.9d);
+        armAngleMap.put(3.3, 26.1d);
+        armAngleMap.put(3.8, 26.3d);
+        armAngleMap.put(4.3d, 26.5d);
     }
 
     public Arm(ArmIO io) {

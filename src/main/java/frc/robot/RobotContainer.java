@@ -133,7 +133,7 @@ public class RobotContainer {
                 drive.getKinematics(),
                 new Rotation2d(),
                 drive.getModulePositions(),
-                StartPosistions.blueAmp
+                StartPosistions.blueCenter
                 );
 
         drive.setPoseEstimator(poseEstimator);
@@ -208,7 +208,7 @@ public class RobotContainer {
     //     new EventMarkerBuilder(AutoPathConstants.blueThree2CLSS, drive, intake, handoff,shooter, arm).getCommandSequence()
     // );
     controller1.x().onTrue(
-        new EventMarkerBuilder(AutoPathConstants.twoNoteCenter, drive, intake, handoff,shooter, arm).getCommandSequence()
+        new EventMarkerBuilder(AutoPathConstants.fourNoteWing, drive, intake, handoff,shooter, arm).getCommandSequence()
     );
 
         /*
