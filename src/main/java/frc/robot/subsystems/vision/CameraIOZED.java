@@ -10,7 +10,6 @@ import frc.robot.utils.*;
 import frc.robot.utils.AprilTag;
 
 public class CameraIOZED implements CameraIO {
-
     NetworkTable tagsTable = NetworkTableInstance.getDefault().getTable("tags");
 
     // DoubleArraySubscriber tagPose2dSub =
@@ -72,8 +71,8 @@ public class CameraIOZED implements CameraIO {
                 new Rotation3d(zedPose.value[3], zedPose.value[4], zedPose.value[5]));
         inputs.zedPoseEstimate3d = new TimestampedPose3d(pose, zedPose.timestamp);
         inputs.zedPoseEstimate = new TimestampedPose2d(pose.toPose2d(), zedPose.timestamp);
-        inputs.zedPoseCovar = VecBuilder.fill(zedPose.value[6], zedPose.value[7], zedPose.value[11]); // (x, y, yaw)
-
+        inputs.zedPoseCovar = VecBuilder.fill(zedPose.value[6], zedPose.value[7], zedPose.value[11]); // (x, y,
+                                                                                                      // yaw)
         // Values from the primary (closest) tag
         inputs.primaryTagId = (int) primaryTagIdSub.get();
         inputs.primaryTagX = Meters.of(primaryTagXSub.get());
@@ -105,7 +104,8 @@ public class CameraIOZED implements CameraIO {
                     new AprilTag(
                             (int) tagIds[i],
                             new Pose3d(tagXs[i], tagYs[i], tagZs[i],
-                                    new Rotation3d(tagRolls[i], tagPitches[i], tagHeadings[i]))));
+                                    new Rotation3d(tagRolls[i], tagPitches[i],
+                                            tagHeadings[i]))));
         }
         inputs.tags = tags;
     }

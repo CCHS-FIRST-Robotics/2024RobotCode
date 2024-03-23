@@ -11,7 +11,6 @@ import frc.robot.utils.*;
 import frc.robot.Constants;
 
 public class Vision extends SubsystemBase {
-
     CameraIO io;
     CameraIOInputs inputs = new CameraIOInputs();
     PoseEstimator poseEstimator;
@@ -31,7 +30,7 @@ public class Vision extends SubsystemBase {
         Logger.recordOutput("AprilTagLocations", Constants.APRIL_TAG_LOCATIONS);
     }
 
-    /*
+    /**
      * (non-Javadoc)
      * 
      * @see edu.wpi.first.wpilibj2.command.Subsystem#periodic()
@@ -61,8 +60,9 @@ public class Vision extends SubsystemBase {
                 System.err.println("pose added");
             Logger.recordOutput("testRecordedPose", pose.pose);
             Logger.recordOutput("testRecordedTimestamp", pose.timestamp);
-            // poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp / 1000000, poseEstimator
-            //         .getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
+            // poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp / 1000000,
+            // poseEstimator
+            // .getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
         }
 
         if (getZedPoseEstimate().pose.getX() > 0) {
