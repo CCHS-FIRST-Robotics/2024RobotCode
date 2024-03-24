@@ -33,7 +33,8 @@ public class CameraIOPhotonVision implements CameraIO {
             PhotonPipelineResult cameraResult = camera.getLatestResult();
             Pose3d estimatedPose3d = estimate.get().estimatedPose;
             double time = cameraResult.getTimestampSeconds();
-            TimestampedPose3d robotPose = new TimestampedPose3d(estimatedPose3d, time);
+            inputs.tagPoseEstimate = new TimestampedPose2d(estimatedPose3d.toPose2d(), time);
+            inputs.tagPoseEstimate3d = new TimestampedPose3d(estimatedPose3d, time);
 
             // get closest tags
             PhotonTrackedTarget closestTag = null;
