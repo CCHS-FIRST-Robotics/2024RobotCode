@@ -127,7 +127,7 @@ public class Vision extends SubsystemBase {
      * @return The latest pose estimate (2d)
      */
     public TimestampedPose2d getPoseEstimate() {
-        return inputs.tagPoseEstimate;
+        return inputs.tagBasedPoseEstimate;
     }
 
     /**
@@ -136,7 +136,7 @@ public class Vision extends SubsystemBase {
      * @return The latest pose estimate (3d)
      */
     public TimestampedPose3d getPoseEstimate3d() {
-        return inputs.tagPoseEstimate3d;
+        return inputs.tagBasedPoseEstimate3d;
     }
 
     /**
@@ -154,13 +154,13 @@ public class Vision extends SubsystemBase {
      * @return The latest pose estimate (3d)
      */
     public TimestampedPose3d getZedPoseEstimate3d() {
-        return inputs.zedPoseEstimate3d;
+        return inputs.zedBasedPoseEstimate3d;
     }
 
     public Matrix<N3, N1> getZedPoseStd() {
         return VecBuilder.fill(
-                Math.sqrt(inputs.zedPoseCovar.get(0, 0)),
-                Math.sqrt(inputs.zedPoseCovar.get(1, 0)),
-                Math.sqrt(inputs.zedPoseCovar.get(2, 0)));
+                Math.sqrt(inputs.zedBasedPoseCovar.get(0, 0)),
+                Math.sqrt(inputs.zedBasedPoseCovar.get(1, 0)),
+                Math.sqrt(inputs.zedBasedPoseCovar.get(2, 0)));
     }
 }
