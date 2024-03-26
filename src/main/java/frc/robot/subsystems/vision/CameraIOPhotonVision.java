@@ -2,7 +2,6 @@ package frc.robot.subsystems.vision;
 
 import static edu.wpi.first.units.Units.*;
 
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.*;
 import org.photonvision.PhotonPoseEstimator.*;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -29,13 +28,10 @@ public class CameraIOPhotonVision implements CameraIO {
     @Override
     public void updateInputs(CameraIOInputs inputs) {
         // get estimate
-        System.out.println("fucking");
         Optional<EstimatedRobotPose> estimate = poseEstimator.update();
         if (!estimate.isPresent()) {
             System.out.println("here");
             return;
-        }else{
-            System.out.println("YAYYYYYY");
         }
 
         // update robot pose
@@ -56,12 +52,9 @@ public class CameraIOPhotonVision implements CameraIO {
                 dist = newDist;
             }
         }
-        System.out.println("fuck1");
 
         // update tag data
         if (closestTag != null) {
-            System.out.println("hihihihihihih");
-            Logger.recordOutput("fuck", closestTag.getFiducialId());
             inputs.primaryTagId = closestTag.getFiducialId();
             inputs.primaryTagX = Meters.of(closestTag.getBestCameraToTarget().getX());
             inputs.primaryTagY = Meters.of(closestTag.getBestCameraToTarget().getY());
