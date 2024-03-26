@@ -41,9 +41,10 @@ public class CameraIOPhotonVision implements CameraIO {
         double dist = 0.0;
         for (PhotonTrackedTarget smart : cameraResult.getTargets()) {
             inputs.tags.add(new AprilTag(smart.getFiducialId(), smart.getBestCameraToTarget()));
-            if (closestTag == null || dist > calcMag(smart.getBestCameraToTarget())) {
+            double newDist = smart.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
+            if (closestTag == null || dist > newDist) {
                 closestTag = smart;
-                dist = calcMag(smart.getBestCameraToTarget());
+                dist = newDist;
             }
         }
 
@@ -55,13 +56,9 @@ public class CameraIOPhotonVision implements CameraIO {
             inputs.primaryTagZ = Meters.of(closestTag.getBestCameraToTarget().getZ());
             inputs.primaryTagPitch = Radians.of(closestTag.getPitch());
             inputs.primaryTagHeading = Radians.of(closestTag.getYaw());
-            inputs.primaryTagPitch = Radians.of(closestTag.getSkew());
-            closestTag.getBestCameraToTarget().getX();
+            inputs.primaryTagRoll = Radians.of(closestTag.getSkew());
+            // closestTag.getBestCameraToTarget().getX();
         }
         inputs.numTags = inputs.tags.size();
-    }
-
-    public static double calcMag(Transform3d vector) {
-        return Math.sqrt(vector.getX() * vector.getX() + vector.getY() * vector.getY() + vector.getZ() * vector.getZ());
     }
 }
