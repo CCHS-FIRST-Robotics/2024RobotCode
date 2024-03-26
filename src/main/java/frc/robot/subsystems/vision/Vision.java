@@ -11,8 +11,10 @@ import frc.robot.utils.*;
 import frc.robot.Constants;
 
 public class Vision extends SubsystemBase {
-    CameraIO io;
-    CameraIOInputs inputs = new CameraIOInputs();
+    CameraIO zed;
+    CameraIO photonVision;
+    CameraIOInputs ZEDinputs = new CameraIOInputs();
+    CameraIOInputs PVinputs = new CameraIOInputs();
     PoseEstimator poseEstimator;
     boolean poseReset = false;
 
@@ -21,11 +23,12 @@ public class Vision extends SubsystemBase {
     /**
      * Constructs a new Vision object
      * 
-     * @param io            The camera IO object
+     * @param zed            The camera IO object
      * @param poseEstimator The pose estimator
      */
-    public Vision(CameraIO io) {
-        this.io = io;
+    public Vision(CameraIO zed, CameraIO photonVision) {
+        this.zed = zed;
+        this.photonVision = photonVision;
 
         Logger.recordOutput("AprilTagLocations", Constants.APRIL_TAG_LOCATIONS);
     }
@@ -36,8 +39,11 @@ public class Vision extends SubsystemBase {
      * @see edu.wpi.first.wpilibj2.command.Subsystem#periodic()
      */
     public void periodic() {
-        io.updateInputs(inputs);
-        Logger.processInputs("Vision", inputs);
+        zed.updateInputs(ZEDinputs);
+        Logger.processInputs("Vision/ZED", ZEDinputs);
+
+        photonVision.updateInputs(PVinputs);
+        Logger.processInputs("Vision/PV", PVinputs);
 
         if (getPoseEstimate3d().pose.getX() > 0) {
             TimestampedPose2d pose = getPoseEstimate();
@@ -87,8 +93,8 @@ public class Vision extends SubsystemBase {
      * @return The closest tag's transform relative to the robot
      */
     public Transform2d getTransformToClosestTag() {
-        return new Transform2d(new Translation2d(inputs.primaryTagX, inputs.primaryTagY),
-                new Rotation2d(inputs.primaryTagHeading));
+        return new Transform2d(new Translation2d(ZEDinputs.primaryTagX, ZEDinputs.primaryTagY),
+                new Rotation2d(ZEDinputs.primaryTagHeading));
     }
 
     /**
@@ -100,8 +106,8 @@ public class Vision extends SubsystemBase {
      */
     public AprilTag getTagFromId(int id) {
         // Sort tags by distance from robot
-        ArrayList<AprilTag> tagsCopy = new ArrayList<AprilTag>(inputs.tags.size());
-        Collections.copy(tagsCopy, inputs.tags);
+        ArrayList<AprilTag> tagsCopy = new ArrayList<AprilTag>(ZEDinputs.tags.size());
+        Collections.copy(tagsCopy, ZEDinputs.tags);
         Collections.sort(tagsCopy, (AprilTag a, AprilTag b) -> {
             return Double.compare(
                     a.transform.getTranslation().toTranslation2d().getDistance(new Translation2d()),
@@ -127,7 +133,7 @@ public class Vision extends SubsystemBase {
      * @return The latest pose estimate (2d)
      */
     public TimestampedPose2d getPoseEstimate() {
-        return inputs.tagBasedPoseEstimate;
+        return ZEDinputs.tagBasedPoseEstimate;
     }
 
     /**
@@ -136,7 +142,7 @@ public class Vision extends SubsystemBase {
      * @return The latest pose estimate (3d)
      */
     public TimestampedPose3d getPoseEstimate3d() {
-        return inputs.tagBasedPoseEstimate3d;
+        return ZEDinputs.tagBasedPoseEstimate3d;
     }
 
     /**
@@ -145,7 +151,7 @@ public class Vision extends SubsystemBase {
      * @return The latest pose estimate (2d)
      */
     public TimestampedPose2d getZedPoseEstimate() {
-        return inputs.zedPoseEstimate;
+        return ZEDinputs.zedPoseEstimate;
     }
 
     /**
@@ -154,13 +160,13 @@ public class Vision extends SubsystemBase {
      * @return The latest pose estimate (3d)
      */
     public TimestampedPose3d getZedPoseEstimate3d() {
-        return inputs.zedBasedPoseEstimate3d;
+        return ZEDinputs.zedBasedPoseEstimate3d;
     }
 
     public Matrix<N3, N1> getZedPoseStd() {
         return VecBuilder.fill(
-                Math.sqrt(inputs.zedBasedPoseCovar.get(0, 0)),
-                Math.sqrt(inputs.zedBasedPoseCovar.get(1, 0)),
-                Math.sqrt(inputs.zedBasedPoseCovar.get(2, 0)));
+                Math.sqrt(ZEDinputs.zedBasedPoseCovar.get(0, 0)),
+                Math.sqrt(ZEDinputs.zedBasedPoseCovar.get(1, 0)),
+                Math.sqrt(ZEDinputs.zedBasedPoseCovar.get(2, 0)));
     }
 }

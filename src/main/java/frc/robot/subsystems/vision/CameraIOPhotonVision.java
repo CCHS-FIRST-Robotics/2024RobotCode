@@ -2,15 +2,17 @@ package frc.robot.subsystems.vision;
 
 import static edu.wpi.first.units.Units.*;
 
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.*;
 import org.photonvision.PhotonPoseEstimator.*;
 import edu.wpi.first.apriltag.AprilTagFields;
 import org.photonvision.targeting.*;
 import edu.wpi.first.math.geometry.*;
+import java.util.*;
 import frc.robot.utils.*;
 
 public class CameraIOPhotonVision implements CameraIO {
-    PhotonCamera camera = new PhotonCamera("limelight");
+    PhotonCamera camera = new PhotonCamera("Camera_Module_v1");
     PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(
             AprilTagFields.kDefaultField.loadAprilTagLayoutField(),
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
@@ -27,11 +29,18 @@ public class CameraIOPhotonVision implements CameraIO {
     @Override
     public void updateInputs(CameraIOInputs inputs) {
         // get estimate
-        EstimatedRobotPose estimate = poseEstimator.update().isPresent() ? poseEstimator.update().get() : null;
+        System.out.println("fucking");
+        Optional<EstimatedRobotPose> estimate = poseEstimator.update();
+        if (!estimate.isPresent()) {
+            System.out.println("here");
+            return;
+        }else{
+            System.out.println("YAYYYYYY");
+        }
 
         // update robot pose
         PhotonPipelineResult cameraResult = camera.getLatestResult();
-        Pose3d estimatedPose3d = estimate.estimatedPose;
+        Pose3d estimatedPose3d = estimate.get().estimatedPose;
         double time = cameraResult.getTimestampSeconds();
         inputs.tagBasedPoseEstimate = new TimestampedPose2d(estimatedPose3d.toPose2d(), time);
         inputs.tagBasedPoseEstimate3d = new TimestampedPose3d(estimatedPose3d, time);
@@ -47,9 +56,12 @@ public class CameraIOPhotonVision implements CameraIO {
                 dist = newDist;
             }
         }
+        System.out.println("fuck1");
 
         // update tag data
         if (closestTag != null) {
+            System.out.println("hihihihihihih");
+            Logger.recordOutput("fuck", closestTag.getFiducialId());
             inputs.primaryTagId = closestTag.getFiducialId();
             inputs.primaryTagX = Meters.of(closestTag.getBestCameraToTarget().getX());
             inputs.primaryTagY = Meters.of(closestTag.getBestCameraToTarget().getY());

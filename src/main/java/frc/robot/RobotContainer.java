@@ -55,7 +55,7 @@ import com.ctre.phoenix6.Orchestra;
 @SuppressWarnings("unused")
 public class RobotContainer {
   private final Drive drive;
-  private final Vision camera;
+  private final Vision vision;
   private final PoseEstimator poseEstimator;
 
   private final Arm arm;
@@ -82,7 +82,7 @@ public class RobotContainer {
             new ModuleIOSparkMax(1),
             new ModuleIOSparkMax(2),
             new ModuleIOSparkMax(3));
-        camera = new Vision(new CameraIOZED());
+            vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
         arm = new Arm(
             new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID,
                 Constants.ARM_CANCODER_ID));
@@ -101,7 +101,7 @@ public class RobotContainer {
             new ModuleIOSim(),
             new ModuleIOSim(),
             new ModuleIOSim());
-        camera = new Vision(new CameraIOZED());
+        vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
         arm = new Arm(new ArmIOSim());
         handoff = new Handoff(new HandoffIOSim());
         intake = new Intake(new IntakeIOSim()); //////// change
@@ -115,7 +115,7 @@ public class RobotContainer {
             new ModuleIOSparkMax(1),
             new ModuleIOSparkMax(2),
             new ModuleIOSparkMax(3));
-        camera = new Vision(new CameraIOZED());
+        vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
         arm = new Arm(
             new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID,
                 Constants.ARM_CANCODER_ID));
@@ -137,7 +137,7 @@ public class RobotContainer {
             new Rotation2d()));
 
     drive.setPoseEstimator(poseEstimator);
-    camera.setPoseEstimator(poseEstimator);
+    vision.setPoseEstimator(poseEstimator);
 
     handoff.addToOrchestra(jukebox, 0);
     shooter.addToOrchestra(jukebox, 1);
