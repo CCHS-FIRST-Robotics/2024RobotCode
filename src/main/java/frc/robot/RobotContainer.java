@@ -208,7 +208,7 @@ public class RobotContainer {
     //     new EventMarkerBuilder(AutoPathConstants.blueThree2CLSS, drive, intake, handoff,shooter, arm).getCommandSequence()
     // );
     controller1.x().onTrue(
-        new EventMarkerBuilder(AutoPathConstants.fourNoteWing, drive, intake, handoff,shooter, arm).getCommandSequence()
+        new EventMarkerBuilder(AutoPathConstants.fourC231, drive, intake, handoff, shooter, arm).getCommandSequence()
     );
 
         /*
@@ -484,7 +484,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new EventMarkerBuilder(AutoPathConstants.blueThree2CLSS, drive, intake, handoff, shooter, arm)
+        return new EventMarkerBuilder(AutoPathConstants.fourC231, drive, intake, handoff, shooter, arm)
                 .getCommandSequence();
         // Command command = new InstantCommand(() ->
         // shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT,

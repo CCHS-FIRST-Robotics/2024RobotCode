@@ -115,61 +115,56 @@ public final class Constants {
         public static final Map<Pair<Double, Constants.EventCommand>, ArrayList<String>> eventMarkerMap = new HashMap<>();
 
         // file names for paths
-        public static final String TWO_NOTE_LEFT = "TwoNoteLeftSS.1";
-        public static final String TWO_NOTE_CENTER = "TwoNoteCenter.1";
-        public static final String TWO_NOTE_RIGHT = "TwoNoteRightSS.1";
+        public static final String TWO_NOTE_A1 = "2A1.1";
+        public static final String TWO_NOTE_C2 = "2C2.1";
+        public static final String TWO_NOTE_S3 = "2S3.1";
+        public static final String TWO_NOTE_S8 = "2S8.1";
 
-        public static final String THREE_NOTE_WRR1 = "ThreeNoteRightRSS.1";
-        public static final String THREE_NOTE_WRR2 = "ThreeNoteRightRSS.2";
-        public static final String THREE_NOTE_WRC1 = "ThreeNoteRightCSS.1";
-        public static final String THREE_NOTE_WRC2 = "ThreeNoteRightCSS.2";
-        public static final String THREE_NOTE_WLL1 = "ThreeNoteLeftLSS.1";
-        public static final String THREE_NOTE_WLL2 = "ThreeNoteLeftLSS.2";
-        public static final String THREE_NOTE_WLC1 = "ThreeNoteLeftCSS.1";
-        public static final String THREE_NOTE_WLC2 = "ThreeNoteLeftCSS.2";
+        public static final String THREE_NOTE_C21_1 = "3C21.1";
+        public static final String THREE_NOTE_C21_2 = "3C21.2";
+        
+        public static final String THREE_NOTE_C23_1 = "3C23.1";
+        public static final String THREE_NOTE_C23_2 = "3C23.2";
 
-        public static final String FOUR_NOTE_WING1 = "FourNoteWing.1";
-        public static final String FOUR_NOTE_WING2 = "FourNoteWing.2";
-        public static final String FOUR_NOTE_WING3 = "FourNoteWing.3";
-        public static final String FOUR_NOTE_L1 = "FourNoteLeftSS.1";
-        public static final String FOUR_NOTE_L2 = "FourNoteLeftSS.2";
-        public static final String FOUR_NOTE_L3 = "FourNoteLeftSS.3";
+        public static final String THREE_NOTE_A14_1 = "3A14.1";
+        public static final String THREE_NOTE_A14_2 = "3A14.2";
 
-        public static final String TESTING_RED1 = "TestingSS.1";
+        public static final String THREE_NOTE_S38_1 = "3S38.1";
+        public static final String THREE_NOTE_S38_2 = "3S38.2";
 
-        public static final String TWOCL = "2CL.1";
+        public static final String THREE_NOTE_C25_1 = "3C25.1";
+        public static final String THREE_NOTE_C25_2 = "3C25.2";
 
-        public static final String B_THREE_LCLSS1 = "BlueThreeLCLSS.1";
-        public static final String B_THREE_LCLSS2 = "BlueThreeLCLSS.2";
+        public static final String THREE_NOTE_S87_1 = "3S87.1";
+        public static final String THREE_NOTE_S87_2 = "3S87.2";
 
-        public static final String B_THREE_RCLSS1 = "BlueThreeRCLSS.1";
-        public static final String B_THREE_RCLSS2 = "BlueThreeRCLSS.2";
+        public static final String FOUR_NOTE_C231_1 = "4C231.1";
+        public static final String FOUR_NOTE_C231_2 = "4C231.2";
+        public static final String FOUR_NOTE_C231_3 = "4C231.3";
 
-        public static final String B_THREE_2CL1 = "BlueThreeNoteCLSS.1";
-        public static final String B_THREE_2CL2 = "BlueThreeNoteCLSS.2";
+        public static final String FOUR_NOTE_C214_1 = "4C214.1";
+        public static final String FOUR_NOTE_C214_2 = "4C214.2";
+        public static final String FOUR_NOTE_C214_3 = "4C214.3";
 
-        public static final String R_THREE_CLSS1 = "RedThreeNoteCLSS.1";
-        public static final String R_THREE_CLSS2 = "RedThreeNoteCLSS.2";
+        public static final String FIVE_NOTE_C3214_1 = "5C3214.1";
+        public static final String FIVE_NOTE_C3214_2 = "5C3214.2";
+        public static final String FIVE_NOTE_C3214_3 = "5C3214.3";
+        public static final String FIVE_NOTE_C3214_4 = "5C3214.4";
 
-        public static final ArrayList<String> twoNoteLeft = new ArrayList<String>();
-        public static final ArrayList<String> twoNoteRight = new ArrayList<String>();
-        public static final ArrayList<String> twoNoteCenter = new ArrayList<String>();
-        public static final ArrayList<String> threeNoteWRR = new ArrayList<String>();
-        public static final ArrayList<String> threeNoteWRC = new ArrayList<String>();
-        public static final ArrayList<String> threeNoteWLL = new ArrayList<String>();
-        public static final ArrayList<String> threeNoteWLC = new ArrayList<String>();
-        public static final ArrayList<String> fourNoteWing = new ArrayList<String>();
-        public static final ArrayList<String> fourNoteLeft = new ArrayList<String>();
-
-        public static final ArrayList<String> blueThreeLCLSS = new ArrayList<String>();
-        public static final ArrayList<String> blueThreeRCLSS = new ArrayList<String>();
-        public static final ArrayList<String> blueThree2CLSS = new ArrayList<String>();
-        public static final ArrayList<String> redThreeCLSS = new ArrayList<String>();
-
-        public static final ArrayList<String> twoCLpath = new ArrayList<String>();
-
-        public static final ArrayList<String> testingRed = new ArrayList<String>();
-
+        // array lists for paths
+        public static final ArrayList<String> twoC2 = new ArrayList<String>();
+        public static final ArrayList<String> twoA1 = new ArrayList<String>();
+        public static final ArrayList<String> twoS3 = new ArrayList<String>();
+        public static final ArrayList<String> twoS8 = new ArrayList<String>();
+        public static final ArrayList<String> threeC21 = new ArrayList<String>();
+        public static final ArrayList<String> threeC23 = new ArrayList<String>();
+        public static final ArrayList<String> threeA14 = new ArrayList<String>();
+        public static final ArrayList<String> threeS38 = new ArrayList<String>();
+        public static final ArrayList<String> threeC25 = new ArrayList<String>();
+        public static final ArrayList<String> threeS87 = new ArrayList<String>();
+        public static final ArrayList<String> fourC231 = new ArrayList<String>();
+        public static final ArrayList<String> fourC214 = new ArrayList<String>();
+        public static final ArrayList<String> fiveC3214 = new ArrayList<String>();
 
         public static final Measure<Voltage> INTAKE_VOLTS = Volts.of(4);
         public static final Measure<Voltage> HANDOFF_IN_VOLTS = Volts.of(5);
@@ -186,45 +181,46 @@ public final class Constants {
         public static final Measure<Velocity<Angle>> SHOOT_SPEED_RIGHT = RotationsPerSecond.of(95); // idk
 
         static {
-            twoNoteLeft.add(TWO_NOTE_LEFT);
-            twoNoteCenter.add(TWO_NOTE_CENTER);
-            twoNoteRight.add(TWO_NOTE_RIGHT);
+            twoA1.add(TWO_NOTE_A1);
+            twoC2.add(TWO_NOTE_C2);
+            twoS3.add(TWO_NOTE_S3);
+            twoS8.add(TWO_NOTE_S8);
 
-            threeNoteWRR.add(THREE_NOTE_WRR1);
-            threeNoteWRR.add(THREE_NOTE_WRR2);
+            threeC21.add(THREE_NOTE_C21_1);
+            threeC21.add(THREE_NOTE_C21_2);
+            
+            threeC23.add(THREE_NOTE_C23_1);
+            threeC23.add(THREE_NOTE_C23_2);
+            
+            threeA14.add(THREE_NOTE_A14_1);
+            threeA14.add(THREE_NOTE_A14_2);
+            
+            threeS38.add(THREE_NOTE_S38_1);
+            threeS38.add(THREE_NOTE_S38_2);
+            
+            threeC25.add(THREE_NOTE_C25_1);
+            threeC25.add(THREE_NOTE_C25_2);
 
-            threeNoteWRC.add(THREE_NOTE_WRC1);
-            threeNoteWRC.add(THREE_NOTE_WRC2);
+            threeS87.add(THREE_NOTE_S87_1);
+            threeS87.add(THREE_NOTE_S87_2);
 
-            threeNoteWLL.add(THREE_NOTE_WLL1);
-            threeNoteWLL.add(THREE_NOTE_WLL2);
-
-            threeNoteWLC.add(THREE_NOTE_WLC1);
-            threeNoteWLC.add(THREE_NOTE_WLC2);
-
-            fourNoteLeft.add(FOUR_NOTE_L1);
-            fourNoteLeft.add(FOUR_NOTE_L2);
-            fourNoteLeft.add(FOUR_NOTE_L3);
-
-            fourNoteWing.add(FOUR_NOTE_WING1);
-            fourNoteWing.add(FOUR_NOTE_WING2);
-            fourNoteWing.add(FOUR_NOTE_WING3);
-
-            twoCLpath.add(TWOCL);
-
-            testingRed.add(TESTING_RED1);
-
-            blueThree2CLSS.add(B_THREE_2CL1);
-            blueThree2CLSS.add(B_THREE_2CL2);
-
-            blueThreeLCLSS.add(B_THREE_LCLSS1);
-            blueThreeLCLSS.add(B_THREE_LCLSS2);
-
-            blueThreeRCLSS.add(B_THREE_RCLSS1);
-            blueThreeRCLSS.add(B_THREE_RCLSS2);
-
-            redThreeCLSS.add(R_THREE_CLSS1);
-            redThreeCLSS.add(R_THREE_CLSS2);
+            fourC231.add(FOUR_NOTE_C231_1);
+            fourC231.add(FOUR_NOTE_C231_2);
+            fourC231.add(FOUR_NOTE_C231_3);
+            
+            fourC214.add(FOUR_NOTE_C214_1);
+            fourC214.add(FOUR_NOTE_C214_2);
+            fourC214.add(FOUR_NOTE_C214_3);
+            
+            fiveC3214.add(FIVE_NOTE_C3214_1);
+            fiveC3214.add(FIVE_NOTE_C3214_2);
+            fiveC3214.add(FIVE_NOTE_C3214_3);
+            fiveC3214.add(FIVE_NOTE_C3214_4);
         }
+
+        /*
+         * AUTO PATHS
+         * starting pose: Amp(A), Center(C), Source(S)
+         */
     }
 }
