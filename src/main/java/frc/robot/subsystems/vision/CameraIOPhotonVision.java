@@ -54,7 +54,8 @@ public class CameraIOPhotonVision implements CameraIO {
             inputs.primaryTagY = Meters.of(closestTag.getBestCameraToTarget().getY());
             inputs.primaryTagZ = Meters.of(closestTag.getBestCameraToTarget().getZ());
             inputs.primaryTagPitch = Radians.of(closestTag.getPitch());
-
+            inputs.primaryTagHeading = Radians.of(closestTag.getYaw());
+            inputs.primaryTagPitch = Radians.of(closestTag.getSkew());
             closestTag.getBestCameraToTarget().getX();
         }
         inputs.numTags = inputs.tags.size();
