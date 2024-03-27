@@ -111,30 +111,30 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
      * @param visionPoseEstimate The pose estimate from vision
      * @param timestamp          The timestamp of the vision update
      */
-    // public void addVisionData(Pose3d visionPoseEstimate, double timestamp) {
-    // latestTimestamp = timestamp;
+    public void addVisionData(Pose3d visionPoseEstimate, double timestamp) {
+        latestTimestamp = timestamp;
 
-    // // This assumes that the vision pose estimate is in the same frame as the
-    // gyro
-    // // Also, kinda assumes that the pose estimate rotation is the same as the
-    // gyro
-    // // rotation
-    // // (which it should be when there are just these two sources of data and the
-    // // other is overriding this one)
-    // Rotation2d gyroAngle = poseEstimate.getRotation();
+        // This assumes that the vision pose estimate is in the same frame as the
+        // gyro
+        // Also, kinda assumes that the pose estimate rotation is the same as the
+        // gyro
+        // rotation
+        // (which it should be when there are just these two sources of data and the
+        // other is overriding this one)
+        Rotation2d gyroAngle = poseEstimate.getRotation();
 
-    // // Filter x, y values
-    // double x = visionXFilter.calculate(visionPoseEstimate.getX());
-    // double y = visionYFilter.calculate(visionPoseEstimate.getY());
+        // Filter x, y values
+        double x = visionXFilter.calculate(visionPoseEstimate.getX());
+        double y = visionYFilter.calculate(visionPoseEstimate.getY());
 
-    // poseEstimate = new Pose2d(new Translation2d(x, y), gyroAngle);
-    // poseEstimate3d = new Pose3d(
-    // visionPoseEstimate.getTranslation(),
-    // new Rotation3d(
-    // visionPoseEstimate.getRotation().getX(),
-    // visionPoseEstimate.getRotation().getY(),
-    // gyroAngle.getRadians()));
-    // }
+        poseEstimate = new Pose2d(new Translation2d(x, y), gyroAngle);
+        poseEstimate3d = new Pose3d(
+                visionPoseEstimate.getTranslation(),
+                new Rotation3d(
+                        visionPoseEstimate.getRotation().getX(),
+                        visionPoseEstimate.getRotation().getY(),
+                        gyroAngle.getRadians()));
+    }
 
     @Override
     public void addVisionMeasurement(Pose2d poseEstimate, double timestamp) {
