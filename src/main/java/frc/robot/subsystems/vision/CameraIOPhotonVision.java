@@ -16,7 +16,10 @@ public class CameraIOPhotonVision implements CameraIO {
             AprilTagFields.kDefaultField.loadAprilTagLayoutField(),
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             camera,
-            new Transform3d() // ! most likely wrong bc camera isn't at the middle of the robot
+            new Transform3d(
+                new Translation3d(.15, .25, .6),
+                new Rotation3d(0, Radians.convertFrom(30, Degrees), 0)
+            ) // ! most likely wrong bc camera isn't at the middle of the robot
     );
 
     public CameraIOPhotonVision() {
@@ -27,6 +30,7 @@ public class CameraIOPhotonVision implements CameraIO {
 
     @Override
     public void updateInputs(CameraIOInputs inputs) {
+        // System.out.println("this shoukd be working");
         // get estimate
         Optional<EstimatedRobotPose> estimate = poseEstimator.update();
         if (!estimate.isPresent()) {
@@ -41,6 +45,7 @@ public class CameraIOPhotonVision implements CameraIO {
         inputs.tagBasedPoseEstimate3d = new TimestampedPose3d(estimatedPose3d, time);
 
         // get closest tag
+        inputs.tags.clear();
         PhotonTrackedTarget closestTag = null;
         double dist = 0.0;
         for (PhotonTrackedTarget smart : cameraResult.getTargets()) {
@@ -61,6 +66,7 @@ public class CameraIOPhotonVision implements CameraIO {
             inputs.primaryTagPitch = Radians.of(closestTag.getPitch());
             inputs.primaryTagHeading = Radians.of(closestTag.getYaw());
             inputs.primaryTagRoll = Radians.of(closestTag.getSkew());
+            inputs.primaryTagAmbiguity = closestTag.getPoseAmbiguity();
             // closestTag.getBestCameraToTarget().getX();
         }
         inputs.numTags = inputs.tags.size();

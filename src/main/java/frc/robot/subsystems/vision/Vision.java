@@ -62,10 +62,10 @@ public class Vision extends SubsystemBase {
             // inputs.primaryTagY,
             // Math.hypot(inputs.primaryTagX, inputs.primaryTagY)
             // );
-            if (i % 50 == 0)
+            if (i % 100 == 0)
                 System.err.println("pose added");
-            Logger.recordOutput("testRecordedPose", pose.pose);
-            Logger.recordOutput("testRecordedTimestamp", pose.timestamp);
+            // Logger.recordOutput("testRecordedPose", pose.pose);
+            // Logger.recordOutput("testRecordedTimestamp", pose.timestamp);
             // poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp / 1000000,
             // poseEstimator
             // .getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
@@ -75,6 +75,20 @@ public class Vision extends SubsystemBase {
             // TimestampedPose2d pose = getZedPoseEstimate();
             // poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp,
             // getZedPoseStd());
+        }
+
+        if (PVinputs.tagBasedPoseEstimate.pose.getX() > 0 && PVinputs.primaryTagAmbiguity < .2) {
+            TimestampedPose2d pose = PVinputs.tagBasedPoseEstimate;
+
+            // if (i % 100 == 0)
+            //     System.err.println("pose added");
+            Logger.recordOutput("testRecordedPosePV", pose.pose);
+            Logger.recordOutput("testRecordedTimestampPV", pose.timestamp);
+            poseEstimator.addVisionMeasurement(
+                pose.pose, 
+                pose.timestamp,
+                poseEstimator.getDefaultPVMeasurementStdDevs().times(getTransformToClosestTagPV().getTranslation().getNorm())
+            );
         }
 
         i++;
@@ -92,9 +106,19 @@ public class Vision extends SubsystemBase {
      * 
      * @return The closest tag's transform relative to the robot
      */
-    public Transform2d getTransformToClosestTag() {
+    public Transform2d getTransformToClosestTagZED() {
         return new Transform2d(new Translation2d(ZEDinputs.primaryTagX, ZEDinputs.primaryTagY),
                 new Rotation2d(ZEDinputs.primaryTagHeading));
+    }
+
+    /**
+     * Returns the closest tag's transform relative to the robot
+     * 
+     * @return The closest tag's transform relative to the robot
+     */
+    public Transform2d getTransformToClosestTagPV() {
+        return new Transform2d(new Translation2d(PVinputs.primaryTagX, PVinputs.primaryTagY),
+                new Rotation2d(PVinputs.primaryTagHeading));
     }
 
     /**

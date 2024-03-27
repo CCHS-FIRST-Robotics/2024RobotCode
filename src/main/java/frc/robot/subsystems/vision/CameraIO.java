@@ -21,6 +21,7 @@ public interface CameraIO {
         public Measure<Angle> primaryTagRoll = Radians.of(-1);
         public Measure<Angle> primaryTagPitch = Radians.of(-1);
         public Measure<Angle> primaryTagHeading = Radians.of(-1);
+        public double primaryTagAmbiguity = 0;
 
         // values for all tags found by the camera
         int numTags = 0;
@@ -50,6 +51,7 @@ public interface CameraIO {
             table.put("primaryTag/Roll", primaryTagRoll);
             table.put("primaryTag/Pitch", primaryTagPitch);
             table.put("primaryTag/Heading", primaryTagHeading);
+            table.put("primaryTag/Ambiguity", primaryTagAmbiguity);
 
             table.put("numTags", tags.size());
             for (int i = 0; i < tags.size(); i++) {
@@ -78,6 +80,7 @@ public interface CameraIO {
             primaryTagRoll = table.get("primaryTag/Roll", primaryTagRoll);
             primaryTagPitch = table.get("primaryTag/Pitch", primaryTagPitch);
             primaryTagHeading = table.get("primaryTag/Heading", primaryTagHeading);
+            primaryTagAmbiguity = table.get("primaryTag/Ambiguity", primaryTagAmbiguity);
 
             numTags = table.get("numTags", numTags);
             for (int i = 0; i < numTags; i++) {

@@ -27,6 +27,7 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
     // static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(10, 10,
     // 10); // for testing (only use vision, essentially)
     static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.003, 0.003, 0.0002);
+    
     SwerveModulePosition[] prevModulePositions = new SwerveModulePosition[4];
 
     /*
@@ -38,7 +39,9 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
      * .045, .16, .1 at 3m
      * Linear fit with distance -> slope: 0.01, 0.05, .1
      */
-    static final Matrix<N3, N1> defaultVisionMeasurementStdDevs = VecBuilder.fill(.025, .15, 1);
+    static final Matrix<N3, N1> defaultZEDMeasurementStdDevs = VecBuilder.fill(.025, .15, 1);
+
+    static final Matrix<N3, N1> defaultPVMeasurementStdDevs = VecBuilder.fill(.05, .2, 2);
 
     /**
      * Constructs a new PoseEstimator object
@@ -48,7 +51,7 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
             SwerveModulePosition[] modulePositions,
             Pose2d initialPoseMeters) {
         super(kinematics, gyroAngle, modulePositions, initialPoseMeters, defaultStateStdDevs,
-                defaultVisionMeasurementStdDevs);
+                defaultPVMeasurementStdDevs);
     }
 
     /**
@@ -82,8 +85,12 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
         return defaultStateStdDevs;
     }
 
-    public Matrix<N3, N1> getDefaultVisionMeasurementStdDevs() {
-        return defaultVisionMeasurementStdDevs;
+    public Matrix<N3, N1> getDefaultZEDMeasurementStdDevs() {
+        return defaultZEDMeasurementStdDevs;
+    }
+
+    public Matrix<N3, N1> getDefaultPVMeasurementStdDevs() {
+        return defaultPVMeasurementStdDevs;
     }
 
     public SwerveModulePosition[] getPrevModulePositions() {
