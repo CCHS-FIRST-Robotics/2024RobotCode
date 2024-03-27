@@ -58,7 +58,7 @@ import com.ctre.phoenix6.Orchestra;
 @SuppressWarnings("unused")
 public class RobotContainer {
     private final Drive drive;
-    private final Vision camera;
+    private final Vision vision;
     private final PoseEstimator poseEstimator;
 
     private final Arm arm;
@@ -85,7 +85,7 @@ public class RobotContainer {
                         new ModuleIOSparkMax(1),
                         new ModuleIOSparkMax(2),
                         new ModuleIOSparkMax(3));
-                camera = new Vision(new CameraIOZED());
+                vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
                 arm = new Arm(
                         new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID,
                                 Constants.ARM_CANCODER_ID));
@@ -108,7 +108,7 @@ public class RobotContainer {
                         new ModuleIOSim(),
                         new ModuleIOSim(),
                         new ModuleIOSim());
-                camera = new Vision(new CameraIOZED());
+                vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
                 arm = new Arm(new ArmIOSim());
                 handoff = new Handoff(new HandoffIOSim());
                 intake = new Intake(new IntakeIOSim()); //////// change
@@ -122,7 +122,7 @@ public class RobotContainer {
                         new ModuleIOSparkMax(1),
                         new ModuleIOSparkMax(2),
                         new ModuleIOSparkMax(3));
-                camera = new Vision(new CameraIOZED());
+                vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
                 arm = new Arm(
                         new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID,
                                 Constants.ARM_CANCODER_ID));
@@ -139,18 +139,17 @@ public class RobotContainer {
                 drive.getKinematics(),
                 new Rotation2d(),
                 drive.getModulePositions(),
-                StartPosistions.blueCenter
-                );
+                StartPosistions.blueCenter);
 
         drive.setPoseEstimator(poseEstimator);
-        camera.setPoseEstimator(poseEstimator);
+        vision.setPoseEstimator(poseEstimator);
 
-    // handoff.addToOrchestra(jukebox, 0);
-    // shooter.addToOrchestra(jukebox, 1);
-    // arm.addToOrchestra(jukebox, 3);
+        // handoff.addToOrchestra(jukebox, 0);
+        // shooter.addToOrchestra(jukebox, 1);
+        // arm.addToOrchestra(jukebox, 3);
 
-    // jukebox.loadMusic("music/sandstorm.chrp");
-    // jukebox.play();
+        // jukebox.loadMusic("music/sandstorm.chrp");
+        // jukebox.play();
 
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
 
@@ -207,15 +206,16 @@ public class RobotContainer {
         // ! colin look at this because idk what it's used for
         // Pose3d targetPose = new Pose3d(4, 0, 3, new Rotation3d());
 
-    // Generate a trajectory to a pose when the X button is pressed (and
-    // switch
-    // drive to position control)
-    // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
-    //     new EventMarkerBuilder(AutoPathConstants.blueThree2CLSS, drive, intake, handoff,shooter, arm).getCommandSequence()
-    // );
-    controller1.x().onTrue(
-        new EventMarkerBuilder(AutoPathConstants.fourNoteWing, drive, intake, handoff,shooter, arm).getCommandSequence()
-    );
+        // Generate a trajectory to a pose when the X button is pressed (and
+        // switch
+        // drive to position control)
+        // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
+        // new EventMarkerBuilder(AutoPathConstants.blueThree2CLSS, drive, intake,
+        // handoff,shooter, arm).getCommandSequence()
+        // );
+        controller1.x().onTrue(
+                new EventMarkerBuilder(AutoPathConstants.fourNoteWing, drive, intake, handoff, shooter, arm)
+                        .getCommandSequence());
 
         /*
          * Controller 1:
@@ -224,46 +224,45 @@ public class RobotContainer {
          * - Shoot (amp and speaker)
          */
 
-    // drive with joysticks
-    drive.setDefaultCommand(
-        new DriveWithJoysticks(
-            drive,
-            () -> -controller1.getLeftX(),
-            () -> -controller1.getLeftY(),
-            () -> -.7 * controller1.getRightX(),
-            () -> {
-              return 1.0;
-            },
-            // () -> {return new Rotation2d();},
-            () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-            false,
-            true
-        )
-    );
+        // drive with joysticks
+        drive.setDefaultCommand(
+                new DriveWithJoysticks(
+                        drive,
+                        () -> -controller1.getLeftX(),
+                        () -> -controller1.getLeftY(),
+                        () -> -.7 * controller1.getRightX(),
+                        () -> {
+                            return 1.0;
+                        },
+                        // () -> {return new Rotation2d();},
+                        () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
+                        false,
+                        true));
 
     controller1.leftBumper().onTrue(
             new InstantCommand(() -> switchDriveThing(), drive));
 
-    controller1.rightBumper().onTrue(
-        new InstantCommand(() -> switchDriveThing2(), drive)
-    );
+        controller1.rightBumper().onTrue(
+                new InstantCommand(() -> switchDriveThing2(), drive));
 
-    // controller1.a().onTrue(
-    //     arm.sysIdFull()
-    // );
+        // controller1.a().onTrue(
+        // arm.sysIdFull()
+        // );
 
-    // controller1.a().onTrue(
-    //     handoff.getHandoffCommand(Volts.of(5))
-    // );
+        // controller1.a().onTrue(
+        // handoff.getHandoffCommand(Volts.of(5))
+        // );
 
-    // controller1.x().onTrue(
-    //     new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED))
-    // );
+        // controller1.x().onTrue(
+        // new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED,
+        // SHOOTER_RIGHT_SPEED))
+        // );
 
-    // controller1.y().onTrue(
-    //     handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
-    //     .alongWith(shooter.getShootNoteCommand(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED))
-    // );
+        // controller1.y().onTrue(
+        // handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
+        // .alongWith(shooter.getShootNoteCommand(SHOOTER_LEFT_SPEED,
+        // SHOOTER_RIGHT_SPEED))
+        // );
 
         // break when left trigger is held
         // controller1.leftTrigger().whileTrue(
@@ -360,20 +359,18 @@ public class RobotContainer {
             .alongWith(arm.moveArm(ArmPosition.SPEAKER, drive::getPose))
     );
 
-    // prime shooter (speaker - out from sub)
-    controller2.povUp().and(() -> !shooter.upToSpeed()).onTrue(
-        // prime shooter
-        new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-            // move arm
-            .alongWith(arm.moveArm(ArmPosition.CLOSE_SUB, drive::getPose))
-    );
-    // prime shooter (speaker - stage)
-    controller2.povLeft().and(() -> !shooter.upToSpeed()).onTrue(
-        // prime shooter
-        new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-            // move arm
-            .alongWith(arm.moveArm(ArmPosition.STAGE, drive::getPose))
-    );
+        // prime shooter (speaker - out from sub)
+        controller2.povUp().and(() -> !shooter.upToSpeed()).onTrue(
+                // prime shooter
+                new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+                        // move arm
+                        .alongWith(arm.moveArm(ArmPosition.CLOSE_SUB, drive::getPose)));
+        // prime shooter (speaker - stage)
+        controller2.povLeft().and(() -> !shooter.upToSpeed()).onTrue(
+                // prime shooter
+                new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+                        // move arm
+                        .alongWith(arm.moveArm(ArmPosition.STAGE, drive::getPose)));
 
     // continuous base intake (intake stops when note is detected in handoff)
     controller2.a().onTrue(
@@ -413,12 +410,11 @@ public class RobotContainer {
         .alongWith(new StartEndCommand(() -> shooter.start(RotationsPerSecond.of(10)), shooter::stop, shooter))
     );
 
-    controller2.povDown().onTrue(
-        // start handoff
-        handoff.getHandoffCommand(Volts.of(4))
-            // move arm down
-            .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
-    );
+        controller2.povDown().onTrue(
+                // start handoff
+                handoff.getHandoffCommand(Volts.of(4))
+                        // move arm down
+                        .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose)));
 
         // set arm pos
         // controller1.leftTrigger().onTrue(
