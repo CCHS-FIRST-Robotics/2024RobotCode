@@ -30,7 +30,6 @@ public class CameraIOPhotonVision implements CameraIO {
         // get estimate
         Optional<EstimatedRobotPose> estimate = poseEstimator.update();
         if (!estimate.isPresent()) {
-            System.out.println("here");
             return;
         }
 
