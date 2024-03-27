@@ -79,7 +79,7 @@ public class Vision extends SubsystemBase {
 
         i++;
         if (i % 20 == 0) {
-            System.out.println();
+            // System.out.println();
             // System.out.print("Tag Distance: ");
             // System.out.println(inputs.primaryTagX);
             // System.out.print("Pose Estimate Distance: ");
