@@ -23,8 +23,8 @@ public class Vision extends SubsystemBase {
     /**
      * Constructs a new Vision object
      * 
-     * @param zed            The camera IO object
-     * @param poseEstimator The pose estimator
+     * @param zed          The zed object
+     * @param photonVision The PV object
      */
     public Vision(CameraIO zed, CameraIO photonVision) {
         this.zed = zed;
