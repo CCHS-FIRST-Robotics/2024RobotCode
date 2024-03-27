@@ -31,7 +31,7 @@ public class FollowAprilTag extends Command {
                 addRequirements(drive, vision);
                 this.drive = drive;
                 this.vision = vision;
-                this.tagTransformSuppier = () -> vision.getTransformToClosestTag();
+                this.tagTransformSuppier = () -> vision.getTransformToClosestTagPV();
                 linearConstraints = new TrapezoidProfile.Constraints(drive.getMaxLinearSpeed().in(MetersPerSecond),
                                 drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond));
                 angularConstraints = new TrapezoidProfile.Constraints(drive.getMaxAngularSpeed().in(RadiansPerSecond),

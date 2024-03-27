@@ -1,111 +1,74 @@
-// package frc.robot.subsystems.vision;
+package frc.robot.subsystems.vision;
 
-// import java.util.Optional;
+import static edu.wpi.first.units.Units.*;
 
-// import org.photonvision.EstimatedRobotPose;
-// import org.photonvision.PhotonCamera;
-// import org.photonvision.PhotonPoseEstimator;
-// import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-// import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.*;
+import org.photonvision.PhotonPoseEstimator.*;
+import edu.wpi.first.apriltag.AprilTagFields;
+import org.photonvision.targeting.*;
+import edu.wpi.first.math.geometry.*;
+import java.util.*;
+import frc.robot.utils.*;
 
-// import edu.wpi.first.apriltag.AprilTagFields;
-// import edu.wpi.first.math.Matrix;
-// import edu.wpi.first.math.VecBuilder;
-// import edu.wpi.first.math.geometry.Pose2d;
-// import edu.wpi.first.math.geometry.Transform3d;
-// import edu.wpi.first.math.numbers.N1;
-// import edu.wpi.first.math.numbers.N3;
-// import frc.robot.utils.TimestampedPose2d;
+public class CameraIOPhotonVision implements CameraIO {
+    PhotonCamera camera = new PhotonCamera("Camera_Module_v1");
+    PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(
+            AprilTagFields.kDefaultField.loadAprilTagLayoutField(),
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+            camera,
+            new Transform3d(
+                new Translation3d(.9, .25, .6),
+                new Rotation3d(0, Radians.convertFrom(20, Degrees), 0)
+            ) // ! most likely wrong bc camera isn't at the middle of the robot
+    );
 
-// public class CameraIOPhotonVision implements CameraIO {
-    
-//     // Change this to match the name of your camera
-//     PhotonCamera camera = new PhotonCamera("limelight");
-//     PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(
-//         AprilTagFields.kDefaultField.loadAprilTagLayoutField(),
-//         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-//         camera,
-//         new Transform3d()
-//     );
+    public CameraIOPhotonVision() {
+        System.out.println("[Init] Creating CameraIOPhotonVision");
 
-//     private double lastEstTimestamp = 0;
+        poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+    }
 
-//     /**
-//      * Constructs a new CameraIOPhotonVision object
-//      */
-//     public CameraIOPhotonVision() {
-//         System.out.println("[Init] Creating CameraIOPhotonVision");
+    @Override
+    public void updateInputs(CameraIOInputs inputs) {
+        // System.out.println("this shoukd be working");
+        // get estimate
+        Optional<EstimatedRobotPose> estimate = poseEstimator.update();
+        if (!estimate.isPresent()) {
+            return;
+        }
 
-//         photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-//     }
+        // update robot pose
+        PhotonPipelineResult cameraResult = camera.getLatestResult();
+        Pose3d estimatedPose3d = estimate.get().estimatedPose;
+        double time = cameraResult.getTimestampSeconds();
+        inputs.tagBasedPoseEstimate = new TimestampedPose2d(estimatedPose3d.toPose2d(), time);
+        inputs.tagBasedPoseEstimate3d = new TimestampedPose3d(estimatedPose3d, time);
 
-//     @Override
-//     public void updateInputs(CameraIOInputs inputs) {
-//         var visionEst = getEstimatedGlobalPose();
-//         visionEst.ifPresent(
-//                 est -> {
-//                     var estPose = est.estimatedPose.toPose2d();
-//                     // Change our trust in the measurement based on the tags we can see
-//                     var estStdDevs = getEstimationStdDevs(estPose);
+        // get closest tag
+        inputs.tags.clear();
+        PhotonTrackedTarget closestTag = null;
+        double dist = 0.0;
+        for (PhotonTrackedTarget smart : cameraResult.getTargets()) {
+            inputs.tags.add(new AprilTag(smart.getFiducialId(), smart.getBestCameraToTarget()));
+            double newDist = smart.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
+            if (closestTag == null || dist > newDist) {
+                closestTag = smart;
+                dist = newDist;
+            }
+        }
 
-//                     drivetrain.addVisionMeasurement(
-//                             est.estimatedPose.toPose2d(), , estStdDevs);
-//                 });
-
-//         TimestampedPose2d pose = new TimestampedPose2d(est.estimatedPose.toPose2d(), est.timestampSeconds)
-//     }
-
-
-//     public PhotonPipelineResult getLatestResult() {
-//         return camera.getLatestResult();
-//     }
-
-
-//     /**
-//      * The latest estimated robot pose on the field from vision data. This may be empty. This should
-//      * only be called once per loop.
-//      *
-//      * @return An {@link EstimatedRobotPose} with an estimated pose, estimate timestamp, and targets
-//      *     used for estimation.
-//      */
-//     public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-//         var visionEst = photonPoseEstimator.update();
-//         double latestTimestamp = camera.getLatestResult().getTimestampSeconds();
-//         boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
-
-//         if (newResult) lastEstTimestamp = latestTimestamp;
-//         return visionEst;
-//     }
-
-//     /**
-//      * The standard deviations of the estimated pose from {@link #getEstimatedGlobalPose()}, for use
-//      * with {@link edu.wpi.first.math.estimator.SwerveDrivePoseEstimator SwerveDrivePoseEstimator}.
-//      * This should only be used when there are targets visible.
-//      *
-//      * @param estimatedPose The estimated pose to guess standard deviations for.
-//      */
-//     public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
-//         var estStdDevs = kSingleTagStdDevs;
-//         var targets = getLatestResult().getTargets();
-//         int numTags = 0;
-//         double avgDist = 0;
-//         for (var tgt : targets) {
-//             var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
-//             if (tagPose.isEmpty()) continue;
-//             numTags++;
-//             avgDist +=
-//                     tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
-//         }
-//         if (numTags == 0) return estStdDevs;
-//         avgDist /= numTags;
-//         // Decrease std devs if multiple targets are visible
-//         if (numTags > 1) estStdDevs = kMultiTagStdDevs;
-//         // Increase std devs based on (average) distance
-//         if (numTags == 1 && avgDist > 4)
-//             estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-//         else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-
-//         return estStdDevs;
-//     }
-
-// }
+        // update tag data
+        if (closestTag != null) {
+            inputs.primaryTagId = closestTag.getFiducialId();
+            inputs.primaryTagX = Meters.of(closestTag.getBestCameraToTarget().getX());
+            inputs.primaryTagY = Meters.of(closestTag.getBestCameraToTarget().getY());
+            inputs.primaryTagZ = Meters.of(closestTag.getBestCameraToTarget().getZ());
+            inputs.primaryTagPitch = Radians.of(closestTag.getPitch());
+            inputs.primaryTagHeading = Radians.of(closestTag.getYaw());
+            inputs.primaryTagRoll = Radians.of(closestTag.getSkew());
+            inputs.primaryTagAmbiguity = closestTag.getPoseAmbiguity();
+            // closestTag.getBestCameraToTarget().getX();
+        }
+        inputs.numTags = inputs.tags.size();
+    }
+}

@@ -6,7 +6,6 @@ import static frc.robot.Constants.SPEAKER_POSE;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
 import frc.robot.Constants.ArmPosition;
 import edu.wpi.first.units.*;
 // import edu.wpi.first.math.MathUtil;
@@ -32,7 +31,6 @@ import com.ctre.phoenix6.SignalLogger;
 public class Arm extends SubsystemBase {
     private final ArmIO io;
     private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
-    @SuppressWarnings({ "unused" })
     private SysIdRoutine sysIdRoutine;
 
     // length and position of the arm in relation to the robot's center
@@ -69,7 +67,8 @@ public class Arm extends SubsystemBase {
                         (state) -> SignalLogger.writeString("SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism(
                         (Measure<Voltage> volts) -> {
-                            // io.setDriveCurrent(Amps.of(7 * Math.cos(getArmAngle().in(Radians)) + volts.in(Volts))); // literal slander
+                            // io.setDriveCurrent(Amps.of(7 * Math.cos(getArmAngle().in(Radians)) +
+                            // volts.in(Volts))); // literal slander
                             io.setDriveCurrent(Amps.of(volts.in(Volts)));
                         },
                         null,
@@ -83,8 +82,8 @@ public class Arm extends SubsystemBase {
         // System.out.println("testingggg");
 
         // trust!
-        // io.setDriveVoltage(Volts.of(.395));
-        // setArmAngle(Degrees.of(23.5));
+        // io.setDriveVoltage(Volts.of(.345));
+        // setArmAngle(Degrees.of(-5));
         // io.setDriveCurrent(Amps.of(8));
     }
 
@@ -104,7 +103,7 @@ public class Arm extends SubsystemBase {
 
     @AutoLogOutput
     public boolean isUnderStage() {
-        return getArmAngle().in(Degrees) < -22;
+        return getArmAngle().in(Degrees) < -21;
     }
 
     public Measure<Angle> getArmAngle() {
@@ -146,7 +145,8 @@ public class Arm extends SubsystemBase {
     public Command moveArm(ArmPosition position, Supplier<Pose2d> robotPose) {
         if (position == ArmPosition.SHOOT) {
             return moveToShoot(robotPose);
-            // return runOnce(() -> setArmAngle(Constants.ARM_POSITIONS.get(ArmPosition.SPEAKER)));
+            // return runOnce(() ->
+            // setArmAngle(Constants.ARM_POSITIONS.get(ArmPosition.SPEAKER)));
         }
 
         Measure<Angle> angle = ARM_POSITIONS.get(position);
@@ -190,16 +190,19 @@ public class Arm extends SubsystemBase {
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         return sysIdRoutine.quasistatic(direction);
     }
-    
+
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return sysIdRoutine.dynamic(direction);
     }
 
     public Command sysIdFull() {
         return (sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(() -> getArmAngle().in(Degrees) > 60))
-            .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(() -> getArmAngle().in(Degrees) < 0))
-            .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(() -> getArmAngle().in(Degrees) > 60))
-            .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(() -> getArmAngle().in(Degrees) < 0))
-            .andThen(new InstantCommand(() -> io.setDriveCurrent(Amps.of(0))));
+                .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse)
+                        .until(() -> getArmAngle().in(Degrees) < 0))
+                .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward)
+                        .until(() -> getArmAngle().in(Degrees) > 60))
+                .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse)
+                        .until(() -> getArmAngle().in(Degrees) < 0))
+                .andThen(new InstantCommand(() -> io.setDriveCurrent(Amps.of(0))));
     }
 }
