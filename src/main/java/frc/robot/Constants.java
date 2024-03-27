@@ -44,22 +44,22 @@ public final class Constants {
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(
             Map.of(
-                    ArmPosition.INTAKE, Degrees.of(-5),
-                    ArmPosition.AMP, Degrees.of(88),
-                    ArmPosition.SPEAKER, Degrees.of(5),
-                    ArmPosition.MAIN, Degrees.of(-23),
-                    ArmPosition.LOWER, Degrees.of(-10),
-                    ArmPosition.STAGE, Degrees.of(27),
-                    ArmPosition.CLOSE_SUB, Degrees.of(14.5)
+                    ArmPosition.INTAKE, Degrees.of(-8),
+                    ArmPosition.AMP, Degrees.of(85),
+                    ArmPosition.SPEAKER, Degrees.of(6),
+                    ArmPosition.MAIN, Degrees.of(-22),
+                    ArmPosition.LOWER, Degrees.of(-15),
+                    ArmPosition.STAGE, Degrees.of(25.5),
+                    ArmPosition.CLOSE_SUB, Degrees.of(18)
             )
     ); // ! TODO: actually make this accurate because it ain't
 
     public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
 
-    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(80);
-    public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(90);
+    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(75);
+    public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(95);
 
-    public static final Measure<Velocity<Angle>> SHOOTER_AMP_SPEED = RotationsPerSecond.of(30);
+    public static final Measure<Velocity<Angle>> SHOOTER_AMP_SPEED = RotationsPerSecond.of(50);
 
     // ports
     public static final int CONTROLLER_PORT_1 = 0;
@@ -86,7 +86,7 @@ public final class Constants {
     };
 
     // TODO: change to tunable numbers
-    public static final double LIENAR_SPEED_EXPONENT = 1.8;
+    public static final double LIENAR_SPEED_EXPONENT = 3.5;
     public static final double ANGULAR_SPEED_EXPONENT = 2;
 
     // private static final Measure SPEAKER_SHOOT_ANGLE = new Measure.
@@ -171,13 +171,13 @@ public final class Constants {
         public static final ArrayList<String> testingRed = new ArrayList<String>();
 
 
-        public static final Measure<Voltage> INTAKE_VOLTS = Volts.of(4);
-        public static final Measure<Voltage> HANDOFF_IN_VOLTS = Volts.of(5);
+        public static final Measure<Voltage> INTAKE_VOLTS = Volts.of(9);
+        public static final Measure<Voltage> HANDOFF_IN_VOLTS = Volts.of(4);
         public static final Measure<Voltage> HANDOFF_OUT_VOLTS = Volts.of(12);
 
         public static final double INIT_MOVEMENTS_TIME = 0.0;
-        public static final double MAX_ARM_MOVE_TIME = 1;
-        public static final double INTAKE_TIME = 1;
+        public static final double MAX_ARM_MOVE_TIME = 1.2;
+        public static final double INTAKE_TIME = 1.5;
         public static final double SHOOT_TIME = 0.5;
 
         public static final Pose2d AUTO_START_POS = new Pose2d(1.3, 5.544, new Rotation2d(0));

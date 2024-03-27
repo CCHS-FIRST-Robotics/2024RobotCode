@@ -83,8 +83,8 @@ public class Arm extends SubsystemBase {
         // System.out.println("testingggg");
 
         // trust!
-        // io.setDriveVoltage(Volts.of(.395));
-        // setArmAngle(Degrees.of(23.5));
+        // io.setDriveVoltage(Volts.of(.345));
+        setArmAngle(Degrees.of(-5));
         // io.setDriveCurrent(Amps.of(8));
     }
 
@@ -104,7 +104,7 @@ public class Arm extends SubsystemBase {
 
     @AutoLogOutput
     public boolean isUnderStage() {
-        return getArmAngle().in(Degrees) < -22;
+        return getArmAngle().in(Degrees) < -21;
     }
 
     public Measure<Angle> getArmAngle() {

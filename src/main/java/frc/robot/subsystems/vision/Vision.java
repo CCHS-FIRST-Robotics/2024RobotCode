@@ -91,6 +91,10 @@ public class Vision extends SubsystemBase {
                 new Rotation2d(inputs.primaryTagHeading));
     }
 
+    public AprilTag getClosestTag() {
+        return new AprilTag(inputs.primaryTagId, getTransformToClosestTag());
+    }
+
     /**
      * Returns the tag with the specified id
      * If there are multiple tags with the same id, the closest one is returned

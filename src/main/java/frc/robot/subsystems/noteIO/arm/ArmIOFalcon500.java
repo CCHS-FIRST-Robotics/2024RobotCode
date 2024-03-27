@@ -51,15 +51,15 @@ public class ArmIOFalcon500 implements ArmIO {
     StatusSignal<Boolean> faultRemoteSensorOutOfSync;
     StatusSignal<Boolean> stickyFaultRemoteSensorOutOfSync;
 
-    private static final double gearRatio = 100 * 26d / 14d; // 100 * 26d / 14d
+    private static final double gearRatio = 100 * 48d / 14d; // 100 * 26d / 14d
 
     // TODO: update constants in periodic once tunable is set up
-    private static final double driveKpV = 175; // 175
+    private static final double driveKpV = 160; // 175
     private static final double driveKdV = .4d; // .4
     private static final double driveKiV = 0.0d; // 0
 
     // Uhh Feedforward momment!
-    private static final double driveFeedforwardKgV = .395; // .395V
+    private static final double driveFeedforwardKgV = .345; // .395V
     private static final double driveFeedforwardKsV = 0;
     // Units needed are volts * seconds / rotations, max rpm is 6,380
     private static final double driveFeedforwardKvV = 12 * (3 / 319d) / gearRatio; // 6380 rotaions per minute is 319/3
@@ -68,7 +68,7 @@ public class ArmIOFalcon500 implements ArmIO {
 
     private static final double driveKpTC = 650; // 620
     private static final double driveKdTC = 1000; // 120
-    private static final double driveKiTC = 1d;
+    private static final double driveKiTC = 1d; // 0
 
     // Uhh Feedforward momment!
     private static final double driveFeedforwardKgTC = 8; // 9.2A
@@ -78,7 +78,7 @@ public class ArmIOFalcon500 implements ArmIO {
 
     boolean torqueCurrent = false;
 
-    private final Measure<Angle> absoluteEncoderOffset = Radians.of(4.25); // 4.25
+    private final Measure<Angle> absoluteEncoderOffset = Radians.of(2.27); // 4.25
 
     int index;
 
@@ -116,9 +116,9 @@ public class ArmIOFalcon500 implements ArmIO {
         faultRemoteSensorOutOfSync = leadFalcon.getFault_RemoteSensorDataInvalid();
         stickyFaultRemoteSensorOutOfSync = leadFalcon.getStickyFault_RemoteSensorDataInvalid();
 
-        driveMMConfig.MotionMagicCruiseVelocity = 98d / gearRatio; // max rps of the motor (almost)
-        driveMMConfig.MotionMagicAcceleration = 2; // .5 second to reach max speed (defaualt)
-        driveMMConfig.MotionMagicJerk = 3; // .33 seconds to reach max accel (defaualt)
+        driveMMConfig.MotionMagicCruiseVelocity = 90d / gearRatio; // max rps of the motor (almost)
+        driveMMConfig.MotionMagicAcceleration = .5; // .5 second to reach max speed (defaualt)
+        driveMMConfig.MotionMagicJerk = 1; // .33 seconds to reach max accel (defaualt)
 
         // Feedforward momment!
 

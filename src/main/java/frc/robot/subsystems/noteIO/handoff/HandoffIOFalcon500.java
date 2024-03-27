@@ -32,7 +32,8 @@ public class HandoffIOFalcon500 implements HandoffIO {
         // current limiting
         TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
         talonFXConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        talonFXConfig.CurrentLimits.SupplyCurrentLimit = 20;
+        talonFXConfig.CurrentLimits.SupplyCurrentLimit = 40;
+        talonFXConfig.CurrentLimits.SupplyTimeThreshold = .5;
         talonFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         motor.getConfigurator().apply(talonFXConfig);
     }

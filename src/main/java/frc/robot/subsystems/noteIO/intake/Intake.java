@@ -36,8 +36,8 @@ public class Intake extends SubsystemBase {
         Logger.processInputs("intake", inputs);
         Logger.recordOutput("Intake on", volts != Volts.of(0));
 
-        io.setVoltage(volts);
-        // io.setVoltage(Volts.of(3));
+        // io.setVoltage(volts);
+        io.setVoltage(Volts.of(3));
     }
 
     @AutoLogOutput

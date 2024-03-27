@@ -29,6 +29,20 @@ public class AprilTag {
      * @param id        The ID of the tag
      * @param transform The transform from the robot to the tag
      */
+    public AprilTag(int id, Transform2d transform) {
+        this.id = id;
+        this.transform = new Transform3d(
+            new Translation3d(transform.getX(), transform.getY(), 0),
+            new Rotation3d(0, 0, transform.getRotation().getRadians())
+        );
+    }
+
+    /**
+     * Constructs a new AprilTag object from a transform from the robot to the tag
+     * 
+     * @param id        The ID of the tag
+     * @param transform The transform from the robot to the tag
+     */
     public AprilTag(int id, Transform3d transform) {
         this.id = id;
         this.transform = transform;
