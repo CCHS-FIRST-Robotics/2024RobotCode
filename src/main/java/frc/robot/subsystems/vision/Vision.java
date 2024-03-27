@@ -111,6 +111,10 @@ public class Vision extends SubsystemBase {
                 new Rotation2d(ZEDinputs.primaryTagHeading));
     }
 
+    public AprilTag getClosestTagZED() {
+        return new AprilTag(ZEDinputs.primaryTagId, getTransformToClosestTagZED());
+    }
+
     /**
      * Returns the closest tag's transform relative to the robot
      * 
@@ -121,8 +125,8 @@ public class Vision extends SubsystemBase {
                 new Rotation2d(PVinputs.primaryTagHeading));
     }
 
-    public AprilTag getClosestTag() {
-        return new AprilTag(inputs.primaryTagId, getTransformToClosestTag());
+    public AprilTag getClosestTagPV() {
+        return new AprilTag(PVinputs.primaryTagId, getTransformToClosestTagPV());
     }
 
     /**

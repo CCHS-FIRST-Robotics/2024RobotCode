@@ -302,36 +302,36 @@ public class RobotContainer {
                         .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose)));
 
 
-    Supplier<Transform2d> speakerTransform = () -> {
-        var tag = camera.getClosestTag();
-        double speakerOffset = 0.56515; // meters
-        if (tag.id == 3 || tag.id ==4 || tag.id == 7 || tag.id == 8) {
-            Transform2d toSpeaker = tag.getTransform();
-            if (tag.id == 3) toSpeaker = toSpeaker.plus(new Transform2d(0, -speakerOffset, new Rotation2d()));
-            if (tag.id == 8) toSpeaker = toSpeaker.plus(new Transform2d(0, speakerOffset, new Rotation2d()));
+    // Supplier<Transform2d> speakerTransform = () -> {
+    //     var tag = vision.getClosestTagZED();
+    //     double speakerOffset = 0.56515; // meters
+    //     if (tag.id == 3 || tag.id ==4 || tag.id == 7 || tag.id == 8) {
+    //         Transform2d toSpeaker = tag.getTransform();
+    //         if (tag.id == 3) toSpeaker = toSpeaker.plus(new Transform2d(0, -speakerOffset, new Rotation2d()));
+    //         if (tag.id == 8) toSpeaker = toSpeaker.plus(new Transform2d(0, speakerOffset, new Rotation2d()));
 
-            return toSpeaker;
-        } else {
-            return new Transform2d(-1, -1, new Rotation2d(Radians.convertFrom(-1, Degrees)));
-        }
-    };
+    //         return toSpeaker;
+    //     } else {
+    //         return new Transform2d(-1, -1, new Rotation2d(Radians.convertFrom(-1, Degrees)));
+    //     }
+    // };
 
-    Supplier<Rotation2d> shootHeading = () -> speakerTransform.get().getRotation();
+    // Supplier<Rotation2d> shootHeading = () -> speakerTransform.get().getRotation();
 
-        // Supplier<Rotation2d> shootHeading = () -> drive.getPose().getTranslation()
-    //                     .minus(SPEAKER_POSE.getTranslation()).getAngle()
-    //                     .plus(new Rotation2d(Math.PI));
+        Supplier<Rotation2d> shootHeading = () -> drive.getPose().getTranslation()
+                        .minus(SPEAKER_POSE.getTranslation()).getAngle()
+                        .plus(new Rotation2d(Math.PI));
 
     // prime shooter (speaker - anywhere)
     controller2.b().and(() -> !shooter.upToSpeed()).onTrue(
         // prime shooter
         new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
             // move arm
-            // .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
-            .alongWith(
-                arm.moveArm(ArmPosition.SHOOT, () -> SPEAKER_POSE.plus(speakerTransform.get()))
-                .unless(() -> shootHeading.get().getDegrees() == -1)
-            )
+            .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
+            // .alongWith(
+            //     arm.moveArm(ArmPosition.SHOOT, () -> SPEAKER_POSE.plus(speakerTransform.get()))
+            //     .unless(() -> shootHeading.get().getDegrees() == -1)
+            // )
             // turn robot towards speaker
             .alongWith(
                 new DriveWithJoysticks(
