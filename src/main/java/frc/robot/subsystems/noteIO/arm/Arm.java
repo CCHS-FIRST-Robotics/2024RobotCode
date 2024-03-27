@@ -15,6 +15,8 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 // import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 // import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -24,6 +26,7 @@ import org.littletonrobotics.junction.Logger;
 // import com.choreo.lib.ChoreoTrajectory;
 // import com.choreo.lib.ChoreoTrajectoryState;
 import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.SignalLogger;
 
 // rev sucks
 public class Arm extends SubsystemBase {
@@ -44,14 +47,15 @@ public class Arm extends SubsystemBase {
 
     // meters, degrees
     static {
-        armAngleMap.put(1.05, 16.5d);
-        armAngleMap.put(1.43256, 23d);
-        armAngleMap.put(1.73736, 24.7d);
-        armAngleMap.put(2.34696, 32.7d);
-        armAngleMap.put(2.9, 37d);
-        armAngleMap.put(3.1, 37.4d);
-        armAngleMap.put(3.71856, 38.8d);
-        armAngleMap.put(4.63296, 41.7d);
+        armAngleMap.put(1.3, 5d);
+        armAngleMap.put(1.8, 9d);
+        armAngleMap.put(2.3, 21d);
+        armAngleMap.put(2.6, 23d);
+        armAngleMap.put(2.8, 25.2d);
+        armAngleMap.put(3d, 25.9d);
+        armAngleMap.put(3.3, 26.1d);
+        armAngleMap.put(3.8, 26.3d);
+        armAngleMap.put(4.3d, 26.5d);
     }
 
     public Arm(ArmIO io) {
@@ -59,13 +63,14 @@ public class Arm extends SubsystemBase {
 
         sysIdRoutine = new SysIdRoutine(
                 new SysIdRoutine.Config( // Calculate ~ how far it's going to go (less than 90 deg)
-                        Volts.per(Second).of(.8),
-                        Volts.of(3),
+                        Volts.per(Second).of(2),
+                        Volts.of(8.75),
                         Seconds.of(5),
-                        (state) -> Logger.recordOutput("SysIdArmTestState", state.toString())),
+                        (state) -> SignalLogger.writeString("SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism(
                         (Measure<Voltage> volts) -> {
-                            io.setDriveVoltage(volts);
+                            // io.setDriveCurrent(Amps.of(7 * Math.cos(getArmAngle().in(Radians)) + volts.in(Volts))); // literal slander
+                            io.setDriveCurrent(Amps.of(volts.in(Volts)));
                         },
                         null,
                         this));
@@ -78,13 +83,13 @@ public class Arm extends SubsystemBase {
         // System.out.println("testingggg");
 
         // trust!
-        // io.setDriveVoltage(Volts.of(1));
-        // setArmAngle(Degrees.of(-10));
+        // io.setDriveVoltage(Volts.of(.395));
+        // setArmAngle(Degrees.of(23.5));
         // io.setDriveCurrent(Amps.of(8));
     }
 
     public void setArmAngle(Measure<Angle> angle) {
-        System.out.println("arm ahh");
+        // System.out.println("arm ahh");
         io.setDrivePosition(angle);
         targetAngle = angle;
     }
@@ -94,7 +99,7 @@ public class Arm extends SubsystemBase {
      */
     @AutoLogOutput
     public boolean isAtGoal() {
-        return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < 1;
+        return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < .8;
     }
 
     @AutoLogOutput
@@ -140,8 +145,8 @@ public class Arm extends SubsystemBase {
 
     public Command moveArm(ArmPosition position, Supplier<Pose2d> robotPose) {
         if (position == ArmPosition.SHOOT) {
-            // return moveToShoot(robotPose);
-            return runOnce(() -> setArmAngle(Constants.ARM_POSITIONS.get(ArmPosition.SPEAKER)));
+            return moveToShoot(robotPose);
+            // return runOnce(() -> setArmAngle(Constants.ARM_POSITIONS.get(ArmPosition.SPEAKER)));
         }
 
         Measure<Angle> angle = ARM_POSITIONS.get(position);
@@ -180,5 +185,21 @@ public class Arm extends SubsystemBase {
 
     public void addToOrchestra(Orchestra orchestra, int trackNum) {
         io.addToOrchestra(orchestra, trackNum);
+    }
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return sysIdRoutine.quasistatic(direction);
+    }
+    
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return sysIdRoutine.dynamic(direction);
+    }
+
+    public Command sysIdFull() {
+        return (sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(() -> getArmAngle().in(Degrees) > 60))
+            .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(() -> getArmAngle().in(Degrees) < 0))
+            .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(() -> getArmAngle().in(Degrees) > 60))
+            .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(() -> getArmAngle().in(Degrees) < 0))
+            .andThen(new InstantCommand(() -> io.setDriveCurrent(Amps.of(0))));
     }
 }

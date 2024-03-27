@@ -48,44 +48,42 @@ public class Module {
      * @param targetState The desired state of the module
      * @return The optimized state of the module
      */
-    public SwerveModuleState runSetpoint(SwerveModuleState targetState) {
+    public SwerveModuleState runSetpoint(SwerveModuleState targetState, boolean isOpenLoop) {
         // Optimize state based on current angle
         var optimizedState = SwerveModuleState.optimize(targetState, getAngle());
         // optimizedState = targetState; // for testing ONLY
 
-        // Run turn controller
-        // io.setTurnVoltage(
-        // turnFeedback.calculate(getAngle().getRadians(),
-        // optimizedState.angle.getRadians())
-        // );
         io.setTurnPosition(Radians.of(optimizedState.angle.getRadians()));
         // io.setTurnVoltage(Volts.of(1));
 
         // Update velocity based on turn error
-        // does some fancy things to move only in the direction you want while theres an
-        // error
-        // draw out the current/desired vectors, and remember that cos is like the dot
-        // product,
-        // it projects one vector onto the other, idk I cant make sense of it rn im
-        // tired asf
+        // does some fancy things to move only in the direction you want while theres an error
+        // draw out the current/desired vectors, and remember that cos is like the dot product,
+        // it projects one vector onto the other, idk I cant make sense of it rn im tired asf
         optimizedState.speedMetersPerSecond *= Math
                 .cos(inputs.turnAbsolutePositionRad.in(Radians) - optimizedState.angle.getRadians());
 
-        // constrian velocity based on voltage and previous velocity using motor
-        // dynamics
-        optimizedState.speedMetersPerSecond = MathUtil.clamp(
-                optimizedState.speedMetersPerSecond,
-                getMaxVelocity(-inputs.driveAverageBusVoltage.in(Volts),
-                        prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, ModuleIO.driveKv,
-                        ModuleIO.driveKa) * wheelRadius.in(Meters),
-                getMaxVelocity(inputs.driveAverageBusVoltage.in(Volts),
-                        prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, ModuleIO.driveKv,
-                        ModuleIO.driveKa) * wheelRadius.in(Meters));
+        if (!isOpenLoop) {
+            // constrian velocity based on voltage and previous velocity using motor
+            // dynamics
+            optimizedState.speedMetersPerSecond = MathUtil.clamp(
+                    optimizedState.speedMetersPerSecond,
+                    getMaxVelocity(-inputs.driveAverageBusVoltage.in(Volts),
+                            prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, ModuleIO.driveKv,
+                            ModuleIO.driveKa) * wheelRadius.in(Meters),
+                    getMaxVelocity(inputs.driveAverageBusVoltage.in(Volts),
+                            prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, ModuleIO.driveKv,
+                            ModuleIO.driveKa) * wheelRadius.in(Meters));
 
-        // Run drive controller
-        // System.out.println(wheelRadius.in(Meters));
-        double velocityRadPerSec = optimizedState.speedMetersPerSecond / wheelRadius.in(Meters);
-        io.setDriveVelocity(RadiansPerSecond.of(velocityRadPerSec));
+            // Run drive controller
+            // System.out.println(wheelRadius.in(Meters));
+            double velocityRadPerSec = optimizedState.speedMetersPerSecond / wheelRadius.in(Meters);
+            io.setDriveVelocity(RadiansPerSecond.of(velocityRadPerSec));
+        } else {
+            io.setDriveVoltage(
+                Volts.of(optimizedState.speedMetersPerSecond) // NORMALIZED IN DRIVE (state speed / max linear speed)
+            );
+        }
 
         prevSetpoint = optimizedState;
         return optimizedState;

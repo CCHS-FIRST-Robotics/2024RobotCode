@@ -12,6 +12,9 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.urcl.URCL;
+
+import com.ctre.phoenix6.SignalLogger;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.LogFileUtil;
 
@@ -69,6 +72,10 @@ public class Robot extends LoggedRobot {
                 Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
                 break;
         }
+
+        SignalLogger.setPath("/media/sda1/");
+        SignalLogger.start();
+
         Logger.registerURCL(URCL.startExternal());
         Logger.start();
 

@@ -29,7 +29,7 @@ public final class Constants {
         REPLAY
     }
 
-    public static final Mode CURRENT_MODE = Mode.SIM;
+    public static final Mode CURRENT_MODE = Mode.REAL;
 
     public static enum ArmPosition {
         INTAKE,
@@ -38,28 +38,28 @@ public final class Constants {
         SHOOT,
         MAIN,
         LOWER,
-        SHOOT_MID,
-        SHOOT_FAR
+        STAGE,
+        CLOSE_SUB
     }
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(
             Map.of(
-                    ArmPosition.INTAKE, Degrees.of(-20),
+                    ArmPosition.INTAKE, Degrees.of(-5),
                     ArmPosition.AMP, Degrees.of(88),
                     ArmPosition.SPEAKER, Degrees.of(5),
                     ArmPosition.MAIN, Degrees.of(-23),
                     ArmPosition.LOWER, Degrees.of(-10),
-                    ArmPosition.SHOOT_MID, Degrees.of(20),
-                    ArmPosition.SHOOT_FAR, Degrees.of(35)
+                    ArmPosition.STAGE, Degrees.of(27),
+                    ArmPosition.CLOSE_SUB, Degrees.of(14.5)
             )
     ); // ! TODO: actually make this accurate because it ain't
 
     public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
 
-    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(95);
-    public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(95);
+    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(80);
+    public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(90);
 
-    public static final Measure<Velocity<Angle>> SHOOTER_AMP_SPEED = RotationsPerSecond.of(95);
+    public static final Measure<Velocity<Angle>> SHOOTER_AMP_SPEED = RotationsPerSecond.of(30);
 
     // ports
     public static final int CONTROLLER_PORT_1 = 0;
@@ -101,16 +101,24 @@ public final class Constants {
         ARM_HANDOFF
     }
 
+    public static class StartPosistions {
+        public static final Pose2d blueAmp = new Pose2d(0.790, 6.550, new Rotation2d());
+        public static final Pose2d blueCenter = new Pose2d(1.3, 5.544, new Rotation2d());
+        public static final Pose2d blueSource = new Pose2d(0.79, 4.55, new Rotation2d());
+        public static final Pose2d redAmp = new Pose2d(15.75, 6.55, new Rotation2d());
+        public static final Pose2d redCenter = new Pose2d(15.27, 5.544, new Rotation2d());
+        public static final Pose2d redSource = new Pose2d(15.75, 4.55, new Rotation2d());
+    }
+
     public static class AutoPathConstants {
-        // all auto paths starts at (1.3, 5.544)
 
         public static final Map<Pair<Double, Constants.EventCommand>, ArrayList<String>> eventMarkerMap = new HashMap<>();
 
         // file names for paths
         public static final String TWO_NOTE_LEFT = "TwoNoteLeftSS.1";
-        public static final String TWO_NOTE_CENTER = "TwoNoteCenterSS.1";
+        public static final String TWO_NOTE_CENTER = "TwoNoteCenter.1";
         public static final String TWO_NOTE_RIGHT = "TwoNoteRightSS.1";
-        
+
         public static final String THREE_NOTE_WRR1 = "ThreeNoteRightRSS.1";
         public static final String THREE_NOTE_WRR2 = "ThreeNoteRightRSS.2";
         public static final String THREE_NOTE_WRC1 = "ThreeNoteRightCSS.1";
@@ -120,10 +128,9 @@ public final class Constants {
         public static final String THREE_NOTE_WLC1 = "ThreeNoteLeftCSS.1";
         public static final String THREE_NOTE_WLC2 = "ThreeNoteLeftCSS.2";
 
-
-        public static final String FOUR_NOTE_WING1 = "FourNoteWingSS.1";
-        public static final String FOUR_NOTE_WING2 = "FourNoteWingSS.2";
-        public static final String FOUR_NOTE_WING3 = "FourNoteWingSS.3";
+        public static final String FOUR_NOTE_WING1 = "FourNoteWing.1";
+        public static final String FOUR_NOTE_WING2 = "FourNoteWing.2";
+        public static final String FOUR_NOTE_WING3 = "FourNoteWing.3";
         public static final String FOUR_NOTE_L1 = "FourNoteLeftSS.1";
         public static final String FOUR_NOTE_L2 = "FourNoteLeftSS.2";
         public static final String FOUR_NOTE_L3 = "FourNoteLeftSS.3";
@@ -165,17 +172,17 @@ public final class Constants {
 
 
         public static final Measure<Voltage> INTAKE_VOLTS = Volts.of(4);
-        public static final Measure<Voltage> HANDOFF_IN_VOLTS = Volts.of(6);
+        public static final Measure<Voltage> HANDOFF_IN_VOLTS = Volts.of(5);
         public static final Measure<Voltage> HANDOFF_OUT_VOLTS = Volts.of(12);
-  
+
         public static final double INIT_MOVEMENTS_TIME = 0.0;
-        public static final double MAX_ARM_MOVE_TIME = .5;
-        public static final double INTAKE_TIME = 0.3;
+        public static final double MAX_ARM_MOVE_TIME = 1;
+        public static final double INTAKE_TIME = 1;
         public static final double SHOOT_TIME = 0.5;
 
         public static final Pose2d AUTO_START_POS = new Pose2d(1.3, 5.544, new Rotation2d(0));
 
-        public static final Measure<Velocity<Angle>> SHOOT_SPEED_LEFT = RotationsPerSecond.of(95);
+        public static final Measure<Velocity<Angle>> SHOOT_SPEED_LEFT = RotationsPerSecond.of(85);
         public static final Measure<Velocity<Angle>> SHOOT_SPEED_RIGHT = RotationsPerSecond.of(95); // idk
 
         static {
@@ -183,16 +190,15 @@ public final class Constants {
             twoNoteCenter.add(TWO_NOTE_CENTER);
             twoNoteRight.add(TWO_NOTE_RIGHT);
 
-
             threeNoteWRR.add(THREE_NOTE_WRR1);
             threeNoteWRR.add(THREE_NOTE_WRR2);
 
             threeNoteWRC.add(THREE_NOTE_WRC1);
             threeNoteWRC.add(THREE_NOTE_WRC2);
-            
+
             threeNoteWLL.add(THREE_NOTE_WLL1);
             threeNoteWLL.add(THREE_NOTE_WLL2);
-            
+
             threeNoteWLC.add(THREE_NOTE_WLC1);
             threeNoteWLC.add(THREE_NOTE_WLC2);
 
