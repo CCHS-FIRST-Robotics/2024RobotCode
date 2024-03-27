@@ -138,6 +138,12 @@ public final class Constants {
         public static final String THREE_NOTE_S87_1 = "3S87.1";
         public static final String THREE_NOTE_S87_2 = "3S87.2";
 
+        public static final String THREE_NOTE_S32_1 = "3S32.1";
+        public static final String THREE_NOTE_S32_2 = "3S32.2";
+
+        public static final String THREE_NOTE_A12_1 = "3A12.1";
+        public static final String THREE_NOTE_A12_2 = "3A12.2";
+
         public static final String FOUR_NOTE_C231_1 = "4C231.1";
         public static final String FOUR_NOTE_C231_2 = "4C231.2";
         public static final String FOUR_NOTE_C231_3 = "4C231.3";
@@ -162,6 +168,8 @@ public final class Constants {
         public static final ArrayList<String> threeS38 = new ArrayList<String>();
         public static final ArrayList<String> threeC25 = new ArrayList<String>();
         public static final ArrayList<String> threeS87 = new ArrayList<String>();
+        public static final ArrayList<String> threeS32 = new ArrayList<String>();
+        public static final ArrayList<String> threeA12 = new ArrayList<String>();
         public static final ArrayList<String> fourC231 = new ArrayList<String>();
         public static final ArrayList<String> fourC214 = new ArrayList<String>();
         public static final ArrayList<String> fiveC3214 = new ArrayList<String>();
@@ -203,6 +211,12 @@ public final class Constants {
 
             threeS87.add(THREE_NOTE_S87_1);
             threeS87.add(THREE_NOTE_S87_2);
+
+            threeS32.add(THREE_NOTE_S32_1);
+            threeS32.add(THREE_NOTE_S32_2);
+
+            threeA12.add(THREE_NOTE_A12_1);
+            threeA12.add(THREE_NOTE_A12_2);
 
             fourC231.add(FOUR_NOTE_C231_1);
             fourC231.add(FOUR_NOTE_C231_2);
