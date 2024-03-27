@@ -41,7 +41,7 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
      */
     static final Matrix<N3, N1> defaultZEDMeasurementStdDevs = VecBuilder.fill(.025, .15, 1);
 
-    static final Matrix<N3, N1> defaultPVMeasurementStdDevs = VecBuilder.fill(.05, .2, 2);
+    static final Matrix<N3, N1> defaultPVMeasurementStdDevs = VecBuilder.fill(.06, .08, 2);
 
     /**
      * Constructs a new PoseEstimator object

@@ -17,8 +17,8 @@ public class CameraIOPhotonVision implements CameraIO {
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             camera,
             new Transform3d(
-                new Translation3d(.15, .25, .6),
-                new Rotation3d(0, Radians.convertFrom(30, Degrees), 0)
+                new Translation3d(.9, .25, .6),
+                new Rotation3d(0, Radians.convertFrom(20, Degrees), 0)
             ) // ! most likely wrong bc camera isn't at the middle of the robot
     );
 

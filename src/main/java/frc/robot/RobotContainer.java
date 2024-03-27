@@ -322,10 +322,10 @@ public class RobotContainer {
                         .minus(SPEAKER_POSE.getTranslation()).getAngle()
                         .plus(new Rotation2d(Math.PI));
 
-    // prime shooter (speaker - anywhere)
-    controller2.b().and(() -> !shooter.upToSpeed()).onTrue(
-        // prime shooter
-        new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+        // prime shooter (speaker - anywhere)
+        controller2.b().and(() -> !shooter.upToSpeed()).onTrue(
+            // prime shooter
+            new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
             // move arm
             .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
             // .alongWith(
@@ -347,17 +347,17 @@ public class RobotContainer {
                     true
                 )
             )
-    );
+        );
 
 
     
-    // prime shooter (speaker - subwoofer)
-    controller2.povRight().and(() -> !shooter.upToSpeed()).onTrue(
-        // prime shooter
-        new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-            // move arm
-            .alongWith(arm.moveArm(ArmPosition.SPEAKER, drive::getPose))
-    );
+        // prime shooter (speaker - subwoofer)
+        controller2.povRight().and(() -> !shooter.upToSpeed()).onTrue(
+            // prime shooter
+            new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+                // move arm
+                .alongWith(arm.moveArm(ArmPosition.SPEAKER, drive::getPose))
+        );
 
         // prime shooter (speaker - out from sub)
         controller2.povUp().and(() -> !shooter.upToSpeed()).onTrue(
@@ -381,12 +381,11 @@ public class RobotContainer {
         //  move arm down
         .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
         .alongWith(
-        Commands.waitUntil(arm::isAtGoal)
-        // turn on intake until detected by handoff
-        .andThen(intake.getIntakeCommand(Volts.of(8),
-        handoff::checkNoteThere))
+            Commands.waitUntil(arm::isAtGoal)
+            // turn on intake until detected by handoff
+            .andThen(intake.getIntakeCommand(Volts.of(8), handoff::checkNoteThere))
         )
-        );
+    );
 
         // outtake
         controller2.x().whileTrue(
