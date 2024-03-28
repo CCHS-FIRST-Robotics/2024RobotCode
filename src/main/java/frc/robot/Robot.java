@@ -29,6 +29,7 @@ public class Robot extends LoggedRobot {
     @SuppressWarnings({ "unused" })
     private RobotContainer robotContainer;
     Command autonomousCommand;
+    Testing test = new Testing();
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -91,6 +92,7 @@ public class Robot extends LoggedRobot {
         // This must be called from the robot's periodic block in order for anything in
         // the Command-based framework to work.
         CommandScheduler.getInstance().run();
+        test.setVoltage();
     }
 
     /** This function is called once when the robot is disabled. */
