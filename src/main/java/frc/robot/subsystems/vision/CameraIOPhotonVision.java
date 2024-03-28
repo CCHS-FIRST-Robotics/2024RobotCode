@@ -17,10 +17,8 @@ public class CameraIOPhotonVision implements CameraIO {
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             camera,
             new Transform3d(
-                new Translation3d(.9, .25, .6),
-                new Rotation3d(0, Radians.convertFrom(20, Degrees), 0)
-            ) // ! most likely wrong bc camera isn't at the middle of the robot
-    );
+                    new Translation3d(.9, .25, .6),
+                    new Rotation3d(0, Radians.convertFrom(20, Degrees), 0)));
 
     public CameraIOPhotonVision() {
         System.out.println("[Init] Creating CameraIOPhotonVision");
@@ -30,7 +28,6 @@ public class CameraIOPhotonVision implements CameraIO {
 
     @Override
     public void updateInputs(CameraIOInputs inputs) {
-        // System.out.println("this shoukd be working");
         // get estimate
         Optional<EstimatedRobotPose> estimate = poseEstimator.update();
         if (!estimate.isPresent()) {
@@ -67,7 +64,6 @@ public class CameraIOPhotonVision implements CameraIO {
             inputs.primaryTagHeading = Radians.of(closestTag.getYaw());
             inputs.primaryTagRoll = Radians.of(closestTag.getSkew());
             inputs.primaryTagAmbiguity = closestTag.getPoseAmbiguity();
-            // closestTag.getBestCameraToTarget().getX();
         }
         inputs.numTags = inputs.tags.size();
     }
