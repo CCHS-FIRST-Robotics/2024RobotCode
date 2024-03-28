@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.*;
-import java.util.ArrayList;
 import frc.robot.utils.*;
 import frc.robot.utils.AprilTag;
 
@@ -99,15 +98,14 @@ public class CameraIOZED implements CameraIO {
                         return;
                 }
 
-                ArrayList<AprilTag> tags = new ArrayList<AprilTag>(tagIds.length);
+                inputs.tags.clear();
                 for (int i = 0; i < tagIds.length; i++) {
-                        tags.add(
+                        inputs.tags.add(
                                         new AprilTag(
                                                         (int) tagIds[i],
                                                         new Pose3d(tagXs[i], tagYs[i], tagZs[i],
                                                                         new Rotation3d(tagRolls[i], tagPitches[i],
                                                                                         tagHeadings[i]))));
                 }
-                inputs.tags = tags;
         }
 }
