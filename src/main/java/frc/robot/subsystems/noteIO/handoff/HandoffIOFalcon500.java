@@ -7,7 +7,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.units.*;
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.StatusSignal;
 
 public class HandoffIOFalcon500 implements HandoffIO {
@@ -52,10 +51,5 @@ public class HandoffIOFalcon500 implements HandoffIO {
         inputs.motorPosition = positionSignal.getValue();
         inputs.motorVelocity = velocitySignal.getValue();
         inputs.motorTemperature = temperatureSignal.getValue();
-    }
-
-    @Override
-    public void addToOrchestra(Orchestra orchestra, int trackNum) {
-        orchestra.addInstrument(motor, trackNum);
     }
 }

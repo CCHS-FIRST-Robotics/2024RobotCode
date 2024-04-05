@@ -7,10 +7,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
- * to do:
+ * To do:
  * 
- * sysID for shooter (same as arm)
+ * go back through robotContainer
+ * understand PID for shooter
+ * 
  */
+
 public final class Main {
     private Main() {
     }

@@ -11,12 +11,6 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.*;
 import java.util.*;
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean constants. This class should not be used for any other
- * purpose. All constants should be declared globally (i.e. public static). Do
- * not put anything functional in this class.
- */
 public final class Constants {
     public static enum Mode {
         /** Running on a real robot. */
@@ -39,7 +33,8 @@ public final class Constants {
         MAIN,
         LOWER,
         STAGE,
-        CLOSE_SUB
+        CLOSE_SUB,
+        TEST
     }
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(
@@ -50,15 +45,13 @@ public final class Constants {
                     ArmPosition.MAIN, Degrees.of(-22),
                     ArmPosition.LOWER, Degrees.of(-15),
                     ArmPosition.STAGE, Degrees.of(25.5),
-                    ArmPosition.CLOSE_SUB, Degrees.of(18)
-            )
-    ); // ! TODO: actually make this accurate because it ain't
+                    ArmPosition.CLOSE_SUB, Degrees.of(18),
+                    ArmPosition.TEST, Degrees.of(20)));
 
     public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
 
     public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(75);
     public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(95);
-
     public static final Measure<Velocity<Angle>> SHOOTER_AMP_SPEED = RotationsPerSecond.of(50);
 
     // ports
@@ -85,12 +78,7 @@ public final class Constants {
             new Pose3d(0, 3, 0, new Rotation3d(0, 0, 0)),
     };
 
-    // TODO: change to tunable numbers
-    public static final double LIENAR_SPEED_EXPONENT = 3.5;
-    public static final double ANGULAR_SPEED_EXPONENT = 2;
-
-    // private static final Measure SPEAKER_SHOOT_ANGLE = new Measure.
-
+    // auto stuff
     public static enum EventCommand {
         INTAKE,
         SHOOT,
@@ -111,7 +99,6 @@ public final class Constants {
     }
 
     public static class AutoPathConstants {
-
         public static final Map<Pair<Double, Constants.EventCommand>, ArrayList<String>> eventMarkerMap = new HashMap<>();
 
         // file names for paths
@@ -122,7 +109,7 @@ public final class Constants {
 
         public static final String THREE_NOTE_C21_1 = "3C21.1";
         public static final String THREE_NOTE_C21_2 = "3C21.2";
-        
+
         public static final String THREE_NOTE_C23_1 = "3C23.1";
         public static final String THREE_NOTE_C23_2 = "3C23.2";
 
@@ -157,7 +144,7 @@ public final class Constants {
         public static final String FIVE_NOTE_C3214_3 = "5C3214.3";
         public static final String FIVE_NOTE_C3214_4 = "5C3214.4";
 
-        // array lists for paths
+        // arraylists for paths
         public static final ArrayList<String> twoC2 = new ArrayList<String>();
         public static final ArrayList<String> twoA1 = new ArrayList<String>();
         public static final ArrayList<String> twoS3 = new ArrayList<String>();
@@ -196,16 +183,16 @@ public final class Constants {
 
             threeC21.add(THREE_NOTE_C21_1);
             threeC21.add(THREE_NOTE_C21_2);
-            
+
             threeC23.add(THREE_NOTE_C23_1);
             threeC23.add(THREE_NOTE_C23_2);
-            
+
             threeA14.add(THREE_NOTE_A14_1);
             threeA14.add(THREE_NOTE_A14_2);
-            
+
             threeS38.add(THREE_NOTE_S38_1);
             threeS38.add(THREE_NOTE_S38_2);
-            
+
             threeC25.add(THREE_NOTE_C25_1);
             threeC25.add(THREE_NOTE_C25_2);
 
@@ -221,11 +208,11 @@ public final class Constants {
             fourC231.add(FOUR_NOTE_C231_1);
             fourC231.add(FOUR_NOTE_C231_2);
             fourC231.add(FOUR_NOTE_C231_3);
-            
+
             fourC214.add(FOUR_NOTE_C214_1);
             fourC214.add(FOUR_NOTE_C214_2);
             fourC214.add(FOUR_NOTE_C214_3);
-            
+
             fiveC3214.add(FIVE_NOTE_C3214_1);
             fiveC3214.add(FIVE_NOTE_C3214_2);
             fiveC3214.add(FIVE_NOTE_C3214_3);
