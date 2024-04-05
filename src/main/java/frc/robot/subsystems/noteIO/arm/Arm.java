@@ -1,74 +1,52 @@
 package frc.robot.subsystems.noteIO.arm;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.Constants.ARM_POSITIONS;
-import static frc.robot.Constants.SPEAKER_POSE;
+import static frc.robot.Constants.*;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.ArmPosition;
-import edu.wpi.first.units.*;
-// import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-// import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
-// import edu.wpi.first.math.interpolation.InverseInterpolator;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
-// import com.choreo.lib.Choreo;
-// import com.choreo.lib.ChoreoTrajectory;
-// import com.choreo.lib.ChoreoTrajectoryState;
-import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import java.util.function.Supplier;
+import edu.wpi.first.units.*;
+import edu.wpi.first.math.geometry.*;
+import org.littletonrobotics.junction.Logger;
+import frc.robot.HardwareConstants;
 
 // rev sucks
 public class Arm extends SubsystemBase {
-    private final ArmIO io;
-    private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
+    private ArmIO io;
+    private ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
     private SysIdRoutine sysIdRoutine;
 
-    // length and position of the arm in relation to the robot's center
-    private final Measure<Distance> armLength = Inches.of(16); // TODO: set this
-    private final Translation2d armOffset = new Translation2d(0.0, .425); // TODO: set this
+    private static final InterpolatingDoubleTreeMap speakerAngleMap = new InterpolatingDoubleTreeMap();
 
-    /** Arm angle look up table key: meters, values: degrees */
-    private static final InterpolatingDoubleTreeMap armAngleMap = new InterpolatingDoubleTreeMap();
-
-    @AutoLogOutput
     private Measure<Angle> targetAngle = Degrees.of(0);
 
     // meters, degrees
     static {
-        armAngleMap.put(1.3, 5d);
-        armAngleMap.put(1.8, 9d);
-        armAngleMap.put(2.3, 21d);
-        armAngleMap.put(2.6, 23d);
-        armAngleMap.put(2.8, 25.2d);
-        armAngleMap.put(3d, 25.9d);
-        armAngleMap.put(3.3, 26.1d);
-        armAngleMap.put(3.8, 26.3d);
-        armAngleMap.put(4.3d, 26.5d);
+        speakerAngleMap.put(1.3, 5d);
+        speakerAngleMap.put(1.8, 9d);
+        speakerAngleMap.put(2.3, 21d);
+        speakerAngleMap.put(2.6, 23d);
+        speakerAngleMap.put(2.8, 25.2d);
+        speakerAngleMap.put(3d, 25.9d);
+        speakerAngleMap.put(3.3, 26.1d);
+        speakerAngleMap.put(3.8, 26.3d);
+        speakerAngleMap.put(4.3d, 26.5d);
     }
 
     public Arm(ArmIO io) {
         this.io = io;
 
         sysIdRoutine = new SysIdRoutine(
-                new SysIdRoutine.Config( // Calculate ~ how far it's going to go (less than 90 deg)
+                new SysIdRoutine.Config( // Calculate around how far it's going to go (less than 90 deg)
                         Volts.per(Second).of(2),
                         Volts.of(8.75),
                         Seconds.of(5),
                         (state) -> SignalLogger.writeString("SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism(
                         (Measure<Voltage> volts) -> {
-                            // io.setDriveCurrent(Amps.of(7 * Math.cos(getArmAngle().in(Radians)) +
-                            // volts.in(Volts))); // literal slander
                             io.setDriveCurrent(Amps.of(volts.in(Volts)));
                         },
                         null,
@@ -79,31 +57,16 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
-        // System.out.println("testingggg");
-
-        // trust!
-        // io.setDriveVoltage(Volts.of(.345));
-        // setArmAngle(Degrees.of(-5));
-        // io.setDriveCurrent(Amps.of(8));
     }
 
+    // ! looks optimizable
     public void setArmAngle(Measure<Angle> angle) {
-        // System.out.println("arm ahh");
         io.setDrivePosition(angle);
         targetAngle = angle;
     }
 
-    /**
-     * @return true if the arm is within .1 degrees of the goal (not setpoint)
-     */
-    @AutoLogOutput
-    public boolean isAtGoal() {
+    public boolean atGoal() {
         return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < .8;
-    }
-
-    @AutoLogOutput
-    public boolean isUnderStage() {
-        return getArmAngle().in(Degrees) < -21;
     }
 
     public Measure<Angle> getArmAngle() {
@@ -114,20 +77,16 @@ public class Arm extends SubsystemBase {
         return inputs.driveVelocity;
     }
 
-    public Translation2d getArmOffset() {
-        return armOffset;
-    }
-
     public Translation2d getEndEffectorPosition() {
-        return new Translation2d(armLength.in(Meters), new Rotation2d(getArmAngle().in(Radians))).plus(armOffset);
+        return new Translation2d(HardwareConstants.ARM_LENGTH.in(Meters), new Rotation2d(getArmAngle().in(Radians)))
+                .plus(HardwareConstants.ARM_OFFSET);
     }
 
     public Command alignWithTarget(Supplier<Translation2d> translationToTargetGround, Supplier<Pose3d> targetPose) {
         return run(() -> {
-            Translation2d armOffset = getArmOffset();
             Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.get().getNorm(),
                     targetPose.get().getZ());
-            Rotation2d targetArmAngle = tranlationToTargetHigh.minus(armOffset).getAngle();
+            Rotation2d targetArmAngle = tranlationToTargetHigh.minus(HardwareConstants.ARM_OFFSET).getAngle();
             setArmAngle(Radians.of(Math.PI / 2.0 - targetArmAngle.getRadians())); // add 90 degrees since 0 is vertical
         });
     }
@@ -136,7 +95,7 @@ public class Arm extends SubsystemBase {
         return run(() -> {
             double distance = robotPose.get().getTranslation().minus(
                     SPEAKER_POSE.getTranslation()).getNorm();
-            double angle = armAngleMap.get(distance);
+            double angle = speakerAngleMap.get(distance);
             setArmAngle(Degrees.of(angle));
             Logger.recordOutput("SpeakerDistance", distance);
         });
@@ -182,10 +141,6 @@ public class Arm extends SubsystemBase {
 
     // return null;
     // }
-
-    public void addToOrchestra(Orchestra orchestra, int trackNum) {
-        io.addToOrchestra(orchestra, trackNum);
-    }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         return sysIdRoutine.quasistatic(direction);

@@ -1,7 +1,10 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.units.*;
 
 public class HardwareConstants {
     // kinematics
@@ -31,4 +34,8 @@ public class HardwareConstants {
     public static final int FALCON_MAX_RPS = 7500 / 60;
     public static final int CIM_MAX_RPS = 5330 / 60;
     public static final int NEO_MAX_RPS = 5676 / 60;
+
+    // arm constants
+    public static final Measure<Distance> ARM_LENGTH = Inches.of(16);
+    public static final Translation2d ARM_OFFSET = new Translation2d(0.0, .425);
 }

@@ -201,7 +201,7 @@ public class RobotContainer {
                 handoff.getHandoffCommand(Volts.of(3))
                         // move arm down
                         .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose)
-                                .andThen(Commands.waitUntil(arm::isAtGoal)))
+                                .andThen(Commands.waitUntil(arm::atGoal)))
                         .alongWith(
                                 // turn on intake until detected by handoff
                                 intake.getIntakeCommand(Volts.of(8), handoff::checkNoteThere)));

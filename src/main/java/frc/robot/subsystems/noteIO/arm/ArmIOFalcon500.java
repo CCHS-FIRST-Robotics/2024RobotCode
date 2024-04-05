@@ -268,10 +268,4 @@ public class ArmIOFalcon500 implements ArmIO {
         }
 
     }
-
-    @Override
-    public void addToOrchestra(Orchestra orchestra, int trackNum) {
-        orchestra.addInstrument(leadFalcon, trackNum);
-        orchestra.addInstrument(followerFalcon, trackNum + 1);
-    }
 }
