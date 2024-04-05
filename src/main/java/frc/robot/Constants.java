@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.*;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 import java.util.*;
 
 /**
@@ -48,16 +50,17 @@ public final class Constants {
                     ArmPosition.AMP, Degrees.of(85),
                     ArmPosition.SPEAKER, Degrees.of(6),
                     ArmPosition.MAIN, Degrees.of(-22),
-                    ArmPosition.LOWER, Degrees.of(-15),
+                    ArmPosition.LOWER, Degrees.of(0),
                     ArmPosition.STAGE, Degrees.of(25.5),
                     ArmPosition.CLOSE_SUB, Degrees.of(18)
             )
     ); // ! TODO: actually make this accurate because it ain't
 
-    public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
+    // public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
+    public static final Pose2d SPEAKER_POSE = new Pose2d(16.57, 5.55, new Rotation2d(Math.PI));
 
-    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(75);
-    public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(95);
+    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(70);
+    public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(90);
 
     public static final Measure<Velocity<Angle>> SHOOTER_AMP_SPEED = RotationsPerSecond.of(50);
 
@@ -87,7 +90,7 @@ public final class Constants {
 
     // TODO: change to tunable numbers
     public static final double LIENAR_SPEED_EXPONENT = 3.5;
-    public static final double ANGULAR_SPEED_EXPONENT = 2;
+    public static final double ANGULAR_SPEED_EXPONENT = 3;
 
     // private static final Measure SPEAKER_SHOOT_ANGLE = new Measure.
 
@@ -112,6 +115,8 @@ public final class Constants {
 
     public static class AutoPathConstants {
 
+        public static final Alliance ALLIANCE = Alliance.Red;
+
         public static final Map<Pair<Double, Constants.EventCommand>, ArrayList<String>> eventMarkerMap = new HashMap<>();
 
         // file names for paths
@@ -129,8 +134,8 @@ public final class Constants {
         public static final String THREE_NOTE_A14_1 = "3A14.1";
         public static final String THREE_NOTE_A14_2 = "3A14.2";
 
-        public static final String THREE_NOTE_S38_1 = "3S38.1";
-        public static final String THREE_NOTE_S38_2 = "3S38.2";
+        public static final String THREE_NOTE_S37_1 = "3S37.1";
+        public static final String THREE_NOTE_S37_2 = "3S37.2";
 
         public static final String THREE_NOTE_C25_1 = "3C25.1";
         public static final String THREE_NOTE_C25_2 = "3C25.2";
@@ -152,10 +157,30 @@ public final class Constants {
         public static final String FOUR_NOTE_C214_2 = "4C214.2";
         public static final String FOUR_NOTE_C214_3 = "4C214.3";
 
+        public static final String FOUR_NOTE_C238_1 = "4C238.1";
+        public static final String FOUR_NOTE_C238_2 = "4C238.2";
+        public static final String FOUR_NOTE_C238_3 = "4C238.3";
+
         public static final String FIVE_NOTE_C3214_1 = "5C3214.1";
         public static final String FIVE_NOTE_C3214_2 = "5C3214.2";
         public static final String FIVE_NOTE_C3214_3 = "5C3214.3";
         public static final String FIVE_NOTE_C3214_4 = "5C3214.4";
+
+        public static final String RED_FOUR_WING_1 = "RedFourWing.1";
+        public static final String RED_FOUR_WING_2 = "RedFourWing.2";
+        public static final String RED_FOUR_WING_3 = "RedFourWing.3";
+
+        public static final String RED_FOUR_4C215_1 = "Red4C215.1";
+        public static final String RED_FOUR_4C215_2 = "Red4C215.2";
+        public static final String RED_FOUR_4C215_3 = "Red4C215.3";
+
+        public static final String RED_FOUR_4C237_1 = "Red4C237.1";
+        public static final String RED_FOUR_4C237_2 = "Red4C237.2";
+        public static final String RED_FOUR_4C237_3 = "Red4C237.3";
+
+        public static final String RED_FOUR_4S378_1 = "Red4C378.1";
+        public static final String RED_FOUR_4S378_2 = "Red4C378.2";
+        public static final String RED_FOUR_4S378_3 = "Red4C378.3";
 
         // array lists for paths
         public static final ArrayList<String> twoC2 = new ArrayList<String>();
@@ -165,27 +190,32 @@ public final class Constants {
         public static final ArrayList<String> threeC21 = new ArrayList<String>();
         public static final ArrayList<String> threeC23 = new ArrayList<String>();
         public static final ArrayList<String> threeA14 = new ArrayList<String>();
-        public static final ArrayList<String> threeS38 = new ArrayList<String>();
+        public static final ArrayList<String> threeS37 = new ArrayList<String>();
         public static final ArrayList<String> threeC25 = new ArrayList<String>();
         public static final ArrayList<String> threeS87 = new ArrayList<String>();
         public static final ArrayList<String> threeS32 = new ArrayList<String>();
         public static final ArrayList<String> threeA12 = new ArrayList<String>();
         public static final ArrayList<String> fourC231 = new ArrayList<String>();
+        public static final ArrayList<String> fourC238 = new ArrayList<String>();
         public static final ArrayList<String> fourC214 = new ArrayList<String>();
         public static final ArrayList<String> fiveC3214 = new ArrayList<String>();
+        public static final ArrayList<String> redFourWing = new ArrayList<String>();
+        public static final ArrayList<String> red4C215 = new ArrayList<String>();
+        public static final ArrayList<String> red4C237 = new ArrayList<String>();
+        public static final ArrayList<String> red4S378 = new ArrayList<String>();
 
         public static final Measure<Voltage> INTAKE_VOLTS = Volts.of(9);
-        public static final Measure<Voltage> HANDOFF_IN_VOLTS = Volts.of(4);
+        public static final Measure<Voltage> HANDOFF_IN_VOLTS = Volts.of(3.5);
         public static final Measure<Voltage> HANDOFF_OUT_VOLTS = Volts.of(12);
 
         public static final double INIT_MOVEMENTS_TIME = 0.0;
         public static final double MAX_ARM_MOVE_TIME = 1.2;
-        public static final double INTAKE_TIME = 1.5;
+        public static final double INTAKE_TIME = .5;
         public static final double SHOOT_TIME = 0.5;
 
         public static final Pose2d AUTO_START_POS = new Pose2d(1.3, 5.544, new Rotation2d(0));
 
-        public static final Measure<Velocity<Angle>> SHOOT_SPEED_LEFT = RotationsPerSecond.of(85);
+        public static final Measure<Velocity<Angle>> SHOOT_SPEED_LEFT = RotationsPerSecond.of(90);
         public static final Measure<Velocity<Angle>> SHOOT_SPEED_RIGHT = RotationsPerSecond.of(95); // idk
 
         static {
@@ -203,8 +233,8 @@ public final class Constants {
             threeA14.add(THREE_NOTE_A14_1);
             threeA14.add(THREE_NOTE_A14_2);
             
-            threeS38.add(THREE_NOTE_S38_1);
-            threeS38.add(THREE_NOTE_S38_2);
+            threeS37.add(THREE_NOTE_S37_1);
+            threeS37.add(THREE_NOTE_S37_2);
             
             threeC25.add(THREE_NOTE_C25_1);
             threeC25.add(THREE_NOTE_C25_2);
@@ -221,6 +251,10 @@ public final class Constants {
             fourC231.add(FOUR_NOTE_C231_1);
             fourC231.add(FOUR_NOTE_C231_2);
             fourC231.add(FOUR_NOTE_C231_3);
+
+            fourC238.add(FOUR_NOTE_C238_1);
+            fourC238.add(FOUR_NOTE_C238_2);
+            fourC238.add(FOUR_NOTE_C238_3);
             
             fourC214.add(FOUR_NOTE_C214_1);
             fourC214.add(FOUR_NOTE_C214_2);
@@ -230,6 +264,22 @@ public final class Constants {
             fiveC3214.add(FIVE_NOTE_C3214_2);
             fiveC3214.add(FIVE_NOTE_C3214_3);
             fiveC3214.add(FIVE_NOTE_C3214_4);
+
+            redFourWing.add(RED_FOUR_WING_1);
+            redFourWing.add(RED_FOUR_WING_2);
+            redFourWing.add(RED_FOUR_WING_3);
+
+            red4C215.add(RED_FOUR_4C215_1);
+            red4C215.add(RED_FOUR_4C215_2);
+            red4C215.add(RED_FOUR_4C215_3);
+
+            red4C237.add(RED_FOUR_4C237_1);
+            red4C237.add(RED_FOUR_4C237_2);
+            red4C237.add(RED_FOUR_4C237_3);
+
+            red4S378.add(RED_FOUR_4S378_1);
+            red4S378.add(RED_FOUR_4S378_2);
+            red4S378.add(RED_FOUR_4S378_3);
         }
 
         /*

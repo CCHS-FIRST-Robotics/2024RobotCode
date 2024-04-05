@@ -18,6 +18,8 @@ public class Handoff extends SubsystemBase {
     private double startTime;
     private HandoffIOInputsAutoLogged inputs = new HandoffIOInputsAutoLogged();
 
+    double currentThreshold = 35;
+
     public Handoff(HandoffIO io) {
         this.io = io;
     }
@@ -36,8 +38,12 @@ public class Handoff extends SubsystemBase {
     @AutoLogOutput
     public boolean checkNoteThere() {
         // return false;
-        return inputs.motorCurrent > 25 && (Timer.getFPGATimestamp() - startTime > 0.5);
+        return inputs.motorCurrent > currentThreshold && (Timer.getFPGATimestamp() - startTime > 0.5);
         // return Timer.getFPGATimestamp()-startTime>AutoPathConstants.Q_INTAKE_TIME;
+    }
+
+    public void setCurrentThreshold(double current) {
+        currentThreshold = current;
     }
 
     @Override

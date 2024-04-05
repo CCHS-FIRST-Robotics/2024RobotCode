@@ -46,12 +46,13 @@ public class Arm extends SubsystemBase {
     // meters, degrees
     static {
         armAngleMap.put(1.3, 5d);
-        armAngleMap.put(1.8, 9d);
+        armAngleMap.put(1.8, 16d);
+        armAngleMap.put(2d, 19d);
         armAngleMap.put(2.3, 21d);
         armAngleMap.put(2.6, 23d);
-        armAngleMap.put(2.8, 25.2d);
-        armAngleMap.put(3d, 25.9d);
-        armAngleMap.put(3.3, 26.1d);
+        armAngleMap.put(2.8, 24.8d);
+        armAngleMap.put(3d, 25.7d);
+        armAngleMap.put(3.3, 25.9d);
         armAngleMap.put(3.8, 26.3d);
         armAngleMap.put(4.3d, 26.5d);
     }
@@ -83,7 +84,7 @@ public class Arm extends SubsystemBase {
 
         // trust!
         // io.setDriveVoltage(Volts.of(.345));
-        // setArmAngle(Degrees.of(-5));
+        // setArmAngle(Degrees.of(40));
         // io.setDriveCurrent(Amps.of(8));
     }
 

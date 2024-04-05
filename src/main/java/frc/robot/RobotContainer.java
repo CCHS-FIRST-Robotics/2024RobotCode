@@ -108,7 +108,7 @@ public class RobotContainer {
                         new ModuleIOSim(),
                         new ModuleIOSim(),
                         new ModuleIOSim());
-                vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
+                vision = new Vision(new CameraIOZED(), new CameraIOZED());
                 arm = new Arm(new ArmIOSim());
                 handoff = new Handoff(new HandoffIOSim());
                 intake = new Intake(new IntakeIOSim()); //////// change
@@ -139,16 +139,16 @@ public class RobotContainer {
                 drive.getKinematics(),
                 new Rotation2d(),
                 drive.getModulePositions(),
-                StartPosistions.blueCenter);
+                StartPosistions.redSource);
 
         drive.setPoseEstimator(poseEstimator);
         vision.setPoseEstimator(poseEstimator);
 
-        // handoff.addToOrchestra(jukebox, 0);
-        // shooter.addToOrchestra(jukebox, 1);
-        // arm.addToOrchestra(jukebox, 3);
+        // handoff.addToOrchestra(jukebox, 4);
+        // shooter.addToOrchestra(jukebox, 0);
+        // arm.addToOrchestra(jukebox, 2);
 
-        // jukebox.loadMusic("music/sandstorm.chrp");
+        // jukebox.loadMusic("music/mario.chrp");
         // jukebox.play();
 
         autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
@@ -164,7 +164,7 @@ public class RobotContainer {
                     drive,
                     () -> -controller1.getLeftX(),
                     () -> -controller1.getLeftY(),
-                    () -> -.7 * controller1.getRightX(),
+                    () -> -.55 * controller1.getRightX(),
                     () -> {
                     return 1.0;
                     },
@@ -183,7 +183,7 @@ public class RobotContainer {
                     drive,
                     () -> controller1.getLeftX(),
                     () -> controller1.getLeftY(),
-                    () -> -.7 * controller1.getRightX(),
+                    () -> -.55 * controller1.getRightX(),
                     () -> {
                     return 1.0;
                     },
@@ -212,9 +212,9 @@ public class RobotContainer {
     // new Trigger(() -> {return ((int) Timer.getFPGATimestamp() == 10);}).onTrue(
     //     new EventMarkerBuilder(AutoPathConstants.blueThree2CLSS, drive, intake, handoff,shooter, arm).getCommandSequence()
     // );
-    controller1.x().onTrue(
-        new EventMarkerBuilder(AutoPathConstants.fourC231, drive, intake, handoff, shooter, arm).getCommandSequence()
-    );
+    // controller1.x().onTrue(
+    //     new EventMarkerBuilder(AutoPathConstants.redFourWing, drive, intake, handoff, shooter, arm).getCommandSequence()
+    // );
 
         /*
          * Controller 1:
@@ -229,7 +229,7 @@ public class RobotContainer {
                         drive,
                         () -> -controller1.getLeftX(),
                         () -> -controller1.getLeftY(),
-                        () -> -.7 * controller1.getRightX(),
+                        () -> -.55 * controller1.getRightX(),
                         () -> {
                             return 1.0;
                         },
@@ -337,7 +337,7 @@ public class RobotContainer {
                     drive,
                     () -> -controller1.getLeftX(),
                     () -> -controller1.getLeftY(),
-                    () -> -.7 * controller1.getRightX(),
+                    () -> -.55 * controller1.getRightX(),
                     () -> {
                     return 1.0;
                     },
@@ -389,7 +389,9 @@ public class RobotContainer {
         // outtake
         controller2.x().whileTrue(
                 intake.getIntakeCommand(Volts.of(-3))
-                        .alongWith(handoff.getHandoffManualCommand(Volts.of(-2))));
+                .alongWith(handoff.getHandoffManualCommand(Volts.of(-2)))
+                .alongWith(new StartEndCommand(() -> shooter.start(RotationsPerSecond.of(-10)), shooter::stop, shooter))
+        );
 
         controller2.rightTrigger().onTrue(
                 arm.moveArm(ArmPosition.MAIN, drive::getPose));
@@ -508,7 +510,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new EventMarkerBuilder(AutoPathConstants.fourC231, drive, intake, handoff, shooter, arm)
+        return new EventMarkerBuilder(AutoPathConstants.red4S378, drive, intake, handoff, shooter, arm)
                 .getCommandSequence();
         // Command command = new InstantCommand(() ->
         // shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT,
@@ -526,5 +528,9 @@ public class RobotContainer {
         // new InstantCommand(() -> shooter.stop())
         // .alongWith(new InstantCommand(() -> handoff.stop())));
         // return command;
+    }
+
+    public void setHandoffCurrent() {
+        handoff.setCurrentThreshold(35);
     }
 }

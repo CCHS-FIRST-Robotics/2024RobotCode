@@ -22,7 +22,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
     private final TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
     private final Slot0Configs drivePID = talonFXConfig.Slot0;
 
-    private static final double driveKp = 0.15;
+    private static final double driveKp = 0.0; // 0.2
     private static final double driveKd = 0d;
     private static final double driveKi = 0.0d;
 
@@ -66,8 +66,8 @@ public class ShooterIOFalcon500 implements ShooterIO {
         temperatureSignalRight = rightShooter.getDeviceTemp();
 
         talonFXConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        talonFXConfig.CurrentLimits.SupplyCurrentLimit = 60;
-        talonFXConfig.CurrentLimits.SupplyTimeThreshold = .5;
+        talonFXConfig.CurrentLimits.SupplyCurrentLimit = 80;
+        // talonFXConfig.CurrentLimits.SupplyTimeThreshold = 0.05;
 
         talonFXConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
@@ -106,14 +106,16 @@ public class ShooterIOFalcon500 implements ShooterIO {
     public void setVoltage(Measure<Voltage> v) {
         leftShooter.setVoltage(v.in(Volts));
         rightShooter.setVoltage(v.in(Volts));
+        // leftShooter.set(1);
+        // rightShooter.set(1);
     }
 
     @Override
     @AutoLogOutput
     public boolean upToSpeed(Measure<Velocity<Angle>> leftTargetVelocity,
             Measure<Velocity<Angle>> rightTargetVelocity) {
-        return velocitySignalLeft.getValue() > leftTargetVelocity.in(RotationsPerSecond) * .90
-                && velocitySignalRight.getValue() > rightTargetVelocity.in(RotationsPerSecond) * .90;
+        return velocitySignalLeft.getValue() > leftTargetVelocity.in(RotationsPerSecond) * .97
+                && velocitySignalRight.getValue() > rightTargetVelocity.in(RotationsPerSecond) * .97;
     }
 
     @Override

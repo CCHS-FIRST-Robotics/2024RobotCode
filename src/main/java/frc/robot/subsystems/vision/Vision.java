@@ -68,7 +68,7 @@ public class Vision extends SubsystemBase {
             // Logger.recordOutput("testRecordedTimestamp", pose.timestamp);
             // poseEstimator.addVisionMeasurement(pose.pose, pose.timestamp / 1000000,
             // poseEstimator
-            // .getDefaultVisionMeasurementStdDevs().times(getTransformToClosestTag().getTranslation().getNorm()));
+            // .getDefaultZEDMeasurementStdDevs().times(getTransformToClosestTagZED().getTranslation().getNorm()));
         }
 
         if (getZedPoseEstimate().pose.getX() > 0) {
@@ -77,8 +77,14 @@ public class Vision extends SubsystemBase {
             // getZedPoseStd());
         }
 
-        if (PVinputs.tagBasedPoseEstimate.pose.getX() > 0 && PVinputs.primaryTagAmbiguity < .2) {
+        if (PVinputs.tagBasedPoseEstimate.pose.getX() > 0 && PVinputs.primaryTagAmbiguity < .18) {
             TimestampedPose2d pose = PVinputs.tagBasedPoseEstimate;
+            Matrix<N3, N1> PVStd = poseEstimator.getDefaultPVMeasurementStdDevs().times(
+                getTransformToClosestTagPV().getTranslation().getNorm()
+            );
+            if (PVinputs.primaryTagAmbiguity != -1) {
+                PVStd = PVStd.times(2);
+            }
 
             // if (i % 100 == 0)
             //     System.err.println("pose added");
@@ -87,7 +93,7 @@ public class Vision extends SubsystemBase {
             poseEstimator.addVisionMeasurement(
                 pose.pose, 
                 pose.timestamp,
-                poseEstimator.getDefaultPVMeasurementStdDevs().times(getTransformToClosestTagPV().getTranslation().getNorm())
+                PVStd
             );
         }
 

@@ -57,7 +57,7 @@ public class Robot extends LoggedRobot {
         // set up data recievers
         switch (Constants.CURRENT_MODE) {
             case REAL: // log to a USB stick
-                // Logger.addDataReceiver(new WPILOGWriter());
+                Logger.addDataReceiver(new WPILOGWriter("/media/sda1"));
                 Logger.addDataReceiver(new NT4Publisher());
                 // new PowerDistribution(0, ModuleType.kCTRE); // Enables power distribution
                 break;
@@ -132,6 +132,7 @@ public class Robot extends LoggedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
+        robotContainer.setHandoffCurrent();
     }
 
     /** This function is called periodically during operator control. */

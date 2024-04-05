@@ -17,7 +17,7 @@ public class CameraIOPhotonVision implements CameraIO {
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             camera,
             new Transform3d(
-                    new Translation3d(.9, .25, .6),
+                    new Translation3d(.85, -.3, .6),
                     new Rotation3d(0, Radians.convertFrom(20, Degrees), 0)));
 
     public CameraIOPhotonVision() {

@@ -3,8 +3,13 @@ package frc.robot.utils;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 import com.choreo.lib.*;
 import frc.robot.*;
+import frc.robot.Constants.AutoPathConstants;
+
 import java.util.ArrayList;
 
 public final class DriveTrajectoryGenerator {
@@ -150,6 +155,7 @@ public final class DriveTrajectoryGenerator {
     }
 
     public static DriveTrajectory generateChoreoTrajectoryFromFile(String path) {
+        // ChoreoTrajectory choreoTrajectory = AutoPathConstants.ALLIANCE == Alliance.Red ? Choreo.getTrajectory(path).flipped() : Choreo.getTrajectory(path);
         ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
 
         double timeToEnd = choreoTrajectory.getTotalTime();

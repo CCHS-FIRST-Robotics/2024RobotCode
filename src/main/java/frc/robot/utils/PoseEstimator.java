@@ -26,7 +26,7 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
 
     // static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(10, 10,
     // 10); // for testing (only use vision, essentially)
-    static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.003, 0.003, 0.0002);
+    static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.0025, 0.0025, 0.0002);
     
     SwerveModulePosition[] prevModulePositions = new SwerveModulePosition[4];
 
@@ -41,7 +41,7 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
      */
     static final Matrix<N3, N1> defaultZEDMeasurementStdDevs = VecBuilder.fill(.025, .15, 1);
 
-    static final Matrix<N3, N1> defaultPVMeasurementStdDevs = VecBuilder.fill(.06, .08, 2);
+    static final Matrix<N3, N1> defaultPVMeasurementStdDevs = VecBuilder.fill(.08, .1, 2);
 
     /**
      * Constructs a new PoseEstimator object

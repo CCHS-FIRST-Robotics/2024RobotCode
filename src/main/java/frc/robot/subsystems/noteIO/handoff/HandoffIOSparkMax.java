@@ -26,7 +26,7 @@ public class HandoffIOSparkMax implements HandoffIO {
 
         motor.setCANTimeout(500);
         motor.setInverted(false);
-        motor.setSmartCurrentLimit(60);
+        motor.setSmartCurrentLimit(120);
         motor.setIdleMode(IdleMode.kBrake);
         motor.setCANTimeout(0);
 

@@ -48,7 +48,7 @@ public class Drive extends SubsystemBase {
 
     // Constants for the drivebase
     private static Measure<Velocity<Distance>> maxLinearSpeed = MetersPerSecond.of(4.5);
-    private static final Measure<Velocity<Velocity<Distance>>> maxLinearAcceleration = MetersPerSecondPerSecond.of(9.0);
+    private static final Measure<Velocity<Velocity<Distance>>> maxLinearAcceleration = MetersPerSecondPerSecond.of(100);
     private static final Measure<Distance> trackWidthX = Inches.of(22.5);
     private static final Measure<Distance> trackWidthY = Inches.of(22.5);
     private static final Measure<Velocity<Angle>> maxAngularSpeed = RadiansPerSecond.of(8 * Math.PI);
@@ -210,9 +210,9 @@ public class Drive extends SubsystemBase {
             module.setBrakeMode(isBrakeMode);
         }
 
-        xController.setTolerance(.035);
-        yController.setTolerance(.035);
-        headingController.setTolerance(.025);
+        xController.setTolerance(.05);
+        yController.setTolerance(.05);
+        headingController.setTolerance(.05);
     }
 
     public void periodic() {

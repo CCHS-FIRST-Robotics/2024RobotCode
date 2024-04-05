@@ -33,6 +33,7 @@ import edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import com.choreo.lib.*;
 import com.ctre.phoenix6.controls.ControlRequest;
@@ -64,14 +65,14 @@ public final class EventMarkerBuilder {
 
         // maybe change???? have it move to right in front of speaker first if not there before starting auto path?
         // command = new MoveToPose(drive, );
-        command = new InstantCommand(() -> shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT, AutoPathConstants.SHOOT_SPEED_RIGHT), shooter)
+        command = Commands.waitSeconds(1).andThen(new InstantCommand(() -> shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT, AutoPathConstants.SHOOT_SPEED_RIGHT), shooter)
                 .andThen(
                     arm.moveArm(ArmPosition.SPEAKER, drive::getPose)
                     .alongWith(
                         Commands.waitUntil(() -> shooter.upToSpeed() && arm.isAtGoal())
                         .andThen(handoff.getShootCommand(AutoPathConstants.HANDOFF_IN_VOLTS, shooter::checkNoteShot))
                     ).until(shooter::checkNoteShot)
-                );
+                ));
         
         for (String path : pathList) {
             addCommand(path);
@@ -87,7 +88,7 @@ public final class EventMarkerBuilder {
 
     public void addCommand(String path) {
         DriveTrajectory traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
-        ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
+        ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path); //only being used rn to get total time
         List<Pair<Double, Command>> eventMarkers = new ArrayList<Pair<Double, Command>>();
 
         double driveTime = Math.max(AutoPathConstants.MAX_ARM_MOVE_TIME, choreoTrajectory.getTotalTime());
