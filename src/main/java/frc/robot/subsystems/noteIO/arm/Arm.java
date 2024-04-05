@@ -11,19 +11,15 @@ import java.util.function.Supplier;
 import edu.wpi.first.units.*;
 import edu.wpi.first.math.geometry.*;
 import org.littletonrobotics.junction.Logger;
-import frc.robot.HardwareConstants;
 
-// rev sucks
 public class Arm extends SubsystemBase {
     private ArmIO io;
-    private ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
-    private SysIdRoutine sysIdRoutine;
-
-    private static final InterpolatingDoubleTreeMap speakerAngleMap = new InterpolatingDoubleTreeMap();
-
     private Measure<Angle> targetAngle = Degrees.of(0);
+    private SysIdRoutine sysIdRoutine;
+    private ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
 
     // meters, degrees
+    private static final InterpolatingDoubleTreeMap speakerAngleMap = new InterpolatingDoubleTreeMap();
     static {
         speakerAngleMap.put(1.3, 5d);
         speakerAngleMap.put(1.8, 9d);
@@ -53,42 +49,13 @@ public class Arm extends SubsystemBase {
                         this));
     }
 
-    /** Updates inputs and checks tunable numbers. */
-    public void periodic() {
-        io.updateInputs(inputs);
-        Logger.processInputs("Arm", inputs);
-    }
+    public Command moveArm(ArmPosition position, Supplier<Pose2d> robotPose) {
+        if (position == ArmPosition.SHOOT) {
+            return moveToShoot(robotPose);
+        }
 
-    // ! looks optimizable
-    public void setArmAngle(Measure<Angle> angle) {
-        io.setDrivePosition(angle);
-        targetAngle = angle;
-    }
-
-    public boolean atGoal() {
-        return Math.abs(getArmAngle().in(Degrees) - targetAngle.in(Degrees)) < .8;
-    }
-
-    public Measure<Angle> getArmAngle() {
-        return inputs.drivePosition;
-    }
-
-    public Measure<Velocity<Angle>> getArmVelocity() {
-        return inputs.driveVelocity;
-    }
-
-    public Translation2d getEndEffectorPosition() {
-        return new Translation2d(HardwareConstants.ARM_LENGTH.in(Meters), new Rotation2d(getArmAngle().in(Radians)))
-                .plus(HardwareConstants.ARM_OFFSET);
-    }
-
-    public Command alignWithTarget(Supplier<Translation2d> translationToTargetGround, Supplier<Pose3d> targetPose) {
-        return run(() -> {
-            Translation2d tranlationToTargetHigh = new Translation2d(translationToTargetGround.get().getNorm(),
-                    targetPose.get().getZ());
-            Rotation2d targetArmAngle = tranlationToTargetHigh.minus(HardwareConstants.ARM_OFFSET).getAngle();
-            setArmAngle(Radians.of(Math.PI / 2.0 - targetArmAngle.getRadians())); // add 90 degrees since 0 is vertical
-        });
+        Measure<Angle> angle = ARM_POSITIONS.get(position);
+        return runOnce(() -> setArmAngle(angle));
     }
 
     public Command moveToShoot(Supplier<Pose2d> robotPose) {
@@ -101,46 +68,19 @@ public class Arm extends SubsystemBase {
         });
     }
 
-    public Command moveArm(ArmPosition position, Supplier<Pose2d> robotPose) {
-        if (position == ArmPosition.SHOOT) {
-            return moveToShoot(robotPose);
-            // return runOnce(() ->
-            // setArmAngle(Constants.ARM_POSITIONS.get(ArmPosition.SPEAKER)));
-        }
-
-        Measure<Angle> angle = ARM_POSITIONS.get(position);
-        return runOnce(() -> setArmAngle(angle));
+    public void setArmAngle(Measure<Angle> angle) {
+        targetAngle = angle;
+        io.setDrivePosition(angle);
     }
 
-    // dont want to remove this but we probably shouldnt be using it
-    // public Supplier<Pose2d> getPosFromPath(String path, double eventTime) {
-    // ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
+    public boolean atGoal() {
+        return Math.abs(inputs.drivePosition.in(Degrees) - targetAngle.in(Degrees)) < .8;
+    }
 
-    // double timeToEnd = choreoTrajectory.getTotalTime();
-
-    // for (int i = 0; i < (int) (timeToEnd / Constants.PERIOD) + 2; i++) {
-    // double time = i * Constants.PERIOD;
-    // ChoreoTrajectoryState state = choreoTrajectory.sample(time);
-
-    // if (time >= eventTime) {
-    // Translation2d translationToTargetGround = new Translation2d(state.x,
-    // state.y);
-    // Pose3d targetPose = new Pose3d(new Pose2d(state.x, state.y, new
-    // Rotation2d(state.heading)));
-
-    // Translation2d armOffset = getArmOffset();
-    // Translation2d tranlationToTargetHigh = new
-    // Translation2d(translationToTargetGround.getNorm(),
-    // targetPose.getZ());
-    // Rotation2d targetArmAngle =
-    // tranlationToTargetHigh.minus(armOffset).getAngle();
-
-    // return () -> new Pose2d(translationToTargetGround, targetArmAngle);
-    // }
-    // }
-
-    // return null;
-    // }
+    public void periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs("Arm", inputs);
+    }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         return sysIdRoutine.quasistatic(direction);
@@ -151,13 +91,14 @@ public class Arm extends SubsystemBase {
     }
 
     public Command sysIdFull() {
-        return (sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(() -> getArmAngle().in(Degrees) > 60))
+        return (sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward)
+                .until(() -> inputs.drivePosition.in(Degrees) > 60))
                 .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse)
-                        .until(() -> getArmAngle().in(Degrees) < 0))
+                        .until(() -> inputs.drivePosition.in(Degrees) < 0))
                 .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward)
-                        .until(() -> getArmAngle().in(Degrees) > 60))
+                        .until(() -> inputs.drivePosition.in(Degrees) > 60))
                 .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse)
-                        .until(() -> getArmAngle().in(Degrees) < 0))
+                        .until(() -> inputs.drivePosition.in(Degrees) < 0))
                 .andThen(new InstantCommand(() -> io.setDriveCurrent(Amps.of(0))));
     }
 }
