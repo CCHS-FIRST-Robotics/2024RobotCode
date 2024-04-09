@@ -21,16 +21,6 @@ import frc.robot.subsystems.noteIO.shooter.*;
 import frc.robot.utils.EventMarkerBuilder;
 import static frc.robot.Constants.*;
 
-import java.util.function.Supplier; // !!!!!!!!!!!!
-
-/**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a "declarative" paradigm, very little robot logic should
- * actually be handled in the {@link Robot} periodic methods (other than the
- * scheduler calls). Instead, the structure of the robot (including subsystems,
- * commands, and button mappings) should be declared here.
- */
-
 public class RobotContainer {
     private final Drive drive;
     private final PoseEstimator poseEstimator;
@@ -118,49 +108,7 @@ public class RobotContainer {
         configureButtonBindings();
     }
 
-    // ! ask colin tf is this for
-    public void switchDriveThing() {
-        System.out.println("ahahhhhhhh");
-        drive.removeDefaultCommand();
-        drive.setDefaultCommand(
-                new DriveWithJoysticks(
-                        drive,
-                        () -> -controller1.getLeftX(),
-                        () -> -controller1.getLeftY(),
-                        () -> -.7 * controller1.getRightX(),
-                        () -> {
-                            return 1.0;
-                        },
-                        // () -> {return new Rotation2d();},
-                        () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-                        false,
-                        true));
-    }
-
-    // ! this too
-    public void switchDriveThing2() {
-        drive.removeDefaultCommand();
-        drive.setDefaultCommand(
-                new DriveWithJoysticks(
-                        drive,
-                        () -> controller1.getLeftX(),
-                        () -> controller1.getLeftY(),
-                        () -> -.7 * controller1.getRightX(),
-                        () -> {
-                            return 1.0;
-                        },
-                        // () -> {return new Rotation2d();},
-                        () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-                        false,
-                        true));
-    }
-
     private void configureButtonBindings() {
-        // ! uhhhhhhhhhhhhhh (basically run an auto during teleop)
-        controller1.x().onTrue(
-                new EventMarkerBuilder(AutoPathConstants.fourC231, drive, intake, handoff, shooter, arm)
-                        .getCommandSequence());
-
         /*
          * Controller 1:
          * - Drive
@@ -177,7 +125,6 @@ public class RobotContainer {
                         () -> {
                             return 1.0;
                         },
-                        // () -> {return new Rotation2d();},
                         () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
                         false,
                         true));
@@ -211,15 +158,6 @@ public class RobotContainer {
                 intake.getIntakeCommand(Volts.of(-3))
                         .alongWith(handoff.getHandoffManualCommand(Volts.of(-2))));
 
-        // ! move to drive subsystem
-        Supplier<Rotation2d> shootHeading = () -> drive.getPose().getTranslation()
-                .minus(SPEAKER_POSE.getTranslation()).getAngle()
-                .plus(new Rotation2d(Math.PI));
-
-        /**
-         * Priming the shooter
-         */
-
         // prime shooter (amp)
         controller2.y().and(() -> !shooter.upToSpeed()).onTrue(
                 // prime shooter
@@ -243,9 +181,13 @@ public class RobotContainer {
                                         () -> {
                                             return 1.0;
                                         },
-                                        shootHeading,
+                                        drive.getShootHeadingTo(SPEAKER_POSE),
                                         true,
                                         true)));
+
+        /**
+         * ! needs to disappear
+         */
 
         // prime shooter (speaker - subwoofer)
         controller2.povRight().and(() -> !shooter.upToSpeed()).onTrue(
@@ -284,39 +226,8 @@ public class RobotContainer {
         // }));
     }
 
-    // ! probably unused
-    public Translation2d getTargetTranslation(Pose3d targetPose) {
-        Pose2d currentPose = drive.getPose();
-        Translation2d translationToTargetGround = targetPose.getTranslation()
-                .toTranslation2d()
-                .minus(currentPose.getTranslation());
-        return translationToTargetGround;
-    }
-
-    // ! look at this later
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     * 
-     * @return the command to run in autonomous
-     */
     public Command getAutonomousCommand() {
         return new EventMarkerBuilder(AutoPathConstants.fourC231, drive, intake, handoff, shooter, arm)
                 .getCommandSequence();
-        // Command command = new InstantCommand(() ->
-        // shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT,
-        // AutoPathConstants.SHOOT_SPEED_RIGHT), shooter)
-        // .andThen(
-        // arm.moveArm(ArmPosition.SPEAKER, drive::getPose)
-        // .alongWith(
-        // Commands.waitUntil(() -> shooter.upToSpeed() && arm.isAtGoal())
-        // .andThen(handoff.getShootCommand(AutoPathConstants.HANDOFF_IN_VOLTS,
-        // shooter::checkNoteShot))
-        // ).until(shooter::checkNoteShot)
-        // );
-
-        // command = command.andThen(
-        // new InstantCommand(() -> shooter.stop())
-        // .alongWith(new InstantCommand(() -> handoff.stop())));
-        // return command;
     }
 }
