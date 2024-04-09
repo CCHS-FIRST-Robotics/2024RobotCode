@@ -3,7 +3,6 @@ package frc.robot.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.MutableMeasure.mutable;
 
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.Consumer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,7 +11,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.units.*;
@@ -23,12 +21,9 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.drive.swerveDrive.GyroIOInputsAutoLogged;
-import frc.robot.utils.DriveTrajectory;
 import frc.robot.utils.DriveTrajectoryGenerator;
-import frc.robot.utils.PoseEstimator;
 
 import java.util.function.Supplier;
-import frc.robot.Constants.*;
 
 public class Drive extends SubsystemBase {
 
