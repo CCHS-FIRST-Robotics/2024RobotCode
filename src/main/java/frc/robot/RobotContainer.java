@@ -9,7 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.math.geometry.*;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser; // ! yeah do something with this
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import frc.robot.commands.*;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.drive.*;
@@ -34,6 +34,7 @@ public class RobotContainer {
     private final CommandXboxController controller1 = new CommandXboxController(Constants.CONTROLLER_PORT_1);
     private final CommandXboxController controller2 = new CommandXboxController(Constants.CONTROLLER_PORT_2);
 
+    // ! yeah do something with this
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
 
     public RobotContainer() {
