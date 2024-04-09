@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drive.swerveDrive;
+package frc.robot.subsystems.drive;
 
 import org.littletonrobotics.junction.AutoLog;
 
@@ -23,7 +23,7 @@ public interface ModuleIO {
         public Measure<Angle> turnAbsolutePositionRad = Radians.of(0.0);
         public Measure<Angle> turnPositionRad = Radians.of(0.0);
         public Measure<Velocity<Angle>> turnVelocityRadPerSec = RadiansPerSecond.of(0.0);
-        public Measure<Voltage> turnAppliedVolts =Volts.of(0.0);
+        public Measure<Voltage> turnAppliedVolts = Volts.of(0.0);
         public Measure<Voltage> turnAverageBusVoltage = Volts.of(12);
         public Measure<Current> turnCurrentAmps = Amps.of(0.0);
         public Measure<Temperature> turnTempCelcius = Celsius.of(0.0);

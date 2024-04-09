@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drive.swerveDrive;
+package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.MutableMeasure.mutable;
@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.drive.swerveDrive.GyroIOInputsAutoLogged;
 import frc.robot.utils.DriveTrajectory;
 import frc.robot.utils.DriveTrajectoryGenerator;
 import frc.robot.utils.PoseEstimator;

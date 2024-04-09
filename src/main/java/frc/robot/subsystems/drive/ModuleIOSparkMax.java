@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drive.swerveDrive;
+package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -211,15 +211,13 @@ public class ModuleIOSparkMax implements ModuleIO {
      */
     public void setDriveVelocity(Measure<Velocity<Angle>> velocity) {
         driveSparkMaxPIDF.setReference(
-            velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
-            CANSparkMax.ControlType.kVelocity,
-            0,
-            driveFeedforward.calculate(
-                prevVelocity.in(RadiansPerSecond),
-                velocity.in(RadiansPerSecond),
-                Constants.PERIOD
-            )
-        );
+                velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
+                CANSparkMax.ControlType.kVelocity,
+                0,
+                driveFeedforward.calculate(
+                        prevVelocity.in(RadiansPerSecond),
+                        velocity.in(RadiansPerSecond),
+                        Constants.PERIOD));
         prevVelocity = velocity;
     }
 
@@ -231,12 +229,12 @@ public class ModuleIOSparkMax implements ModuleIO {
     public void setTurnPosition(Measure<Angle> position) {
         // Adjust from [-PI, PI] (wrapped angle, so initially -pi was 2pi) -> [0, 2PI]
         position = Radians.of(
-        MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
+                MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
 
         turnSparkMaxPIDF.setReference(
-        position.in(Rotations),
-        CANSparkMax.ControlType.kPosition,
-        0);
+                position.in(Rotations),
+                CANSparkMax.ControlType.kPosition,
+                0);
     }
 
     /*
