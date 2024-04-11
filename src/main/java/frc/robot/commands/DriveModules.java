@@ -55,7 +55,7 @@ public class DriveModules extends Command {
                 prevSpeed + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD);
 
         drive.runModules(new SwerveModuleState(
-                linearSpeed,
+                0, //linearSpeed
                 new Rotation2d(Math.PI / 2.0 * angularPosition)));
     }
 

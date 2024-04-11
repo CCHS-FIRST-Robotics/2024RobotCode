@@ -434,6 +434,8 @@ public class Drive extends SubsystemBase {
                     optimizedStates[i] = modules[i].runSetpoint(setpointStates[i], false);
                 }
 
+
+                
                 // Log setpoint states
                 Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
                 Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedStates);
