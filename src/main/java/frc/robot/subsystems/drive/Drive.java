@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.subsystems.drive.swerveDrive.GyroIOInputsAutoLogged;
+import frc.robot.subsystems.drive.GyroIOInputsAutoLogged;
 import frc.robot.utils.DriveTrajectoryGenerator;
 
 import java.util.function.Supplier;
@@ -31,19 +31,16 @@ public class Drive extends SubsystemBase {
      * CONSTANTS
      */
 
-    private static final Measure<Velocity<Distance>> coastThresholdMetersPerSec = MetersPerSecond.of(0.05); // Need to
-                                                                                                            // be under
-                                                                                                            // this to
-                                                                                                            // switch to
-                                                                                                            // coast
-                                                                                                            // when
-                                                                                                            // disabling
-    private static final Measure<Velocity<Distance>> coastThresholdSecs = MetersPerSecond.of(6.0); // Need to be under
-                                                                                                   // the above speed
-                                                                                                   // for this length of
-                                                                                                   // time to switch to
-                                                                                                   // coast
-    private static final Measure<Angle> ledsFallenAngle = Degrees.of(60.0); // Threshold to detect falls
+    // ! stuff for brake mode
+    // private static final Measure<Velocity<Distance>> coastThresholdMetersPerSec =
+    // MetersPerSecond.of(0.05);
+    // // Need to be under this to switch to coast when disabling
+    // private static final Measure<Velocity<Distance>> coastThresholdSecs =
+    // MetersPerSecond.of(6.0);
+    // // Need to be under the above speed for this length of time to switch to
+    // coast
+    // private static final Measure<Angle> ledsFallenAngle = Degrees.of(60.0);
+    // // Threshold to detect falls
 
     // Define Gyro IO and inputs
     private final GyroIO gyroIO;
@@ -160,8 +157,6 @@ public class Drive extends SubsystemBase {
      * OTHER
      */
 
-    int i = 0;
-
     private boolean isBrakeMode = true;
     private Timer lastMovementTimer = new Timer();
 
@@ -215,7 +210,6 @@ public class Drive extends SubsystemBase {
 
     public void periodic() {
         // System.out.println("HI IM RUNNING");
-        i++;
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
         for (var module : modules) {

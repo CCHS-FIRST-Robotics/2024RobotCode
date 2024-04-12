@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 /**
  * To do:
  * 
- * go back through robotContainer
  * understand PID for shooter
  * 
  * try to get advantagekit to simulate the entire robot
