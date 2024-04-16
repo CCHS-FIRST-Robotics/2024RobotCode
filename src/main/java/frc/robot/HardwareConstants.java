@@ -24,7 +24,6 @@ public class HardwareConstants {
             FR_WHEEL_POS, BL_WHEEL_POS, BR_WHEEL_POS);
 
     // swerve constants
-    // ! what're these for
     public static final double LINEAR_SPEED_EXPONENT = 2;
     public static final double ANGULAR_SPEED_EXPONENT = 2.5;
 

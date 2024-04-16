@@ -1,48 +1,16 @@
 package frc.robot.utils;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volt;
-
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.AutoLogOutput;
-
+import edu.wpi.first.wpilibj2.command.*;
+import com.choreo.lib.*;
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.*;
-import frc.robot.Constants.ArmPosition;
-import frc.robot.Constants.AutoPathConstants;
-import frc.robot.Constants.EventCommand;
+import java.util.*;
 import frc.robot.commands.AutoCommand;
-import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.noteIO.arm.Arm;
 import frc.robot.subsystems.noteIO.handoff.Handoff;
 import frc.robot.subsystems.noteIO.intake.Intake;
 import frc.robot.subsystems.noteIO.shooter.Shooter;
-import edu.wpi.first.units.Units.*;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-
-import com.choreo.lib.*;
-import com.ctre.phoenix6.controls.ControlRequest;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
-
-// import org.json.*;
-// import org.json.simple.JSONArray;
-// import org.json.simple.JSONObject;
-// import org.json.simple.parser.JSONParser;
+import frc.robot.Constants.*;
 
 public final class EventMarkerBuilder {
     private Drive drive;
@@ -63,9 +31,6 @@ public final class EventMarkerBuilder {
         this.arm = arm;
         this.handoff = handoff;
 
-        // maybe change???? have it move to right in front of speaker first if not there
-        // before starting auto path?
-        // command = new MoveToPose(drive, );
         command = Commands.waitSeconds(1).andThen(new InstantCommand(
                 () -> shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT, AutoPathConstants.SHOOT_SPEED_RIGHT), shooter)
                 .andThen(

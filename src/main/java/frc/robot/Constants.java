@@ -77,10 +77,6 @@ public final class Constants {
             new Pose3d(0, 3, 0, new Rotation3d(0, 0, 0)),
     };
 
-    // ! what're these for
-    public static final double LINEAR_SPEED_EXPONENT = 3.5;
-    public static final double ANGULAR_SPEED_EXPONENT = 3;
-
     public static enum EventCommand {
         INTAKE,
         SHOOT,
