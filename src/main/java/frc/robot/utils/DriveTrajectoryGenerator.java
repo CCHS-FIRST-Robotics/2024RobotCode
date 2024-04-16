@@ -3,12 +3,9 @@ package frc.robot.utils;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import com.choreo.lib.*;
 import frc.robot.*;
-import frc.robot.Constants.AutoPathConstants;
 
 import java.util.ArrayList;
 
