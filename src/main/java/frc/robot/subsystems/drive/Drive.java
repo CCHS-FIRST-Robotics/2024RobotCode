@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.subsystems.drive.GyroIOInputsAutoLogged;
 import frc.robot.utils.DriveTrajectoryGenerator;
 
 import java.util.function.Supplier;

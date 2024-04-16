@@ -8,8 +8,6 @@ import edu.wpi.first.math.geometry.*;
 import frc.robot.utils.*;
 import frc.robot.utils.AprilTag;
 
-// ! look at https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/networktables/package-summary.html
-
 public class CameraIOZED implements CameraIO {
     NetworkTable tagsTable = NetworkTableInstance.getDefault().getTable("tags");
 

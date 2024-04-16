@@ -6,7 +6,6 @@ import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
-
     @AutoLog
     public static class ArmIOInputs {
         public Measure<Angle> drivePosition = Radians.of(0.0);
