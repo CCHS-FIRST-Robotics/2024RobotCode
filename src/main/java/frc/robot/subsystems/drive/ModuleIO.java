@@ -7,7 +7,6 @@ import static edu.wpi.first.units.Units.*;
 
 public interface ModuleIO {
     // ! just has to be here
-    // ! bad bad bad bad bad abd
     static double driveKv = 0.0;
     static double driveKa = 0.0;
 

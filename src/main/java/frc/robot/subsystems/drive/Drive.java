@@ -28,7 +28,7 @@ public class Drive extends SubsystemBase {
      * CONSTANTS
      */
 
-    // ! stuff for brake mode
+    // stuff for brake mode
     // private static final Measure<Velocity<Distance>> coastThresholdMetersPerSec =
     // MetersPerSecond.of(0.05);
     // // Need to be under this to switch to coast when disabling

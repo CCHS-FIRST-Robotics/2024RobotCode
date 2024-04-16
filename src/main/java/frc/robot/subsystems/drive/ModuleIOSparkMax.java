@@ -17,7 +17,6 @@ public class ModuleIOSparkMax implements ModuleIO {
     /* MOTOR CONTROLLERS + PID */
     private final CANSparkMax driveSparkMax;
     private final CANSparkMax turnSparkMax;
-
     private final SparkPIDController driveSparkMaxPIDF;
     private final SparkPIDController turnSparkMaxPIDF;
 
