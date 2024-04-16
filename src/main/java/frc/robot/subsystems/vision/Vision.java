@@ -33,11 +33,6 @@ public class Vision extends SubsystemBase {
         // add the PV pose estimate to poseEstimator
         if (PVinputs.tagBasedPoseEstimate.pose.getX() > 0 && PVinputs.primaryTagAmbiguity < .2) {
             TimestampedPose2d pose = PVinputs.tagBasedPoseEstimate;
-            Matrix<N3, N1> PVStd = poseEstimator.getDefaultPVMeasurementStdDevs().times(
-                    getTransformToClosestTagPV().getTranslation().getNorm());
-            if (PVinputs.primaryTagAmbiguity != -1) {
-                PVStd = PVStd.times(2);
-            }
 
             Logger.recordOutput("testRecordedPosePV", pose.pose);
             Logger.recordOutput("testRecordedTimestampPV", pose.timestamp);
