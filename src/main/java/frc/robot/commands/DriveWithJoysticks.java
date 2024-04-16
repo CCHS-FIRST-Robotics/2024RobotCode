@@ -83,7 +83,7 @@ public class DriveWithJoysticks extends Command {
         double angularSpeed = angularSpeedSupplier.get();
         // System.out.println(angularSpeed);
 
-        // TODO: switch constants to tunable numbers
+        // ! switch constants to tunable numbers
         linearSpeed = applyPreferences(linearSpeed, HardwareConstants.LINEAR_SPEED_EXPONENT,
                 Constants.ANALOG_DEADZONE);
         angularSpeed = applyPreferences(angularSpeed, HardwareConstants.ANGULAR_SPEED_EXPONENT,
@@ -103,7 +103,7 @@ public class DriveWithJoysticks extends Command {
 
             State targetState = new State(headingGoal, 0);
             State currentState = new State(prevHeadingSetpoint, prevHeadingSpeed);
-            // TODO: bugged, fix optimization
+            // ! bugged, fix optimization
             // optimizeStates(currentState, targetState, currentHeadingRad); // take
             // shortest path to next angle
 
@@ -219,7 +219,7 @@ public class DriveWithJoysticks extends Command {
         return Math.pow(Math.abs(input), exponent) * Math.signum(input);
     }
 
-    // TODO: fix (bugged currently)
+    // ! fix (bugged currently)
     // private void optimizeStates(State currentState, State targetState, double
     // currentHeading) {
     // // Get error which is the smallest distance between goal and measurement

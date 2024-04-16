@@ -13,7 +13,6 @@ public class Module {
     private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
     private final int index;
 
-    // TODO: switch to tunable numbers w/ smartdash
     private static final Measure<Distance> wheelRadius = Inches.of(2); // 2"; .0508m
     // private static final Measure<Distance> trackWidth = Inches.of(22.5);
 

@@ -130,7 +130,6 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnRelativeEncoder.setAverageDepth(2);
         turnRelativeEncoder.setPositionConversionFactor(1);
 
-        // TODO: any other params/tuning?
         turnAbsoluteEncoder.setAverageDepth(2); // NOTE: changed from 8 since last tested run (12/15/23) -- was at 2 a
                                                 // couple weeks ago tho
 
@@ -153,7 +152,6 @@ public class ModuleIOSparkMax implements ModuleIO {
         // update drive motor info
         inputs.driveRawPositionRad = // doesnt account for coupling
                 Rotations.of(driveEncoder.getPosition() / driveAfterEncoderReduction);
-        // TODO: CHECK THAT COUPLING WAS ADDED CORRECTLY
         inputs.drivePositionRad = Rotations.of((driveEncoder.getPosition()
                 + turnRelativeEncoder.getPosition() / turnAfterEncoderReduction * couplingRatio)
                 / driveAfterEncoderReduction);
@@ -172,7 +170,6 @@ public class ModuleIOSparkMax implements ModuleIO {
                                 turnAbsoluteEncoder.getPosition() // POSITION IN ROTATIONS
                                         * 2 * Math.PI)
                                 .getRadians()));
-        // TODO: FOR TESTING ONLY:
         // inputs.turnAbsolutePositionRad = turnAbsoluteEncoder.getPosition();
 
         inputs.turnPositionRad = Rotations.of(turnRelativeEncoder.getPosition()

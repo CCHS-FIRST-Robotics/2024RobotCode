@@ -7,24 +7,30 @@ package frc.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
- * To do:
+ * to do:
  * 
- * understand PID for shooter
+ * at robo:
+ * tune module PID
+ * FOC instead of MotionMagic armIOFalcon
  * 
- * tune the PID in moduleSparkMax
  * 
- * tunable numbers with smartdashboard
+ * small things:
+ * make objects in IO classes final
  * moduleIO kV and kA
- * phoenix sims
- * don't use timestampedpose2d/3d
- * 
- * // ! do we need any raw acc data? I don't think we have any use for it
- * // ! dual imu??? https://arxiv.org/pdf/2107.02632.pdf in gyroIO.java
  * GyroIONavX negative values
  * 
- * make objects in IO classes final
+ * 
+ * ask colin:
  * find out where the gyro is actually used
+ * fix something in drivewithjoysticks
+ * something I don't understand in gyroIO.java
+ * 
+ * 
+ * eventually:
  * try to get advantagekit to simulate the entire robot
+ * don't use timestampedpose2d/3d
+ * tunable numbers with smartdashboard
+ * phoenix sims
  */
 
 public final class Main {

@@ -25,7 +25,7 @@ public class ArmIOFalcon500 implements ArmIO {
 
     private CANcoder driveCancoder;
 
-    // TODO - USE FOC (Field Oriented Control) - MotionMagicTorqueCurrentFOC
+    // ! USE FOC (Field Oriented Control) - MotionMagicTorqueCurrentFOC
     private final MotionMagicVoltage driveMotionMagicVoltage = new MotionMagicVoltage(0);
     private final MotionMagicTorqueCurrentFOC driveMotionMagicCurrent = new MotionMagicTorqueCurrentFOC(0);
     private final MotionMagicConfigs driveMMConfig = driveFalconConfig.MotionMagic;
@@ -53,7 +53,6 @@ public class ArmIOFalcon500 implements ArmIO {
 
     private static final double gearRatio = 100 * 48d / 14d; // 100 * 26d / 14d
 
-    // TODO: update constants in periodic once tunable is set up
     private static final double driveKpV = 160; // 175
     private static final double driveKdV = .4d; // .4
     private static final double driveKiV = 0.0d; // 0
