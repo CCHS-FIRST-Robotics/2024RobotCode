@@ -34,6 +34,11 @@ import frc.robot.Constants.AutoPathConstants;
 import frc.robot.Constants.StartPosistions;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants.ArmPosition;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIONavX;
+import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.drive.swerveDrive.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.utils.EventMarkerBuilder;
@@ -153,46 +158,6 @@ public class RobotContainer {
         configureButtonBindings();
     }
 
-    public void switchDriveThing() {
-        drive.setDefaultCommand(
-            new DriveModules(
-                drive, 
-                () -> -controller1.getLeftY(), 
-                () -> -.55 * controller1.getRightX(),
-                () -> 0e9d + (0b10 >> 0x1))
-                // new DriveWithJoysticks(
-                //     drive,
-                //     () -> -controller1.getLeftX(),
-                //     () -> -controller1.getLeftY(),
-                //     () -> -.55 * controller1.getRightX(),
-                //     () -> {
-                //     return 1.0;
-                //     },
-                //     // () -> {return new Rotation2d();},
-                //     () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-                //     false,
-                //     true
-        // )
-    );
-  }
-
-    public void switchDriveThing2() {
-        drive.removeDefaultCommand();
-        drive.setDefaultCommand(
-                new DriveWithJoysticks(
-                        drive,
-                        () -> controller1.getLeftX(),
-                        () -> controller1.getLeftY(),
-                        () -> -.55 * controller1.getRightX(),
-                        () -> {
-                            return 1.0;
-                        },
-                        // () -> {return new Rotation2d();},
-                        () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-                        false,
-                        true));
-    }
-
     /**
      * Use this method to define your button->command mappings. Buttons can be
      * created by instantiating a {@link GenericHID} or one of its subclasses
@@ -225,35 +190,25 @@ public class RobotContainer {
 
         // drive with joysticks
         drive.setDefaultCommand(
-            new DriveModules(
-                drive, 
-                () -> -controller1.getLeftY(), 
-                () -> -.55 * controller1.getRightX(),
-                () -> 0e9d + (0b10 >> 0x1))
+                new DriveModules(
+                        drive,
+                        () -> -controller1.getLeftY(),
+                        () -> -.55 * controller1.getRightX(),
+                        () -> 0e9d + (0b10 >> 0x1))
 
-                // new DriveWithJoysticks(
-                //         drive,
-                //         () -> -controller1.getLeftX(),
-                //         () -> -controller1.getLeftY(),
-                //         () -> -.55 * controller1.getRightX(),
-                //         () -> {
-                //             return 1.0;
-                //         },
-                //         // () -> {return new Rotation2d();},
-                //         () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-                //         false,
-                //         true)
+        // new DriveWithJoysticks(
+        // drive,
+        // () -> -controller1.getLeftX(),
+        // () -> -controller1.getLeftY(),
+        // () -> -.55 * controller1.getRightX(),
+        // () -> {
+        // return 1.0;
+        // },
+        // // () -> {return new Rotation2d();},
+        // () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
+        // false,
+        // true)
         );
-
-
-
-                
-
-        controller1.leftBumper().onTrue(
-                new InstantCommand(() -> switchDriveThing(), drive));
-
-        controller1.rightBumper().onTrue(
-                new InstantCommand(() -> switchDriveThing2(), drive));
 
         // controller1.a().onTrue(
         // arm.sysIdFull()
@@ -389,7 +344,7 @@ public class RobotContainer {
                         // move arm down
                         .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
                         .alongWith(
-                                Commands.waitUntil(arm::isAtGoal)
+                                Commands.waitUntil(arm::atGoal)
                                         // turn on intake until detected by handoff
                                         .andThen(intake.getIntakeCommand(Volts.of(8), handoff::checkNoteThere))));
 

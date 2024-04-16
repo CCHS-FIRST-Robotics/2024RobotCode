@@ -1,17 +1,17 @@
-package frc.robot.subsystems.drive.swerveDrive;
+package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
 import com.revrobotics.*;
-import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.units.*;
-import frc.robot.Constants;
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.filter.MedianFilter;
+import frc.robot.Constants;
 
 public class ModuleIOSparkMax implements ModuleIO {
     /* MOTOR CONTROLLERS + PID */
@@ -21,11 +21,11 @@ public class ModuleIOSparkMax implements ModuleIO {
     private final SparkPIDController driveSparkMaxPIDF;
     private final SparkPIDController turnSparkMaxPIDF;
 
-    // TODO: update constants in periodic once tunable is set up
+    // ! lol tune these
     public double driveKp = 0.00001; // 00015
     public double driveKd = 0.0;
-    public double driveKi = 0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000; // 0.000008
-    
+    public double driveKi = 0.0; // 0.000008
+
     public double driveKs = 0.0; // 0.19
     public double driveKv = 0.136898; // From NEO datasheet (473kV): 0.136194 V/(rad/s) -
                                       // https://www.wolframalpha.com/input?i=1%2F%28473+*+2pi%2F60%29+*+%2850.0+%2F+14.0%29+*+%2817.0+%2F+27.0%29+*+%2845.0+%2F+15.0%29
@@ -211,15 +211,13 @@ public class ModuleIOSparkMax implements ModuleIO {
      */
     public void setDriveVelocity(Measure<Velocity<Angle>> velocity) {
         driveSparkMaxPIDF.setReference(
-            velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
-            CANSparkMax.ControlType.kVelocity,
-            0,
-            driveFeedforward.calculate(
-                prevVelocity.in(RadiansPerSecond),
-                velocity.in(RadiansPerSecond),
-                Constants.PERIOD
-            )
-        );
+                velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
+                CANSparkMax.ControlType.kVelocity,
+                0,
+                driveFeedforward.calculate(
+                        prevVelocity.in(RadiansPerSecond),
+                        velocity.in(RadiansPerSecond),
+                        Constants.PERIOD));
         prevVelocity = velocity;
     }
 
@@ -231,12 +229,12 @@ public class ModuleIOSparkMax implements ModuleIO {
     public void setTurnPosition(Measure<Angle> position) {
         // Adjust from [-PI, PI] (wrapped angle, so initially -pi was 2pi) -> [0, 2PI]
         position = Radians.of(
-        MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
+                MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
 
         turnSparkMaxPIDF.setReference(
-        position.in(Rotations),
-        CANSparkMax.ControlType.kPosition,
-        0);
+                position.in(Rotations),
+                CANSparkMax.ControlType.kPosition,
+                0);
     }
 
     /*

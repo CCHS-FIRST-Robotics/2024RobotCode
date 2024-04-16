@@ -4,7 +4,8 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.Supplier;
-import frc.robot.subsystems.drive.swerveDrive.*;
+
+import frc.robot.subsystems.drive.Drive;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -55,7 +56,7 @@ public class DriveModules extends Command {
                 prevSpeed + drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD);
 
         drive.runModules(new SwerveModuleState(
-                0, //linearSpeed
+                0, // linearSpeed
                 new Rotation2d(Math.PI / 2.0 * angularPosition)));
     }
 

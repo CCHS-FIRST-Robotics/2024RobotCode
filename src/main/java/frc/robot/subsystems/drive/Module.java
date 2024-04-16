@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drive.swerveDrive;
+package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.*;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
+import frc.robot.subsystems.drive.swerveDrive.ModuleIOInputsAutoLogged;
 
 public class Module {
 
@@ -54,12 +55,14 @@ public class Module {
         // optimizedState = targetState; // for testing ONLY
 
         io.setTurnPosition(Radians.of(optimizedState.angle.getRadians()));
-        // io.setTurnVoltage(Volts.of(1));
 
         // Update velocity based on turn error
-        // does some fancy things to move only in the direction you want while theres an error
-        // draw out the current/desired vectors, and remember that cos is like the dot product,
-        // it projects one vector onto the other, idk I cant make sense of it rn im tired asf
+        // does some fancy things to move only in the direction you want while theres an
+        // error
+        // draw out the current/desired vectors, and remember that cos is like the dot
+        // product,
+        // it projects one vector onto the other, idk I cant make sense of it rn im
+        // tired asf
         optimizedState.speedMetersPerSecond *= Math
                 .cos(inputs.turnAbsolutePositionRad.in(Radians) - optimizedState.angle.getRadians());
 
@@ -69,10 +72,12 @@ public class Module {
             optimizedState.speedMetersPerSecond = MathUtil.clamp(
                     optimizedState.speedMetersPerSecond,
                     getMaxVelocity(-inputs.driveAverageBusVoltage.in(Volts),
-                            prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, ModuleIO.driveKv,
+                            prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD,
+                            ModuleIO.driveKv,
                             ModuleIO.driveKa) * wheelRadius.in(Meters),
                     getMaxVelocity(inputs.driveAverageBusVoltage.in(Volts),
-                            prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD, ModuleIO.driveKv,
+                            prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD,
+                            ModuleIO.driveKv,
                             ModuleIO.driveKa) * wheelRadius.in(Meters));
 
             // Run drive controller
@@ -81,7 +86,8 @@ public class Module {
             io.setDriveVelocity(RadiansPerSecond.of(velocityRadPerSec));
         } else {
             io.setDriveVoltage(
-                Volts.of(optimizedState.speedMetersPerSecond) // NORMALIZED IN DRIVE (state speed / max linear speed)
+                    Volts.of(optimizedState.speedMetersPerSecond) // NORMALIZED IN DRIVE (state speed / max linear
+                                                                  // speed)
             );
         }
 

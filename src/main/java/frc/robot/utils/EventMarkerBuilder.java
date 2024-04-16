@@ -24,7 +24,7 @@ import frc.robot.Constants.AutoPathConstants;
 import frc.robot.Constants.EventCommand;
 import frc.robot.commands.AutoCommand;
 import frc.robot.commands.MoveToPose;
-import frc.robot.subsystems.drive.swerveDrive.Drive;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.noteIO.arm.Arm;
 import frc.robot.subsystems.noteIO.handoff.Handoff;
 import frc.robot.subsystems.noteIO.intake.Intake;
@@ -63,17 +63,19 @@ public final class EventMarkerBuilder {
         this.arm = arm;
         this.handoff = handoff;
 
-        // maybe change???? have it move to right in front of speaker first if not there before starting auto path?
+        // maybe change???? have it move to right in front of speaker first if not there
+        // before starting auto path?
         // command = new MoveToPose(drive, );
-        command = Commands.waitSeconds(1).andThen(new InstantCommand(() -> shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT, AutoPathConstants.SHOOT_SPEED_RIGHT), shooter)
+        command = Commands.waitSeconds(1).andThen(new InstantCommand(
+                () -> shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT, AutoPathConstants.SHOOT_SPEED_RIGHT), shooter)
                 .andThen(
-                    arm.moveArm(ArmPosition.SPEAKER, drive::getPose)
-                    .alongWith(
-                        Commands.waitUntil(() -> shooter.upToSpeed() && arm.isAtGoal())
-                        .andThen(handoff.getShootCommand(AutoPathConstants.HANDOFF_IN_VOLTS, shooter::checkNoteShot))
-                    ).until(shooter::checkNoteShot)
-                ));
-        
+                        arm.moveArm(ArmPosition.SPEAKER, drive::getPose)
+                                .alongWith(
+                                        Commands.waitUntil(() -> shooter.upToSpeed() && arm.atGoal())
+                                                .andThen(handoff.getShootCommand(AutoPathConstants.HANDOFF_IN_VOLTS,
+                                                        shooter::checkNoteShot)))
+                                .until(shooter::checkNoteShot)));
+
         for (String path : pathList) {
             addCommand(path);
         }
@@ -88,7 +90,7 @@ public final class EventMarkerBuilder {
 
     public void addCommand(String path) {
         DriveTrajectory traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path);
-        ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path); //only being used rn to get total time
+        ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path); // only being used rn to get total time
         List<Pair<Double, Command>> eventMarkers = new ArrayList<Pair<Double, Command>>();
 
         double driveTime = Math.max(AutoPathConstants.MAX_ARM_MOVE_TIME, choreoTrajectory.getTotalTime());
@@ -98,21 +100,21 @@ public final class EventMarkerBuilder {
 
         // start drive and more arm to inake
         eventMarkers.add(Pair.of(AutoPathConstants.INIT_MOVEMENTS_TIME,
-            // turn on handoff
-            handoff.getHandoffCommand(AutoPathConstants.HANDOFF_IN_VOLTS)
-            // turn on intake (no matter where arm is)
-            .alongWith(intake.getIntakeCommand(AutoPathConstants.INTAKE_VOLTS, handoff::checkNoteThere))
-            // move arm down
-            .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
-            // drive
-            .alongWith(drive.followTrajectory(traj))
-            // turn on intake (when arm is down)
-            // .alongWith(
-            //     Commands.waitUntil(arm::isAtGoal)
-            //     // turn on intake until detected by handoff
-            //     .andThen(intake.getIntakeCommand(AutoPathConstants.INTAKE_VOLTS,
-            //         handoff::checkNoteThere))
-            // ))
+                // turn on handoff
+                handoff.getHandoffCommand(AutoPathConstants.HANDOFF_IN_VOLTS)
+                        // turn on intake (no matter where arm is)
+                        .alongWith(intake.getIntakeCommand(AutoPathConstants.INTAKE_VOLTS, handoff::checkNoteThere))
+                        // move arm down
+                        .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
+                        // drive
+                        .alongWith(drive.followTrajectory(traj))
+        // turn on intake (when arm is down)
+        // .alongWith(
+        // Commands.waitUntil(arm::isAtGoal)
+        // // turn on intake until detected by handoff
+        // .andThen(intake.getIntakeCommand(AutoPathConstants.INTAKE_VOLTS,
+        // handoff::checkNoteThere))
+        // ))
         ));
 
         // arm shoot
@@ -122,9 +124,7 @@ public final class EventMarkerBuilder {
         // run handoff & shoot
         eventMarkers.add(Pair.of(shootTime,
                 handoff.getShootCommand(AutoPathConstants.HANDOFF_OUT_VOLTS,
-                        shooter::checkNoteShot)
-            )
-        );
+                        shooter::checkNoteShot)));
 
         if (command == null) {
             command = (new AutoCommand(eventMarkers, totalTime));
@@ -134,30 +134,30 @@ public final class EventMarkerBuilder {
     }
 
     // public static ArrayList<Double> getEventMarkers(String path) {
-    //     var traj_dir = new File(Filesystem.getDeployDirectory(), "choreo");
-    //     var traj_file = new File(traj_dir, path + ".traj");
+    // var traj_dir = new File(Filesystem.getDeployDirectory(), "choreo");
+    // var traj_file = new File(traj_dir, path + ".traj");
 
-    //     var timestamps = new ArrayList<Double>(); 
+    // var timestamps = new ArrayList<Double>();
 
-    //     try {
-    //         // parsing file "JSONExample.json" 
-    //         Object obj = new JSONParser().parse(new FileReader(traj_file)); 
-    //         // typecasting obj to JSONObject 
-    //         JSONObject jo = (JSONObject) obj;
+    // try {
+    // // parsing file "JSONExample.json"
+    // Object obj = new JSONParser().parse(new FileReader(traj_file));
+    // // typecasting obj to JSONObject
+    // JSONObject jo = (JSONObject) obj;
 
-    //         // getting timestamps
-    //         JSONArray eventMarkers = (JSONArray) jo.get("eventMarkers");
-    //         eventMarkers.forEach((marker) -> {
-    //             timestamps.add(
-    //                 (Double) ((JSONObject) marker).get("timestamp")
-    //             );
-    //         });
+    // // getting timestamps
+    // JSONArray eventMarkers = (JSONArray) jo.get("eventMarkers");
+    // eventMarkers.forEach((marker) -> {
+    // timestamps.add(
+    // (Double) ((JSONObject) marker).get("timestamp")
+    // );
+    // });
 
-    //     } catch (Exception ex) {
-    //         DriverStation.reportError(ex.getMessage(), ex.getStackTrace());
-    //     }
+    // } catch (Exception ex) {
+    // DriverStation.reportError(ex.getMessage(), ex.getStackTrace());
+    // }
 
-    //     return timestamps;
+    // return timestamps;
     // }
 
     public Command getCommandSequence() {
