@@ -12,12 +12,6 @@ import edu.wpi.first.units.*;
 import java.util.*;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean constants. This class should not be used for any other
- * purpose. All constants should be declared globally (i.e. public static). Do
- * not put anything functional in this class.
- */
 public final class Constants {
     public static enum Mode {
         /** Running on a real robot. */
@@ -40,7 +34,8 @@ public final class Constants {
         MAIN,
         LOWER,
         STAGE,
-        CLOSE_SUB
+        CLOSE_SUB,
+        TEST
     }
 
     public static HashMap<ArmPosition, Measure<Angle>> ARM_POSITIONS = new HashMap<ArmPosition, Measure<Angle>>(
@@ -51,12 +46,13 @@ public final class Constants {
                     ArmPosition.MAIN, Degrees.of(-22),
                     ArmPosition.LOWER, Degrees.of(0),
                     ArmPosition.STAGE, Degrees.of(25.5),
-                    ArmPosition.CLOSE_SUB, Degrees.of(18)));
+                    ArmPosition.CLOSE_SUB, Degrees.of(18),
+                    ArmPosition.TEST, Degrees.of(20)));
 
-    public static final Pose2d SPEAKER_POSE = new Pose2d(16.57, 5.55, new Rotation2d(Math.PI));
+    public static final Pose2d SPEAKER_POSE = new Pose2d(0, 5.55, new Rotation2d(0));
 
-    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(70);
-    public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(90);
+    public static final Measure<Velocity<Angle>> SHOOTER_LEFT_SPEED = RotationsPerSecond.of(75);
+    public static final Measure<Velocity<Angle>> SHOOTER_RIGHT_SPEED = RotationsPerSecond.of(95);
     public static final Measure<Velocity<Angle>> SHOOTER_AMP_SPEED = RotationsPerSecond.of(50);
 
     // ports and ids

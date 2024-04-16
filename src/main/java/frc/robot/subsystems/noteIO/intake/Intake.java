@@ -6,8 +6,6 @@ import edu.wpi.first.wpilibj2.command.*;
 import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.units.*;
-
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
@@ -23,7 +21,6 @@ public class Intake extends SubsystemBase {
     public void start(Measure<Voltage> v) {
         volts = v;
         startTime = Timer.getFPGATimestamp();
-        System.out.println("dhsudhhuh");
     }
 
     public void stop() {
@@ -33,19 +30,12 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs("intake", inputs);
+        Logger.processInputs("Intake", inputs);
         Logger.recordOutput("Intake on", volts != Volts.of(0));
 
         io.setVoltage(volts);
-        // io.setVoltage(Volts.of(4));
     }
 
-    @AutoLogOutput
-    public boolean isOn() {
-        return volts.in(Volts) != 0;
-    }
-
-    @AutoLogOutput
     public boolean checkNoteThere() {
         return inputs.motor1Current > 28 && Timer.getFPGATimestamp() - startTime > 0.1;
     }

@@ -7,7 +7,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
- * to do:
+ * To do:
+ * 
+ * understand PID for shooter
  * 
  * tune the PID in moduleSparkMax
  * 
@@ -22,6 +24,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * 
  * make objects in IO classes final
  * find out where the gyro is actually used
+ * try to get advantagekit to simulate the entire robot
  */
 
 public final class Main {

@@ -9,8 +9,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.Orchestra;
-// import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -28,8 +26,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
 
     private static final double driveFeedforwardKs = 0;
     // Units needed are volts * seconds / rotations, max rpm is 6,380
-    private static final double driveFeedforwardKv = .132; // 6380 rotaions per minute is 319/3
-                                                           // rotations per second
+    private static final double driveFeedforwardKv = .132; // 6380 rotaions per minute is 319/3 rotations per second
     private static final double driveFeedforwardKa = 0;
 
     private StatusSignal<Double> voltageSignalLeft;
@@ -65,6 +62,7 @@ public class ShooterIOFalcon500 implements ShooterIO {
         velocitySignalRight = rightShooter.getVelocity();
         temperatureSignalRight = rightShooter.getDeviceTemp();
 
+        // ! look at this
         talonFXConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         talonFXConfig.CurrentLimits.SupplyCurrentLimit = 80;
         // talonFXConfig.CurrentLimits.SupplyTimeThreshold = 0.05;
@@ -146,11 +144,5 @@ public class ShooterIOFalcon500 implements ShooterIO {
         inputs.rightShooterTemperature = temperatureSignalRight.getValue();
 
         inputs.closedLoopReference = closedLoopReferenceSignal.getValue();
-    }
-
-    @Override
-    public void addToOrchestra(Orchestra orchestra, int trackNum) {
-        orchestra.addInstrument(leftShooter, trackNum);
-        orchestra.addInstrument(rightShooter, trackNum + 1);
     }
 }

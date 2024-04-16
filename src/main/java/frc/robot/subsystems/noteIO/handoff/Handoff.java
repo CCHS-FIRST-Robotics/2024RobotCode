@@ -8,9 +8,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-// import frc.robot.Constants.AutoPathConstants;
-
-import com.ctre.phoenix6.Orchestra;
 
 public class Handoff extends SubsystemBase {
     private HandoffIO io;
@@ -27,19 +24,15 @@ public class Handoff extends SubsystemBase {
     public void start(Measure<Voltage> v) {
         volts = v;
         startTime = Timer.getFPGATimestamp();
-        System.out.println("teu9shuhufhds");
     }
 
     public void stop() {
         volts = Volts.of(0);
-        // startTime = Timer.getFPGATimestamp();
     }
 
     @AutoLogOutput
     public boolean checkNoteThere() {
-        // return false;
-        return inputs.motorCurrent > currentThreshold && (Timer.getFPGATimestamp() - startTime > 0.5);
-        // return Timer.getFPGATimestamp()-startTime>AutoPathConstants.Q_INTAKE_TIME;
+        return inputs.motorCurrent > 25 && (Timer.getFPGATimestamp() - startTime > 0.5);
     }
 
     public void setCurrentThreshold(double current) {
@@ -49,16 +42,10 @@ public class Handoff extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs("handoff", inputs);
+        Logger.processInputs("Handoff", inputs);
         Logger.recordOutput("Handoff on", volts != Volts.of(0));
 
         io.setVoltage(volts);
-        // io.setVoltage(Volts.of(6));
-    }
-
-    @AutoLogOutput
-    public boolean isOn() {
-        return volts.in(Volts) != 0;
     }
 
     // turns motor on until interrupted
@@ -83,9 +70,5 @@ public class Handoff extends SubsystemBase {
                 () -> start(v),
                 this::stop,
                 this).until(shooterDone);
-    }
-
-    public void addToOrchestra(Orchestra orchestra, int trackNum) {
-        io.addToOrchestra(orchestra, trackNum);
     }
 }

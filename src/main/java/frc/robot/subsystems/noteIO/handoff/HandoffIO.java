@@ -3,8 +3,6 @@ package frc.robot.subsystems.noteIO.handoff;
 import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.AutoLog;
 
-import com.ctre.phoenix6.Orchestra;
-
 public interface HandoffIO {
     @AutoLog
     public static class HandoffIOInputs {
@@ -19,8 +17,5 @@ public interface HandoffIO {
     }
 
     public default void updateInputs(HandoffIOInputs inputs) {
-    }
-
-    public default void addToOrchestra(Orchestra orchestra, int trackNum) {
     }
 }

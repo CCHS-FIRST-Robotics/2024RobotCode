@@ -5,10 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.AutoLog;
 
-import com.ctre.phoenix6.Orchestra;
-
 public interface ArmIO {
-
     @AutoLog
     public static class ArmIOInputs {
         public Measure<Angle> drivePosition = Radians.of(0.0);
@@ -54,8 +51,4 @@ public interface ArmIO {
     public default void setCharacterizationVoltage(Measure<Voltage> volts) {
 
     }
-
-    public default void addToOrchestra(Orchestra orchestra, int trackNum) {
-    }
-
 }

@@ -3,8 +3,6 @@ package frc.robot.subsystems.noteIO.shooter;
 import edu.wpi.first.units.*;
 import org.littletonrobotics.junction.AutoLog;
 
-import com.ctre.phoenix6.Orchestra;
-
 public interface ShooterIO {
     @AutoLog
     public static class ShooterIOInputs {
@@ -34,8 +32,5 @@ public interface ShooterIO {
     }
 
     public default void updateInputs(ShooterIOInputs inputs) {
-    }
-
-    public default void addToOrchestra(Orchestra orchestra, int trackNum) {
     }
 }
