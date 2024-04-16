@@ -19,7 +19,6 @@ import frc.robot.utils.PoseEstimator;
 import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
-import frc.robot.subsystems.drive.swerveDrive.GyroIOInputsAutoLogged;
 
 import java.util.function.Supplier;
 

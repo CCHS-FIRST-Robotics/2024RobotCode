@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.*;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
-import frc.robot.subsystems.drive.swerveDrive.ModuleIOInputsAutoLogged;
 
 public class Module {
     private final ModuleIO io;
