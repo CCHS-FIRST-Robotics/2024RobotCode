@@ -32,9 +32,8 @@ public class AprilTag {
     public AprilTag(int id, Transform2d transform) {
         this.id = id;
         this.transform = new Transform3d(
-            new Translation3d(transform.getX(), transform.getY(), 0),
-            new Rotation3d(0, 0, transform.getRotation().getRadians())
-        );
+                new Translation3d(transform.getX(), transform.getY(), 0),
+                new Rotation3d(0, 0, transform.getRotation().getRadians()));
     }
 
     /**

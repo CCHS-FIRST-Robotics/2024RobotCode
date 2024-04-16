@@ -66,8 +66,7 @@ public class Handoff extends SubsystemBase {
         return new StartEndCommand(
                 () -> start(v),
                 this::stop,
-                this
-        );
+                this);
     }
 
     // turns motor on until note detected
@@ -75,8 +74,7 @@ public class Handoff extends SubsystemBase {
         return new StartEndCommand(
                 () -> start(v),
                 this::stop,
-                this
-        ).until(this::checkNoteThere);
+                this).until(this::checkNoteThere);
     }
 
     // turns motor on until shooter detects note
@@ -84,8 +82,7 @@ public class Handoff extends SubsystemBase {
         return new StartEndCommand(
                 () -> start(v),
                 this::stop,
-                this
-        ).until(shooterDone);
+                this).until(shooterDone);
     }
 
     public void addToOrchestra(Orchestra orchestra, int trackNum) {

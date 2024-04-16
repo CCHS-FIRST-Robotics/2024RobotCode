@@ -22,7 +22,7 @@ public class HandoffIOSparkMax implements HandoffIO {
 
     public HandoffIOSparkMax(int id) {
         motor = new CANSparkMax(id, CANSparkBase.MotorType.kBrushless);
-        encoder = motor.getEncoder(); 
+        encoder = motor.getEncoder();
 
         motor.setCANTimeout(500);
         motor.setInverted(false);

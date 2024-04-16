@@ -10,7 +10,6 @@ import frc.robot.Constants;
 import frc.robot.subsystems.drive.swerveDrive.ModuleIOInputsAutoLogged;
 
 public class Module {
-
     private final ModuleIO io;
     private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
     private final int index;

@@ -7,10 +7,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
- * to do:
+ * Things to do next year:
  * 
- * sysID for shooter (same as arm)
+ * tunable numbers with smartdashboard
+ * phoenix sims
+ * don't use timestampedpose2d/3d
  */
+
 public final class Main {
     private Main() {
     }

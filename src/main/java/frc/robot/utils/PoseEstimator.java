@@ -27,7 +27,7 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
     // static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(10, 10,
     // 10); // for testing (only use vision, essentially)
     static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.0025, 0.0025, 0.0002);
-    
+
     SwerveModulePosition[] prevModulePositions = new SwerveModulePosition[4];
 
     /*
@@ -97,6 +97,7 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
         return prevModulePositions;
     }
 
+    // ! why tf is this never used
     /**
      * Adds odometry data to the pose estimator (pose exponential)
      * 

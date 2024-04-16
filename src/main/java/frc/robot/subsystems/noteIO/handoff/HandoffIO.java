@@ -21,5 +21,6 @@ public interface HandoffIO {
     public default void updateInputs(HandoffIOInputs inputs) {
     }
 
-    public default void addToOrchestra(Orchestra orchestra, int trackNum) {}
+    public default void addToOrchestra(Orchestra orchestra, int trackNum) {
+    }
 }

@@ -51,10 +51,11 @@ public interface ArmIO {
     public default void setDriveBrakeMode(boolean enable) {
     }
 
-    public default void setCharacterizationVoltage(Measure<Voltage> volts){
+    public default void setCharacterizationVoltage(Measure<Voltage> volts) {
 
     }
 
-    public default void addToOrchestra(Orchestra orchestra, int trackNum) {}
+    public default void addToOrchestra(Orchestra orchestra, int trackNum) {
+    }
 
 }

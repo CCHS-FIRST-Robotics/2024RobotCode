@@ -13,7 +13,6 @@ import edu.wpi.first.units.*;
 import frc.robot.Constants;
 
 public class ModuleIOSim implements ModuleIO {
-
     public double driveKp = 0.00015; // 0.00015
     public double driveKd = 0.0;
     public double driveKi = 0.000000; // 0.000008

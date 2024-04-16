@@ -28,12 +28,14 @@ public interface ShooterIO {
     public default void setVoltage(Measure<Voltage> v) {
     }
 
-    public default boolean upToSpeed(Measure<Velocity<Angle>> leftTargetVelocity, Measure<Velocity<Angle>> rightTargetVelocity) {
+    public default boolean upToSpeed(Measure<Velocity<Angle>> leftTargetVelocity,
+            Measure<Velocity<Angle>> rightTargetVelocity) {
         return false;
     }
 
     public default void updateInputs(ShooterIOInputs inputs) {
     }
 
-    public default void addToOrchestra(Orchestra orchestra, int trackNum) {}
+    public default void addToOrchestra(Orchestra orchestra, int trackNum) {
+    }
 }

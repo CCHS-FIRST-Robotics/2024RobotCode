@@ -24,7 +24,6 @@ import frc.robot.subsystems.drive.swerveDrive.GyroIOInputsAutoLogged;
 import java.util.function.Supplier;
 
 public class Drive extends SubsystemBase {
-
     /*
      * CONSTANTS
      */
@@ -41,11 +40,11 @@ public class Drive extends SubsystemBase {
     // // Threshold to detect falls
 
     // Define Gyro IO and inputs
-    private final GyroIO gyroIO;
-    private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+    private GyroIO gyroIO;
+    private GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
     // Define Module objects
-    private final Module[] modules = new Module[4]; // FL, FR, BL, BR
+    private Module[] modules = new Module[4]; // FL, FR, BL, BR
 
     // Constants for the drivebase
     private static Measure<Velocity<Distance>> maxLinearSpeed = MetersPerSecond.of(4.5);
@@ -206,7 +205,6 @@ public class Drive extends SubsystemBase {
     }
 
     public void periodic() {
-        // System.out.println("HI IM RUNNING");
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
         for (var module : modules) {

@@ -55,7 +55,8 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("shooter", inputs);
-        Logger.recordOutput("Shooter on", leftVelocity.in(RadiansPerSecond) != 0 || rightVelocity.in(RadiansPerSecond) != 0);
+        Logger.recordOutput("Shooter on",
+                leftVelocity.in(RadiansPerSecond) != 0 || rightVelocity.in(RadiansPerSecond) != 0);
 
         io.setVelocity(leftVelocity, rightVelocity);
         // io.setVoltage(Volts.of(2));

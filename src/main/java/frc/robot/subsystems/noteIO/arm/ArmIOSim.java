@@ -17,26 +17,23 @@ public class ArmIOSim implements ArmIO {
     private static final double gearRatio = 100 * 48 / 22d;
     Measure<Angle> startPos = Degrees.of(-15);
     LinearFilter accelerationSetpoint = LinearFilter.backwardFiniteDifference(1, 2, Constants.PERIOD);
-    
+
     SingleJointedArmSim armSim = new SingleJointedArmSim(
-        DCMotor.getFalcon500Foc(1),
-        gearRatio,
-        1,
-        .41,
-        startPos.in(Radians),
-        Radians.convertFrom(120, Degrees),
-        true,
-        Radians.convertFrom(0, Degrees)
-    );
+            DCMotor.getFalcon500Foc(1),
+            gearRatio,
+            1,
+            .41,
+            startPos.in(Radians),
+            Radians.convertFrom(120, Degrees),
+            true,
+            Radians.convertFrom(0, Degrees));
 
     PIDController feedback = new PIDController(20, 0, 0);
     ArmFeedforward feedforward = new ArmFeedforward(0, .435, 12 * (3 / 319d), 0);
     TrapezoidProfile trapProf = new TrapezoidProfile(
-        new TrapezoidProfile.Constraints(
-            RotationsPerSecond.of(5),
-            RotationsPerSecond.per(Second).of(30)
-        )
-    );
+            new TrapezoidProfile.Constraints(
+                    RotationsPerSecond.of(5),
+                    RotationsPerSecond.per(Second).of(30)));
     State prevState = new State(startPos.in(Rotations), 0);
 
     Measure<Voltage> appliedVoltage = Volts.of(0.0);
@@ -65,20 +62,18 @@ public class ArmIOSim implements ArmIO {
     @Override
     public void setDrivePosition(Measure<Angle> position) {
         var setpoint = trapProf.calculate(
-            Constants.PERIOD, 
-            prevState,
-            new State(position.in(Rotations), 0)
-        );
+                Constants.PERIOD,
+                prevState,
+                new State(position.in(Rotations), 0));
 
         double volts = feedforward.calculate(
-            setpoint.position, 
-            setpoint.velocity, 
-            accelerationSetpoint.calculate(setpoint.velocity)
-        ) + feedback.calculate(
-            Rotations.convertFrom(armSim.getAngleRads(), Radians), 
-            setpoint.position
-        );
-        
+                setpoint.position,
+                setpoint.velocity,
+                accelerationSetpoint.calculate(setpoint.velocity))
+                + feedback.calculate(
+                        Rotations.convertFrom(armSim.getAngleRads(), Radians),
+                        setpoint.position);
+
         setDriveVoltage(Volts.of(volts));
 
         prevState = setpoint;

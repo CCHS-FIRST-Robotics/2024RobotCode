@@ -6,9 +6,10 @@ import edu.wpi.first.units.*;
 import static edu.wpi.first.units.Units.*;
 
 public interface ModuleIO {
-
-    public double driveKv = 0.136898;
-    public double driveKa = 0.020864;
+    // ! just has to be here
+    // ! bad bad bad bad bad abd
+    static double driveKv = 0.0;
+    static double driveKa = 0.0;
 
     @AutoLog
     public static class ModuleIOInputs {

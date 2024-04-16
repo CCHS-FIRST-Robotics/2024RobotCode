@@ -155,7 +155,9 @@ public final class DriveTrajectoryGenerator {
     }
 
     public static DriveTrajectory generateChoreoTrajectoryFromFile(String path) {
-        // ChoreoTrajectory choreoTrajectory = AutoPathConstants.ALLIANCE == Alliance.Red ? Choreo.getTrajectory(path).flipped() : Choreo.getTrajectory(path);
+        // ChoreoTrajectory choreoTrajectory = AutoPathConstants.ALLIANCE ==
+        // Alliance.Red ? Choreo.getTrajectory(path).flipped() :
+        // Choreo.getTrajectory(path);
         ChoreoTrajectory choreoTrajectory = Choreo.getTrajectory(path);
 
         double timeToEnd = choreoTrajectory.getTotalTime();
