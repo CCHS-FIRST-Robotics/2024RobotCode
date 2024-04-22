@@ -8,8 +8,8 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.units.*;
 
 public class IntakeIONEO implements IntakeIO {
-    CANSparkMax motor1, motor2;
-    RelativeEncoder encoder1, encoder2;
+    private final CANSparkMax motor1, motor2;
+    private final RelativeEncoder encoder1, encoder2;
 
     public IntakeIONEO(int id1, int id2) {
         motor1 = new CANSparkMax(id1, MotorType.kBrushless);

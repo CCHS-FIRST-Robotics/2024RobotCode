@@ -10,7 +10,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 
 public class HandoffIOFalcon500 implements HandoffIO {
-    private TalonFX motor;
+    private final TalonFX motor;
 
     private StatusSignal<Double> voltageSignal;
     private StatusSignal<Double> currentSignal;

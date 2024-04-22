@@ -32,24 +32,24 @@ public class ArmIOFalcon500 implements ArmIO {
     private final Slot0Configs drivePID = driveFalconConfig.Slot0;
     private final FeedbackConfigs driveFeedbackConfig = driveFalconConfig.Feedback;
 
-    StatusSignal<Double> drivePositionSignal;
-    StatusSignal<Double> driveVelocitySignal;
-    StatusSignal<Double> driveAppliedVoltageSignal;
-    StatusSignal<Double> driveCurrentSignal;
-    StatusSignal<Double> driveTempSignal;
+    private StatusSignal<Double> drivePositionSignal;
+    private StatusSignal<Double> driveVelocitySignal;
+    private StatusSignal<Double> driveAppliedVoltageSignal;
+    private StatusSignal<Double> driveCurrentSignal;
+    private StatusSignal<Double> driveTempSignal;
 
-    StatusSignal<Double> absolutePositionSignal;
-    StatusSignal<Double> absoluteVelocitySignal;
+    private StatusSignal<Double> absolutePositionSignal;
+    private StatusSignal<Double> absoluteVelocitySignal;
 
-    StatusSignal<Double> rotorPositionSignal;
+    private StatusSignal<Double> rotorPositionSignal;
 
-    StatusSignal<Double> closedLoopReferenceSignal;
-    StatusSignal<Double> closedLoopErrorSignal;
+    private StatusSignal<Double> closedLoopReferenceSignal;
+    private StatusSignal<Double> closedLoopErrorSignal;
 
-    StatusSignal<Boolean> faultFusedSensorOutOfSync;
-    StatusSignal<Boolean> stickyFaultFusedSensorOutOfSync;
-    StatusSignal<Boolean> faultRemoteSensorOutOfSync;
-    StatusSignal<Boolean> stickyFaultRemoteSensorOutOfSync;
+    private StatusSignal<Boolean> faultFusedSensorOutOfSync;
+    private StatusSignal<Boolean> stickyFaultFusedSensorOutOfSync;
+    private StatusSignal<Boolean> faultRemoteSensorOutOfSync;
+    private StatusSignal<Boolean> stickyFaultRemoteSensorOutOfSync;
 
     private static final double gearRatio = 100 * 48d / 14d; // 100 * 26d / 14d
 

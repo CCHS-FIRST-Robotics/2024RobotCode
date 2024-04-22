@@ -11,8 +11,8 @@ import java.util.*;
 import frc.robot.utils.*;
 
 public class CameraIOPhotonVision implements CameraIO {
-    PhotonCamera camera = new PhotonCamera("Camera_Module_v1");
-    PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(
+    private final PhotonCamera camera = new PhotonCamera("Camera_Module_v1");
+    private final PhotonPoseEstimator poseEstimator = new PhotonPoseEstimator(
             AprilTagFields.kDefaultField.loadAprilTagLayoutField(),
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             camera,

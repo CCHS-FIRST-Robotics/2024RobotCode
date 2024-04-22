@@ -7,8 +7,8 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.units.*;
 
 public class HandoffIOSparkMax implements HandoffIO {
-    private CANSparkMax motor;
-    private RelativeEncoder encoder;
+    private final CANSparkMax motor;
+    private final RelativeEncoder encoder;
 
     public HandoffIOSparkMax(int id) {
         motor = new CANSparkMax(id, CANSparkBase.MotorType.kBrushless);

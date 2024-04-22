@@ -10,21 +10,15 @@ import edu.wpi.first.wpilibj.RobotBase;
  * to do:
  * 
  * at robo:
- * tune module PID
+ * tune module PID and add KS to feedforward
  * FOC instead of MotionMagic armIOFalcon
- * 
  * 
  * small things:
  * make objects in IO classes final
  * moduleIO kV and kA
- * GyroIONavX negative values
- * 
  * 
  * ask colin:
- * find out where the gyro is actually used
- * fix something in drivewithjoysticks
  * something I don't understand in gyroIO.java
- * 
  * 
  * eventually:
  * autochooser for autos
