@@ -15,7 +15,7 @@ import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.units.*;
 
 public class ShooterIOFalcon500 implements ShooterIO {
-    private TalonFX leftShooter, rightShooter;
+    private final TalonFX leftShooter, rightShooter;
     private VelocityVoltage velocityControl = new VelocityVoltage(0);
     private final TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
     private final Slot0Configs drivePID = talonFXConfig.Slot0;
