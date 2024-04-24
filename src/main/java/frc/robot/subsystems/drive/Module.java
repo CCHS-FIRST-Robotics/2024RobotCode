@@ -79,7 +79,9 @@ public class Module {
 
             // Run drive controller
             // System.out.println(wheelRadius.in(Meters));
+
             double velocityRadPerSec = optimizedState.speedMetersPerSecond / wheelRadius.in(Meters);
+
             io.setDriveVelocity(RadiansPerSecond.of(velocityRadPerSec));
         } else {
             io.setDriveVoltage(
