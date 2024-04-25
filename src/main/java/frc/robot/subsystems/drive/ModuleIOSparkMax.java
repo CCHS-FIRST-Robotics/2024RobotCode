@@ -32,13 +32,15 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     public double turnKp = 8;
     public double turnKd = 0.00;
-    // add ks here
+    public double turnKi = 0.00;
 
-    private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa); // kV
-                                                                                                             // UNITS:
-                                                                                                             // VOLTS /
-                                                                                                             // (RAD PER
-                                                                                                             // SECOND)
+    public double turnKs = 0.0; // voltage to overcome static friction
+    public double turnKv = 0.0;
+    public double turnKa = 0.0;
+
+    private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
+    // kV UNITS: VOLTS / (RAD PER SECOND)
+    private SimpleMotorFeedforward turnFeedforward = new SimpleMotorFeedforward(turnKs, turnKv, turnKa);
 
     /* ENCODERS */
     private final RelativeEncoder driveEncoder; // NEO Encoder
@@ -58,7 +60,7 @@ public class ModuleIOSparkMax implements ModuleIO {
     // private final Rotation2d absoluteEncoderOffset;
 
     private Measure<Velocity<Angle>> prevVelocity = RadiansPerSecond.of(0.0);
-    // private double prevVelocity = 0;
+    private Measure<Angle> prevPosition = Radians.of(0.0);
 
     public int index;
 
@@ -85,7 +87,7 @@ public class ModuleIOSparkMax implements ModuleIO {
 
         turnSparkMaxPIDF.setP(turnKp, 0);
         turnSparkMaxPIDF.setD(turnKd, 0);
-        turnSparkMaxPIDF.setI(0, 0);
+        turnSparkMaxPIDF.setI(turnKi, 0);
         turnSparkMaxPIDF.setFF(0, 0);
 
         turnSparkMaxPIDF.setPositionPIDWrappingEnabled(true);
@@ -228,10 +230,18 @@ public class ModuleIOSparkMax implements ModuleIO {
         position = Radians.of(
                 MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
 
+        int signum = 1;
+        if (Math.abs(position.in(Radians) - prevPosition.in(Radians)) < Math.PI) {
+
+        }
+
         turnSparkMaxPIDF.setReference(
                 position.in(Rotations),
                 CANSparkMax.ControlType.kPosition,
-                0);
+                0,
+                turnKs * signum);
+
+        prevPosition = position;
     }
 
     /*
