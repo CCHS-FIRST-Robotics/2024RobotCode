@@ -230,10 +230,27 @@ public class ModuleIOSparkMax implements ModuleIO {
         position = Radians.of(
                 MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
 
-        int signum = 1;
-        if (Math.abs(position.in(Radians) - prevPosition.in(Radians)) < Math.PI) {
+        // + = ccw
+        // - = cw
+        // sigNum = position.in(Radians) > prevPosition.in(Radians) ?
 
-        }
+        int signum = position.in(Radians) > prevPosition.in(Radians)
+                ? position.in(Radians) < prevPosition.in(Radians) + Math.PI ? 1 : -1
+                : prevPosition.in(Radians) < position.in(Radians) + Math.PI ? 1 : -1;
+
+        // double p = position.in(Radians);
+        // double q = prevPosition.in(Radians);
+        // if (p > q) {
+        // // need to check positino - prevPosition and prevPosition - position + 2pi
+        // if (p - q < q - p + 2 * Math.PI) {
+        // signum = -1;
+        // }
+        // } else {
+        // // need to check prevPosition - position and 2pi - prevPosition + position
+        // if (q - p < p - q + 2 * Math.PI) {
+        // signum = -1;
+        // }
+        // }
 
         turnSparkMaxPIDF.setReference(
                 position.in(Rotations),
