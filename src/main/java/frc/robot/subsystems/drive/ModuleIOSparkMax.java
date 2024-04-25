@@ -229,6 +229,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         // Adjust from [-PI, PI] (wrapped angle, so initially -pi was 2pi) -> [0, 2PI]
         position = Radians.of(
                 MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
+
         // + = ccw
         // - = cw
         // sigNum = position.in(Radians) > prevPosition.in(Radians) ?
