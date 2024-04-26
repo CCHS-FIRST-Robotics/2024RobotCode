@@ -19,10 +19,6 @@ public final class DriveTrajectoryGenerator {
             Pose2d targetPose, Twist2d targetVelocity, Pose2d currentPose, Twist2d currentVelocity,
             Constraints linearConstraints, Constraints angularConstraints) {
 
-        // System.out.println("TESTING");
-        // System.out.println(targetPose);
-        // System.out.println(currentPose);
-
         TrapezoidProfile.State targetXState = new TrapezoidProfile.State(targetPose.getX(), targetVelocity.dx);
         TrapezoidProfile.State targetYState = new TrapezoidProfile.State(targetPose.getY(), targetVelocity.dy);
         TrapezoidProfile.State targetHeadingState = new TrapezoidProfile.State(targetPose.getRotation().getRadians(),
@@ -57,10 +53,6 @@ public final class DriveTrajectoryGenerator {
             double dy = profileY.calculate(time, currentYState, targetYState).velocity;
             double dtheta = profileHeading.calculate(time, currentHeadingState, targetHeadingState).velocity;
             velocityTrajectory.add(new Twist2d(dx, dy, dtheta));
-
-            // System.out.println(i);
-            // System.out.println(new Pose2d(x, y, new Rotation2d(heading)));
-            // System.out.println(new Twist2d(dx, dy, dtheta));
         }
 
         return new DriveTrajectory(poseTrajectory, velocityTrajectory);
@@ -69,10 +61,6 @@ public final class DriveTrajectoryGenerator {
     public static DriveTrajectory generateTrapezoidTrajectory(Pose2d targetPose, Twist2d targetVelocity,
             Pose2d currentPose, Twist2d currentVelocity, Constraints linearConstraints,
             Constraints angularConstraints) {
-
-        // System.out.println("TESTING");
-        // System.out.println(targetPose);
-        // System.out.println(currentPose);
 
         TrapezoidProfile.State targetHeadingState = new TrapezoidProfile.State(targetPose.getRotation().getRadians(),
                 targetVelocity.dtheta);
@@ -120,10 +108,6 @@ public final class DriveTrajectoryGenerator {
                     dtheta));
 
             prevTranslation = translation;
-
-            // System.out.println(i);
-            // System.out.println(new Pose2d(x, y, new Rotation2d(heading)));
-            // System.out.println(new Twist2d(dx, dy, dtheta));
         }
 
         return new DriveTrajectory(poseTrajectory, velocityTrajectory);

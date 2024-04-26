@@ -59,17 +59,6 @@ public class DriveTrajectory {
         }
     }
 
-    public void print() {
-        System.out.println("Position Trajectory:");
-        for (Pose2d pose : this.positionTrajectory) {
-            System.out.println(pose);
-        }
-        System.out.println("Velocity Trajectory:");
-        for (Twist2d twist : this.velocityTrajectory) {
-            System.out.println(twist);
-        }
-    }
-
     public void toCSV() {
         toCSV("trajectory");
     }

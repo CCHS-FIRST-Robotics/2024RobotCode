@@ -44,15 +44,12 @@ public class ModuleIOSim implements ModuleIO {
     private double turnAppliedVolts = 0.0;
 
     public ModuleIOSim() {
-        System.out.println("[Init] Creating ModuleIOSim");
-
         turnPID.enableContinuousInput(0, 1);
 
         driveSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(driveKv, driveKa), DCMotor.getNEO(1), 1);
     }
 
     public void updateInputs(ModuleIOInputs inputs) {
-        // System.out.println("test");
         driveSim.update(Constants.PERIOD);
         turnSim.update(Constants.PERIOD);
 

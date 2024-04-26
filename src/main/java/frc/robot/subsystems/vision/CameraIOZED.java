@@ -35,13 +35,6 @@ public class CameraIOZED implements CameraIO {
     DoubleArraySubscriber tagPitchesSub = tagsTable.getDoubleArrayTopic("tag_pitches").subscribe(new double[] {});
     DoubleArraySubscriber tagHeadingsSub = tagsTable.getDoubleArrayTopic("tag_headings").subscribe(new double[] {});
 
-    /**
-     * Constructs a new CameraIOZED object
-     */
-    public CameraIOZED() {
-        System.out.println("[Init] Creating CameraIOZED");
-    }
-
     /*
      * (non-Javadoc)
      * 

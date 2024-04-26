@@ -9,32 +9,20 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
 
 public class Module {
-    private final ModuleIO io;
-    private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
+    private ModuleIO io;
+    private ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
     private final int index;
 
     private static final Measure<Distance> wheelRadius = Inches.of(2); // 2"; .0508m
-    // private static final Measure<Distance> trackWidth = Inches.of(22.5);
 
     private SwerveModuleState prevSetpoint = new SwerveModuleState(0, new Rotation2d(0));
 
-    /**
-     * Constructs a new Module (subsytem) object
-     * 
-     * @param io    The ModuleIO object to use
-     * @param index The index of the module
-     */
     public Module(ModuleIO io, int index) {
-        System.out.println("[Init] Creating Module " + Integer.toString(index));
         this.io = io;
         this.index = index;
-
-        // turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
     }
 
-    /** Updates inputs and checks tunable numbers. */
     public void periodic() {
-        // double prevVel = getVelocityMetersPerSec();
         io.updateInputs(inputs);
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
     }
@@ -76,9 +64,6 @@ public class Module {
                             prevSetpoint.speedMetersPerSecond / wheelRadius.in(Meters), Constants.PERIOD,
                             ModuleIO.driveKv,
                             ModuleIO.driveKa) * wheelRadius.in(Meters));
-
-            // Run drive controller
-            // System.out.println(wheelRadius.in(Meters));
 
             double velocityRadPerSec = optimizedState.speedMetersPerSecond / wheelRadius.in(Meters);
 
