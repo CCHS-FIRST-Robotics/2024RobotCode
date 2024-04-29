@@ -234,29 +234,17 @@ public class ModuleIOSparkMax implements ModuleIO {
         // - = cw
         // sigNum = position.in(Radians) > prevPosition.in(Radians) ?
 
-        int signum = position.in(Radians) > prevPosition.in(Radians)
-                ? position.in(Radians) < prevPosition.in(Radians) + Math.PI ? 1 : -1
-                : prevPosition.in(Radians) < position.in(Radians) + Math.PI ? 1 : -1;
-
-        // double p = position.in(Radians);
-        // double q = prevPosition.in(Radians);
-        // if (p > q) {
-        // // need to check positino - prevPosition and prevPosition - position + 2pi
-        // if (p - q < q - p + 2 * Math.PI) {
-        // signum = -1;
-        // }
-        // } else {
-        // // need to check prevPosition - position and 2pi - prevPosition + position
-        // if (q - p < p - q + 2 * Math.PI) {
-        // signum = -1;
-        // }
-        // }
+        double p = position.in(Radians);
+        double q = prevPosition.in(Radians);
+        int signum = p > q
+                ? p < q + Math.PI ? 1 : -1
+                : q < p + Math.PI ? 1 : -1;
 
         turnSparkMaxPIDF.setReference(
                 position.in(Rotations),
                 CANSparkMax.ControlType.kPosition,
                 0,
-                turnKs * signum);
+                signum * turnKs);
 
         prevPosition = position;
     }
