@@ -206,6 +206,12 @@ public class ModuleIOSparkMax implements ModuleIO {
      * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVelocity(double)
      */
     public void setDriveVelocity(Measure<Velocity<Angle>> velocity) {
+        System.out.println(prevVelocity.in(RadiansPerSecond));
+        System.out.println(velocity.in(RadiansPerSecond));
+        System.out.println(driveFeedforward.calculate(
+                        prevVelocity.in(RadiansPerSecond),
+                        velocity.in(RadiansPerSecond),
+                        Constants.PERIOD));
         driveSparkMaxPIDF.setReference(
                 velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
                 CANSparkMax.ControlType.kVelocity,

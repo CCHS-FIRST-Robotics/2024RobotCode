@@ -48,10 +48,13 @@ public class Module {
      */
     public SwerveModuleState runSetpoint(SwerveModuleState targetState, boolean isOpenLoop) {
         // Optimize state based on current angle
+        // System.out.println(isOpenLoop);
         var optimizedState = SwerveModuleState.optimize(targetState, getAngle());
         // optimizedState = targetState; // for testing ONLY
 
+
         io.setTurnPosition(Radians.of(optimizedState.angle.getRadians()));
+
 
         // Update velocity based on turn error
         // does some fancy things to move only in the direction you want while theres an
@@ -60,12 +63,14 @@ public class Module {
         // product,
         // it projects one vector onto the other, idk I cant make sense of it rn im
         // tired asf
+
         optimizedState.speedMetersPerSecond *= Math
                 .cos(inputs.turnAbsolutePositionRad.in(Radians) - optimizedState.angle.getRadians());
 
+
         if (!isOpenLoop) {
             // constrian velocity based on voltage and previous velocity using motor
-            // dynamics
+            // dynamics]
             optimizedState.speedMetersPerSecond = MathUtil.clamp(
                     optimizedState.speedMetersPerSecond,
                     getMaxVelocity(-inputs.driveAverageBusVoltage.in(Volts),
@@ -79,6 +84,8 @@ public class Module {
 
             // Run drive controller
             // System.out.println(wheelRadius.in(Meters));
+            // if(Double.isNaN(optimizedState.speedMetersPerSecond)) optimizedState.speedMetersPerSecond = 0d;
+
             double velocityRadPerSec = optimizedState.speedMetersPerSecond / wheelRadius.in(Meters);
             io.setDriveVelocity(RadiansPerSecond.of(velocityRadPerSec));
         } else {
