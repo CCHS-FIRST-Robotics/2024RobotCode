@@ -72,7 +72,6 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMaxPIDF.setI(turnKi, 0);
         turnSparkMaxPIDF.setFF(0, 0);
 
-        // ! idk what this is
         turnSparkMaxPIDF.setPositionPIDWrappingEnabled(true);
         turnSparkMaxPIDF.setPositionPIDWrappingMinInput(0);
         turnSparkMaxPIDF.setPositionPIDWrappingMaxInput(1);
