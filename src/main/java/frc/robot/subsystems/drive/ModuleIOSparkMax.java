@@ -33,6 +33,8 @@ public class ModuleIOSparkMax implements ModuleIO {
     public double turnKp = 8;
     public double turnKd = 0.00;
 
+    
+
     private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa); // kV
                                                                                                              // UNITS:
                                                                                                              // VOLTS /
