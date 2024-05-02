@@ -28,12 +28,12 @@ public class ModuleIOSparkMax implements ModuleIO {
     public double driveKv = 0.136898;
     public double driveKa = 0.020864;
 
-    public double turnKp = 8;
+    public double turnKp = 0d; //8d
     public double turnKd = 0.00;
     public double turnKi = 0.00;
 
-    public double turnKs = 0.0; // voltage to overcome static friction
-
+    public double turnKs = 0.142578125; // voltage to overcome static friction
+    // maybe tune a bit more? try between 0.14453125 and 0.140625
     private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
 
     private final RelativeEncoder driveEncoder; // NEO Encoder
@@ -138,15 +138,19 @@ public class ModuleIOSparkMax implements ModuleIO {
 
         double p = position.in(Radians);
         double q = prevTurnPosition.in(Radians);
-        int signum = p > q
-                ? p < q + Math.PI ? 1 : -1
-                : q < p + Math.PI ? 1 : -1;
+        double π = Math.PI;
+        //trust
+        int signum = p > q ? 
+        p < q + π ? 1 : -1 : 
+            p < q ? 
+            q < p + π ? 1 : -1 :
+            0;
 
         turnSparkMaxPIDF.setReference(
                 position.in(Rotations),
                 CANSparkMax.ControlType.kPosition,
                 0,
-                signum * turnKs);
+                1 * turnKs);
 
         prevTurnPosition = position;
     }
