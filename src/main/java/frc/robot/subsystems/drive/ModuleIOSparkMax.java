@@ -14,39 +14,33 @@ import edu.wpi.first.math.filter.MedianFilter;
 import frc.robot.Constants;
 
 public class ModuleIOSparkMax implements ModuleIO {
-    /* MOTOR CONTROLLERS + PID */
     private final CANSparkMax driveSparkMax;
     private final CANSparkMax turnSparkMax;
     private final SparkPIDController driveSparkMaxPIDF;
     private final SparkPIDController turnSparkMaxPIDF;
+    public int index;
 
-    // ! lol tune these
-    public double driveKp = 0.00001; // 00015
+    public double driveKp = 0.00001;
     public double driveKd = 0.0;
-    public double driveKi = 0.0; // 0.000008
+    public double driveKi = 0.0;
 
-    public double driveKs = 0.0; // 0.19
-    public double driveKv = 0.136898; // From NEO datasheet (473kV): 0.136194 V/(rad/s) -
-                                      // https://www.wolframalpha.com/input?i=1%2F%28473+*+2pi%2F60%29+*+%2850.0+%2F+14.0%29+*+%2817.0+%2F+27.0%29+*+%2845.0+%2F+15.0%29
-    public double driveKa = 0.020864; // 0.0148
+    public double driveKs = 0.0;
+    public double driveKv = 0.136898;
+    public double driveKa = 0.020864;
 
     public double turnKp = 8;
     public double turnKd = 0.00;
     public double turnKi = 0.00;
 
     public double turnKs = 0.0; // voltage to overcome static friction
-    public double turnKv = 0.0;
-    public double turnKa = 0.0;
 
     private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
-    // kV UNITS: VOLTS / (RAD PER SECOND)
-    private SimpleMotorFeedforward turnFeedforward = new SimpleMotorFeedforward(turnKs, turnKv, turnKa);
 
-    /* ENCODERS */
     private final RelativeEncoder driveEncoder; // NEO Encoder
     private final RelativeEncoder turnRelativeEncoder; // NEO Encoder
     private final AbsoluteEncoder turnAbsoluteEncoder; // CANandcoder
 
+    // ! figure these out
     private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
     private final double turnAfterEncoderReduction = 150.0 / 7.0;
     // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
@@ -56,22 +50,10 @@ public class ModuleIOSparkMax implements ModuleIO {
     private final MedianFilter driveVoltageFilter = new MedianFilter(1000);
     private final MedianFilter turnVoltageFilter = new MedianFilter(1000);
 
-    private final boolean isTurnMotorInverted = true;
-    // private final Rotation2d absoluteEncoderOffset;
-
     private Measure<Velocity<Angle>> prevVelocity = RadiansPerSecond.of(0.0);
-    private Measure<Angle> prevPosition = Radians.of(0.0);
+    private Measure<Angle> prevTurnPosition = Radians.of(0.0);
 
-    public int index;
-
-    /**
-     * Constructs a new ModuleIOSparkMax object
-     * Sets PID constants and configures the SparkMAX's + encoders
-     * 
-     * @param index The index of the module
-     */
     public ModuleIOSparkMax(int index) {
-        System.out.println("[Init] Creating ModuleIOSparkMax " + Integer.toString(index));
         this.index = index;
 
         driveSparkMax = new CANSparkMax(2 + 2 * index, MotorType.kBrushless);
@@ -90,13 +72,13 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnSparkMaxPIDF.setI(turnKi, 0);
         turnSparkMaxPIDF.setFF(0, 0);
 
+        // ! idk what this is
         turnSparkMaxPIDF.setPositionPIDWrappingEnabled(true);
         turnSparkMaxPIDF.setPositionPIDWrappingMinInput(0);
         turnSparkMaxPIDF.setPositionPIDWrappingMaxInput(1);
 
         turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-        turnAbsoluteEncoder.setInverted(isTurnMotorInverted);
-        // absoluteEncoderOffset = new Rotation2d(-3.03887450);
+        turnAbsoluteEncoder.setInverted(true);
         turnSparkMaxPIDF.setFeedbackDevice(turnAbsoluteEncoder);
 
         driveSparkMax.setCANTimeout(500);
@@ -105,16 +87,11 @@ public class ModuleIOSparkMax implements ModuleIO {
         driveEncoder = driveSparkMax.getEncoder();
         turnRelativeEncoder = turnSparkMax.getEncoder();
 
-        driveSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
-        turnSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20); // report absolute encoder measurements at 20ms
-                                                                         // (default: 200ms)
+        driveSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20);
+        turnSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
 
-        turnSparkMax.setInverted(isTurnMotorInverted);
-        if (index == 10) {
-            driveSparkMax.setInverted(true);
-        } else {
-            driveSparkMax.setInverted(false);
-        }
+        driveSparkMax.setInverted(false);
+        turnSparkMax.setInverted(true);
 
         driveSparkMax.setSmartCurrentLimit(50);
         turnSparkMax.setSmartCurrentLimit(30);
@@ -139,18 +116,50 @@ public class ModuleIOSparkMax implements ModuleIO {
         driveSparkMax.setCANTimeout(0);
         turnSparkMax.setCANTimeout(0);
 
-        System.out.println("TESTING");
         System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
         System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * frc.robot.subsystems.swerveDrive.ModuleIO#updateInputs(frc.robot.subsystems.
-     * swerveDrive.ModuleIO.ModuleIOInputs)
-     */
+    public void setDriveVelocity(Measure<Velocity<Angle>> velocity) {
+        driveSparkMaxPIDF.setReference(
+                velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
+                CANSparkMax.ControlType.kVelocity,
+                0,
+                driveFeedforward.calculate(
+                        prevVelocity.in(RadiansPerSecond),
+                        velocity.in(RadiansPerSecond),
+                        Constants.PERIOD));
+        prevVelocity = velocity;
+    }
+
+    public void setTurnPosition(Measure<Angle> position) {
+        // Adjust from [-PI, PI] (wrapped angle, so initially -pi was 2pi) -> [0, 2PI]
+        position = Radians.of(
+                MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
+
+        double p = position.in(Radians);
+        double q = prevTurnPosition.in(Radians);
+        int signum = p > q
+                ? p < q + Math.PI ? 1 : -1
+                : q < p + Math.PI ? 1 : -1;
+
+        turnSparkMaxPIDF.setReference(
+                position.in(Rotations),
+                CANSparkMax.ControlType.kPosition,
+                0,
+                signum * turnKs);
+
+        prevTurnPosition = position;
+    }
+
+    public void setDriveBrakeMode(boolean enable) {
+        driveSparkMax.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+    }
+
+    public void setTurnBrakeMode(boolean enable) {
+        turnSparkMax.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+    }
+
     public void updateInputs(ModuleIOInputs inputs) {
         // update drive motor info
         inputs.driveRawPositionRad = // doesnt account for coupling
@@ -183,87 +192,5 @@ public class ModuleIOSparkMax implements ModuleIO {
         inputs.turnAverageBusVoltage = Volts.of(turnVoltageFilter.calculate(turnSparkMax.getBusVoltage()));
         inputs.turnCurrentAmps = Amps.of(turnSparkMax.getOutputCurrent());
         inputs.turnTempCelcius = Celsius.of(turnSparkMax.getMotorTemperature());
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVoltage(double)
-     */
-    public void setDriveVoltage(Measure<Voltage> volts) {
-        // driveSparkMax.setVoltage(volts.in(Volts));
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setTurnVoltage(double)
-     */
-    public void setTurnVoltage(Measure<Voltage> volts) {
-        // turnSparkMax.setVoltage(volts.in(Volts));
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVelocity(double)
-     */
-    public void setDriveVelocity(Measure<Velocity<Angle>> velocity) {
-        driveSparkMaxPIDF.setReference(
-                velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
-                CANSparkMax.ControlType.kVelocity,
-                0,
-                driveFeedforward.calculate(
-                        prevVelocity.in(RadiansPerSecond),
-                        velocity.in(RadiansPerSecond),
-                        Constants.PERIOD));
-        prevVelocity = velocity;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setTurnPosition(double)
-     */
-    public void setTurnPosition(Measure<Angle> position) {
-        // Adjust from [-PI, PI] (wrapped angle, so initially -pi was 2pi) -> [0, 2PI]
-        position = Radians.of(
-                MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
-
-        // + = ccw
-        // - = cw
-        // sigNum = position.in(Radians) > prevPosition.in(Radians) ?
-
-        double p = position.in(Radians);
-        double q = prevPosition.in(Radians);
-        int signum = p > q
-                ? p < q + Math.PI ? 1 : -1
-                : q < p + Math.PI ? 1 : -1;
-
-        turnSparkMaxPIDF.setReference(
-                position.in(Rotations),
-                CANSparkMax.ControlType.kPosition,
-                0,
-                signum * turnKs);
-
-        prevPosition = position;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveBrakeMode(boolean)
-     */
-    public void setDriveBrakeMode(boolean enable) {
-        driveSparkMax.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setTurnBrakeMode(boolean)
-     */
-    public void setTurnBrakeMode(boolean enable) {
-        turnSparkMax.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
     }
 }
