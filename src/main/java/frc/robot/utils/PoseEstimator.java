@@ -159,7 +159,6 @@ public class PoseEstimator extends SwerveDrivePoseEstimator {
 
     @Override
     public Pose2d updateWithTime(double timestamp, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-        // System.out.println("Adding odom measurement");
         Logger.recordOutput("odomTimestamp", timestamp);
         prevModulePositions = modulePositions;
         return super.updateWithTime(timestamp, gyroAngle, modulePositions);

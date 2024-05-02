@@ -45,8 +45,6 @@ public final class EventMarkerBuilder {
             addCommand(path);
         }
 
-        System.out.println("fihffhusdhfd");
-
         command = command.andThen(
                 new InstantCommand(() -> shooter.stop())
                         .alongWith(new InstantCommand(() -> handoff.stop())));

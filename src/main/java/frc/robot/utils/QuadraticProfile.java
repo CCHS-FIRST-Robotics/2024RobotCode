@@ -70,10 +70,6 @@ public class QuadraticProfile {
             constantSpeedSetpoints = getConstantSpeedSetpoints(timeConstantSpeed, angleDisplacement, speed);
         }
 
-        System.out.println("#Accel: " + accelSetpoints.length);
-        System.out.println("#Speed: " + constantSpeedSetpoints.length);
-        System.out.println("#Stop: " + stoppingSetpoints.length);
-
         return combineSetPoints(accelSetpoints, constantSpeedSetpoints, stoppingSetpoints, initialPosition);
     }
 
@@ -90,7 +86,6 @@ public class QuadraticProfile {
     // try {
     // double x = combined[i].x;
     // double y = combined[i].y;
-    // // System.out.println("(x, y) = " + x + ", " + y);
     // if (i == 0) {
     // angles = Kinematics.positionInverseKinematics(x, y, true);
     // // angles = Kinematics.positionInverseKinematics(x, y, initialAngles);
@@ -128,25 +123,17 @@ public class QuadraticProfile {
     // }
     // } catch(ArithmeticException e)
     // {
-    // // System.out.println("X: " + combined[i].x);
-    // // System.out.println("Y: " + combined[i].y);
-    // System.out.println(e.getMessage());
     // if (i != 0) {
     // setpoints.add(setpoints.get(i-1));
     // }
     // continue;
     // } catch(Exception e) {
     // // If the motor is past a limit, stop the sequence
-    // // System.out.println("X: " + combined[i].x);
-    // // System.out.println("Y: " + combined[i].y);
-    // System.out.println(e.getMessage());
-
     // break;
     // }
 
     // setpoints.add(angles);
     // }
-    // System.out.println("GOT HERE -1");
     // return setpoints;
     // }
 

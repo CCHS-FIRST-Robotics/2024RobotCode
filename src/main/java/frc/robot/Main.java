@@ -8,9 +8,11 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 /**
  * to do:
+ * hunt for magic numbers
+ * alex needs to figure out more levels for the code hierarchy
  * 
  * at robo:
- * tune module PID and add KS to feedforward
+ * tune module PID
  * FOC instead of MotionMagic in armIOFalcon
  * 
  * small things:

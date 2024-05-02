@@ -178,7 +178,6 @@ public class Drive extends SubsystemBase {
             ModuleIO frModuleIO,
             ModuleIO blModuleIO,
             ModuleIO brModuleIO) {
-        System.out.println("[Init] Creating Drive");
         Logger.recordOutput("SysIdTestState", "none");
 
         this.gyroIO = gyroIO;
@@ -279,7 +278,6 @@ public class Drive extends SubsystemBase {
                 for (var module : modules) {
                     module.stop();
                 }
-                // System.out.println("DISABLED");
                 // Clear setpoint logs
                 Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
                 Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
@@ -290,8 +288,6 @@ public class Drive extends SubsystemBase {
                 for (var module : modules) {
                     module.runCharacterization(characterizationVolts);
                 }
-                // System.out.println(characterizationVolts.in(Volts));
-                // System.out.println("RUNNING");
                 // Clear setpoint logs
                 Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
                 Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
@@ -309,10 +305,6 @@ public class Drive extends SubsystemBase {
                 // Get the position/velocity setpoints at the current point in the trajectory
                 positionSetpointTrajectory = positionTrajectory.get(trajectoryCounter);
                 twistSetpointTrajectory = twistTrajectory.get(trajectoryCounter);
-
-                // System.out.println("SETPOINTS:");
-                // System.out.println(positionSetpointTrajectory);
-                // System.out.println(twistSetpointTrajectory);
 
                 // Record setpoints to "RealOutputs"
                 Logger.recordOutput("Auto/FieldVelocity", new Pose2d(twistSetpointTrajectory.dx,
@@ -379,8 +371,6 @@ public class Drive extends SubsystemBase {
 
                 lastSetpoint = adjustedSpeeds;
 
-                // System.out.println(adjustedSpeeds);
-
                 // Uses the IK to convert from chassis velocities to individual swerve module
                 // positions/velocities
                 Logger.recordOutput("Target Velocity", adjustedSpeeds);
@@ -421,7 +411,6 @@ public class Drive extends SubsystemBase {
                 setpointStates = new SwerveModuleState[] { moduleSetpoint, moduleSetpoint, moduleSetpoint,
                         moduleSetpoint };
                 lastSetpointStates = setpointStates;
-                // System.out.println(moduleSetpoint.angle.getDegrees());
 
                 // Send setpoints to modules
                 optimizedStates = new SwerveModuleState[4];
@@ -442,7 +431,6 @@ public class Drive extends SubsystemBase {
      * @param speeds Speeds in meters/sec
      */
     public void runVelocity(ChassisSpeeds speeds) {
-        // if (i % 50 == 0) System.out.println(controlMode);
         // Since DriveWithJoysticks is the default command and MoveToPose runs once
         // Keep drive running the position trajectory unless overridden (driver sets a
         // nonzero speed with joysticks)
@@ -671,7 +659,6 @@ public class Drive extends SubsystemBase {
     public Command followTrajectory(DriveTrajectory traj) {
         return runOnce(
                 () -> {
-                    System.out.println("recording pos traj");
                     Logger.recordOutput("Auto/GeneratedTrajectory",
                             traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
                     runPosition(traj);
