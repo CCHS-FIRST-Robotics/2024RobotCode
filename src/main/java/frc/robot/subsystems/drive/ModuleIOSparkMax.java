@@ -140,13 +140,18 @@ public class ModuleIOSparkMax implements ModuleIO {
         double q = prevTurnPosition.in(Radians);
         double π = Math.PI;
         // trust
-        int signum = p > q ? p < q + π ? 1 : -1 : p < q ? q < p + π ? 1 : -1 : 0;
+        int signum = 
+            p > q ? 
+            p < q + π ? 1 : -1 : 
+            p < q ? 
+            q < p + π ? 1 : -1 : 
+            0;
 
         turnSparkMaxPIDF.setReference(
-                position.in(Rotations),
-                CANSparkMax.ControlType.kPosition,
-                0,
-                1 * turnKs);
+            position.in(Rotations),
+            CANSparkMax.ControlType.kPosition,
+            0,
+            1 * turnKs);
 
         prevTurnPosition = position;
     }
