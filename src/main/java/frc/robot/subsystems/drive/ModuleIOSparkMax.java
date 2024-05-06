@@ -1,16 +1,30 @@
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.Minute;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
 
-import com.revrobotics.*;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
-import com.revrobotics.CANSparkBase.IdleMode;
-import edu.wpi.first.units.*;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkAbsoluteEncoder;
+import com.revrobotics.SparkPIDController;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.*;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.filter.MedianFilter;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import frc.robot.Constants;
 
 public class ModuleIOSparkMax implements ModuleIO {
@@ -166,7 +180,7 @@ public class ModuleIOSparkMax implements ModuleIO {
         }
         if(System.currentTimeMillis() - llt >= spacing){
             llt = System.currentTimeMillis();
-            prevRot += prevRot < cur ? 2 * Math.PI : 0;
+            prevRot -= prevRot < cur ? 0 : 2 * Math.PI;
             if((cur - prevRot) / (System.currentTimeMillis() - llt) < maxSlope){
                 lowKs = turnKs;
             }else{
