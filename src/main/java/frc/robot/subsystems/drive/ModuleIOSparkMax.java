@@ -131,6 +131,9 @@ public class ModuleIOSparkMax implements ModuleIO {
         prevVelocity = velocity;
     }
 
+
+    double lowKs = 0, highKs = 1, prevRot = -0x123, maxSlope = 1, acc = 1e-10;
+    long llt = System.currentTimeMillis(), spacing = 100;
     public void setTurnPosition(Measure<Angle> position) {
         // Adjust from [-PI, PI] (wrapped angle, so initially -pi was 2pi) -> [0, 2PI]
         position = Radians.of(
@@ -146,7 +149,7 @@ public class ModuleIOSparkMax implements ModuleIO {
             p < q ? 
             q < p + π ? 1 : -1 : 
             0;
-
+        System.out.println(sbmstit(p));
         turnSparkMaxPIDF.setReference(
             position.in(Rotations),
             CANSparkMax.ControlType.kPosition,
@@ -154,6 +157,24 @@ public class ModuleIOSparkMax implements ModuleIO {
             1 * turnKs);
 
         prevTurnPosition = position;
+    }
+
+    public double sbmstit(double cur){
+        if(prevRot == -0x123){
+            llt = System.currentTimeMillis();
+            prevRot = cur;
+        }
+        if(System.currentTimeMillis() - llt >= spacing){
+            llt = System.currentTimeMillis();
+            prevRot += prevRot < cur ? 2 * Math.PI : 0;
+            if((cur - prevRot) / (System.currentTimeMillis() - llt) < maxSlope){
+                lowKs = turnKs;
+            }else{
+                highKs = turnKs - acc;
+            }
+            turnKs = lowKs + (highKs - lowKs + 1)/2;
+        }
+        return turnKs;
     }
 
     public void setDriveBrakeMode(boolean enable) {
