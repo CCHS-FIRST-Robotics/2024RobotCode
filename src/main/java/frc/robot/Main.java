@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * 
  * eventually:
  * autochooser for autos
+ * structs and protobuffs
  * try to get advantagekit to simulate the entire robot
  * don't use timestampedpose2d/3d
  * tunable numbers with smartdashboard

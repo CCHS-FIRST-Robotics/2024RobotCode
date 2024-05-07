@@ -150,8 +150,7 @@ public class ModuleIOSparkMax implements ModuleIO {
     long llt = System.currentTimeMillis(), spacing = 100;
     public void setTurnPosition(Measure<Angle> position) {
         // Adjust from [-PI, PI] (wrapped angle, so initially -pi was 2pi) -> [0, 2PI]
-        position = Radians.of(
-                MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
+        position = Radians.of(MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
 
         double p = position.in(Radians);
         double q = prevTurnPosition.in(Radians);
@@ -173,11 +172,13 @@ public class ModuleIOSparkMax implements ModuleIO {
         prevTurnPosition = position;
     }
 
-    public double sbmstit(double cur){
+    public double sbmstit(double cur){ // she binary my search till im tuned
+        // update stuff
         if(prevRot == -0x123){
             llt = System.currentTimeMillis();
             prevRot = cur;
         }
+        // binary search ks
         if(System.currentTimeMillis() - llt >= spacing){
             llt = System.currentTimeMillis();
             prevRot -= prevRot < cur ? 0 : 2 * Math.PI;
