@@ -40,9 +40,9 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     public double driveKs = 0.0;
     public double driveKv = 0.136898;
-    public double driveKa = 0.020864;
+    public double driveKa = 0.02086;
 
-    public double turnKp = 0.00; // 8.00
+    public double turnKp = 23; // 8.00 23 - 26.5 trust
     public double turnKd = 0.00;
     public double turnKi = 0.00;
 
@@ -160,14 +160,14 @@ public class ModuleIOSparkMax implements ModuleIO {
             p > q ? 
             p < q + π ? 1 : -1 : 
             p < q ? 
-            q < p + π ? 1 : -1 : 
+            q < p + π ? -1 : 1 : 
             0;
-        System.out.println(sbmstit(p));
+        // System.out.println(sbmstit(p));
         turnSparkMaxPIDF.setReference(
             position.in(Rotations),
             CANSparkMax.ControlType.kPosition,
             0,
-            1 * turnKs);
+            signum * turnKs);
 
         prevTurnPosition = position;
     }
@@ -182,13 +182,14 @@ public class ModuleIOSparkMax implements ModuleIO {
         if(System.currentTimeMillis() - llt >= spacing){
             llt = System.currentTimeMillis();
             prevRot -= prevRot < cur ? 0 : 2 * Math.PI;
-            if((cur - prevRot) / (System.currentTimeMillis() - llt) < maxSlope){
+            if((cur - prevRot) / (System.currentTimeMillis() - llt) < 0.01){
                 lowKs = turnKs;
             }else{
                 highKs = turnKs - acc;
             }
             turnKs = lowKs + (highKs - lowKs + 1)/2;
         }
+        System.out.println((cur - prevRot) / (System.currentTimeMillis() - llt));
         return turnKs;
     }
 
