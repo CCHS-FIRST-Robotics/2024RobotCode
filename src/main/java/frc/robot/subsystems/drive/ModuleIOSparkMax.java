@@ -42,7 +42,7 @@ public class ModuleIOSparkMax implements ModuleIO {
     public double driveKv = 0.136898;
     public double driveKa = 0.02086;
 
-    public double turnKp = 23; // 8.00 23 - 26.5 trust
+    public double turnKp = 17.28125; // 8.00 17.25-17.3125 trust
     public double turnKd = 0.00;
     public double turnKi = 0.00;
 
@@ -52,7 +52,7 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     private final RelativeEncoder driveEncoder; // NEO Encoder
     private final RelativeEncoder turnRelativeEncoder; // NEO Encoder
-    private final AbsoluteEncoder turnAbsoluteEncoder; // CANandcoder
+    private final AbsoluteEncoder turnAbsoluteEncoder; // CANandcodeP
 
     // ! figure these out
     private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
