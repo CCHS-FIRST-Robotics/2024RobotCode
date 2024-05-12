@@ -52,16 +52,10 @@ public class RobotContainer {
                         new ModuleIOSparkMax(2),
                         new ModuleIOSparkMax(3));
                 vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
-                arm = new Arm(
-                        new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID,
-                                Constants.ARM_CANCODER_ID));
-                intake = new Intake(
-                        new IntakeIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
-                handoff = new Handoff(
-                        // new HandoffIOFalcon500(Constants.HANDOFF_ID)
-                        new HandoffIOSparkMax(Constants.HANDOFF_ID));
-                shooter = new Shooter(
-                        new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
+                arm = new Arm(new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID, Constants.ARM_CANCODER_ID));
+                intake = new Intake(new IntakeIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
+                handoff = new Handoff(new HandoffIOSparkMax(Constants.HANDOFF_ID));
+                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
             case SIM:
                 // instantiate physics sim IO implementations
@@ -86,14 +80,10 @@ public class RobotContainer {
                         new ModuleIOSparkMax(2),
                         new ModuleIOSparkMax(3));
                 vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
-                arm = new Arm(
-                        new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID,
-                                Constants.ARM_CANCODER_ID));
-                intake = new Intake(
-                        new IntakeIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
+                arm = new Arm(new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID, Constants.ARM_CANCODER_ID));
+                intake = new Intake(new IntakeIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
                 handoff = new Handoff(new HandoffIOFalcon500(Constants.HANDOFF_ID));
-                shooter = new Shooter(
-                        new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
+                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
         }
 
@@ -103,12 +93,13 @@ public class RobotContainer {
                 drive.getKinematics(),
                 new Rotation2d(),
                 drive.getModulePositions(),
-                StartPosistions.redSource);
+                StartPosistions.redSource
+        );
 
         drive.setPoseEstimator(poseEstimator);
         vision.setPoseEstimator(poseEstimator);
 
-        autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
+        autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
 
         configureButtonBindings();
     }
@@ -122,11 +113,11 @@ public class RobotContainer {
 
         // drive with joysticks
         drive.setDefaultCommand(
-                new DriveModules(
-                        drive,
-                        () -> -controller1.getLeftY(),
-                        () -> -.55 * controller1.getRightX(),
-                        () -> 0e9d + (0b10 >> 0x1))
+            new DriveModules(
+                drive,
+                () -> -controller1.getLeftY(),
+                () -> -.55 * controller1.getRightX(),
+                () -> 0e9d + (0b10 >> 0x1))
 
 
         // new DriveWithJoysticks(
@@ -145,10 +136,11 @@ public class RobotContainer {
 
         // shoot
         controller1.b().onTrue(
-                // handoff
-                handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
-                        // stop shooter
-                        .andThen(new InstantCommand(shooter::stop, shooter)));
+            // handoff
+            handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
+            // stop shooter
+            .andThen(new InstantCommand(shooter::stop, shooter))
+        );
 
         /*
          * Controller 2:
@@ -158,86 +150,79 @@ public class RobotContainer {
 
         // intake
         controller2.a().onTrue(
-                // turn on handoff
-                handoff.getHandoffCommand(Volts.of(3))
-                        // move arm down
-                        .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose)
-                                .andThen(Commands.waitUntil(arm::atGoal)))
-                        .alongWith(
-                                // turn on intake until detected by handoff
-                                intake.getIntakeCommand(Volts.of(8), handoff::checkNoteThere)));
+            // turn on handoff
+            handoff.getHandoffCommand(Volts.of(3))
+            .alongWith(
+                // move arm down
+                arm.moveArm(ArmPosition.INTAKE, drive::getPose)
+                .andThen(Commands.waitUntil(arm::atGoal)))
+            .alongWith(
+                // turn on intake until detected by handoff
+                intake.getIntakeCommand(Volts.of(8), handoff::checkNoteThere))
+        );
 
         // outtake
         controller2.x().whileTrue(
-                intake.getIntakeCommand(Volts.of(-3))
-                        .alongWith(handoff.getHandoffManualCommand(Volts.of(-2))));
+            intake.getIntakeCommand(Volts.of(-3))
+            .alongWith(handoff.getHandoffManualCommand(Volts.of(-2))));
 
         // prime shooter (amp)
         controller2.y().and(() -> !shooter.upToSpeed()).onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(SHOOTER_AMP_SPEED, SHOOTER_AMP_SPEED), shooter)
-                        // move arm
-                        .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose)));
+            // prime shooter
+            new InstantCommand(() -> shooter.start(SHOOTER_AMP_SPEED, SHOOTER_AMP_SPEED), shooter)
+            // move arm
+            .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose)) 
+        );
 
         // prime shooter (speaker - anywhere)
         controller2.b().and(() -> !shooter.upToSpeed()).onTrue(
                 // prime shooter
                 new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-                        // move arm
-                        .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
-                        // turn robot towards speaker
-                        .alongWith(
-                                new DriveWithJoysticks(
-                                        drive,
-                                        () -> -controller1.getLeftX(),
-                                        () -> -controller1.getLeftY(),
-                                        () -> -.7 * controller1.getRightX(),
-                                        () -> {
-                                            return 1.0;
-                                        },
-                                        drive.getShootHeadingTo(SPEAKER_POSE),
-                                        true,
-                                        true)));
+                // move arm
+                .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
+                // turn robot towards speaker
+                .alongWith(
+                    new DriveWithJoysticks(
+                        drive,
+                        () -> -controller1.getLeftX(),
+                        () -> -controller1.getLeftY(),
+                        () -> -.7 * controller1.getRightX(),
+                        () -> {
+                            return 1.0;
+                        },
+                        drive.getShootHeadingTo(SPEAKER_POSE),
+                        true,
+                        true)
+                )
+        );
 
-        /**
-         * ! needs to disappear
+        /*
+         * Justin Case
          */
 
         // prime shooter (speaker - subwoofer)
         controller2.povRight().and(() -> !shooter.upToSpeed()).onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-                        // move arm
-                        .alongWith(arm.moveArm(ArmPosition.SPEAKER, drive::getPose)));
+            // prime shooter
+            new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+            // move arm
+            .alongWith(arm.moveArm(ArmPosition.SPEAKER, drive::getPose))
+        );
 
         // prime shooter (speaker - close to sub)
         controller2.povUp().and(() -> !shooter.upToSpeed()).onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-                        // move arm
-                        .alongWith(arm.moveArm(ArmPosition.CLOSE_SUB, drive::getPose)));
+            // prime shooter
+            new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+            // move arm
+            .alongWith(arm.moveArm(ArmPosition.CLOSE_SUB, drive::getPose))
+        );
 
         // prime shooter (speaker - stage)
         controller2.povLeft().and(() -> !shooter.upToSpeed()).onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-                        // move arm
-                        .alongWith(arm.moveArm(ArmPosition.STAGE, drive::getPose)));
-
-        // arm position testing
-        // controller1.leftTrigger().onTrue(new InstantCommand(() -> {
-        // ARM_POSITIONS.put(ArmPosition.TEST,
-        // ARM_POSITIONS.get(ArmPosition.TEST).minus(Degrees.of(.5)));
-        // arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.TEST));
-        // }));
-        // controller1.rightTrigger().onTrue(new InstantCommand(() -> {
-        // ARM_POSITIONS.put(ArmPosition.TEST,
-        // ARM_POSITIONS.get(ArmPosition.TEST).plus(Degrees.of(.5)));
-        // arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.TEST));
-        // }));
-        // controller1.a().onTrue(new InstantCommand(() -> {
-        // System.out.println("ARM ANGLE IS : " + ARM_POSITIONS.get(ArmPosition.TEST));
-        // }));
+            // prime shooter
+            new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+            // move arm
+            .alongWith(arm.moveArm(ArmPosition.STAGE, drive::getPose))
+        );
     }
 
     public Command getAutonomousCommand() {
