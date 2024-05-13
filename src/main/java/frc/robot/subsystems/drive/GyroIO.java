@@ -16,16 +16,14 @@ public interface GyroIO {
         public Measure<Angle> rollPosition = Radians.of(0.0);
         public Measure<Angle> pitchPosition = Radians.of(0.0);
         public Measure<Angle> yawPosition = Radians.of(0.0);
-
-        // "fused" (combined with magnetometer or accelerometer)
-        public Measure<Angle> rollFusedPosition = Radians.of(0.0);
-        public Measure<Angle> pitchFusedPosition = Radians.of(0.0);
-        public Measure<Angle> yawFusedPosition = Radians.of(0.0);
-
-        // raw velocities
         public Measure<Velocity<Angle>> rollVelocity = RadiansPerSecond.of(0.0);
         public Measure<Velocity<Angle>> pitchVelocity = RadiansPerSecond.of(0.0);
         public Measure<Velocity<Angle>> yawVelocity = RadiansPerSecond.of(0.0);
+
+        // fused (combined with magnetometer or accelerometer)
+        public Measure<Angle> rollFusedPosition = Radians.of(0.0);
+        public Measure<Angle> pitchFusedPosition = Radians.of(0.0);
+        public Measure<Angle> yawFusedPosition = Radians.of(0.0);
     }
 
     public default void updateInputs(GyroIOInputs inputs) {

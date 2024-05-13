@@ -7,12 +7,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.*;
 
 public class AutoCommand extends Command {
-
     private final Timer timer = new Timer();
-    // private final Supplier<Pose2d> poseSupplier;
-    // private final Supplier<ChassisSpeeds> speedsSupplier;
-    // private final Consumer<ChassisSpeeds> speedsOutput;
-
     private double totalTime;
 
     // For event markers
@@ -21,9 +16,6 @@ public class AutoCommand extends Command {
     private List<Pair<Double, Command>> eventMarkers = new ArrayList<>();
 
     public AutoCommand(List<Pair<Double, Command>> eventMarkers, double totalTime) {
-        // m_subsystem = subsystem;
-        // Use addRequirements() here to declare subsystem dependencies.
-
         this.eventMarkers = eventMarkers;
         this.totalTime = totalTime;
 
@@ -34,10 +26,8 @@ public class AutoCommand extends Command {
         }
     }
 
-    // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-
         // Initialize marker stuff
         currentEventCommands.clear();
         untriggeredEvents.clear();
@@ -45,13 +35,10 @@ public class AutoCommand extends Command {
 
         timer.reset();
         timer.start();
-
     }
 
-    // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-
         // checks if the time has reached when an event is supposed to happen
         if (!untriggeredEvents.isEmpty() && timer.hasElapsed(untriggeredEvents.get(0).getFirst())) {
             // Time to trigger this event command
@@ -89,19 +76,17 @@ public class AutoCommand extends Command {
         }
     }
 
-    // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        timer.stop();
-        // will switch to this when using intake indication
+        timer.stop(); // will switch to this when using intake indication
     }
 
-    // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if (timer.hasElapsed(totalTime))
-            return true;
-        return false;
         // return when intake is done
+        if (timer.hasElapsed(totalTime)){
+            return true;
+        }
+        return false;
     }
 }

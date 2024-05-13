@@ -27,11 +27,7 @@ public interface ArmIO {
         public boolean faultRemoteSensorOutOfSync = false;
         public boolean stickyFaultRemoteSensorOutOfSync = false;
     }
-
-    /** Updates the set of loggable inputs. */
-    public default void updateInputs(ArmIOInputs inputs) {
-    }
-
+    
     /** Run the drive motor at the specified voltage. */
     public default void setDriveVoltage(Measure<Voltage> volts) {
     }
@@ -49,6 +45,9 @@ public interface ArmIO {
     }
 
     public default void setCharacterizationVoltage(Measure<Voltage> volts) {
+    }
 
+    /** Updates the set of loggable inputs. */
+    public default void updateInputs(ArmIOInputs inputs) {
     }
 }

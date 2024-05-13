@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * hunt for magic numbers
  * alex needs to figure out more levels for the code hierarchy
  * moduleIO kV and kA
+ * mayyyyybe javadoc (probably not)
  * 
  * at robo:
  * sysID
@@ -18,6 +19,8 @@ import edu.wpi.first.wpilibj.RobotBase;
  * 
  * ask colin:
  * something in gyroIO
+ * what is fused in gyroIO used for (unused in NavX)
+ * what is covar in cameraIO
  * 
  * eventually:
  * autochooser for autos

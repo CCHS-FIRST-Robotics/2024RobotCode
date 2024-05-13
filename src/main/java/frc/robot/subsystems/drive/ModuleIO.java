@@ -29,9 +29,6 @@ public interface ModuleIO {
         public Measure<Temperature> turnTempCelcius = Celsius.of(0.0);
     }
 
-    /** Updates the set of loggable inputs. */
-    public default void updateInputs(ModuleIOInputs inputs) {
-    }
 
     /** Run the drive motor at the specified voltage. */
     public default void setDriveVoltage(Measure<Voltage> volts) {
@@ -55,5 +52,9 @@ public interface ModuleIO {
 
     /** Enable or disable brake mode on the turn motor. */
     public default void setTurnBrakeMode(boolean enable) {
+    }
+
+    /** Updates the set of loggable inputs. */
+    public default void updateInputs(ModuleIOInputs inputs) {
     }
 }
