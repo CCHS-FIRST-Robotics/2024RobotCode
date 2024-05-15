@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.math.geometry.*;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
 import frc.robot.Constants.ArmPosition;
 import frc.robot.Constants.AutoPathConstants;
 import frc.robot.Constants.StartPosistions;
