@@ -10,16 +10,17 @@ import edu.wpi.first.wpilibj.RobotBase;
  * to do:
  * hunt for magic numbers
  * alex needs to figure out more levels for the code hierarchy
+ * moduleIO kV and kA
+ * mayyyyybe javadoc (probably not)
  * 
  * at robo:
- * tune module PID
+ * sysID
  * FOC instead of MotionMagic in armIOFalcon
- * 
- * small things:
- * moduleIO kV and kA
  * 
  * ask colin:
  * something in gyroIO
+ * what is fused in gyroIO used for (unused in NavX)
+ * what is covar in cameraIO
  * 
  * eventually:
  * autochooser for autos

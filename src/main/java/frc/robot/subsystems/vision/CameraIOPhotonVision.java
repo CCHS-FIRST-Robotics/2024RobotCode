@@ -18,7 +18,8 @@ public class CameraIOPhotonVision implements CameraIO {
             camera,
             new Transform3d(
                     new Translation3d(.85, -.3, .6),
-                    new Rotation3d(0, Radians.convertFrom(20, Degrees), 0)));
+                    new Rotation3d(0, Radians.convertFrom(20, Degrees), 0))
+    );
 
     public CameraIOPhotonVision() {
         poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);

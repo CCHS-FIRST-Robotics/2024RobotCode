@@ -20,7 +20,6 @@ import frc.robot.Constants;
 import frc.robot.HardwareConstants;
 
 public class DriveWithJoysticks extends Command {
-
     Drive drive;
     Supplier<Double> linearXSpeedSupplier;
     Supplier<Double> linearYSpeedSupplier;

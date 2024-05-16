@@ -13,7 +13,7 @@ import frc.robot.utils.AprilTag;
 
 public interface CameraIO {
     public static class CameraIOInputs implements LoggableInputs {
-        // values from the primary (closest) tag
+        // primary = closest
         public int primaryTagId = -1;
         public Measure<Distance> primaryTagX = Meters.of(-1);
         public Measure<Distance> primaryTagY = Meters.of(-1);
@@ -29,19 +29,13 @@ public interface CameraIO {
 
         // robot pose based on tags
         TimestampedPose2d tagBasedPoseEstimate = new TimestampedPose2d(new Pose2d(-1, -1, new Rotation2d(-1)), 0);
-        TimestampedPose3d tagBasedPoseEstimate3d = new TimestampedPose3d(
-                new Pose3d(-1, -1, -1, new Rotation3d(-1, -1, -1)), 0);
+        TimestampedPose3d tagBasedPoseEstimate3d = new TimestampedPose3d(new Pose3d(-1, -1, -1, new Rotation3d(-1, -1, -1)), 0);
 
         // robot pose based on ZED wizardry
         TimestampedPose2d zedPoseEstimate = new TimestampedPose2d(new Pose2d(-1, -1, new Rotation2d(-1)), 0);
-        TimestampedPose3d zedBasedPoseEstimate3d = new TimestampedPose3d(
-                new Pose3d(-1, -1, -1, new Rotation3d(-1, -1, -1)), 0);
-        Matrix<N3, N1> zedBasedPoseCovar = VecBuilder.fill(0, 0, 0);
+        TimestampedPose3d zedBasedPoseEstimate3d = new TimestampedPose3d(new Pose3d(-1, -1, -1, new Rotation3d(-1, -1, -1)), 0);
+        Matrix<N3, N1> zedBasedPoseCovar = VecBuilder.fill(0, 0, 0); // ! what is covar
 
-        /*
-         * IMPLEMENTS LOGGABLE INPUTS MANUALLY (NOT AUTOLOG) TO LOG CUSTOM AprilTag
-         * OBJECTS
-         */
         @Override
         public void toLog(LogTable table) {
             table.put("primaryTag/Id", primaryTagId);
@@ -90,18 +84,17 @@ public interface CameraIO {
             }
 
             Pose3d pose = table.get("poseEstimate3d", tagBasedPoseEstimate3d.pose);
-            double poseTimestamp = table.get("poseTimestampSeconds", tagBasedPoseEstimate3d.timestamp);
-            tagBasedPoseEstimate3d = new TimestampedPose3d(pose, poseTimestamp);
-            tagBasedPoseEstimate = new TimestampedPose2d(pose.toPose2d(), poseTimestamp);
+            double timestamp = table.get("poseTimestampSeconds", tagBasedPoseEstimate3d.timestamp);
+            tagBasedPoseEstimate3d = new TimestampedPose3d(pose, timestamp);
+            tagBasedPoseEstimate = new TimestampedPose2d(pose.toPose2d(), timestamp);
 
-            pose = table.get("zedPoseEstimate3d", zedBasedPoseEstimate3d.pose);
-            poseTimestamp = table.get("zedPoseTimestampSeconds", zedBasedPoseEstimate3d.timestamp);
-            zedBasedPoseEstimate3d = new TimestampedPose3d(pose, poseTimestamp);
-            zedPoseEstimate = new TimestampedPose2d(pose.toPose2d(), poseTimestamp);
+            Pose3d zedPose = table.get("zedPoseEstimate3d", zedBasedPoseEstimate3d.pose);
+            double zedTimestamp = table.get("zedPoseTimestampSeconds", zedBasedPoseEstimate3d.timestamp);
+            zedBasedPoseEstimate3d = new TimestampedPose3d(zedPose, zedTimestamp);
+            zedPoseEstimate = new TimestampedPose2d(zedPose.toPose2d(), zedTimestamp);
         }
     }
 
-    /** Updates the set of loggable inputs. */
     public default void updateInputs(CameraIOInputs inputs) {
     }
 }

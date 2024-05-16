@@ -1,12 +1,6 @@
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Celsius;
-import static edu.wpi.first.units.Units.Minute;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -175,7 +169,11 @@ public class ModuleIOSparkMax implements ModuleIO {
         prevTurnPosition = position;
     }
 
-    public double sbmstit(double cur){ // she binary my search till im tuned
+    // she binary my search till im tuned
+    public double sbmstit(double cur){ 
+
+        // !!!!!!!!!Timer.getFPGATimestamp();
+
         // update stuff
         if(prevRot == -0x123){
             llt = System.currentTimeMillis();

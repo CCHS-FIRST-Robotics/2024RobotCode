@@ -8,13 +8,13 @@ public class GyroIONavX implements GyroIO {
     private final AHRS navx;
 
     public GyroIONavX() {
-        System.out.println("[Init] Creating GyroIONavX");
         navx = new AHRS();
         navx.reset();
     }
 
     public void updateInputs(GyroIOInputs inputs) {
         inputs.connected = navx.isConnected();
+        
         inputs.rollPosition = Degrees.of(navx.getRoll());
         inputs.pitchPosition = Degrees.of(navx.getPitch());
         inputs.yawPosition = Degrees.of(-navx.getYaw()); // negative because clockwise
