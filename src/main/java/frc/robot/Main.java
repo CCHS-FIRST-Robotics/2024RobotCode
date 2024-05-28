@@ -18,8 +18,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * FOC instead of MotionMagic in armIOFalcon
  * 
  * ask colin:
- * something in gyroIO
- * what is fused in gyroIO used for (unused in NavX)
+ * when is fused in gyroIO used (unused in NavX)
  * what is covar in cameraIO
  * 
  * eventually:
