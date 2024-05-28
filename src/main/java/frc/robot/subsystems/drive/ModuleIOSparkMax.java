@@ -2,6 +2,8 @@ package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -137,6 +139,8 @@ public class ModuleIOSparkMax implements ModuleIO {
                         velocity.in(RadiansPerSecond),
                         Constants.PERIOD));
         prevVelocity = velocity;
+        Logger.recordOutput("driveSpeed" + index, driveSparkMax.get());
+        Logger.recordOutput("outputVoltage" + index, driveSparkMax.getAppliedOutput());
     }
 
 
@@ -162,7 +166,6 @@ public class ModuleIOSparkMax implements ModuleIO {
             CANSparkMax.ControlType.kPosition,
             0,
             signum * turnKs);
-
         prevTurnPosition = position;
     }
 
