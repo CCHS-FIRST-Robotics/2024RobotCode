@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * ask colin:
  * when is fused in gyroIO used (unused in NavX)
  * what is covar in cameraIO
+ * why drivewithjoysticks needs an exponent
  * 
  * eventually:
  * autochooser for autos

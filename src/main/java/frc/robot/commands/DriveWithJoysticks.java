@@ -83,6 +83,7 @@ public class DriveWithJoysticks extends Command {
         // System.out.println(angularSpeed);
 
         // ! switch constants to tunable numbers
+        // ! ask colin why they need to have an exponent
         linearSpeed = applyPreferences(linearSpeed, HardwareConstants.LINEAR_SPEED_EXPONENT,
                 Constants.ANALOG_DEADZONE);
         angularSpeed = applyPreferences(angularSpeed, HardwareConstants.ANGULAR_SPEED_EXPONENT,
