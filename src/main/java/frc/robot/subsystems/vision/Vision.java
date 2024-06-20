@@ -11,12 +11,13 @@ import frc.robot.subsystems.vision.CameraIO.CameraIOInputs;
 import frc.robot.utils.*;
 
 public class Vision extends SubsystemBase {
+    SwerveDrivePoseEstimator poseEstimator;
+
     CameraIO zed;
     CameraIO photonVision;
+
     CameraIOInputs ZEDinputs = new CameraIOInputs();
     CameraIOInputs PVinputs = new CameraIOInputs();
-    SwerveDrivePoseEstimator poseEstimator;
-    boolean poseReset = false;
 
     static final Matrix<N3, N1> defaultZEDMeasurementStdDevs = VecBuilder.fill(.025, .15, 1);
     static final Matrix<N3, N1> defaultPVMeasurementStdDevs = VecBuilder.fill(.08, .1, 2);
@@ -37,7 +38,7 @@ public class Vision extends SubsystemBase {
         photonVision.updateInputs(PVinputs);
         Logger.processInputs("Vision/PV", PVinputs);
 
-        // add the PV pose estimate to poseEstimator
+        // update poseEstimator with pv estimate
         if (PVinputs.tagBasedPoseEstimate.pose.getX() > 0 && PVinputs.primaryTagAmbiguity < .2) {
             TimestampedPose2d pose = PVinputs.tagBasedPoseEstimate;
 
