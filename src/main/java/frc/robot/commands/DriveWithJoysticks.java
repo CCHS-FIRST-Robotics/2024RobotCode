@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
-import frc.robot.HardwareConstants;
 
 public class DriveWithJoysticks extends Command {
     Drive drive;
@@ -38,6 +37,10 @@ public class DriveWithJoysticks extends Command {
     TrapezoidProfile angularProfile;
 
     ChassisSpeeds prevSpeeds;
+
+        // swerve constants
+        public static final double LINEAR_SPEED_EXPONENT = 2;
+        public static final double ANGULAR_SPEED_EXPONENT = 2.5;
 
     public DriveWithJoysticks(
             Drive drive,
@@ -84,9 +87,9 @@ public class DriveWithJoysticks extends Command {
 
         // ! switch constants to tunable numbers
         // ! ask colin why they need to have an exponent
-        linearSpeed = applyPreferences(linearSpeed, HardwareConstants.LINEAR_SPEED_EXPONENT,
+        linearSpeed = applyPreferences(linearSpeed, LINEAR_SPEED_EXPONENT,
                 Constants.ANALOG_DEADZONE);
-        angularSpeed = applyPreferences(angularSpeed, HardwareConstants.ANGULAR_SPEED_EXPONENT,
+        angularSpeed = applyPreferences(angularSpeed, ANGULAR_SPEED_EXPONENT,
                 Constants.ANALOG_DEADZONE);
         // System.out.println(angularSpeed);
 

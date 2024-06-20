@@ -119,21 +119,6 @@ public class Drive extends SubsystemBase {
     private final MutableMeasure<Angle> characterizationDistanceAngular = mutable(Radians.of(0));
     private final MutableMeasure<Velocity<Angle>> characterizationVelocityAngular = mutable(RadiansPerSecond.of(0));
 
-    // Tell SysId how to record a frame of data for each motor on the mechanism
-    // being
-    // characterized (real uses URCL, sim uses manual logging)
-    Consumer<SysIdRoutineLog> log = (Constants.CURRENT_MODE == Constants.Mode.REAL) ? null : log -> {
-        // Record a frame for the left motors. Since these share an encoder, we consider
-        // the entire group to be one motor.
-        log.motor("drive-0")
-                .voltage(
-                        characterizationVolts)
-                .angularPosition(
-                        characterizationDistanceAngular.mut_replace(modules[0].getCharacterizationPosition()))
-                .angularVelocity(
-                        characterizationVelocityAngular.mut_replace(modules[0].getCharacterizationVelocity()));
-    };
-
     SysIdRoutine characterizationRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(
                     Volts.per(Second).of(.8),
@@ -145,7 +130,7 @@ public class Drive extends SubsystemBase {
                     (Measure<Voltage> volts) -> {
                         runCharacterization(volts);
                     },
-                    log,
+                    null,
                     this));
 
     /*
