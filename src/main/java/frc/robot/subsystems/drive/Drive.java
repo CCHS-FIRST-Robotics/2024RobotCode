@@ -9,13 +9,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.units.*;
-import frc.robot.utils.DriveTrajectory;
-import frc.robot.utils.PoseEstimator;
 import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
@@ -110,7 +109,7 @@ public class Drive extends SubsystemBase {
     private Twist2d fieldVelocity = new Twist2d();
     private Pose2d fieldPosition = new Pose2d(); // Use poseEstimator instead
     private Pose2d rawFieldPosition = new Pose2d(); // doesnt account for coa
-    private PoseEstimator poseEstimator;
+    private SwerveDrivePoseEstimator poseEstimator;
 
     /*
      * SYSID STUFF
@@ -459,13 +458,6 @@ public class Drive extends SubsystemBase {
         trajectoryCounter = 0;
     }
 
-    public void runPosition(DriveTrajectory driveTrajectory) {
-        controlMode = CONTROL_MODE.POSITION_SETPOINT;
-        this.positionTrajectory = driveTrajectory.positionTrajectory;
-        this.twistTrajectory = driveTrajectory.velocityTrajectory;
-        trajectoryCounter = 0;
-    }
-
     public void runCharacterization(Measure<Voltage> volts) {
         controlMode = CONTROL_MODE.CHARACTERIZING;
         characterizationVolts.mut_replace(volts.in(Volts), Volts);
@@ -623,12 +615,12 @@ public class Drive extends SubsystemBase {
         return headingController;
     }
 
-    public void setPoseEstimator(PoseEstimator poseEstimator) {
+    public void setPoseEstimator(SwerveDrivePoseEstimator poseEstimator) {
         this.poseEstimator = poseEstimator;
     }
 
     public Pose2d getPose() {
-        return poseEstimator.getPoseEstimate();
+        return poseEstimator.getEstimatedPosition();
     }
 
     public Twist2d getVelocity() {
@@ -654,14 +646,5 @@ public class Drive extends SubsystemBase {
                 .andThen(characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
                 .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward))
                 .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
-    }
-
-    public Command followTrajectory(DriveTrajectory traj) {
-        return runOnce(
-                () -> {
-                    Logger.recordOutput("Auto/GeneratedTrajectory",
-                            traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
-                    runPosition(traj);
-                });
     }
 }

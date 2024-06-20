@@ -1,7 +1,11 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.*;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.numbers.*;
+
 import org.littletonrobotics.junction.Logger;
 import frc.robot.subsystems.vision.CameraIO.CameraIOInputs;
 import frc.robot.utils.*;
@@ -11,15 +15,18 @@ public class Vision extends SubsystemBase {
     CameraIO photonVision;
     CameraIOInputs ZEDinputs = new CameraIOInputs();
     CameraIOInputs PVinputs = new CameraIOInputs();
-    PoseEstimator poseEstimator;
+    SwerveDrivePoseEstimator poseEstimator;
     boolean poseReset = false;
+
+    static final Matrix<N3, N1> defaultZEDMeasurementStdDevs = VecBuilder.fill(.025, .15, 1);
+    static final Matrix<N3, N1> defaultPVMeasurementStdDevs = VecBuilder.fill(.08, .1, 2);
 
     public Vision(CameraIO zed, CameraIO photonVision) {
         this.zed = zed;
         this.photonVision = photonVision;
     }
 
-    public void setPoseEstimator(PoseEstimator poseEstimator) {
+    public void setPoseEstimator(SwerveDrivePoseEstimator poseEstimator) {
         this.poseEstimator = poseEstimator;
     }
 
@@ -39,8 +46,7 @@ public class Vision extends SubsystemBase {
             poseEstimator.addVisionMeasurement(
                     pose.pose,
                     pose.timestamp,
-                    poseEstimator.getDefaultPVMeasurementStdDevs()
-                            .times(new Translation2d(PVinputs.primaryTagX, PVinputs.primaryTagY).getNorm()));
+                    defaultPVMeasurementStdDevs.times(new Translation2d(PVinputs.primaryTagX, PVinputs.primaryTagY).getNorm()));
         }
     }
 }

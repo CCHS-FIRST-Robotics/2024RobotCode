@@ -4,28 +4,20 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-
-import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.*;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import frc.robot.Constants.ArmPosition;
-import frc.robot.Constants.AutoPathConstants;
-import frc.robot.Constants.StartPosistions;
 import frc.robot.commands.*;
-import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
-import static frc.robot.Constants.*;
+import frc.robot.Constants.StartPosistions;
 
 public class RobotContainer {
     private final Drive drive;
-    private final PoseEstimator poseEstimator;
+    private final SwerveDrivePoseEstimator poseEstimator;
     private final Vision vision;
 
-    private final CommandXboxController controller1 = new CommandXboxController(Constants.CONTROLLER_PORT_1);
-    private final CommandXboxController controller2 = new CommandXboxController(Constants.CONTROLLER_PORT_2);
+    private final CommandXboxController controller = new CommandXboxController(Constants.CONTROLLER_PORT_1);
 
     public RobotContainer() {
 
@@ -41,7 +33,7 @@ public class RobotContainer {
 
         // ! wow this looks like it should be automized
         // change pose here for autos!!!
-        poseEstimator = new PoseEstimator(
+        poseEstimator = new SwerveDrivePoseEstimator(
                 drive.getKinematics(),
                 new Rotation2d(),
                 drive.getModulePositions(),
@@ -67,17 +59,16 @@ public class RobotContainer {
 
         new DriveWithJoysticks(
         drive,
-        () -> -controller1.getLeftX(),
-        () -> -controller1.getLeftY(),
-        () -> -.55 * controller1.getRightX(),
+        () -> -controller.getLeftX(),
+        () -> -controller.getLeftY(),
+        () -> -.55 * controller.getRightX(),
         () -> {
         return 1.0;
         },
         // () -> {return new Rotation2d();},
-        () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()), // ! the hell is this
+        () -> Rotation2d.fromDegrees(controller.getHID().getPOV()), // ! the hell is this
         false,
         true)
         );
-
     }
 }
