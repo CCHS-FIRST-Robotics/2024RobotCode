@@ -161,7 +161,8 @@ public class Drive extends SubsystemBase {
             ModuleIO flModuleIO,
             ModuleIO frModuleIO,
             ModuleIO blModuleIO,
-            ModuleIO brModuleIO) {
+            ModuleIO brModuleIO
+        ) {
         Logger.recordOutput("SysIdTestState", "none");
 
         this.gyroIO = gyroIO;

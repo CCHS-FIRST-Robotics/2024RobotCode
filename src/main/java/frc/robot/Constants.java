@@ -4,7 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 public final class Constants {
     // ports and ids
@@ -19,6 +23,10 @@ public final class Constants {
             new Pose3d(0, 1, 0, new Rotation3d(0, 0, 0)),
             new Pose3d(0, 3, 0, new Rotation3d(0, 0, 0)),
     };
+
+    // vision
+    public static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.0025, 0.0025, 0.0002);
+    public static final Matrix<N3, N1> defaultPVMeasurementStdDevs = VecBuilder.fill(.08, .1, 2);
 
     public static class StartPosistions {
         public static final Pose2d blueAmp = new Pose2d(0.790, 6.550, new Rotation2d());
