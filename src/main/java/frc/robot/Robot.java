@@ -5,19 +5,11 @@
 package frc.robot;
 
 import org.littletonrobotics.junction.LoggedRobot;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.LogFileUtil;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
-import org.littletonrobotics.urcl.URCL;
-import com.ctre.phoenix6.SignalLogger;
 
 public class Robot extends LoggedRobot {
-    private RobotContainer robotContainer;
-    Command autonomousCommand;
+    RobotContainer robotContainer;
 
     @Override
     public void robotInit() {
@@ -39,29 +31,6 @@ public class Robot extends LoggedRobot {
                 break;
         }
 
-        // set up data recievers
-        switch (Constants.CURRENT_MODE) {
-            case REAL: // log to a USB stick
-                Logger.addDataReceiver(new WPILOGWriter("/media/sda1"));
-                Logger.addDataReceiver(new NT4Publisher());
-                // new PowerDistribution(0, ModuleType.kCTRE); // enables power distribution
-                break;
-            case SIM: // log to local folder
-                Logger.addDataReceiver(new WPILOGWriter());
-                Logger.addDataReceiver(new NT4Publisher());
-                break;
-            case REPLAY: // set up replay source
-                setUseTiming(false); // run as fast as possible
-                String logPath = LogFileUtil.findReplayLog();
-                Logger.setReplaySource(new WPILOGReader(logPath));
-                Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-                break;
-        }
-
-        SignalLogger.setPath("/media/sda1/");
-        SignalLogger.start();
-
-        Logger.registerURCL(URCL.startExternal());
         Logger.start();
 
         robotContainer = new RobotContainer();
@@ -89,12 +58,6 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void autonomousInit() {
-        autonomousCommand = robotContainer.getAutonomousCommand();
-
-        // schedule the autonomous command (example)
-        if (autonomousCommand != null) {
-            autonomousCommand.schedule();
-        }
     }
 
     /** This function is called periodically during autonomous. */
@@ -105,14 +68,6 @@ public class Robot extends LoggedRobot {
     /** This function is called once when teleop is enabled. */
     @Override
     public void teleopInit() {
-        // This makes sure that the autonomous stops running when
-        // teleop starts running. If you want the autonomous to
-        // continue until interrupted by another command, remove
-        // this line or comment it out.
-        if (autonomousCommand != null) {
-            autonomousCommand.cancel();
-        }
-        robotContainer.setHandoffCurrent();
     }
 
     /** This function is called periodically during operator control. */
