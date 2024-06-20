@@ -20,16 +20,12 @@ public class AprilTag {
         return this.id;
     }
 
-    public Transform3d getTransform3d(){
-        return this.transform;
+    public Pose2d getPose2d() {
+        return getPose3d().toPose2d();
     }
 
     public Pose3d getPose3d() {
         return new Pose3d(transform.getTranslation(), transform.getRotation());
-    }
-
-    public Pose2d getPose2d() {
-        return getPose3d().toPose2d();
     }
 
     public double getDistance() {
