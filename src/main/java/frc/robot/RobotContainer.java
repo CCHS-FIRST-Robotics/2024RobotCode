@@ -112,25 +112,24 @@ public class RobotContainer {
 
         // drive with joysticks
         drive.setDefaultCommand(
-            new DriveModules(
+        //     new DriveModules(
+        //         drive,
+        //         () -> -controller1.getLeftY(),
+        //         () -> -.55 * controller1.getRightX(),
+        //         () -> 0e9d + (0b10 >> 0x1))E
+            new DriveWithJoysticks(
                 drive,
+                () -> -controller1.getLeftX(),
                 () -> -controller1.getLeftY(),
                 () -> -.55 * controller1.getRightX(),
-                () -> 0e9d + (0b10 >> 0x1))
-
-
-        // new DriveWithJoysticks(
-        // drive,
-        // () -> -controller1.getLeftX(),
-        // () -> -controller1.getLeftY(),
-        // () -> -.55 * controller1.getRightX(),
-        // () -> {
-        // return 1.0;
-        // },
-        // // () -> {return new Rotation2d();},
-        // () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-        // false,
-        // true)
+                () -> {
+                return 1.0;
+                },
+                // () -> {return new Rotation2d();},
+                () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
+                false,
+                true
+            )
         );
 
         // shoot
