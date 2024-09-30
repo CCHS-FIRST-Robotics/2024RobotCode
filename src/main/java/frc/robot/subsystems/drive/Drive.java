@@ -46,11 +46,11 @@ public class Drive extends SubsystemBase {
     private Module[] modules = new Module[4]; // FL, FR, BL, BR
 
     // Constants for the drivebase
-    private static Measure<Velocity<Distance>> maxLinearSpeed = MetersPerSecond.of(4.5);
+    private static Measure<Velocity<Distance>> maxLinearSpeed = MetersPerSecond.of(1.5); // 4.5
     private static final Measure<Velocity<Velocity<Distance>>> maxLinearAcceleration = MetersPerSecondPerSecond.of(9.0);
     private static final Measure<Distance> trackWidthX = Inches.of(22.5);
     private static final Measure<Distance> trackWidthY = Inches.of(22.5);
-    private static final Measure<Velocity<Angle>> maxAngularSpeed = RadiansPerSecond.of(8 * Math.PI);
+    private static final Measure<Velocity<Angle>> maxAngularSpeed = RadiansPerSecond.of(6 * Math.PI); // 8 * pi
     private static final Measure<Velocity<Velocity<Angle>>> maxAngularAcceleration = RadiansPerSecond.per(Seconds)
             .of(10 * Math.PI);
 

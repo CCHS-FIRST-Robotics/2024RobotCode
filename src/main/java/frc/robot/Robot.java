@@ -40,23 +40,23 @@ public class Robot extends LoggedRobot {
         }
 
         // set up data recievers
-        switch (Constants.CURRENT_MODE) {
-            case REAL: // log to a USB stick
-                Logger.addDataReceiver(new WPILOGWriter("/media/sda1"));
-                Logger.addDataReceiver(new NT4Publisher());
-                // new PowerDistribution(0, ModuleType.kCTRE); // enables power distribution
-                break;
-            case SIM: // log to local folder
-                Logger.addDataReceiver(new WPILOGWriter());
-                Logger.addDataReceiver(new NT4Publisher());
-                break;
-            case REPLAY: // set up replay source
-                setUseTiming(false); // run as fast as possible
-                String logPath = LogFileUtil.findReplayLog();
-                Logger.setReplaySource(new WPILOGReader(logPath));
-                Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-                break;
-        }
+        // switch (Constants.CURRENT_MODE) {
+        //     case REAL: // log to a USB stick
+        //         Logger.addDataReceiver(new WPILOGWriter("/media/sda1"));
+        //         Logger.addDataReceiver(new NT4Publisher());
+        //         // new PowerDistribution(0, ModuleType.kCTRE); // enables power distribution
+        //         break;
+        //     case SIM: // log to local folder
+        //         Logger.addDataReceiver(new WPILOGWriter());
+        //         Logger.addDataReceiver(new NT4Publisher());
+        //         break;
+        //     case REPLAY: // set up replay source
+        //         setUseTiming(false); // run as fast as possible
+        //         String logPath = LogFileUtil.findReplayLog();
+        //         Logger.setReplaySource(new WPILOGReader(logPath));
+        //         Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        //         break;
+        // }
 
         SignalLogger.setPath("/media/sda1/");
         SignalLogger.start();
