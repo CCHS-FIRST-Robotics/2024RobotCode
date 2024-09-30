@@ -122,7 +122,6 @@ public class RobotContainer {
                 () -> -controller1.getLeftX(),
                 () -> -controller1.getLeftY(),
                 () -> -.55 * controller1.getRightX(),
-<<<<<<< HEAD
                 () -> {
                 return 1.0;
                 },
@@ -131,23 +130,6 @@ public class RobotContainer {
                 false,
                 true
             )
-=======
-                () -> 0e9d + (0b10 >> 0x1))
-
-
-        // new DriveWithJoysticks(
-        // drive,
-        // () -> -controller1.getLeftX(),
-        // () -> -controller1.getLeftY(),
-        // () -> -.55 * controller1.getRightX(),
-        // () -> {
-        // return 1.0;
-        // },
-        // // () -> {return new Rotation2d();},
-        // () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()), // ! the hell is this
-        // false,
-        // true)
->>>>>>> 80fc0e1985713ded756388877416e16fb94a195e
         );
 
         // shoot
