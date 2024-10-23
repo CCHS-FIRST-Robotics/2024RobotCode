@@ -185,46 +185,6 @@ public class RobotContainer {
                                         drive.getShootHeadingTo(SPEAKER_POSE),
                                         true,
                                         true)));
-
-        /**
-         * ! needs to disappear
-         */
-
-        // prime shooter (speaker - subwoofer)
-        controller2.povRight().and(() -> !shooter.upToSpeed()).onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-                        // move arm
-                        .alongWith(arm.moveArm(ArmPosition.SPEAKER, drive::getPose)));
-
-        // prime shooter (speaker - close to sub)
-        controller2.povUp().and(() -> !shooter.upToSpeed()).onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-                        // move arm
-                        .alongWith(arm.moveArm(ArmPosition.CLOSE_SUB, drive::getPose)));
-
-        // prime shooter (speaker - stage)
-        controller2.povLeft().and(() -> !shooter.upToSpeed()).onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-                        // move arm
-                        .alongWith(arm.moveArm(ArmPosition.STAGE, drive::getPose)));
-
-        // arm position testing
-        // controller1.leftTrigger().onTrue(new InstantCommand(() -> {
-        // ARM_POSITIONS.put(ArmPosition.TEST,
-        // ARM_POSITIONS.get(ArmPosition.TEST).minus(Degrees.of(.5)));
-        // arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.TEST));
-        // }));
-        // controller1.rightTrigger().onTrue(new InstantCommand(() -> {
-        // ARM_POSITIONS.put(ArmPosition.TEST,
-        // ARM_POSITIONS.get(ArmPosition.TEST).plus(Degrees.of(.5)));
-        // arm.setArmAngle(ARM_POSITIONS.get(ArmPosition.TEST));
-        // }));
-        // controller1.a().onTrue(new InstantCommand(() -> {
-        // System.out.println("ARM ANGLE IS : " + ARM_POSITIONS.get(ArmPosition.TEST));
-        // }));
     }
 
     public Command getAutonomousCommand() {
