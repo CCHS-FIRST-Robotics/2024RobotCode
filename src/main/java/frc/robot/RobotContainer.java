@@ -188,7 +188,13 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new EventMarkerBuilder(AutoPathConstants.fourC231, drive, intake, handoff, shooter, arm)
-                .getCommandSequence();
+        return new EventMarkerBuilder(
+            AutoPathConstants.fourC231, 
+            drive, 
+            arm, 
+            intake, 
+            handoff, 
+            shooter
+        ).getCommandSequence();
     }
 }

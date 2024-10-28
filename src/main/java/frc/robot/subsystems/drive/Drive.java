@@ -66,7 +66,7 @@ public class Drive extends SubsystemBase {
 
     // Initialize setpoints
     private ChassisSpeeds chassisSetpoint = new ChassisSpeeds();
-    private ChassisSpeeds lastSetpoint = new ChassisSpeeds();
+    // private ChassisSpeeds lastSetpoint = new ChassisSpeeds();
     private SwerveModuleState moduleSetpoint = new SwerveModuleState();
     private SwerveModuleState[] lastSetpointStates = new SwerveModuleState[] {
             new SwerveModuleState(),
@@ -112,7 +112,7 @@ public class Drive extends SubsystemBase {
     private Rotation2d lastGyroYaw = new Rotation2d();
     private Twist2d fieldVelocity = new Twist2d();
     private Pose2d fieldPosition = new Pose2d(); // Use poseEstimator instead
-    private Pose2d rawFieldPosition = new Pose2d(); // doesnt account for coa TODO: write lol
+    // private Pose2d rawFieldPosition = new Pose2d(); // doesnt account for coa TODO: write lol
     private PoseEstimator poseEstimator;
 
     /*
@@ -160,7 +160,7 @@ public class Drive extends SubsystemBase {
     private Timer lastMovementTimer = new Timer();
 
     // auto path
-    private ArrayList<String> autoPaths;
+    // private ArrayList<String> autoPaths;
     private int currentPathNum = 0; // 0 in the list is the first path
 
     boolean openLoop = false;
@@ -382,7 +382,7 @@ public class Drive extends SubsystemBase {
                         setpointTwist.dy / Constants.PERIOD,
                         setpointTwist.dtheta / Constants.PERIOD);
 
-                lastSetpoint = adjustedSpeeds;
+                // lastSetpoint = adjustedSpeeds;
 
                 // System.out.println(adjustedSpeeds);
 
