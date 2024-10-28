@@ -18,7 +18,7 @@ import frc.robot.subsystems.noteIO.arm.*;
 import frc.robot.subsystems.noteIO.handoff.*;
 import frc.robot.subsystems.noteIO.intake.*;
 import frc.robot.subsystems.noteIO.shooter.*;
-import frc.robot.utils.EventMarkerBuilder;
+import frc.robot.utils.AutoCommandSequenceBuilder;
 import static frc.robot.Constants.*;
 
 public class RobotContainer {
@@ -179,13 +179,13 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new EventMarkerBuilder(
+        return new AutoCommandSequenceBuilder(
             AutoPathConstants.twoStraight, // specifies the auto to run
             drive, 
             arm, 
             intake, 
             handoff, 
             shooter
-        ).getCommandSequence();
+        ).getAutoCommandSequence();
     }
 }

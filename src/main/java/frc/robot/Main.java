@@ -6,6 +6,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
+/**
+ * to do: 
+ * 
+ * ! probably lower the max speed when testing
+ */
+
 public final class Main {
     private Main() {
     }
