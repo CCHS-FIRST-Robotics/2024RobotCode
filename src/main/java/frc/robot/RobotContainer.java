@@ -40,71 +40,62 @@ public class RobotContainer {
     public RobotContainer() {
         switch (Constants.CURRENT_MODE) {
             case REAL:
-                // instantiate hardware IO implementations
                 drive = new Drive(
-                        new GyroIONavX(),
-                        new ModuleIOSparkMax(0),
-                        new ModuleIOSparkMax(1),
-                        new ModuleIOSparkMax(2),
-                        new ModuleIOSparkMax(3));
+                    new GyroIONavX(),
+                    new ModuleIOSparkMax(0),
+                    new ModuleIOSparkMax(1),
+                    new ModuleIOSparkMax(2),
+                    new ModuleIOSparkMax(3)
+                );
                 vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
-                arm = new Arm(
-                        new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID,
-                                Constants.ARM_CANCODER_ID));
-                intake = new Intake(
-                        new IntakeIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
-                handoff = new Handoff(
-                        // new HandoffIOFalcon500(Constants.HANDOFF_ID)
-                        new HandoffIOSparkMax(Constants.HANDOFF_ID));
-                shooter = new Shooter(
-                        new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
+                arm = new Arm(new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID, Constants.ARM_CANCODER_ID));
+                intake = new Intake(new IntakeIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
+                handoff = new Handoff(new HandoffIOSparkMax(Constants.HANDOFF_ID));
+                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
             case SIM:
-                // instantiate physics sim IO implementations
                 drive = new Drive(
-                        new GyroIO() {
-                        },
-                        new ModuleIOSim(),
-                        new ModuleIOSim(),
-                        new ModuleIOSim(),
-                        new ModuleIOSim());
+                    new GyroIO() {},
+                    new ModuleIOSim(),
+                    new ModuleIOSim(),
+                    new ModuleIOSim(),
+                    new ModuleIOSim()
+                );
                 vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
                 arm = new Arm(new ArmIOSim());
                 handoff = new Handoff(new HandoffIOSim());
-                intake = new Intake(new IntakeIOSim()); //////// change
+                intake = new Intake(new IntakeIOSim());
                 shooter = new Shooter(new ShooterIOSim());
                 break;
-            default: // replayed robot; disable IO implementations
+            default:
                 drive = new Drive(
-                        new GyroIONavX(),
-                        new ModuleIOSparkMax(0),
-                        new ModuleIOSparkMax(1),
-                        new ModuleIOSparkMax(2),
-                        new ModuleIOSparkMax(3));
+                    new GyroIONavX(),
+                    new ModuleIOSparkMax(0),
+                    new ModuleIOSparkMax(1),
+                    new ModuleIOSparkMax(2),
+                    new ModuleIOSparkMax(3)
+                );
                 vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
-                arm = new Arm(
-                        new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID,
-                                Constants.ARM_CANCODER_ID));
-                intake = new Intake(
-                        new IntakeIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
-                handoff = new Handoff(new HandoffIOFalcon500(Constants.HANDOFF_ID));
-                shooter = new Shooter(
-                        new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
+                arm = new Arm(new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID, Constants.ARM_CANCODER_ID));
+                intake = new Intake(new IntakeIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
+                handoff = new Handoff(new HandoffIOSparkMax(Constants.HANDOFF_ID));
+                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
         }
 
         // ! wow this looks like it should be automized
         // change pose here for autos!!!
         poseEstimator = new PoseEstimator(
-                drive.getKinematics(),
-                new Rotation2d(),
-                drive.getModulePositions(),
-                StartPosistions.blueCenter);
+            drive.getKinematics(),
+            new Rotation2d(),
+            drive.getModulePositions(),
+            new Pose2d(0, 0, new Rotation2d())
+        );
 
         drive.setPoseEstimator(poseEstimator);
         vision.setPoseEstimator(poseEstimator);
 
-        autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // set up autoroutines
+        autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // ! set up autoroutines
 
         configureButtonBindings();
     }
@@ -189,7 +180,7 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return new EventMarkerBuilder(
-            AutoPathConstants.fourC231, 
+            AutoPathConstants.twoStraight, // specifies the auto to run
             drive, 
             arm, 
             intake, 

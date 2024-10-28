@@ -6,7 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.*;
 import java.util.*;
@@ -89,77 +88,14 @@ public final class Constants {
         ARM_HANDOFF
     }
 
-    public static class StartPosistions {
-        public static final Pose2d blueAmp = new Pose2d(0.790, 6.550, new Rotation2d());
-        public static final Pose2d blueCenter = new Pose2d(1.3, 5.544, new Rotation2d());
-        public static final Pose2d blueSource = new Pose2d(0.79, 4.55, new Rotation2d());
-        public static final Pose2d redAmp = new Pose2d(15.75, 6.55, new Rotation2d());
-        public static final Pose2d redCenter = new Pose2d(15.27, 5.544, new Rotation2d());
-        public static final Pose2d redSource = new Pose2d(15.75, 4.55, new Rotation2d());
-    }
-
-    public static class AutoPathConstants {
-        public static final Map<Pair<Double, Constants.EventCommand>, ArrayList<String>> eventMarkerMap = new HashMap<>();
+    public static class AutoPathConstants {        
+        // arraylists for paths
+        public static final ArrayList<String> twoStraight = new ArrayList<String>();
 
         // file names for paths
-        public static final String TWO_NOTE_A1 = "2A1.1";
-        public static final String TWO_NOTE_C2 = "2C2.1";
-        public static final String TWO_NOTE_S3 = "2S3.1";
-        public static final String TWO_NOTE_S8 = "2S8.1";
+        public static final String TWO_STRAIGHT_1 = "2Straight.1";
+        public static final String TWO_STRAIGHT_2 = "2Straight.2";
 
-        public static final String THREE_NOTE_C21_1 = "3C21.1";
-        public static final String THREE_NOTE_C21_2 = "3C21.2";
-
-        public static final String THREE_NOTE_C23_1 = "3C23.1";
-        public static final String THREE_NOTE_C23_2 = "3C23.2";
-
-        public static final String THREE_NOTE_A14_1 = "3A14.1";
-        public static final String THREE_NOTE_A14_2 = "3A14.2";
-
-        public static final String THREE_NOTE_S38_1 = "3S38.1";
-        public static final String THREE_NOTE_S38_2 = "3S38.2";
-
-        public static final String THREE_NOTE_C25_1 = "3C25.1";
-        public static final String THREE_NOTE_C25_2 = "3C25.2";
-
-        public static final String THREE_NOTE_S87_1 = "3S87.1";
-        public static final String THREE_NOTE_S87_2 = "3S87.2";
-
-        public static final String THREE_NOTE_S32_1 = "3S32.1";
-        public static final String THREE_NOTE_S32_2 = "3S32.2";
-
-        public static final String THREE_NOTE_A12_1 = "3A12.1";
-        public static final String THREE_NOTE_A12_2 = "3A12.2";
-
-        public static final String FOUR_NOTE_C231_1 = "4C231.1";
-        public static final String FOUR_NOTE_C231_2 = "4C231.2";
-        public static final String FOUR_NOTE_C231_3 = "4C231.3";
-
-        public static final String FOUR_NOTE_C214_1 = "4C214.1";
-        public static final String FOUR_NOTE_C214_2 = "4C214.2";
-        public static final String FOUR_NOTE_C214_3 = "4C214.3";
-
-        public static final String FIVE_NOTE_C3214_1 = "5C3214.1";
-        public static final String FIVE_NOTE_C3214_2 = "5C3214.2";
-        public static final String FIVE_NOTE_C3214_3 = "5C3214.3";
-        public static final String FIVE_NOTE_C3214_4 = "5C3214.4";
-
-        // arraylists for paths
-        public static final ArrayList<String> twoC2 = new ArrayList<String>();
-        public static final ArrayList<String> twoA1 = new ArrayList<String>();
-        public static final ArrayList<String> twoS3 = new ArrayList<String>();
-        public static final ArrayList<String> twoS8 = new ArrayList<String>();
-        public static final ArrayList<String> threeC21 = new ArrayList<String>();
-        public static final ArrayList<String> threeC23 = new ArrayList<String>();
-        public static final ArrayList<String> threeA14 = new ArrayList<String>();
-        public static final ArrayList<String> threeS38 = new ArrayList<String>();
-        public static final ArrayList<String> threeC25 = new ArrayList<String>();
-        public static final ArrayList<String> threeS87 = new ArrayList<String>();
-        public static final ArrayList<String> threeS32 = new ArrayList<String>();
-        public static final ArrayList<String> threeA12 = new ArrayList<String>();
-        public static final ArrayList<String> fourC231 = new ArrayList<String>();
-        public static final ArrayList<String> fourC214 = new ArrayList<String>();
-        public static final ArrayList<String> fiveC3214 = new ArrayList<String>();
 
         public static final Measure<Voltage> INTAKE_VOLTS = Volts.of(9);
         public static final Measure<Voltage> HANDOFF_IN_VOLTS = Volts.of(4);
@@ -170,58 +106,12 @@ public final class Constants {
         public static final double INTAKE_TIME = 1.5;
         public static final double SHOOT_TIME = 0.5;
 
-        public static final Pose2d AUTO_START_POS = new Pose2d(1.3, 5.544, new Rotation2d(0));
-
         public static final Measure<Velocity<Angle>> SHOOT_SPEED_LEFT = RotationsPerSecond.of(85);
         public static final Measure<Velocity<Angle>> SHOOT_SPEED_RIGHT = RotationsPerSecond.of(95); // idk
 
         static {
-            twoA1.add(TWO_NOTE_A1);
-            twoC2.add(TWO_NOTE_C2);
-            twoS3.add(TWO_NOTE_S3);
-            twoS8.add(TWO_NOTE_S8);
-
-            threeC21.add(THREE_NOTE_C21_1);
-            threeC21.add(THREE_NOTE_C21_2);
-
-            threeC23.add(THREE_NOTE_C23_1);
-            threeC23.add(THREE_NOTE_C23_2);
-
-            threeA14.add(THREE_NOTE_A14_1);
-            threeA14.add(THREE_NOTE_A14_2);
-
-            threeS38.add(THREE_NOTE_S38_1);
-            threeS38.add(THREE_NOTE_S38_2);
-
-            threeC25.add(THREE_NOTE_C25_1);
-            threeC25.add(THREE_NOTE_C25_2);
-
-            threeS87.add(THREE_NOTE_S87_1);
-            threeS87.add(THREE_NOTE_S87_2);
-
-            threeS32.add(THREE_NOTE_S32_1);
-            threeS32.add(THREE_NOTE_S32_2);
-
-            threeA12.add(THREE_NOTE_A12_1);
-            threeA12.add(THREE_NOTE_A12_2);
-
-            fourC231.add(FOUR_NOTE_C231_1);
-            fourC231.add(FOUR_NOTE_C231_2);
-            fourC231.add(FOUR_NOTE_C231_3);
-
-            fourC214.add(FOUR_NOTE_C214_1);
-            fourC214.add(FOUR_NOTE_C214_2);
-            fourC214.add(FOUR_NOTE_C214_3);
-
-            fiveC3214.add(FIVE_NOTE_C3214_1);
-            fiveC3214.add(FIVE_NOTE_C3214_2);
-            fiveC3214.add(FIVE_NOTE_C3214_3);
-            fiveC3214.add(FIVE_NOTE_C3214_4);
+            twoStraight.add(TWO_STRAIGHT_1);
+            twoStraight.add(TWO_STRAIGHT_2);
         }
-
-        /*
-         * AUTO PATHS
-         * starting pose: Amp(A), Center(C), Source(S)
-         */
     }
 }
