@@ -325,6 +325,7 @@ public class Drive extends SubsystemBase {
                 Logger.recordOutput("Auto/FieldPosition", positionSetpointTrajectory);
 
                 // Get the PID output for the desired setpoint (output in m/s)
+                // gets pid for x, y, and heading
                 double xPID = xController.calculate(getPose().getX(), positionSetpointTrajectory.getX());
                 double yPID = yController.calculate(getPose().getY(), positionSetpointTrajectory.getY());
                 double headingPID = headingController.calculate(getPose().getRotation().getRadians(),
@@ -363,7 +364,7 @@ public class Drive extends SubsystemBase {
             case CHASSIS_SETPOINT:
 
                 // Brief explanation here:
-                // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/transformations.html
+                // https://docs.wpilib.org/en/stable/d ocs/software/advanced-controls/geometry/transformations.html
                 // For more detail, see chapter 10 here:
                 // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
                 // Purpose: accounts for continuous movement along an arc instead of a discrete
@@ -411,9 +412,6 @@ public class Drive extends SubsystemBase {
                     if (openLoop)
                         setpointStates[i].speedMetersPerSecond *= 1d / (maxLinearSpeed.in(MetersPerSecond));
                     optimizedStates[i] = modules[i].runSetpoint(setpointStates[i], openLoop);
-
-                    // FOR TESTING ONLY
-                    // optimizedStates[i] = new SwerveModuleState();
                 }
 
                 // Log setpoint states
@@ -688,7 +686,7 @@ public class Drive extends SubsystemBase {
         return runOnce(
                 () -> {
                     DriveTrajectory traj = DriveTrajectoryGenerator
-                            .generateChoreoTrajectoryFromFile(path.get(currentPathNum));
+                            .generateChoreoTrajectory(path.get(currentPathNum));
                     System.out.println("recording pos traj");
                     Logger.recordOutput("Auto/GeneratedTrajectory",
                             traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));

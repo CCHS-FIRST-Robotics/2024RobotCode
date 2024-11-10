@@ -1,13 +1,9 @@
 package frc.robot.utils;
 
 import edu.wpi.first.math.geometry.*;
-import java.io.*;
 import java.util.ArrayList;
 
-import com.opencsv.CSVWriter;
-
 public class DriveTrajectory {
-
     public ArrayList<Pose2d> positionTrajectory;
     public ArrayList<Twist2d> velocityTrajectory;
 
@@ -51,50 +47,4 @@ public class DriveTrajectory {
     public DriveTrajectory combine(DriveTrajectory other) {
         return combine(this, other);
     }
-
-    public void translateBy(Translation2d translation) {
-        for (int i = 0; i < this.positionTrajectory.size(); i++) {
-            Pose2d pose = this.positionTrajectory.get(i);
-            this.positionTrajectory.set(i, new Pose2d(pose.getTranslation().plus(translation), pose.getRotation()));
-        }
-    }
-
-    public void print() {
-        System.out.println("Position Trajectory:");
-        for (Pose2d pose : this.positionTrajectory) {
-            System.out.println(pose);
-        }
-        System.out.println("Velocity Trajectory:");
-        for (Twist2d twist : this.velocityTrajectory) {
-            System.out.println(twist);
-        }
-    }
-
-    public void toCSV() {
-        toCSV("trajectory");
-    }
-
-    public void toCSV(String filename) {
-        try {
-            CSVWriter writer = new CSVWriter(new FileWriter("data/" + filename + ".csv"));
-            String[] header = { "x", "y", "heading", "dx", "dy", "dtheta" };
-            writer.writeNext(header);
-            for (int i = 0; i < this.positionTrajectory.size(); i++) {
-                Pose2d pose = this.positionTrajectory.get(i);
-                Twist2d twist = this.velocityTrajectory.get(i);
-                String[] data = {
-                        Double.toString(pose.getX()),
-                        Double.toString(pose.getY()),
-                        Double.toString(pose.getRotation().getRadians()),
-                        Double.toString(twist.dx), Double.toString(twist.dy),
-                        Double.toString(twist.dtheta)
-                };
-                writer.writeNext(data);
-            }
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

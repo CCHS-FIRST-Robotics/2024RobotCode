@@ -66,7 +66,7 @@ public final class AutoCommandSequenceBuilder {
         events.add(
             Pair.of(
                 0.0,
-                drive.followTrajectory(DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path))
+                drive.followTrajectory(DriveTrajectoryGenerator.generateChoreoTrajectory(path))
                 .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
                 .alongWith(intake.getIntakeCommand(AutoPathConstants.INTAKE_VOLTS, handoff::checkNoteThere))
                 .alongWith(handoff.getHandoffCommand(AutoPathConstants.HANDOFF_IN_VOLTS))
