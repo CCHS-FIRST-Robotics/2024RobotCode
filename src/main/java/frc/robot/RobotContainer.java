@@ -95,7 +95,7 @@ public class RobotContainer {
         drive.setPoseEstimator(poseEstimator);
         vision.setPoseEstimator(poseEstimator);
 
-        autoChooser.addDefaultOption("Do Nothing", new InstantCommand()); // ! set up autoroutines
+        autoChooser.addDefaultOption("Do Nothing", new InstantCommand());
 
         configureButtonBindings();
     }
@@ -109,24 +109,23 @@ public class RobotContainer {
 
         // drive with joysticks
         drive.setDefaultCommand(
-                new DriveWithJoysticks(
-                        drive,
-                        () -> -0.3 * controller1.getLeftX(),
-                        () -> -0.3 * controller1.getLeftY(),
-                        () -> -.7 * controller1.getRightX(),
-                        () -> {
-                            return 1.0;
-                        },
-                        () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-                        false,
-                        true));
+            new DriveWithJoysticks(
+                drive,
+                () -> -0.3 * controller1.getLeftX(),
+                () -> -0.3 * controller1.getLeftY(),
+                () -> -.7 * controller1.getRightX(),
+                false,
+                () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()) // ! I think this is just for FOC
+            )
+        );
 
         // shoot
         controller1.b().onTrue(
-                // handoff
-                handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
-                        // stop shooter
-                        .andThen(new InstantCommand(shooter::stop, shooter)));
+            // handoff
+            handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
+            // stop shooter
+            .andThen(new InstantCommand(shooter::stop, shooter))
+        );
 
         /*
          * Controller 2:
@@ -136,46 +135,47 @@ public class RobotContainer {
 
         // intake
         controller2.a().onTrue(
-                // turn on handoff
-                handoff.getHandoffCommand(Volts.of(3))
-                        // move arm down
-                        .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose)
-                                .andThen(Commands.waitUntil(arm::atGoal)))
-                        .alongWith(
-                                // turn on intake until detected by handoff
-                                intake.getIntakeCommand(Volts.of(8), handoff::checkNoteThere)));
+            // turn on handoff
+            handoff.getHandoffCommand(Volts.of(3))
+                // move arm down
+                .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose)
+            .andThen(Commands.waitUntil(arm::atGoal)))
+                // turn on intake until note detected by handoff
+                .alongWith(intake.getIntakeCommand(Volts.of(8), handoff::checkNoteThere))
+        );
 
         // outtake
         controller2.x().whileTrue(
-                intake.getIntakeCommand(Volts.of(-3))
-                        .alongWith(handoff.getHandoffManualCommand(Volts.of(-2))));
+            intake.getIntakeCommand(Volts.of(-3))
+                .alongWith(handoff.getHandoffManualCommand(Volts.of(-2)))
+        );
 
         // prime shooter (amp)
         controller2.y().and(() -> !shooter.upToSpeed()).onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(SHOOTER_AMP_SPEED, SHOOTER_AMP_SPEED), shooter)
-                        // move arm
-                        .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose)));
+            // prime shooter
+            new InstantCommand(() -> shooter.start(SHOOTER_AMP_SPEED, SHOOTER_AMP_SPEED), shooter)
+                // move arm
+                .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose))
+        );
 
-        // prime shooter (speaker - anywhere)
+        // prime shooter (speaker)
         controller2.b().and(() -> !shooter.upToSpeed()).onTrue(
-                // prime shooter
-                new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-                        // move arm
-                        .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
-                        // turn robot towards speaker
-                        .alongWith(
-                                new DriveWithJoysticks(
-                                        drive,
-                                        () -> -controller1.getLeftX(),
-                                        () -> -controller1.getLeftY(),
-                                        () -> -.7 * controller1.getRightX(),
-                                        () -> {
-                                            return 1.0;
-                                        },
-                                        drive.getShootHeadingTo(SPEAKER_POSE),
-                                        true,
-                                        true)));
+            // prime shooter
+            new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
+                // move arm
+                .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
+                // turn robot towards speaker
+                .alongWith(
+                    new DriveWithJoysticks(
+                        drive,
+                        () -> -controller1.getLeftX(),
+                        () -> -controller1.getLeftY(),
+                        () -> -.7 * controller1.getRightX(),
+                        true,
+                        drive.getShootHeadingTo(SPEAKER_POSE)
+                    )
+                )
+        );
     }
 
     public Command getAutonomousCommand() {

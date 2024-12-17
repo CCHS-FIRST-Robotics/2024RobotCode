@@ -13,46 +13,32 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.filter.MedianFilter;
 
-@SuppressWarnings("unused")
 public class ModuleIOSparkMax implements ModuleIO {
-    /* MOTOR CONTROLLERS + PID */
     private final CANSparkMax driveSparkMax;
     private final CANSparkMax turnSparkMax;
 
+    private double driveKp = 0.00001;
+    private double driveKi = 0;
+    private double driveKd = 0;
+    private double driveKs = 0;
+    private double driveKv = 0.136898;
+    private double driveKa = 0.020864;
+
+    private double turnKp = 8;
+    private double turnKd = 0;
+
     private final SparkPIDController driveSparkMaxPIDF;
     private final SparkPIDController turnSparkMaxPIDF;
+    private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
 
-    // TODO: update constants in periodic once tunable is set up
-    public double driveKp = 0.00001; // 00015
-    public double driveKd = 0.0;
-    public double driveKi = 0.000000; // 0.000008
-    public double driveKs = 0.0; // 0.19
-    public double driveKv = 0.136898; // From NEO datasheet (473kV): 0.136194 V/(rad/s) -
-                                      // https://www.wolframalpha.com/input?i=1%2F%28473+*+2pi%2F60%29+*+%2850.0+%2F+14.0%29+*+%2817.0+%2F+27.0%29+*+%2845.0+%2F+15.0%29
-    public double driveKa = 0.020864; // 0.0148
-
-    public double turnKp = 8;
-    public double turnKd = 0.00;
-
-    private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa); // kV
-                                                                                                             // UNITS:
-                                                                                                             // VOLTS /
-                                                                                                             // (RAD PER
-                                                                                                             // SECOND)
-
-    /* ENCODERS */
-    private final RelativeEncoder driveEncoder; // NEO Encoder
-    private final RelativeEncoder turnRelativeEncoder; // NEO Encoder
+    private final RelativeEncoder driveEncoder; // NEO
+    private final RelativeEncoder turnRelativeEncoder; // NEO
     private final AbsoluteEncoder turnAbsoluteEncoder; // CANandcoder
 
+    // trust
     private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
     private final double turnAfterEncoderReduction = 150.0 / 7.0;
-    // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
-    // This may need to be tuned to your individual robot
-    private static final double couplingRatio = 50d / 14d; // equal to the first stage gear ratio
-
-    private final MedianFilter driveVoltageFilter = new MedianFilter(1000);
-    private final MedianFilter turnVoltageFilter = new MedianFilter(1000);
+    private final double couplingRatio = 50.0 / 14.0;
 
     private final boolean isTurnMotorInverted = true;
     // private final Rotation2d absoluteEncoderOffset;
@@ -131,84 +117,23 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnRelativeEncoder.setAverageDepth(2);
         turnRelativeEncoder.setPositionConversionFactor(1);
 
-        // TODO: any other params/tuning?
-        turnAbsoluteEncoder.setAverageDepth(2); // NOTE: changed from 8 since last tested run (12/15/23) -- was at 2 a
-                                                // couple weeks ago tho
+        turnAbsoluteEncoder.setAverageDepth(2);
 
         driveSparkMax.setCANTimeout(0);
         turnSparkMax.setCANTimeout(0);
 
-        System.out.println("TESTING");
-        System.out.println(driveSparkMax.burnFlash() == REVLibError.kOk);
-        System.out.println(turnSparkMax.burnFlash() == REVLibError.kOk);
+        driveSparkMax.burnFlash();
+        turnSparkMax.burnFlash();
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * frc.robot.subsystems.swerveDrive.ModuleIO#updateInputs(frc.robot.subsystems.
-     * swerveDrive.ModuleIO.ModuleIOInputs)
-     */
-    public void updateInputs(ModuleIOInputs inputs) {
-        // update drive motor info
-        inputs.driveRawPositionRad = // doesnt account for coupling
-                Rotations.of(driveEncoder.getPosition() / driveAfterEncoderReduction);
-        // TODO: CHECK THAT COUPLING WAS ADDED CORRECTLY
-        inputs.drivePositionRad = Rotations.of((driveEncoder.getPosition()
-                + turnRelativeEncoder.getPosition() / turnAfterEncoderReduction * couplingRatio)
-                / driveAfterEncoderReduction);
-        inputs.driveVelocityRadPerSec = Rotations.per(Minute).of(driveEncoder.getVelocity()
-                / driveAfterEncoderReduction);
-        inputs.driveAppliedVolts = Volts.of(driveSparkMax.getAppliedOutput() * driveSparkMax.getBusVoltage());
-        inputs.driveAverageBusVoltage = Volts.of(driveVoltageFilter.calculate(driveSparkMax.getBusVoltage()));
-        inputs.driveCurrentAmps = Amps.of(driveSparkMax.getOutputCurrent());
-        inputs.driveTempCelcius = Celsius.of(driveSparkMax.getMotorTemperature());
-
-        // update turning motor info
-        // System.out.println(turnAbsoluteEncoder.getPosition().getValue());
-        inputs.turnAbsolutePositionRad = Radians.of(
-                MathUtil.angleModulus(
-                        new Rotation2d(
-                                turnAbsoluteEncoder.getPosition() // POSITION IN ROTATIONS
-                                        * 2 * Math.PI)
-                                .getRadians()));
-        // TODO: FOR TESTING ONLY:
-        // inputs.turnAbsolutePositionRad = turnAbsoluteEncoder.getPosition();
-
-        inputs.turnPositionRad = Rotations.of(turnRelativeEncoder.getPosition()
-                / turnAfterEncoderReduction);
-        inputs.turnVelocityRadPerSec = Rotations.per(Minute).of(turnRelativeEncoder.getVelocity()
-                / turnAfterEncoderReduction);
-        inputs.turnAppliedVolts = Volts.of(turnSparkMax.getAppliedOutput() * turnSparkMax.getBusVoltage());
-        inputs.turnAverageBusVoltage = Volts.of(turnVoltageFilter.calculate(turnSparkMax.getBusVoltage()));
-        inputs.turnCurrentAmps = Amps.of(turnSparkMax.getOutputCurrent());
-        inputs.turnTempCelcius = Celsius.of(turnSparkMax.getMotorTemperature());
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVoltage(double)
-     */
+    
     public void setDriveVoltage(Measure<Voltage> volts) {
-        // driveSparkMax.setVoltage(volts.in(Volts));
+        driveSparkMax.setVoltage(volts.in(Volts));
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setTurnVoltage(double)
-     */
+    
     public void setTurnVoltage(Measure<Voltage> volts) {
-        // turnSparkMax.setVoltage(volts.in(Volts));
+        turnSparkMax.setVoltage(volts.in(Volts));
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveVelocity(double)
-     */
+    
     public void setDriveVelocity(Measure<Velocity<Angle>> velocity) {
         driveSparkMaxPIDF.setReference(
                 velocity.in(Rotations.per(Minute)) * driveAfterEncoderReduction,
@@ -221,37 +146,56 @@ public class ModuleIOSparkMax implements ModuleIO {
         prevVelocity = velocity;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setTurnPosition(double)
-     */
     public void setTurnPosition(Measure<Angle> position) {
         // Adjust from [-PI, PI] (wrapped angle, so initially -pi was 2pi) -> [0, 2PI]
         position = Radians.of(
-                MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
-
+            MathUtil.inputModulus(position.in(Radians), 0, 2 * Math.PI));
+            
         turnSparkMaxPIDF.setReference(
-                position.in(Rotations),
-                CANSparkMax.ControlType.kPosition,
-                0);
+            position.in(Rotations),
+            CANSparkMax.ControlType.kPosition,
+            0);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setDriveBrakeMode(boolean)
-     */
+    // ! idk if these are necessary
     public void setDriveBrakeMode(boolean enable) {
         driveSparkMax.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see frc.robot.subsystems.swerveDrive.ModuleIO#setTurnBrakeMode(boolean)
-     */
     public void setTurnBrakeMode(boolean enable) {
         turnSparkMax.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+    }
+    
+    public void updateInputs(ModuleIOInputs inputs) {
+        inputs.driveRawPositionRad = // doesnt account for coupling
+            Rotations.of(driveEncoder.getPosition() / driveAfterEncoderReduction
+        );
+        inputs.drivePositionRad = 
+            Rotations.of((driveEncoder.getPosition()
+            + turnRelativeEncoder.getPosition() / turnAfterEncoderReduction * couplingRatio)
+            / driveAfterEncoderReduction
+        );
+        inputs.driveVelocityRadPerSec = 
+            Rotations.per(Minute).of(driveEncoder.getVelocity()
+            / driveAfterEncoderReduction
+        );
+        inputs.driveAppliedVolts = Volts.of(driveSparkMax.getAppliedOutput() * driveSparkMax.getBusVoltage());
+        inputs.driveCurrentAmps = Amps.of(driveSparkMax.getOutputCurrent());
+        inputs.driveTempCelcius = Celsius.of(driveSparkMax.getMotorTemperature());
+
+        inputs.turnAbsolutePositionRad = Radians.of(
+                MathUtil.angleModulus(
+                        new Rotation2d(
+                                turnAbsoluteEncoder.getPosition() // POSITION IN ROTATIONS
+                                        * 2 * Math.PI)
+                                .getRadians()));
+
+        inputs.turnPositionRad = Rotations.of(turnRelativeEncoder.getPosition()
+                / turnAfterEncoderReduction);
+        inputs.turnVelocityRadPerSec = Rotations.per(Minute).of(turnRelativeEncoder.getVelocity()
+                / turnAfterEncoderReduction);
+        inputs.turnAppliedVolts = Volts.of(turnSparkMax.getAppliedOutput() * turnSparkMax.getBusVoltage());
+        inputs.turnCurrentAmps = Amps.of(turnSparkMax.getOutputCurrent());
+        inputs.turnTempCelcius = Celsius.of(turnSparkMax.getMotorTemperature());
     }
 }

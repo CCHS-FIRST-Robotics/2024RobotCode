@@ -1,16 +1,12 @@
 package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.MutableMeasure.mutable;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.function.Consumer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.units.*;
@@ -19,29 +15,11 @@ import frc.robot.utils.PoseEstimator;
 import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
-import frc.robot.Constants.Mode;
 import frc.robot.utils.DriveTrajectoryGenerator;
 
 import java.util.function.Supplier;
 
 public class Drive extends SubsystemBase {
-
-    /*
-     * CONSTANTS
-     */
-
-    // ! stuff for brake mode
-    // private static final Measure<Velocity<Distance>> coastThresholdMetersPerSec =
-    // MetersPerSecond.of(0.05);
-    // // Need to be under this to switch to coast when disabling
-    // private static final Measure<Velocity<Distance>> coastThresholdSecs =
-    // MetersPerSecond.of(6.0);
-    // // Need to be under the above speed for this length of time to switch to
-    // coast
-    // private static final Measure<Angle> ledsFallenAngle = Degrees.of(60.0);
-    // // Threshold to detect falls
-
-    // Define Gyro IO and inputs
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
@@ -54,19 +32,14 @@ public class Drive extends SubsystemBase {
     private static final Measure<Distance> trackWidthX = Inches.of(22.5);
     private static final Measure<Distance> trackWidthY = Inches.of(22.5);
     private static final Measure<Velocity<Angle>> maxAngularSpeed = RadiansPerSecond.of(8 * Math.PI);
-    private static final Measure<Velocity<Velocity<Angle>>> maxAngularAcceleration = RadiansPerSecond.per(Seconds)
-            .of(10 * Math.PI);
+    private static final Measure<Velocity<Velocity<Angle>>> maxAngularAcceleration = RadiansPerSecond.per(Seconds).of(10 * Math.PI);
 
-    // Define Kinematics object
     private SwerveDriveKinematics kinematics = getKinematics();
 
     /*
      * TRAJECTORIES & CONTROLS
      */
-
-    // Initialize setpoints
     private ChassisSpeeds chassisSetpoint = new ChassisSpeeds();
-    // private ChassisSpeeds lastSetpoint = new ChassisSpeeds();
     private SwerveModuleState moduleSetpoint = new SwerveModuleState();
     private SwerveModuleState[] lastSetpointStates = new SwerveModuleState[] {
             new SwerveModuleState(),
@@ -74,31 +47,22 @@ public class Drive extends SubsystemBase {
             new SwerveModuleState(),
             new SwerveModuleState()
     };
-    // Initialize trajectory info
     private Pose2d positionSetpointTrajectory = new Pose2d();
     private Twist2d twistSetpointTrajectory = new Twist2d();
     private ArrayList<Pose2d> positionTrajectory = new ArrayList<Pose2d>();
     private ArrayList<Twist2d> twistTrajectory = new ArrayList<Twist2d>();
     private int trajectoryCounter = -1;
 
-    /*
-     * POSITIONAL CONTROL
-     */
-
-    // POSITION PID CONSTANTS - SHOULD NOT BE NEGATIVE
-    private double kPx = 2.7; // 2.3
-    private double kPy = 2.7; // 2.3
-    private double kPHeading = 3; // 0.25 // 0.5
-
-    private double kDx = 0.12; // .1
-    private double kDy = 0.12; // .1
-    private double kDHeading = .3; // .3
-
-    private double kIx = 0.05; // 0.12
-    private double kIy = 0.05; // 0.15
-    // private double kPlinear =
-    private double kIHeading = 0.00; // 0.05
-
+    // position control
+    private double kPx = 2.7;
+    private double kIx = 0.05;
+    private double kDx = 0.12;
+    private double kPy = 2.7;
+    private double kIy = 0.05;
+    private double kDy = 0.12;
+    private double kPHeading = 3;
+    private double kIHeading = 0;
+    private double kDHeading = .3;
     private PIDController xController = new PIDController(kPx, kIx, kDx);
     private PIDController yController = new PIDController(kPy, kIy, kDy);
     private PIDController headingController = new PIDController(kPHeading, kIHeading, kDHeading);
@@ -106,58 +70,15 @@ public class Drive extends SubsystemBase {
     /*
      * ODOMETRY
      */
-
-    // Initialize estimated positions
+    private PoseEstimator poseEstimator;
     private double[] lastModulePositionsMeters = new double[] { 0.0, 0.0, 0.0, 0.0 };
     private Rotation2d lastGyroYaw = new Rotation2d();
     private Twist2d fieldVelocity = new Twist2d();
     private Pose2d fieldPosition = new Pose2d(); // Use poseEstimator instead
-    // private Pose2d rawFieldPosition = new Pose2d(); // doesnt account for coa TODO: write lol
-    private PoseEstimator poseEstimator;
-
-    /*
-     * SYSID STUFF
-     */
-
-    private final MutableMeasure<Voltage> characterizationVolts = mutable(Volts.of(0));
-    private final MutableMeasure<Angle> characterizationDistanceAngular = mutable(Radians.of(0));
-    private final MutableMeasure<Velocity<Angle>> characterizationVelocityAngular = mutable(RadiansPerSecond.of(0));
-
-    // Tell SysId how to record a frame of data for each motor on the mechanism
-    // being
-    // characterized (real uses URCL, sim uses manual logging)
-    Consumer<SysIdRoutineLog> log = (Constants.CURRENT_MODE == Mode.REAL) ? null : log -> {
-        // Record a frame for the left motors. Since these share an encoder, we consider
-        // the entire group to be one motor.
-        log.motor("drive-0")
-                .voltage(
-                        characterizationVolts)
-                .angularPosition(
-                        characterizationDistanceAngular.mut_replace(modules[0].getCharacterizationPosition()))
-                .angularVelocity(
-                        characterizationVelocityAngular.mut_replace(modules[0].getCharacterizationVelocity()));
-    };
-
-    SysIdRoutine characterizationRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(
-                    Volts.per(Second).of(.8),
-                    Volts.of(3),
-                    Seconds.of(5),
-                    (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
-            new SysIdRoutine.Mechanism(
-                    // Tell SysId how to plumb the driving voltage to the motors.
-                    (Measure<Voltage> volts) -> {
-                        runCharacterization(volts);
-                    },
-                    log,
-                    this));
 
     /*
      * OTHER
      */
-
-    private boolean isBrakeMode = true;
-    private Timer lastMovementTimer = new Timer();
 
     // auto path
     // private ArrayList<String> autoPaths;
@@ -171,40 +92,32 @@ public class Drive extends SubsystemBase {
         MODULE_SETPOINT,
         CHASSIS_SETPOINT,
         POSITION_SETPOINT,
-        CHARACTERIZING
     };
 
     CONTROL_MODE controlMode = CONTROL_MODE.DISABLED;
 
     public Drive(
-            GyroIO gyroIO,
-            ModuleIO flModuleIO,
-            ModuleIO frModuleIO,
-            ModuleIO blModuleIO,
-            ModuleIO brModuleIO) {
-        System.out.println("[Init] Creating Drive");
-        Logger.recordOutput("SysIdTestState", "none");
-
+        GyroIO gyroIO,
+        ModuleIO flModuleIO,
+        ModuleIO frModuleIO,
+        ModuleIO blModuleIO,
+        ModuleIO brModuleIO
+    ) {
         this.gyroIO = gyroIO;
-
-        // idk why it wont let me put it above??
-        headingController.enableContinuousInput(-Math.PI, Math.PI);
 
         modules[0] = new Module(flModuleIO, 0);
         modules[1] = new Module(frModuleIO, 1);
         modules[2] = new Module(blModuleIO, 2);
         modules[3] = new Module(brModuleIO, 3);
-
-        lastMovementTimer.start();
-        // whats the difference between this and modules.forEach(()=> )
-        // wait thats js im stupid
-        for (var module : modules) {
-            module.setBrakeMode(isBrakeMode);
+        
+        for (Module module : modules) {
+            module.setBrakeMode(true);
         }
-
+        
         xController.setTolerance(.035);
         yController.setTolerance(.035);
         headingController.setTolerance(.025);
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     public void periodic() {
@@ -231,14 +144,13 @@ public class Drive extends SubsystemBase {
 
         // Use kinematics to convert the change in position of each module -> change in
         // position of the robot
-        var twist = kinematics.toTwist2d(wheelDeltas);
-        Logger.recordOutput("Odometry/RobotTwist", twist);
+        Twist2d twist = kinematics.toTwist2d(wheelDeltas);
 
         // Use the gyro to get the change in heading of the robot, instead of the change
         // in heading of each module
         // Gyro is likely more accurate than the modules' encoders (due to slippage,
         // etc)
-        var gyroYaw = new Rotation2d(gyroInputs.yawPosition.in(Radians));
+        Rotation2d gyroYaw = new Rotation2d(gyroInputs.yawPosition.in(Radians));
         if (gyroInputs.connected) {
             twist = new Twist2d(twist.dx, twist.dy, gyroYaw.minus(lastGyroYaw).getRadians());
         }
@@ -289,19 +201,6 @@ public class Drive extends SubsystemBase {
                 Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
                 Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
                 return;
-
-            case CHARACTERIZING:
-                // Run in characterization mode
-                for (var module : modules) {
-                    module.runCharacterization(characterizationVolts);
-                }
-                // System.out.println(characterizationVolts.in(Volts));
-                // System.out.println("RUNNING");
-                // Clear setpoint logs
-                Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
-                Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
-                break;
-
             case POSITION_SETPOINT:
                 // If we've reached the end of the trajectory, hold at the last setpoint
                 if (trajectoryCounter > positionTrajectory.size() - 1) {
@@ -364,7 +263,7 @@ public class Drive extends SubsystemBase {
             case CHASSIS_SETPOINT:
 
                 // Brief explanation here:
-                // https://docs.wpilib.org/en/stable/d ocs/software/advanced-controls/geometry/transformations.html
+                // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/transformations.html
                 // For more detail, see chapter 10 here:
                 // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
                 // Purpose: accounts for continuous movement along an arc instead of a discrete
@@ -481,11 +380,6 @@ public class Drive extends SubsystemBase {
         trajectoryCounter = 0;
     }
 
-    public void runCharacterization(Measure<Voltage> volts) {
-        controlMode = CONTROL_MODE.CHARACTERIZING;
-        characterizationVolts.mut_replace(volts.in(Volts), Volts);
-    }
-
     public void setOpenLoop(boolean isOpenLoop) {
         openLoop = isOpenLoop;
     }
@@ -511,20 +405,6 @@ public class Drive extends SubsystemBase {
 
     public void setControlMode(CONTROL_MODE mode) {
         controlMode = mode;
-    }
-
-    public void setDriveMotorsBrakeMode(boolean isEnabled) {
-        isBrakeMode = isEnabled;
-        for (int i = 0; i < 4; i++) {
-            modules[i].setBrakeMode(isBrakeMode);
-        }
-    }
-
-    public void toggleDriveMotorsBrakeMode() {
-        isBrakeMode = !isBrakeMode;
-        for (int i = 0; i < 4; i++) {
-            modules[i].setBrakeMode(isBrakeMode);
-        }
     }
 
     /** Returns the maximum linear speed in meters per sec. */
@@ -557,6 +437,7 @@ public class Drive extends SubsystemBase {
         return new Rotation2d(gyroInputs.rollPosition.in(Radians));
     }
 
+    // ! maybe should do the math for alliance rotations here
     /** Returns the current yaw (Z rotation). */
     public Rotation2d getYaw() {
         // return new Rotation2d(gyroInputs.yawPosition.in(Radians));
@@ -580,17 +461,6 @@ public class Drive extends SubsystemBase {
 
     /** Returns an array of module translations. */
     public static Translation2d[] getModuleTranslations() {
-        // return new Translation2d[] {
-        // new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) /
-        // 2.0),
-        // new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) /
-        // 2.0),
-        // new Translation2d(trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) /
-        // 2.0),
-        // new Translation2d(-trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) /
-        // 2.0)
-        // };
-
         return new Translation2d[] {
                 new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
                 new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
@@ -654,21 +524,6 @@ public class Drive extends SubsystemBase {
         return () -> getPose().getTranslation()
                 .minus(target.getTranslation()).getAngle()
                 .plus(new Rotation2d(Math.PI));
-    }
-
-    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-        return characterizationRoutine.quasistatic(direction);
-    }
-
-    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return characterizationRoutine.dynamic(direction);
-    }
-
-    public Command sysIdFull() {
-        return characterizationRoutine.quasistatic(SysIdRoutine.Direction.kForward)
-                .andThen(characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
-                .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward))
-                .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
     }
 
     public Command followTrajectory(DriveTrajectory traj) {

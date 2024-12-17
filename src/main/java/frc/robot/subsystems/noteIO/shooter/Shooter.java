@@ -48,6 +48,7 @@ public class Shooter extends SubsystemBase {
     }
 
     // turns shooter on
+    // ! unused, see if we can implement it
     public Command getShootNoteCommand(Measure<Velocity<Angle>> leftVelocity, Measure<Velocity<Angle>> rightVelocity) {
         return new FunctionalCommand(
                 () -> start(leftVelocity, rightVelocity),

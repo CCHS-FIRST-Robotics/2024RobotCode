@@ -20,8 +20,6 @@ public class Robot extends LoggedRobot {
         robotContainer = new RobotContainer();
 
         Logger.recordMetadata("ProjectName", "2024RobotCode");
-
-        // set up data recievers
         switch (Constants.CURRENT_MODE) {
             case REAL:
                 Logger.addDataReceiver(new NT4Publisher());
@@ -35,7 +33,6 @@ public class Robot extends LoggedRobot {
                 Logger.addDataReceiver(new NT4Publisher());
                 break;
         }
-
         Logger.start();
     }
 
@@ -54,7 +51,7 @@ public class Robot extends LoggedRobot {
     public void autonomousInit() { 
         autonomousCommand = robotContainer.getAutonomousCommand();
 
-        // schedule the autonomous command (example)
+        // schedule autonomous command
         if (autonomousCommand != null) {
             autonomousCommand.schedule();
         }

@@ -20,12 +20,6 @@ public class Module {
 
     private SwerveModuleState prevSetpoint = new SwerveModuleState(0, new Rotation2d(0));
 
-    /**
-     * Constructs a new Module (subsytem) object
-     * 
-     * @param io    The ModuleIO object to use
-     * @param index The index of the module
-     */
     public Module(ModuleIO io, int index) {
         System.out.println("[Init] Creating Module " + Integer.toString(index));
         this.io = io;
@@ -34,20 +28,12 @@ public class Module {
         // turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
     }
 
-    /** Updates inputs and checks tunable numbers. */
     public void periodic() {
         // double prevVel = getVelocityMetersPerSec();
         io.updateInputs(inputs);
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
     }
 
-    /**
-     * Runs the module with the specified setpoint state.
-     * Must be called periodically. Returns the optimized state.
-     * 
-     * @param targetState The desired state of the module
-     * @return The optimized state of the module
-     */
     public SwerveModuleState runSetpoint(SwerveModuleState targetState, boolean isOpenLoop) {
         // Optimize state based on current angle
         var optimizedState = SwerveModuleState.optimize(targetState, getAngle());
@@ -95,25 +81,6 @@ public class Module {
         return optimizedState;
     }
 
-    /**
-     * Calculates the maximum possible velocity of a DC Motor, given
-     * parameters of the motor and the current velocity.
-     * 
-     * xₖ₊₁ = A_d xₖ + B_d uₖ where
-     * A = -Kᵥ/Kₐ
-     * B = 1/Kₐ
-     * A_d = eᴬᵀ
-     * B_d = A⁻¹(A_d − I)B
-     * 
-     * true max (xₖ₊₁=xₖ): x = (I − A_d)⁻¹B_duₖ
-     * 
-     * @param maxControlInput Maximum voltage input to the motor
-     * @param currentVelocity Current velocity of the motor (previous setpoint)
-     * @param dt              Time to achieve the next setpoint (period)
-     * @param kV              Motor kV (Volts/RadiansPerSecond)
-     * @param kA              Motor kA (Volts/RadiansPerSecondPerSecond)
-     * @return The max achievable velocity given the control max control input
-     */
     public static double getMaxVelocity(double maxControlInput, double currentVelocity, double dt, double kV,
             double kA) {
         double A = -kV / kA;
@@ -130,25 +97,19 @@ public class Module {
         return Drive.getModuleTranslations()[index];
     }
 
-    /**
-     * Runs the module with the specified voltage while controlling to zero degrees.
-     * Must be called periodically.
-     */
     public void runCharacterization(Measure<Voltage> volts) {
         // System.out.println(volts.in(Volts));
         io.setTurnPosition(Radians.of(0.0));
         io.setDriveVoltage(volts);
     }
 
-    /** Disables all outputs to motors (sets voltage to 0). */
     public void stop() {
         io.setTurnVoltage(Volts.of(0.0));
         io.setDriveVoltage(Volts.of(0.0));
     }
 
-    /** Sets whether brake mode is enabled. */
     public void setBrakeMode(boolean enabled) {
-        io.setDriveBrakeMode(enabled);
+        io.setDriveBrakeMode(true);
         io.setTurnBrakeMode(false);
     }
 
