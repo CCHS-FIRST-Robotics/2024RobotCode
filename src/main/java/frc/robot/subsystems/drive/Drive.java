@@ -121,25 +121,20 @@ public class Drive extends SubsystemBase {
     }
 
     public void periodic() {
-        // System.out.println("HI IM RUNNING");
         gyroIO.updateInputs(gyroInputs);
-        Logger.processInputs("Drive/Gyro", gyroInputs);
-        for (var module : modules) {
+        Logger.processInputs("Gyro", gyroInputs);
+        for (Module module : modules) {
             module.periodic();
         }
 
-        // Log measured states
         SwerveModuleState[] measuredStates = new SwerveModuleState[4];
         for (int i = 0; i < 4; i++) {
             measuredStates[i] = modules[i].getState();
         }
-        Logger.recordOutput("SwerveStates/Measured", measuredStates);
 
         /*
          * UPDATE ODOMETRY
          */
-
-        // Get the change in position of each module
         SwerveModulePosition[] wheelDeltas = getModuleDeltas();
 
         // Use kinematics to convert the change in position of each module -> change in

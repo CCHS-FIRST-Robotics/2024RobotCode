@@ -9,14 +9,10 @@ import edu.wpi.first.wpilibj.RobotBase;
 /**
  * to do: 
  * 
- * ! probably lower the max speed when testing
  * look into how the drive trajectories are actually generated
  */
 
 public final class Main {
-    private Main() {
-    }
-
     public static void main(String... args) {
         RobotBase.startRobot(Robot::new);
     }
