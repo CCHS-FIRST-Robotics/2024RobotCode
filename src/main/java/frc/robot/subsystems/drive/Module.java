@@ -14,8 +14,7 @@ public class Module {
     private final int index;
 
     // TODO: switch to tunable numbers w/ smartdash
-    private static final Measure<Distance> wheelRadius = Inches.of(2); // 2"; .0508m
-    // private static final Measure<Distance> trackWidth = Inches.of(22.5);
+    private static final Measure<Distance> wheelRadius = Inches.of(2);
 
     private SwerveModuleState prevSetpoint = new SwerveModuleState(0, new Rotation2d(0));
 
@@ -97,7 +96,6 @@ public class Module {
     }
 
     public void runCharacterization(Measure<Voltage> volts) {
-        // System.out.println(volts.in(Volts));
         io.setTurnPosition(Radians.of(0.0));
         io.setDriveVoltage(volts);
     }
@@ -131,38 +129,8 @@ public class Module {
         return inputs.driveVelocityRadPerSec.in(RadiansPerSecond) * wheelRadius.in(Meters);
     }
 
-    /** Returns the module position (turn angle and drive position). */
-    public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(getPositionMeters(), getAngle());
-    }
-
-    /** Returns the module position (turn angle and drive position). */
-    public SwerveModulePosition getRawPosition() {
-        return new SwerveModulePosition(getRawPositionMeters(), getAngle());
-    }
-
     /** Returns the module state (turn angle and drive velocity). */
     public SwerveModuleState getState() {
         return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
-    }
-
-    /** Returns the drive position in radians. */
-    public Measure<Angle> getCharacterizationPosition() {
-        return inputs.drivePositionRad;
-    }
-
-    /** Returns the drive velocity in radians/sec. */
-    public Measure<Velocity<Angle>> getCharacterizationVelocity() {
-        return inputs.driveVelocityRadPerSec;
-    }
-
-    /** Returns the drive voltage in volts. */
-    public Measure<Voltage> getCharacterizationVoltage() {
-        return inputs.driveAppliedVolts;
-    }
-
-    /** Returns the drive wheel radius. */
-    public static Measure<Distance> getWheelRadius() {
-        return wheelRadius;
     }
 }

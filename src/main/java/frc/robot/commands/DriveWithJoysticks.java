@@ -12,9 +12,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
 import frc.robot.HardwareConstants;
 
@@ -23,9 +20,6 @@ public class DriveWithJoysticks extends Command {
     Supplier<Double> linearXSpeedSupplier;
     Supplier<Double> linearYSpeedSupplier;
     Supplier<Double> angularSpeedSupplier;
-
-    boolean usingHeadingFeedback;
-    Supplier<Rotation2d> headingSupplier;
 
     double headingGoal;
     double prevHeadingSetpoint;
@@ -39,27 +33,21 @@ public class DriveWithJoysticks extends Command {
         Drive drive,
         Supplier<Double> linearXSpeedSupplier,
         Supplier<Double> linearYSpeedSupplier,
-        Supplier<Double> angularSpeedSupplier,
-        boolean usingHeadingFeedback,
-        Supplier<Rotation2d> headingSupplier
+        Supplier<Double> angularSpeedSupplier
     ) {
         addRequirements(drive);
         this.drive = drive;
-
         this.linearXSpeedSupplier = linearXSpeedSupplier;
         this.linearYSpeedSupplier = linearYSpeedSupplier;
         this.angularSpeedSupplier = angularSpeedSupplier;
-
-        this.usingHeadingFeedback = usingHeadingFeedback;
-        this.headingSupplier = headingSupplier;
     }
     
     @Override
     public void initialize() {
+        prevSpeeds = new ChassisSpeeds();
+
         angularProfile = new TrapezoidProfile(new Constraints(drive.getMaxAngularSpeed(), drive.getMaxAngularAcceleration()));
         headingController = drive.getHeadingController();
-        
-        prevSpeeds = new ChassisSpeeds();
     }
 
     @Override
@@ -77,57 +65,25 @@ public class DriveWithJoysticks extends Command {
         double angularSpeed = angularSpeedSupplier.get();
         angularSpeed = applyPreferences(angularSpeed, HardwareConstants.ANGULAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
 
-        if (usingHeadingFeedback 
-            && angularSpeed == 0 // if the driver isn't turning
-        ) {
-            // ! what does this do
-            headingGoal = headingSupplier.get().getDegrees() == -1 ? headingGoal : MathUtil.angleModulus(headingSupplier.get().getRadians());
 
-            State currentState = new State(prevHeadingSetpoint, prevHeadingSpeed);
-            State finalTargetState = new State(headingGoal, 0);
-            State nextState = angularProfile.calculate(
-                Constants.PERIOD,
-                currentState,
-                finalTargetState
-            );
+        // ! what does this do
+        prevHeadingSetpoint = drive.getYaw().getRadians();
+        prevHeadingSpeed = drive.getVelocity().dtheta;
 
-            angularSpeed = headingController.calculate(drive.getYaw().getRadians(), headingGoal);
-
-            if (headingController.atSetpoint()){
-                angularSpeed = 0;
-            }
-            // divide by max speed to get as a percentage of max (for continuity with
-            // joystick control)
-            angularSpeed = angularSpeed / drive.getMaxAngularSpeed().in(RadiansPerSecond);
-
-            prevHeadingSetpoint = nextState.position;
-            prevHeadingSpeed = nextState.velocity;
-        } else {
-            prevHeadingSetpoint = drive.getYaw().getRadians();
-            prevHeadingSpeed = drive.getVelocity().dtheta;
-
-            double stoppingDistance = getStoppingDistance(prevHeadingSpeed,
-                drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second))
-            );
-
-            headingGoal = prevHeadingSetpoint + stoppingDistance * Math.signum(prevHeadingSpeed);
-            headingGoal = MathUtil.angleModulus(headingGoal);
-        }
-
-        // ! should probably be in drive.getyaw
-        // make field relative to red if on red team
-        Rotation2d driveRotation = drive.getYaw().plus(
-            DriverStation.getAlliance().get() == Alliance.Red ? 
-            new Rotation2d(Math.PI) : 
-            new Rotation2d(0)
+        double stoppingDistance = getStoppingDistance(prevHeadingSpeed,
+            drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second))
         );
+
+        headingGoal = prevHeadingSetpoint + stoppingDistance * Math.signum(prevHeadingSpeed);
+        headingGoal = MathUtil.angleModulus(headingGoal);
+        // ! end of what does this do
 
         // make chassisspeeds object with FOC
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             linearVelocity.getX() * drive.getMaxLinearSpeed().in(MetersPerSecond),
             linearVelocity.getY() * drive.getMaxLinearSpeed().in(MetersPerSecond),
             angularSpeed * drive.getMaxAngularSpeed().in(RadiansPerSecond),
-            driveRotation
+            drive.getYawWithAllianceRotation()
         );
 
         // ! check colin's units

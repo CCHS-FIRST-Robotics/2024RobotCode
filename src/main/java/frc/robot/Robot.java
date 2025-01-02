@@ -48,10 +48,9 @@ public class Robot extends LoggedRobot {
     public void disabledPeriodic() {}
 
     @Override
-    public void autonomousInit() { 
+    public void autonomousInit() { // schedule auto
         autonomousCommand = robotContainer.getAutonomousCommand();
 
-        // schedule autonomous command
         if (autonomousCommand != null) {
             autonomousCommand.schedule();
         }
@@ -61,7 +60,7 @@ public class Robot extends LoggedRobot {
     public void autonomousPeriodic() {}
 
     @Override
-    public void teleopInit() { // cancel all autos
+    public void teleopInit() { // cancel auto
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }

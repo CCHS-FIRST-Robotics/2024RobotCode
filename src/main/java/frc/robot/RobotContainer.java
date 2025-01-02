@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.math.geometry.*;
@@ -32,7 +30,6 @@ public class RobotContainer {
     private final Shooter shooter;
 
     private final CommandXboxController controller1 = new CommandXboxController(Constants.CONTROLLER_PORT_1);
-    private final CommandXboxController controller2 = new CommandXboxController(Constants.CONTROLLER_PORT_2);
 
     // ! yeah do something with this
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Choices");
@@ -101,80 +98,13 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
-        /*
-         * Controller 1:
-         * - Drive
-         * - Shoot
-         */
-
-        // drive with joysticks
         drive.setDefaultCommand(
             new DriveWithJoysticks(
                 drive,
-                () -> -0.3 * controller1.getLeftX(),
-                () -> -0.3 * controller1.getLeftY(),
-                () -> -.7 * controller1.getRightX(),
-                false,
-                () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()) // ! I think this is just for FOC
+                () -> -0.3 * controller1.getLeftX(), //! get rid of these magic numbers or at least move them
+                () -> -0.3 * controller1.getLeftY(), 
+                () -> -0.7 * controller1.getRightX()
             )
-        );
-
-        // shoot
-        controller1.b().onTrue(
-            // handoff
-            handoff.getShootCommand(Volts.of(12), shooter::checkNoteShot)
-            // stop shooter
-            .andThen(new InstantCommand(shooter::stop, shooter))
-        );
-
-        /*
-         * Controller 2:
-         * - Intake / Outtake
-         * - Prime shooter
-         */
-
-        // intake
-        controller2.a().onTrue(
-            // turn on handoff
-            handoff.getHandoffCommand(Volts.of(3))
-                // move arm down
-                .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose)
-            .andThen(Commands.waitUntil(arm::atGoal)))
-                // turn on intake until note detected by handoff
-                .alongWith(intake.getIntakeCommand(Volts.of(8), handoff::checkNoteThere))
-        );
-
-        // outtake
-        controller2.x().whileTrue(
-            intake.getIntakeCommand(Volts.of(-3))
-                .alongWith(handoff.getHandoffManualCommand(Volts.of(-2)))
-        );
-
-        // prime shooter (amp)
-        controller2.y().and(() -> !shooter.upToSpeed()).onTrue(
-            // prime shooter
-            new InstantCommand(() -> shooter.start(SHOOTER_AMP_SPEED, SHOOTER_AMP_SPEED), shooter)
-                // move arm
-                .alongWith(arm.moveArm(ArmPosition.AMP, drive::getPose))
-        );
-
-        // prime shooter (speaker)
-        controller2.b().and(() -> !shooter.upToSpeed()).onTrue(
-            // prime shooter
-            new InstantCommand(() -> shooter.start(SHOOTER_LEFT_SPEED, SHOOTER_RIGHT_SPEED), shooter)
-                // move arm
-                .alongWith(arm.moveArm(ArmPosition.SHOOT, drive::getPose))
-                // turn robot towards speaker
-                .alongWith(
-                    new DriveWithJoysticks(
-                        drive,
-                        () -> -controller1.getLeftX(),
-                        () -> -controller1.getLeftY(),
-                        () -> -.7 * controller1.getRightX(),
-                        true,
-                        drive.getShootHeadingTo(SPEAKER_POSE)
-                    )
-                )
         );
     }
 
