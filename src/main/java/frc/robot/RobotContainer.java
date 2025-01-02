@@ -101,9 +101,9 @@ public class RobotContainer {
         drive.setDefaultCommand(
             new DriveWithJoysticks(
                 drive,
-                () -> -0.3 * controller1.getLeftX(), //! get rid of these magic numbers or at least move them
-                () -> -0.3 * controller1.getLeftY(), 
-                () -> -0.7 * controller1.getRightX()
+                () -> controller1.getLeftX(), 
+                () -> -controller1.getLeftY(), // xbox controller is flipped
+                () -> controller1.getRightX()
             )
         );
     }

@@ -177,7 +177,6 @@ public class Drive extends SubsystemBase {
             controlMode = CONTROL_MODE.DISABLED;
         }
 
-        // Run modules
         switch (controlMode) {
             case DISABLED:
                 for (var module : modules) {
@@ -190,18 +189,12 @@ public class Drive extends SubsystemBase {
                 if (trajectoryCounter == -1){ // if no available trajectory
                     break;
                 }
-                // if at the end of trajectory, hold the last setpoint
-                if (trajectoryCounter > positionTrajectory.size() - 1) {
+                if (trajectoryCounter > positionTrajectory.size() - 1) { // if at the end of trajectory, hold the last setpoint
                     trajectoryCounter = positionTrajectory.size() - 1;
                 }
 
-                // Get the position/velocity setpoints at the current point in the trajectory
                 positionSetpointTrajectory = positionTrajectory.get(trajectoryCounter);
                 twistSetpointTrajectory = twistTrajectory.get(trajectoryCounter);
-
-                // System.out.println("SETPOINTS:");
-                // System.out.println(positionSetpointTrajectory);
-                // System.out.println(twistSetpointTrajectory);
 
                 // Record setpoints to "RealOutputs"
                 Logger.recordOutput("Auto/FieldVelocity", new Pose2d(twistSetpointTrajectory.dx,
@@ -213,19 +206,23 @@ public class Drive extends SubsystemBase {
                 double xPID = xController.calculate(getPose().getX(), positionSetpointTrajectory.getX());
                 double yPID = yController.calculate(getPose().getY(), positionSetpointTrajectory.getY());
                 double headingPID = headingController.calculate(getPose().getRotation().getRadians(),
-                        positionSetpointTrajectory.getRotation().getRadians());
+                    positionSetpointTrajectory.getRotation().getRadians()
+                );
 
-                if (xController.atSetpoint())
+                if (xController.atSetpoint()){
                     xPID = 0;
-                if (yController.atSetpoint())
+                }
+                if (yController.atSetpoint()){
                     yPID = 0;
-                if (headingController.atSetpoint())
+                }
+                if (headingController.atSetpoint()){
                     headingPID = 0;
+                }
 
                 Logger.recordOutput("headingpidout", headingPID);
                 Logger.recordOutput("rotout", twistSetpointTrajectory.dtheta + headingPID);
 
-                // Add the PID output to the velocity setpoint
+                // add the PID output to the velocity setpoint
                 chassisSetpoint = new ChassisSpeeds(
                         twistSetpointTrajectory.dx + xPID,
                         twistSetpointTrajectory.dy + yPID,
@@ -249,7 +246,7 @@ public class Drive extends SubsystemBase {
                 // straight line, avoids skew
                 // More detail here:
                 // https://www.chiefdelphi.com/t/whitepaper-swerve-drive-skew-and-second-order-kinematics/416964/47
-                Twist2d setpointTwist = new Pose2d().log(
+                Twist2d setpointTwist = new Pose2d().log( // ! why use a new Pose2d every time
                     new Pose2d(
                         chassisSetpoint.vxMetersPerSecond * Constants.PERIOD,
                         chassisSetpoint.vyMetersPerSecond * Constants.PERIOD,

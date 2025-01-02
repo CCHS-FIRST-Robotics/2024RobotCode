@@ -5,13 +5,9 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.*;
 import java.util.function.Supplier;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import frc.robot.Constants;
 import frc.robot.HardwareConstants;
 
@@ -19,86 +15,63 @@ public class DriveWithJoysticks extends Command {
     Drive drive;
     Supplier<Double> linearXSpeedSupplier;
     Supplier<Double> linearYSpeedSupplier;
-    Supplier<Double> angularSpeedSupplier;
+    Supplier<Double> angularVelocitySupplier;
 
     double headingGoal;
     double prevHeadingSetpoint;
     double prevHeadingSpeed;
     
-    TrapezoidProfile angularProfile;
-    PIDController headingController;
     ChassisSpeeds prevSpeeds;
 
     public DriveWithJoysticks(
         Drive drive,
         Supplier<Double> linearXSpeedSupplier,
         Supplier<Double> linearYSpeedSupplier,
-        Supplier<Double> angularSpeedSupplier
+        Supplier<Double> angularVelocitySupplier
     ) {
         addRequirements(drive);
         this.drive = drive;
         this.linearXSpeedSupplier = linearXSpeedSupplier;
         this.linearYSpeedSupplier = linearYSpeedSupplier;
-        this.angularSpeedSupplier = angularSpeedSupplier;
-    }
-    
-    @Override
-    public void initialize() {
-        prevSpeeds = new ChassisSpeeds();
-
-        angularProfile = new TrapezoidProfile(new Constraints(drive.getMaxAngularSpeed(), drive.getMaxAngularAcceleration()));
-        headingController = drive.getHeadingController();
+        this.angularVelocitySupplier = angularVelocitySupplier;
     }
 
     @Override
     public void execute() {
+        // get linearVelocity
         double linearXSpeed = linearXSpeedSupplier.get();
         double linearYSpeed = linearYSpeedSupplier.get();
-        double linearSpeed = Math.hypot(linearXSpeed, linearYSpeed);
-        Rotation2d linearDirection = new Rotation2d(linearXSpeed, linearYSpeed);
-        linearSpeed = applyPreferences(linearSpeed, HardwareConstants.LINEAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
+        double linearSpeed = applyPreferences(Math.hypot(linearXSpeed, linearYSpeed), Constants.ANALOG_DEADZONE, HardwareConstants.LINEAR_SPEED_EXPONENT);
+        Rotation2d linearDirection = new Rotation2d(linearXSpeed, linearYSpeed); // kinda weird lol
         Translation2d linearVelocity = new Translation2d(
             linearSpeed, 
             linearDirection
         );
 
-        double angularSpeed = angularSpeedSupplier.get();
-        angularSpeed = applyPreferences(angularSpeed, HardwareConstants.ANGULAR_SPEED_EXPONENT, Constants.ANALOG_DEADZONE);
-
-
-        // ! what does this do
-        prevHeadingSetpoint = drive.getYaw().getRadians();
-        prevHeadingSpeed = drive.getVelocity().dtheta;
-
-        double stoppingDistance = getStoppingDistance(prevHeadingSpeed,
-            drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second))
-        );
-
-        headingGoal = prevHeadingSetpoint + stoppingDistance * Math.signum(prevHeadingSpeed);
-        headingGoal = MathUtil.angleModulus(headingGoal);
-        // ! end of what does this do
+        // get angularSpeed
+        double angularVelocity = applyPreferences(-angularVelocitySupplier.get(), Constants.ANALOG_DEADZONE, HardwareConstants.ANGULAR_SPEED_EXPONENT);
 
         // make chassisspeeds object with FOC
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             linearVelocity.getX() * drive.getMaxLinearSpeed().in(MetersPerSecond),
             linearVelocity.getY() * drive.getMaxLinearSpeed().in(MetersPerSecond),
-            angularSpeed * drive.getMaxAngularSpeed().in(RadiansPerSecond),
+            angularVelocity * drive.getMaxAngularSpeed().in(RadiansPerSecond),
             drive.getYawWithAllianceRotation()
         );
 
-        // ! check colin's units
+        // clamp everything between max and min possible velocities
         speeds = new ChassisSpeeds(
-            clampWithMaxAcceleration(
+            clampVelocity(
                 speeds.vxMetersPerSecond, 
                 prevSpeeds.vxMetersPerSecond, 
                 drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD
             ),
-            clampWithMaxAcceleration(
+            clampVelocity(
                 speeds.vyMetersPerSecond, 
                 prevSpeeds.vyMetersPerSecond, 
                 drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD
             ),
-            clampWithMaxAcceleration(
+            clampVelocity(
                 speeds.omegaRadiansPerSecond, 
                 prevSpeeds.omegaRadiansPerSecond, 
                 drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD
@@ -115,7 +88,7 @@ public class DriveWithJoysticks extends Command {
         drive.setOpenLoop(false);
     }
 
-    private double applyPreferences(double input, double exponent, double deadzone) {
+    private double applyPreferences(double input, double deadzone, double exponent) {
         if (Math.abs(input) < deadzone) {
             return 0;
         }
@@ -126,7 +99,7 @@ public class DriveWithJoysticks extends Command {
         return 0.5 * Math.pow(currentSpeed, 2) / maxAcceleration;
     }
 
-    public double clampWithMaxAcceleration(double velocity, double prevVelocity, double maxAcceleration){
+    public double clampVelocity(double velocity, double prevVelocity, double maxAcceleration){
         return MathUtil.clamp(velocity, prevVelocity - maxAcceleration, prevVelocity + maxAcceleration);
     }
 }

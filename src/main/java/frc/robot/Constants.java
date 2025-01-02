@@ -68,8 +68,8 @@ public final class Constants {
     public static final int INTAKE_ID2 = 26;
 
     // miscellaneous
-    public static final double PERIOD = .02;
-    public static final double ANALOG_DEADZONE = .02;
+    public static final double PERIOD = 0.02;
+    public static final double ANALOG_DEADZONE = 0.1;
     public static final Pose3d[] APRIL_TAG_LOCATIONS = {
             new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)),
             new Pose3d(0, 2, 0, new Rotation3d(0, 0, 0)),

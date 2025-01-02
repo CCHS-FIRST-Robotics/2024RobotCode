@@ -10,7 +10,6 @@ public class HardwareConstants {
     // kinematics
     public static final double WHEEL_ABSOLUTE_X_METERS = 0.2794;
     public static final double WHEEL_ABSOLUTE_Y_METERS = 0.31115;
-    public static final double MECANUM_WHEEL_DIAMETER = 0.1524; // meters
     public static final int TALON_FX_CPR = 2048;
     public static final double FALCON_GEARBOX_RATIO = 10.71;
 
@@ -28,7 +27,7 @@ public class HardwareConstants {
 
     // swerve constants
     public static final double LINEAR_SPEED_EXPONENT = 2;
-    public static final double ANGULAR_SPEED_EXPONENT = 2.5;
+    public static final double ANGULAR_SPEED_EXPONENT = 2;
 
     // motor constants
     public static final int FALCON_MAX_RPS = 7500 / 60;
