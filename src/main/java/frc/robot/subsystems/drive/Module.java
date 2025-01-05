@@ -32,27 +32,22 @@ public class Module {
         Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
     }
 
-    public SwerveModuleState runSetpoint(SwerveModuleState targetState, boolean isOpenLoop) {
+    public SwerveModuleState runSetpoint(SwerveModuleState targetState) {
         // Optimize state based on current angle
         var optimizedState = SwerveModuleState.optimize(targetState, getAngle());
-        // optimizedState = targetState; // for testing ONLY
 
         io.setTurnPosition(Radians.of(optimizedState.angle.getRadians()));
         // io.setTurnVoltage(Volts.of(1));
 
         // Update velocity based on turn error
-        // does some fancy things to move only in the direction you want while theres an
-        // error
-        // draw out the current/desired vectors, and remember that cos is like the dot
-        // product,
-        // it projects one vector onto the other, idk I cant make sense of it rn im
-        // tired asf
+        // does some fancy things to move only in the direction you want while theres an error
+        // draw out the current/desired vectors, and remember that cos is like the dot product,
+        // it projects one vector onto the other, idk I cant make sense of it rn im tired asf
         optimizedState.speedMetersPerSecond *= Math
                 .cos(inputs.turnAbsolutePositionRad.in(Radians) - optimizedState.angle.getRadians());
 
-        if (!isOpenLoop) {
-            // constrian velocity based on voltage and previous velocity using motor
-            // dynamics
+        
+            // constrian velocity based on voltage and previous velocity using motor dynamics
             optimizedState.speedMetersPerSecond = MathUtil.clamp(
                     optimizedState.speedMetersPerSecond,
                     getMaxVelocity(-inputs.driveAverageBusVoltage.in(Volts),
@@ -68,12 +63,7 @@ public class Module {
             // System.out.println(wheelRadius.in(Meters));
             double velocityRadPerSec = optimizedState.speedMetersPerSecond / wheelRadius.in(Meters);
             io.setDriveVelocity(RadiansPerSecond.of(velocityRadPerSec));
-        } else {
-            io.setDriveVoltage(
-                    Volts.of(optimizedState.speedMetersPerSecond) // NORMALIZED IN DRIVE (state speed / max linear
-                                                                  // speed)
-            );
-        }
+        
 
         prevSetpoint = optimizedState;
         return optimizedState;
@@ -86,13 +76,8 @@ public class Module {
         double A_d = Math.exp(A * dt);
         double B_d = (1 / A) * (A_d - 1) * B;
 
-        // System.out.println("true max (m/s): " + 1/(1 - A_d) * B_d * maxControlInput *
-        // 0.0508);
+        // System.out.println("true max (m/s): " + 1/(1 - A_d) * B_d * maxControlInput * 0.0508);
         return (A_d * currentVelocity + B_d * maxControlInput);
-    }
-
-    public Translation2d getModuleTranslation() {
-        return Drive.getModuleTranslations()[index];
     }
 
     public void runCharacterization(Measure<Voltage> volts) {
@@ -105,7 +90,8 @@ public class Module {
         io.setDriveVoltage(Volts.of(0.0));
     }
 
-    public void setBrakeMode(boolean enabled) {
+    // ! why is this necessary
+    public void setBrakeMode() {
         io.setDriveBrakeMode(true);
         io.setTurnBrakeMode(false);
     }

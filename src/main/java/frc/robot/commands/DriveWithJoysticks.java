@@ -51,11 +51,11 @@ public class DriveWithJoysticks extends Command {
         // get angularSpeed
         double angularVelocity = applyPreferences(-angularVelocitySupplier.get(), Constants.ANALOG_DEADZONE, HardwareConstants.ANGULAR_SPEED_EXPONENT);
 
-        // make chassisspeeds object with FOC
+        // FOC
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            linearVelocity.getX() * drive.getMaxLinearSpeed().in(MetersPerSecond),
-            linearVelocity.getY() * drive.getMaxLinearSpeed().in(MetersPerSecond),
-            angularVelocity * drive.getMaxAngularSpeed().in(RadiansPerSecond),
+            linearVelocity.getX() * HardwareConstants.maxLinearSpeed.in(MetersPerSecond),
+            linearVelocity.getY() * HardwareConstants.maxLinearSpeed.in(MetersPerSecond),
+            angularVelocity * HardwareConstants.maxAngularSpeed.in(RadiansPerSecond),
             drive.getYawWithAllianceRotation()
         );
 
@@ -64,17 +64,17 @@ public class DriveWithJoysticks extends Command {
             clampVelocity(
                 speeds.vxMetersPerSecond, 
                 prevSpeeds.vxMetersPerSecond, 
-                drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD
+                HardwareConstants.maxLinearAcceleration.in(MetersPerSecondPerSecond) * Constants.PERIOD
             ),
             clampVelocity(
                 speeds.vyMetersPerSecond, 
                 prevSpeeds.vyMetersPerSecond, 
-                drive.getMaxLinearAcceleration().in(MetersPerSecondPerSecond) * Constants.PERIOD
+                HardwareConstants.maxLinearAcceleration.in(MetersPerSecondPerSecond) * Constants.PERIOD
             ),
             clampVelocity(
                 speeds.omegaRadiansPerSecond, 
                 prevSpeeds.omegaRadiansPerSecond, 
-                drive.getMaxAngularAcceleration().in(RadiansPerSecond.per(Second)) * Constants.PERIOD
+                HardwareConstants.maxAngularAcceleration.in(RadiansPerSecond.per(Second)) * Constants.PERIOD
             )
         );
         
@@ -85,7 +85,6 @@ public class DriveWithJoysticks extends Command {
     @Override
     public void end(boolean interrupted) {
         drive.stop();
-        drive.setOpenLoop(false);
     }
 
     private double applyPreferences(double input, double deadzone, double exponent) {

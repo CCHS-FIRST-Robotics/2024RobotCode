@@ -12,6 +12,7 @@ import frc.robot.subsystems.noteIO.arm.Arm;
 import frc.robot.subsystems.noteIO.handoff.Handoff;
 import frc.robot.subsystems.noteIO.intake.Intake;
 import frc.robot.subsystems.noteIO.shooter.Shooter;
+import frc.robot.Constants;
 import frc.robot.Constants.*;
 
 public final class AutoCommandSequenceBuilder {
@@ -53,10 +54,10 @@ public final class AutoCommandSequenceBuilder {
         List<Pair<Double, Command>> events = new ArrayList<Pair<Double, Command>>();
 
         // the time it takes to perform each item
-        double driveTime = Math.max(AutoPathConstants.MAX_ARM_MOVE_TIME, Choreo.getTrajectory(path).getTotalTime());
-        double intakeTime = AutoPathConstants.INTAKE_TIME;
-        double moveArmTime = AutoPathConstants.MAX_ARM_MOVE_TIME;
-        double shootTime =  AutoPathConstants.SHOOT_TIME;
+        double driveTime = Math.max(AutoConstants.MAX_ARM_MOVE_TIME, Choreo.getTrajectory(path).getTotalTime());
+        double intakeTime = AutoConstants.INTAKE_TIME;
+        double moveArmTime = AutoConstants.MAX_ARM_MOVE_TIME;
+        double shootTime =  AutoConstants.SHOOT_TIME;
         double totalTime = driveTime + intakeTime + moveArmTime + shootTime;
 
         // drive to the next waypoint
@@ -68,9 +69,9 @@ public final class AutoCommandSequenceBuilder {
                 0.0,
                 drive.followTrajectory(DriveTrajectoryGenerator.generateChoreoTrajectory(path))
                 .alongWith(arm.moveArm(ArmPosition.INTAKE, drive::getPose))
-                .alongWith(intake.getIntakeCommand(AutoPathConstants.INTAKE_VOLTS, handoff::checkNoteThere))
-                .alongWith(handoff.getHandoffCommand(AutoPathConstants.HANDOFF_IN_VOLTS))
-                .alongWith(new InstantCommand(() -> shooter.start(AutoPathConstants.SHOOT_SPEED_LEFT, AutoPathConstants.SHOOT_SPEED_RIGHT), shooter))
+                .alongWith(intake.getIntakeCommand(AutoConstants.INTAKE_VOLTS, handoff::checkNoteThere))
+                .alongWith(handoff.getHandoffCommand(AutoConstants.HANDOFF_IN_VOLTS))
+                .alongWith(new InstantCommand(() -> shooter.start(Constants.SHOOT_SPEED_LEFT, Constants.SHOOT_SPEED_RIGHT), shooter))
             )
         );
 
@@ -86,7 +87,7 @@ public final class AutoCommandSequenceBuilder {
         events.add(
             Pair.of(
                 driveTime + intakeTime + moveArmTime, 
-                handoff.getShootCommand(AutoPathConstants.HANDOFF_OUT_VOLTS, shooter::checkNoteShot)
+                handoff.getShootCommand(AutoConstants.HANDOFF_OUT_VOLTS, shooter::checkNoteShot)
             )
         );
 
