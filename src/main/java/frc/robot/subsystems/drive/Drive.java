@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.*;
-import edu.wpi.first.units.*;
 import frc.robot.utils.DriveTrajectory;
 import frc.robot.utils.PoseEstimator;
 import java.util.ArrayList;
@@ -24,9 +23,6 @@ public class Drive extends SubsystemBase {
 
     // Define Module objects
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
-
-    // ! look at this
-    private SwerveDriveKinematics kinematics = getKinematics(); // ! move to hardware constants???
 
     /*
      * TRAJECTORIES & CONTROLS
@@ -120,7 +116,7 @@ public class Drive extends SubsystemBase {
         /*
          * UPDATE ODOMETRY
          */
-        Twist2d twist = kinematics.toTwist2d(getModuleDeltas());
+        Twist2d twist = HardwareConstants.KINEMATICS.toTwist2d(getModuleDeltas());
         Rotation2d gyroYaw = new Rotation2d(gyroInputs.yawPosition.in(Radians));
         if (gyroInputs.connected) {
             twist = new Twist2d(twist.dx, twist.dy, gyroYaw.minus(lastGyroYaw).getRadians());
@@ -201,10 +197,10 @@ public class Drive extends SubsystemBase {
 
                 // Uses the IK to convert from chassis velocities to individual swerve module positions/velocities
                 Logger.recordOutput("Target Velocity", adjustedSpeeds);
-                SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(adjustedSpeeds);
+                SwerveModuleState[] setpointStates = HardwareConstants.KINEMATICS.toSwerveModuleStates(adjustedSpeeds);
 
                 // Ensure a module isnt trying to go faster than max
-                SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, HardwareConstants.maxLinearSpeed);
+                SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, HardwareConstants.MAX_LINEAR_SPEED);
 
                 // Set to last angles if zero
                 if (adjustedSpeeds.vxMetersPerSecond == 0
@@ -300,13 +296,6 @@ public class Drive extends SubsystemBase {
                     modules[i].getAngle());
         }
         return wheelPos;
-    }
-
-    public SwerveDriveKinematics getKinematics() {
-        if (kinematics != null){
-            return kinematics;
-        }
-        return new SwerveDriveKinematics(HardwareConstants.moduleTranslations);
     }
 
     // ! are these seriously needed

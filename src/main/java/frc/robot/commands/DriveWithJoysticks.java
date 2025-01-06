@@ -41,7 +41,7 @@ public class DriveWithJoysticks extends Command {
         // get linearVelocity
         double linearXSpeed = linearXSpeedSupplier.get();
         double linearYSpeed = linearYSpeedSupplier.get();
-        double linearSpeed = applyPreferences(Math.hypot(linearXSpeed, linearYSpeed), Constants.ANALOG_DEADZONE, HardwareConstants.LINEAR_SPEED_EXPONENT);
+        double linearSpeed = applyPreferences(Math.hypot(linearXSpeed, linearYSpeed), Constants.JOYSTICK_DEADZONE, Constants.LINEAR_SPEED_EXPONENT);
         Rotation2d linearDirection = new Rotation2d(linearXSpeed, linearYSpeed); // kinda weird lol
         Translation2d linearVelocity = new Translation2d(
             linearSpeed, 
@@ -49,13 +49,13 @@ public class DriveWithJoysticks extends Command {
         );
 
         // get angularSpeed
-        double angularVelocity = applyPreferences(-angularVelocitySupplier.get(), Constants.ANALOG_DEADZONE, HardwareConstants.ANGULAR_SPEED_EXPONENT);
+        double angularVelocity = applyPreferences(-angularVelocitySupplier.get(), Constants.JOYSTICK_DEADZONE, Constants.ANGULAR_SPEED_EXPONENT);
 
         // FOC
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            linearVelocity.getX() * HardwareConstants.maxLinearSpeed.in(MetersPerSecond),
-            linearVelocity.getY() * HardwareConstants.maxLinearSpeed.in(MetersPerSecond),
-            angularVelocity * HardwareConstants.maxAngularSpeed.in(RadiansPerSecond),
+            linearVelocity.getX() * HardwareConstants.MAX_LINEAR_SPEED.in(MetersPerSecond),
+            linearVelocity.getY() * HardwareConstants.MAX_LINEAR_SPEED.in(MetersPerSecond),
+            angularVelocity * HardwareConstants.MAX_ANGULAR_SPEED.in(RadiansPerSecond),
             drive.getYawWithAllianceRotation()
         );
 
@@ -64,17 +64,17 @@ public class DriveWithJoysticks extends Command {
             clampVelocity(
                 speeds.vxMetersPerSecond, 
                 prevSpeeds.vxMetersPerSecond, 
-                HardwareConstants.maxLinearAcceleration.in(MetersPerSecondPerSecond) * Constants.PERIOD
+                HardwareConstants.MAX_LINEAR_ACCEL.in(MetersPerSecondPerSecond) * Constants.PERIOD
             ),
             clampVelocity(
                 speeds.vyMetersPerSecond, 
                 prevSpeeds.vyMetersPerSecond, 
-                HardwareConstants.maxLinearAcceleration.in(MetersPerSecondPerSecond) * Constants.PERIOD
+                HardwareConstants.MAX_LINEAR_ACCEL.in(MetersPerSecondPerSecond) * Constants.PERIOD
             ),
             clampVelocity(
                 speeds.omegaRadiansPerSecond, 
                 prevSpeeds.omegaRadiansPerSecond, 
-                HardwareConstants.maxAngularAcceleration.in(RadiansPerSecond.per(Second)) * Constants.PERIOD
+                HardwareConstants.MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)) * Constants.PERIOD
             )
         );
         

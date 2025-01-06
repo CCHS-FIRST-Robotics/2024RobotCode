@@ -12,10 +12,6 @@ import frc.robot.commands.*;
 import frc.robot.utils.PoseEstimator;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
-import frc.robot.subsystems.noteIO.arm.*;
-import frc.robot.subsystems.noteIO.handoff.*;
-import frc.robot.subsystems.noteIO.intake.*;
-import frc.robot.subsystems.noteIO.shooter.*;
 import frc.robot.utils.AutoCommandSequenceBuilder;
 import static frc.robot.Constants.*;
 
@@ -23,11 +19,6 @@ public class RobotContainer {
     private final Drive drive;
     private final PoseEstimator poseEstimator;
     private final Vision vision;
-
-    private final Arm arm;
-    private final Handoff handoff;
-    private final Intake intake;
-    private final Shooter shooter;
 
     private final CommandXboxController controller1 = new CommandXboxController(Constants.CONTROLLER_PORT_1);
 
@@ -45,10 +36,6 @@ public class RobotContainer {
                     new ModuleIOSparkMax(3)
                 );
                 vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
-                arm = new Arm(new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID, Constants.ARM_CANCODER_ID));
-                intake = new Intake(new IntakeIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
-                handoff = new Handoff(new HandoffIOSparkMax(Constants.HANDOFF_ID));
-                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
             case SIM:
                 drive = new Drive(
@@ -59,10 +46,6 @@ public class RobotContainer {
                     new ModuleIOSim()
                 );
                 vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
-                arm = new Arm(new ArmIOSim());
-                handoff = new Handoff(new HandoffIOSim());
-                intake = new Intake(new IntakeIOSim());
-                shooter = new Shooter(new ShooterIOSim());
                 break;
             default:
                 drive = new Drive(
@@ -73,17 +56,13 @@ public class RobotContainer {
                     new ModuleIOSparkMax(3)
                 );
                 vision = new Vision(new CameraIOZED(), new CameraIOPhotonVision());
-                arm = new Arm(new ArmIOFalcon500(Constants.ARM_LEAD_ID, Constants.ARM_FOLLOW_ID, Constants.ARM_CANCODER_ID));
-                intake = new Intake(new IntakeIONEO(Constants.INTAKE_ID1, Constants.INTAKE_ID2));
-                handoff = new Handoff(new HandoffIOSparkMax(Constants.HANDOFF_ID));
-                shooter = new Shooter(new ShooterIOFalcon500(Constants.SHOOTER_ID_1, Constants.SHOOTER_ID_2));
                 break;
         }
 
         // ! wow this looks like it should be automized
         // change pose here for autos!!!
         poseEstimator = new PoseEstimator(
-            drive.getKinematics(),
+            HardwareConstants.KINEMATICS,
             new Rotation2d(),
             drive.getModulePositions(),
             new Pose2d(0, 0, new Rotation2d())
@@ -111,11 +90,7 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return new AutoCommandSequenceBuilder(
             AutoConstants.twoStraight, // specifies the auto to run
-            drive, 
-            arm, 
-            intake, 
-            handoff, 
-            shooter
+            drive
         ).getAutoCommandSequence();
     }
 }
