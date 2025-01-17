@@ -49,46 +49,27 @@ public class ModuleIOSparkMax implements ModuleIO {
         driveSparkMax = new CANSparkMax(2 + 2 * index, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(1 + 2 * index, MotorType.kBrushless);
 
-        driveSparkMaxPIDF = driveSparkMax.getPIDController();
-        turnSparkMaxPIDF = turnSparkMax.getPIDController();
-
-        driveSparkMaxPIDF.setP(driveKp, 0);
-        driveSparkMaxPIDF.setI(driveKi, 0);
-        driveSparkMaxPIDF.setD(driveKd, 0);
-        driveSparkMaxPIDF.setFF(0, 0);
-        driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
-
-        turnSparkMaxPIDF.setP(turnKp, 0);
-        turnSparkMaxPIDF.setI(0, 0);
-        turnSparkMaxPIDF.setD(turnKd, 0);
-        turnSparkMaxPIDF.setFF(0, 0);
-
-        turnSparkMaxPIDF.setPositionPIDWrappingEnabled(true);
-        turnSparkMaxPIDF.setPositionPIDWrappingMinInput(0);
-        turnSparkMaxPIDF.setPositionPIDWrappingMaxInput(1);
-
-        turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-        turnAbsoluteEncoder.setInverted(true);
-        turnSparkMaxPIDF.setFeedbackDevice(turnAbsoluteEncoder);
-
+        // start config
         driveSparkMax.setCANTimeout(500);
         turnSparkMax.setCANTimeout(500);
 
-        driveEncoder = driveSparkMax.getEncoder();
-        turnRelativeEncoder = turnSparkMax.getEncoder();
+        turnSparkMax.setInverted(true);
 
         driveSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10);
         turnSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-
-        turnSparkMax.setInverted(true);
-
+        
         driveSparkMax.setSmartCurrentLimit(30);
         turnSparkMax.setSmartCurrentLimit(20);
         driveSparkMax.enableVoltageCompensation(12.0);
         turnSparkMax.enableVoltageCompensation(12.0);
-
+        
         driveSparkMax.setIdleMode(IdleMode.kBrake);
         turnSparkMax.setIdleMode(IdleMode.kBrake);
+        
+        // encoders
+        driveEncoder = driveSparkMax.getEncoder();
+        turnRelativeEncoder = turnSparkMax.getEncoder();
+        turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
 
         driveEncoder.setPosition(0.0);
         driveEncoder.setMeasurementPeriod(10);
@@ -97,10 +78,28 @@ public class ModuleIOSparkMax implements ModuleIO {
         turnRelativeEncoder.setPosition(0.0);
         turnRelativeEncoder.setMeasurementPeriod(10);
         turnRelativeEncoder.setAverageDepth(2);
-        turnRelativeEncoder.setPositionConversionFactor(1);
 
+        turnAbsoluteEncoder.setInverted(true);
         turnAbsoluteEncoder.setAverageDepth(2);
 
+        // pid 
+        driveSparkMaxPIDF = driveSparkMax.getPIDController();
+        turnSparkMaxPIDF = turnSparkMax.getPIDController();
+
+        driveSparkMaxPIDF.setP(driveKp, 0);
+        driveSparkMaxPIDF.setI(driveKi, 0);
+        driveSparkMaxPIDF.setD(driveKd, 0);
+        driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
+        
+        turnSparkMaxPIDF.setP(turnKp, 0);
+        turnSparkMaxPIDF.setI(0, 0);
+        turnSparkMaxPIDF.setD(turnKd, 0);
+        turnSparkMaxPIDF.setPositionPIDWrappingEnabled(true);
+        turnSparkMaxPIDF.setPositionPIDWrappingMinInput(0);
+        turnSparkMaxPIDF.setPositionPIDWrappingMaxInput(1);
+        turnSparkMaxPIDF.setFeedbackDevice(turnAbsoluteEncoder);
+
+        // stop config
         driveSparkMax.setCANTimeout(0);
         turnSparkMax.setCANTimeout(0);
 

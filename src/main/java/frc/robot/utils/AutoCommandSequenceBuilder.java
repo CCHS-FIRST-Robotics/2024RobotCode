@@ -29,7 +29,7 @@ public final class AutoCommandSequenceBuilder {
         List<Pair<Double, Command>> events = new ArrayList<Pair<Double, Command>>();
 
         events.add(Pair.of(0.0, drive.followTrajectory(DriveTrajectoryGenerator.generateChoreoTrajectory(path))));
-        double totalTime =  Choreo.getTrajectory(path).getTotalTime();
+        double totalTime = Choreo.getTrajectory(path).getTotalTime();
 
         // append to the command sequence
         autoCommandSequence = autoCommandSequence == null ? 
