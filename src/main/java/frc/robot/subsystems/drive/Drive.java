@@ -48,12 +48,12 @@ public class Drive extends SubsystemBase {
     private double kPy = 2.7;
     private double kIy = 0.05;
     private double kDy = 0.12;
-    private double kPθ = 3;
-    private double kIθ = 0;
-    private double kDθ = .3;
+    private double kPthetaaaaaa = 3;
+    private double kIthetaaaaaa = 0;
+    private double kDthetaaaaaa = .3;
     private PIDController xController = new PIDController(kPx, kIx, kDx);
     private PIDController yController = new PIDController(kPy, kIy, kDy);
-    private PIDController θController = new PIDController(kPθ, kIθ, kDθ);
+    private PIDController thetaaaaaaController = new PIDController(kPthetaaaaaa, kIthetaaaaaa, kDthetaaaaaa);
 
     /*
      * ODOMETRY
@@ -90,8 +90,8 @@ public class Drive extends SubsystemBase {
         
         xController.setTolerance(.035);
         yController.setTolerance(.035);
-        θController.setTolerance(.025);
-        θController.enableContinuousInput(-Math.PI, Math.PI);
+        thetaaaaaaController.setTolerance(.025);
+        thetaaaaaaController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     public void periodic() {
@@ -152,13 +152,13 @@ public class Drive extends SubsystemBase {
                 // get and add PID outputs
                 double xPID = xController.atSetpoint() ? 0 : xController.calculate(getPose().getX(), positionSetpoint.getX());
                 double yPID = yController.atSetpoint() ? 0 : yController.calculate(getPose().getY(), positionSetpoint.getY());
-                double θPID = θController.atSetpoint() ? 0 : θController.calculate(getPose().getRotation().getRadians(),
+                double thetaaaaaaPID = thetaaaaaaController.atSetpoint() ? 0 : thetaaaaaaController.calculate(getPose().getRotation().getRadians(),
                     positionSetpoint.getRotation().getRadians()
                 );
                 chassisSetpoint = new ChassisSpeeds(
                     twistSetpoint.dx + xPID,
                     twistSetpoint.dy + yPID,
-                    twistSetpoint.dtheta + θPID
+                    twistSetpoint.dtheta + thetaaaaaaPID
                 );
 
                 // FOC
@@ -307,8 +307,8 @@ public class Drive extends SubsystemBase {
         return yController;
     }
 
-    public PIDController getθController() {
-        return θController;
+    public PIDController getthetaaaaaaController() {
+        return thetaaaaaaController;
     }
 
     public void setPoseEstimator(PoseEstimator poseEstimator) {
