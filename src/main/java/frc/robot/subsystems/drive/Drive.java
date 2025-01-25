@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drive.swerveDrive;
+package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.MutableMeasure.mutable;
@@ -16,15 +16,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.units.*;
-import frc.robot.utils.DriveTrajectory;
 import frc.robot.utils.PoseEstimator;
 import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.utils.DriveTrajectory;
-import frc.robot.utils.DriveTrajectoryGenerator;
-import frc.robot.utils.PoseEstimator;
 
 
 public class Drive extends SubsystemBase {
@@ -479,13 +475,6 @@ public class Drive extends SubsystemBase {
         trajectoryCounter = 0;
     }
 
-    public void runPosition(DriveTrajectory driveTrajectory) {
-        controlMode = CONTROL_MODE.POSITION_SETPOINT;
-        this.positionTrajectory = driveTrajectory.positionTrajectory;
-        this.twistTrajectory = driveTrajectory.velocityTrajectory;
-        trajectoryCounter = 0;
-    }
-
     public void runCharacterization(Measure<Voltage> volts) {
         controlMode = CONTROL_MODE.CHARACTERIZING;
         characterizationVolts.mut_replace(volts.in(Volts), Volts);
@@ -665,29 +654,5 @@ public class Drive extends SubsystemBase {
             .andThen(characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
             .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward))
             .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
-    }
-    
-    public Command followTrajectory(DriveTrajectory traj) {
-        return runOnce(
-                () -> {
-                    System.out.println("recording pos traj");
-                    Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
-                    runPosition(traj);
-                }
-            );
-    }
-
-
-    /* added for auto stuff - not good but maybe better? */
-    public Command followTrajectory(ArrayList<String> path) {
-        return runOnce(
-                () -> {
-                    DriveTrajectory traj = DriveTrajectoryGenerator.generateChoreoTrajectoryFromFile(path.get(currentPathNum));
-                    System.out.println("recording pos traj");
-                    Logger.recordOutput("Auto/GeneratedTrajectory", traj.positionTrajectory.toArray(new Pose2d[traj.positionTrajectory.size()]));
-                    currentPathNum++;
-                    runPosition(traj);
-                }
-            );
     }
 }
