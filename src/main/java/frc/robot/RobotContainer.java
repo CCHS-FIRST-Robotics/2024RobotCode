@@ -121,9 +121,7 @@ public class RobotContainer {
                     return 1.0;
                 },
                 // () -> {return new Rotation2d();},
-                () -> Rotation2d.fromDegrees(controller1.getHID().getPOV()),
-                false,
-                true
+                () -> Rotation2d.fromDegrees(controller1.getHID().getPOV())
             )
         );
     }

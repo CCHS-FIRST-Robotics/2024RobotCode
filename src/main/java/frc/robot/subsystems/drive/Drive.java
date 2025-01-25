@@ -3,16 +3,12 @@ package frc.robot.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.MutableMeasure.mutable;
 
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.Consumer;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.units.*;
@@ -28,13 +24,6 @@ public class Drive extends SubsystemBase {
     /*
      * CONSTANTS
      */
-
-    private static final Measure<Velocity<Distance>> coastThresholdMetersPerSec =
-        MetersPerSecond.of(0.05); // Need to be under this to switch to coast when disabling
-    private static final Measure<Velocity<Distance>> coastThresholdSecs =
-        MetersPerSecond.of(6.0); // Need to be under the above speed for this length of time to switch to coast
-    private static final Measure<Angle> ledsFallenAngle = Degrees.of(60.0); // Threshold to detect falls
-
     // Define Gyro IO and inputs
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -59,7 +48,6 @@ public class Drive extends SubsystemBase {
 
     // Initialize setpoints
     private ChassisSpeeds chassisSetpoint = new ChassisSpeeds();
-    private ChassisSpeeds lastSetpoint = new ChassisSpeeds();
     private SwerveModuleState moduleSetpoint = new SwerveModuleState();
     private SwerveModuleState[] lastSetpointStates =
         new SwerveModuleState[] {
@@ -134,23 +122,6 @@ public class Drive extends SubsystemBase {
                             characterizationVelocityAngular.mut_replace(modules[0].getCharacterizationVelocity())
                         );
                 };
-    
-    SysIdRoutine characterizationRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(
-                Volts.per(Second).of(.8),
-                Volts.of(3),
-                Seconds.of(5),
-                (state) -> Logger.recordOutput("SysIdTestState", state.toString())
-            ),
-            new SysIdRoutine.Mechanism(
-                // Tell SysId how to plumb the driving voltage to the motors.
-                (Measure<Voltage> volts) -> {
-                    runCharacterization(volts);
-                },
-                log,
-                this
-            )
-        );
 
 
     /* 
@@ -380,8 +351,6 @@ public class Drive extends SubsystemBase {
                         setpointTwist.dtheta / Constants.PERIOD
                     );
 
-                lastSetpoint = adjustedSpeeds;
-
                 // System.out.println(adjustedSpeeds);
 
                 // Uses the IK to convert from chassis velocities to individual swerve module positions/velocities
@@ -574,13 +543,6 @@ public class Drive extends SubsystemBase {
 
     /** Returns an array of module translations. */
     public static Translation2d[] getModuleTranslations() {
-        // return new Translation2d[] {
-        //     new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
-        //     new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
-        //     new Translation2d(trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0),
-        //     new Translation2d(-trackWidthX.in(Meters) / 2.0, trackWidthY.in(Meters) / 2.0)
-        // };
-
         return new Translation2d[] {
             new Translation2d(-trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
             new Translation2d(trackWidthX.in(Meters) / 2.0, -trackWidthY.in(Meters) / 2.0),
@@ -639,20 +601,5 @@ public class Drive extends SubsystemBase {
 
     public Twist2d getVelocity() {
         return fieldVelocity;
-    }
-
-    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-        return characterizationRoutine.quasistatic(direction);
-    }
-    
-    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return characterizationRoutine.dynamic(direction);
-    }
-
-    public Command sysIdFull() {
-        return characterizationRoutine.quasistatic(SysIdRoutine.Direction.kForward)
-            .andThen(characterizationRoutine.quasistatic(SysIdRoutine.Direction.kReverse))
-            .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kForward))
-            .andThen(characterizationRoutine.dynamic(SysIdRoutine.Direction.kReverse));
     }
 }
